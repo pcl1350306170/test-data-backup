@@ -1,0 +1,706 @@
+{
+  "status": 200,
+  "desc": "操作成功",
+  "data": [
+    {
+      "id": 1,
+      "foodName": "豆腐",
+      "servingSize": "200毫升",
+      "weight": "143g",
+      "waterContent": "88%"
+    },
+    {
+      "id": 2,
+      "foodName": "蘑菇",
+      "servingSize": "200毫升",
+      "weight": "89g",
+      "waterContent": "97%"
+    },
+    {
+      "id": 3,
+      "foodName": "葡萄",
+      "servingSize": "1个",
+      "weight": "104g",
+      "waterContent": "79%"
+    },
+    {
+      "id": 4,
+      "foodName": "青椒",
+      "servingSize": "1小勺",
+      "weight": "67g",
+      "waterContent": "54%"
+    },
+    {
+      "id": 5,
+      "foodName": "牛肉",
+      "servingSize": "1小勺",
+      "weight": "147g",
+      "waterContent": "81%"
+    },
+    {
+      "id": 6,
+      "foodName": "核桃",
+      "servingSize": "1片",
+      "weight": "114g",
+      "waterContent": "59%"
+    },
+    {
+      "id": 7,
+      "foodName": "鱼肉",
+      "servingSize": "1小勺",
+      "weight": "78g",
+      "waterContent": "96%"
+    },
+    {
+      "id": 8,
+      "foodName": "奶酪",
+      "servingSize": "1小勺",
+      "weight": "62g",
+      "waterContent": "80%"
+    },
+    {
+      "id": 9,
+      "foodName": "牛肉",
+      "servingSize": "200毫升",
+      "weight": "63g",
+      "waterContent": "91%"
+    },
+    {
+      "id": 10,
+      "foodName": "黄瓜",
+      "servingSize": "1片",
+      "weight": "83g",
+      "waterContent": "83%"
+    },
+    {
+      "id": 11,
+      "foodName": "猪肉",
+      "servingSize": "1碗",
+      "weight": "290g",
+      "waterContent": "59%"
+    },
+    {
+      "id": 12,
+      "foodName": "桃子",
+      "servingSize": "1小勺",
+      "weight": "194g",
+      "waterContent": "85%"
+    },
+    {
+      "id": 13,
+      "foodName": "梨",
+      "servingSize": "50克",
+      "weight": "316g",
+      "waterContent": "73%"
+    },
+    {
+      "id": 14,
+      "foodName": "橙子",
+      "servingSize": "100克",
+      "weight": "116g",
+      "waterContent": "57%"
+    },
+    {
+      "id": 15,
+      "foodName": "苹果",
+      "servingSize": "50克",
+      "weight": "208g",
+      "waterContent": "97%"
+    },
+    {
+      "id": 16,
+      "foodName": "梨",
+      "servingSize": "1个",
+      "weight": "294g",
+      "waterContent": "77%"
+    },
+    {
+      "id": 17,
+      "foodName": "紫薯",
+      "servingSize": "100克",
+      "weight": "284g",
+      "waterContent": "98%"
+    },
+    {
+      "id": 18,
+      "foodName": "土豆",
+      "servingSize": "1小勺",
+      "weight": "280g",
+      "waterContent": "88%"
+    },
+    {
+      "id": 19,
+      "foodName": "酸奶",
+      "servingSize": "200毫升",
+      "weight": "215g",
+      "waterContent": "83%"
+    },
+    {
+      "id": 20,
+      "foodName": "核桃",
+      "servingSize": "100克",
+      "weight": "94g",
+      "waterContent": "55%"
+    },
+    {
+      "id": 21,
+      "foodName": "西红柿",
+      "servingSize": "1小勺",
+      "weight": "81g",
+      "waterContent": "59%"
+    },
+    {
+      "id": 22,
+      "foodName": "鸡蛋",
+      "servingSize": "100克",
+      "weight": "150g",
+      "waterContent": "56%"
+    },
+    {
+      "id": 23,
+      "foodName": "土豆",
+      "servingSize": "1碗",
+      "weight": "265g",
+      "waterContent": "95%"
+    },
+    {
+      "id": 24,
+      "foodName": "火腿肠",
+      "servingSize": "1个",
+      "weight": "78g",
+      "waterContent": "98%"
+    },
+    {
+      "id": 25,
+      "foodName": "鸡蛋",
+      "servingSize": "1片",
+      "weight": "289g",
+      "waterContent": "90%"
+    },
+    {
+      "id": 26,
+      "foodName": "红薯",
+      "servingSize": "1碗",
+      "weight": "109g",
+      "waterContent": "88%"
+    },
+    {
+      "id": 27,
+      "foodName": "蘑菇",
+      "servingSize": "1片",
+      "weight": "128g",
+      "waterContent": "91%"
+    },
+    {
+      "id": 28,
+      "foodName": "桃子",
+      "servingSize": "1碗",
+      "weight": "250g",
+      "waterContent": "68%"
+    },
+    {
+      "id": 29,
+      "foodName": "燕麦",
+      "servingSize": "1个",
+      "weight": "264g",
+      "waterContent": "73%"
+    },
+    {
+      "id": 30,
+      "foodName": "花生",
+      "servingSize": "1片",
+      "weight": "262g",
+      "waterContent": "72%"
+    },
+    {
+      "id": 31,
+      "foodName": "西红柿",
+      "servingSize": "1片",
+      "weight": "107g",
+      "waterContent": "92%"
+    },
+    {
+      "id": 32,
+      "foodName": "豆芽",
+      "servingSize": "100克",
+      "weight": "174g",
+      "waterContent": "93%"
+    },
+    {
+      "id": 33,
+      "foodName": "玉米",
+      "servingSize": "1片",
+      "weight": "285g",
+      "waterContent": "59%"
+    },
+    {
+      "id": 34,
+      "foodName": "桃子",
+      "servingSize": "1片",
+      "weight": "85g",
+      "waterContent": "84%"
+    },
+    {
+      "id": 35,
+      "foodName": "鸡胸肉",
+      "servingSize": "1小勺",
+      "weight": "187g",
+      "waterContent": "85%"
+    },
+    {
+      "id": 36,
+      "foodName": "芒果",
+      "servingSize": "1片",
+      "weight": "226g",
+      "waterContent": "77%"
+    },
+    {
+      "id": 37,
+      "foodName": "胡萝卜",
+      "servingSize": "1碗",
+      "weight": "135g",
+      "waterContent": "81%"
+    },
+    {
+      "id": 38,
+      "foodName": "藜麦",
+      "servingSize": "1碗",
+      "weight": "326g",
+      "waterContent": "85%"
+    },
+    {
+      "id": 39,
+      "foodName": "芹菜",
+      "servingSize": "100克",
+      "weight": "52g",
+      "waterContent": "96%"
+    },
+    {
+      "id": 40,
+      "foodName": "苹果",
+      "servingSize": "200毫升",
+      "weight": "249g",
+      "waterContent": "86%"
+    },
+    {
+      "id": 41,
+      "foodName": "奶酪",
+      "servingSize": "200毫升",
+      "weight": "95g",
+      "waterContent": "96%"
+    },
+    {
+      "id": 42,
+      "foodName": "胡萝卜",
+      "servingSize": "1碗",
+      "weight": "143g",
+      "waterContent": "90%"
+    },
+    {
+      "id": 43,
+      "foodName": "香蕉",
+      "servingSize": "1个",
+      "weight": "275g",
+      "waterContent": "87%"
+    },
+    {
+      "id": 44,
+      "foodName": "鸡蛋",
+      "servingSize": "50克",
+      "weight": "326g",
+      "waterContent": "69%"
+    },
+    {
+      "id": 45,
+      "foodName": "豆腐",
+      "servingSize": "50克",
+      "weight": "83g",
+      "waterContent": "66%"
+    },
+    {
+      "id": 46,
+      "foodName": "土豆",
+      "servingSize": "1小勺",
+      "weight": "260g",
+      "waterContent": "50%"
+    },
+    {
+      "id": 47,
+      "foodName": "藜麦",
+      "servingSize": "1碗",
+      "weight": "106g",
+      "waterContent": "71%"
+    },
+    {
+      "id": 48,
+      "foodName": "猪肉",
+      "servingSize": "1小勺",
+      "weight": "342g",
+      "waterContent": "64%"
+    },
+    {
+      "id": 49,
+      "foodName": "胡萝卜",
+      "servingSize": "1小勺",
+      "weight": "87g",
+      "waterContent": "94%"
+    },
+    {
+      "id": 50,
+      "foodName": "猪肉",
+      "servingSize": "1个",
+      "weight": "255g",
+      "waterContent": "79%"
+    },
+    {
+      "id": 51,
+      "foodName": "茄子",
+      "servingSize": "100克",
+      "weight": "281g",
+      "waterContent": "78%"
+    },
+    {
+      "id": 52,
+      "foodName": "芒果",
+      "servingSize": "1碗",
+      "weight": "241g",
+      "waterContent": "54%"
+    },
+    {
+      "id": 53,
+      "foodName": "酸奶",
+      "servingSize": "1小勺",
+      "weight": "291g",
+      "waterContent": "87%"
+    },
+    {
+      "id": 54,
+      "foodName": "藜麦",
+      "servingSize": "1片",
+      "weight": "214g",
+      "waterContent": "58%"
+    },
+    {
+      "id": 55,
+      "foodName": "南瓜",
+      "servingSize": "1碗",
+      "weight": "328g",
+      "waterContent": "71%"
+    },
+    {
+      "id": 56,
+      "foodName": "豆腐",
+      "servingSize": "50克",
+      "weight": "68g",
+      "waterContent": "82%"
+    },
+    {
+      "id": 57,
+      "foodName": "茄子",
+      "servingSize": "1小勺",
+      "weight": "335g",
+      "waterContent": "97%"
+    },
+    {
+      "id": 58,
+      "foodName": "火腿肠",
+      "servingSize": "100克",
+      "weight": "314g",
+      "waterContent": "55%"
+    },
+    {
+      "id": 59,
+      "foodName": "西瓜",
+      "servingSize": "1小勺",
+      "weight": "75g",
+      "waterContent": "86%"
+    },
+    {
+      "id": 60,
+      "foodName": "酸奶",
+      "servingSize": "1个",
+      "weight": "231g",
+      "waterContent": "71%"
+    },
+    {
+      "id": 61,
+      "foodName": "香蕉",
+      "servingSize": "50克",
+      "weight": "272g",
+      "waterContent": "52%"
+    },
+    {
+      "id": 62,
+      "foodName": "茄子",
+      "servingSize": "1碗",
+      "weight": "341g",
+      "waterContent": "53%"
+    },
+    {
+      "id": 63,
+      "foodName": "燕麦",
+      "servingSize": "1碗",
+      "weight": "155g",
+      "waterContent": "51%"
+    },
+    {
+      "id": 64,
+      "foodName": "苹果",
+      "servingSize": "1片",
+      "weight": "254g",
+      "waterContent": "51%"
+    },
+    {
+      "id": 65,
+      "foodName": "葡萄",
+      "servingSize": "50克",
+      "weight": "68g",
+      "waterContent": "61%"
+    },
+    {
+      "id": 66,
+      "foodName": "梨",
+      "servingSize": "1片",
+      "weight": "333g",
+      "waterContent": "89%"
+    },
+    {
+      "id": 67,
+      "foodName": "核桃",
+      "servingSize": "1碗",
+      "weight": "218g",
+      "waterContent": "56%"
+    },
+    {
+      "id": 68,
+      "foodName": "核桃",
+      "servingSize": "1碗",
+      "weight": "298g",
+      "waterContent": "87%"
+    },
+    {
+      "id": 69,
+      "foodName": "西红柿",
+      "servingSize": "1个",
+      "weight": "96g",
+      "waterContent": "63%"
+    },
+    {
+      "id": 70,
+      "foodName": "橙子",
+      "servingSize": "50克",
+      "weight": "295g",
+      "waterContent": "55%"
+    },
+    {
+      "id": 71,
+      "foodName": "酸奶",
+      "servingSize": "1个",
+      "weight": "124g",
+      "waterContent": "68%"
+    },
+    {
+      "id": 72,
+      "foodName": "芒果",
+      "servingSize": "100克",
+      "weight": "78g",
+      "waterContent": "70%"
+    },
+    {
+      "id": 73,
+      "foodName": "黄瓜",
+      "servingSize": "1片",
+      "weight": "230g",
+      "waterContent": "51%"
+    },
+    {
+      "id": 74,
+      "foodName": "红薯",
+      "servingSize": "50克",
+      "weight": "274g",
+      "waterContent": "56%"
+    },
+    {
+      "id": 75,
+      "foodName": "芹菜",
+      "servingSize": "1碗",
+      "weight": "191g",
+      "waterContent": "64%"
+    },
+    {
+      "id": 76,
+      "foodName": "橙子",
+      "servingSize": "1小勺",
+      "weight": "102g",
+      "waterContent": "58%"
+    },
+    {
+      "id": 77,
+      "foodName": "紫薯",
+      "servingSize": "200毫升",
+      "weight": "234g",
+      "waterContent": "58%"
+    },
+    {
+      "id": 78,
+      "foodName": "茄子",
+      "servingSize": "200毫升",
+      "weight": "210g",
+      "waterContent": "98%"
+    },
+    {
+      "id": 79,
+      "foodName": "豆腐",
+      "servingSize": "50克",
+      "weight": "225g",
+      "waterContent": "75%"
+    },
+    {
+      "id": 80,
+      "foodName": "火腿肠",
+      "servingSize": "50克",
+      "weight": "284g",
+      "waterContent": "87%"
+    },
+    {
+      "id": 81,
+      "foodName": "黄瓜",
+      "servingSize": "1片",
+      "weight": "198g",
+      "waterContent": "80%"
+    },
+    {
+      "id": 82,
+      "foodName": "西瓜",
+      "servingSize": "50克",
+      "weight": "252g",
+      "waterContent": "82%"
+    },
+    {
+      "id": 83,
+      "foodName": "豆芽",
+      "servingSize": "50克",
+      "weight": "98g",
+      "waterContent": "65%"
+    },
+    {
+      "id": 84,
+      "foodName": "黄瓜",
+      "servingSize": "1片",
+      "weight": "261g",
+      "waterContent": "94%"
+    },
+    {
+      "id": 85,
+      "foodName": "橙子",
+      "servingSize": "1小勺",
+      "weight": "114g",
+      "waterContent": "50%"
+    },
+    {
+      "id": 86,
+      "foodName": "橙子",
+      "servingSize": "50克",
+      "weight": "299g",
+      "waterContent": "96%"
+    },
+    {
+      "id": 87,
+      "foodName": "西瓜",
+      "servingSize": "1片",
+      "weight": "100g",
+      "waterContent": "53%"
+    },
+    {
+      "id": 88,
+      "foodName": "白菜",
+      "servingSize": "200毫升",
+      "weight": "255g",
+      "waterContent": "75%"
+    },
+    {
+      "id": 89,
+      "foodName": "白菜",
+      "servingSize": "1个",
+      "weight": "331g",
+      "waterContent": "97%"
+    },
+    {
+      "id": 90,
+      "foodName": "酸奶",
+      "servingSize": "50克",
+      "weight": "276g",
+      "waterContent": "76%"
+    },
+    {
+      "id": 91,
+      "foodName": "鸡蛋",
+      "servingSize": "1个",
+      "weight": "85g",
+      "waterContent": "67%"
+    },
+    {
+      "id": 92,
+      "foodName": "香蕉",
+      "servingSize": "1片",
+      "weight": "335g",
+      "waterContent": "70%"
+    },
+    {
+      "id": 93,
+      "foodName": "火腿肠",
+      "servingSize": "1个",
+      "weight": "320g",
+      "waterContent": "72%"
+    },
+    {
+      "id": 94,
+      "foodName": "蘑菇",
+      "servingSize": "1片",
+      "weight": "265g",
+      "waterContent": "88%"
+    },
+    {
+      "id": 95,
+      "foodName": "鱼肉",
+      "servingSize": "200毫升",
+      "weight": "265g",
+      "waterContent": "70%"
+    },
+    {
+      "id": 96,
+      "foodName": "胡萝卜",
+      "servingSize": "1碗",
+      "weight": "178g",
+      "waterContent": "53%"
+    },
+    {
+      "id": 97,
+      "foodName": "牛奶",
+      "servingSize": "200毫升",
+      "weight": "142g",
+      "waterContent": "82%"
+    },
+    {
+      "id": 98,
+      "foodName": "红薯",
+      "servingSize": "200毫升",
+      "weight": "50g",
+      "waterContent": "71%"
+    },
+    {
+      "id": 99,
+      "foodName": "蘑菇",
+      "servingSize": "1个",
+      "weight": "212g",
+      "waterContent": "76%"
+    },
+    {
+      "id": 100,
+      "foodName": "胡萝卜",
+      "servingSize": "200毫升",
+      "weight": "255g",
+      "waterContent": "61%"
+    }
+  ]
+}

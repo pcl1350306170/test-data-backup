@@ -1,0 +1,19 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": {
+        "id": "1f6c53b0a89711efaed80cda411de3c6",
+        "pageId": "1f674194a89711efaed80cda411de3c6",
+        "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+        "layoutName": "默认布局",
+        "layoutStr": "{\"position_1\":{\"classId\":\"5e7a9da32ba711eb91f80894efa56a0a\",\"className\":\"统计信息\",\"sort\":4,\"labelType\":201,\"createTime\":null,\"updateTime\":null,\"updateUser\":null,\"isDelete\":0,\"checked\":true,\"position\":\"position_1\"},\"position_2\":{\"classId\":\"5e6891272ba711eb91f80894efa56a0a\",\"className\":\"病区概况\",\"sort\":1,\"labelType\":201,\"updateUser\":null,\"isDelete\":0,\"checked\":true,\"position\":\"position_2\"},\"position_3\":{\"classId\":\"tcxx_12315\",\"className\":\"调床信息\",\"labelType\":\"changeBed\",\"checked\":true,\"position\":\"position_3\"},\"position_4\":{\"classId\":\"hjxx_12315\",\"className\":\"呼叫信息\",\"labelType\":\"calling\",\"checked\":true,\"position\":\"position_4\"},\"position_5\":{\"classId\":\"5e7052c82ba711eb91f80894efa56a0a\",\"className\":\"护理信息\",\"sort\":5,\"labelType\":201,\"updateUser\":null,\"isDelete\":0,\"checked\":true,\"position\":\"position_5\"},\"position_6\":{\"classId\":\"5e6026552ba711eb91f80894efa56a0a\",\"className\":\"高危管理\",\"sort\":6,\"labelType\":201,\"createTime\":null,\"createUser\":null,\"updateTime\":null,\"updateUser\":null,\"isDelete\":0,\"checked\":true,\"position\":\"position_6\"},\"position_7\":{\"classId\":\"12315\",\"className\":\"患者信息\",\"labelType\":\"warning\",\"checked\":true,\"position\":\"position_7\"}}",
+        "checked": 1,
+        "remark": "系统默认布局",
+        "extJson": null,
+        "status": "0",
+        "creator": null,
+        "createTime": null,
+        "modify": null,
+        "updateTime": null
+    }
+}

@@ -1,0 +1,1086 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "labelId": "c2a7be6901434c6da4adf295b688ee53",
+            "labelName": "耳穴疗法",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "6987f49e574146eb8caf67d3a0098930",
+            "labelValue": "[{\"is_exec\":\"1\",\"bed_name\":\"6\",\"patient_id\":\"0000685169\",\"total_info\":\"\",\"patient_name\":\"周金龙\"},{\"is_exec\":\"1\",\"bed_name\":\"9\",\"patient_id\":\"0000688792\",\"total_info\":\"\",\"patient_name\":\"高任香\"},{\"is_exec\":\"1\",\"bed_name\":\"11\",\"patient_id\":\"0000006547\",\"total_info\":\"\",\"patient_name\":\"何伯成\"},{\"is_exec\":\"1\",\"bed_name\":\"13\",\"patient_id\":\"0000069844\",\"total_info\":\"\",\"patient_name\":\"马修来\"},{\"is_exec\":\"1\",\"bed_name\":\"16\",\"patient_id\":\"0000217136\",\"total_info\":\"\",\"patient_name\":\"侯昌风\"},{\"is_exec\":\"1\",\"bed_name\":\"17\",\"patient_id\":\"0000379609\",\"total_info\":\"\",\"patient_name\":\"刘桂云\"},{\"is_exec\":\"1\",\"bed_name\":\"26\",\"patient_id\":\"0000527807\",\"total_info\":\"\",\"patient_name\":\"陈忠德\"},{\"is_exec\":\"1\",\"bed_name\":\"30\",\"patient_id\":\"0000690032\",\"total_info\":\"\",\"patient_name\":\"巢华辉\"},{\"is_exec\":\"1\",\"bed_name\":\"32\",\"patient_id\":\"0000690174\",\"total_info\":\"\",\"patient_name\":\"周玉梅\"},{\"is_exec\":\"1\",\"bed_name\":\"33\",\"patient_id\":\"0000681312\",\"total_info\":\"\",\"patient_name\":\"邹香桂\"},{\"is_exec\":\"1\",\"bed_name\":\"38\",\"patient_id\":\"0000228057\",\"total_info\":\"\",\"patient_name\":\"陈书妹\"},{\"is_exec\":\"1\",\"bed_name\":\"50\",\"patient_id\":\"0000095538\",\"total_info\":\"\",\"patient_name\":\"熊金保\"},{\"is_exec\":\"1\",\"bed_name\":\"51\",\"patient_id\":\"0000690067\",\"total_info\":\"\",\"patient_name\":\"吴重耀\"},{\"is_exec\":\"1\",\"bed_name\":\"57\",\"patient_id\":\"0000689909\",\"total_info\":\"\",\"patient_name\":\"李军英\"},{\"is_exec\":\"1\",\"bed_name\":\"58\",\"patient_id\":\"0000516065\",\"total_info\":\"\",\"patient_name\":\"李小江\"},{\"is_exec\":\"1\",\"bed_name\":\"62\",\"patient_id\":\"0000690117\",\"total_info\":\"\",\"patient_name\":\"刘江辉\"},{\"is_exec\":\"1\",\"bed_name\":\"65\",\"patient_id\":\"0000690205\",\"total_info\":\"\",\"patient_name\":\"叶炳红\"},{\"is_exec\":\"1\",\"bed_name\":\"105\",\"patient_id\":\"0000688760\",\"total_info\":\"\",\"patient_name\":\"陶尝菊\"},{\"is_exec\":\"1\",\"bed_name\":\"106\",\"patient_id\":\"0000152266\",\"total_info\":\"\",\"patient_name\":\"陈柏初\"},{\"is_exec\":\"1\",\"bed_name\":\"107\",\"patient_id\":\"0000048397\",\"total_info\":\"\",\"patient_name\":\"蔡玉梅\"},{\"is_exec\":\"1\",\"bed_name\":\"108\",\"patient_id\":\"0000600487\",\"total_info\":\"\",\"patient_name\":\"王亮\"},{\"is_exec\":\"1\",\"bed_name\":\"109\",\"patient_id\":\"0000639360\",\"total_info\":\"\",\"patient_name\":\"王廼平\"},{\"is_exec\":\"1\",\"bed_name\":\"110\",\"patient_id\":\"0000689617\",\"total_info\":\"\",\"patient_name\":\"宫五连\"},{\"is_exec\":\"1\",\"bed_name\":\"111\",\"patient_id\":\"0000022251\",\"total_info\":\"\",\"patient_name\":\"韦骏\"},{\"is_exec\":\"1\",\"bed_name\":\"112\",\"patient_id\":\"0000689293\",\"total_info\":\"\",\"patient_name\":\"熊金山\"},{\"is_exec\":\"1\",\"bed_name\":\"116\",\"patient_id\":\"0000614486\",\"total_info\":\"\",\"patient_name\":\"戴碧娥\"},{\"is_exec\":\"1\",\"bed_name\":\"118\",\"patient_id\":\"0000682881\",\"total_info\":\"\",\"patient_name\":\"于放\"},{\"is_exec\":\"1\",\"bed_name\":\"119\",\"patient_id\":\"0000363917\",\"total_info\":\"\",\"patient_name\":\"胡根水\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "1",
+                    "bed_name": "6",
+                    "patient_id": "0000685169",
+                    "total_info": "",
+                    "patient_name": "周金龙",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "9",
+                    "patient_id": "0000688792",
+                    "total_info": "",
+                    "patient_name": "高任香",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "11",
+                    "patient_id": "0000006547",
+                    "total_info": "",
+                    "patient_name": "何伯成",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "13",
+                    "patient_id": "0000069844",
+                    "total_info": "",
+                    "patient_name": "马修来",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "16",
+                    "patient_id": "0000217136",
+                    "total_info": "",
+                    "patient_name": "侯昌风",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "17",
+                    "patient_id": "0000379609",
+                    "total_info": "",
+                    "patient_name": "刘桂云",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "26",
+                    "patient_id": "0000527807",
+                    "total_info": "",
+                    "patient_name": "陈忠德",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "30",
+                    "patient_id": "0000690032",
+                    "total_info": "",
+                    "patient_name": "巢华辉",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "32",
+                    "patient_id": "0000690174",
+                    "total_info": "",
+                    "patient_name": "周玉梅",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "33",
+                    "patient_id": "0000681312",
+                    "total_info": "",
+                    "patient_name": "邹香桂",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "38",
+                    "patient_id": "0000228057",
+                    "total_info": "",
+                    "patient_name": "陈书妹",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "50",
+                    "patient_id": "0000095538",
+                    "total_info": "",
+                    "patient_name": "熊金保",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "51",
+                    "patient_id": "0000690067",
+                    "total_info": "",
+                    "patient_name": "吴重耀",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "57",
+                    "patient_id": "0000689909",
+                    "total_info": "",
+                    "patient_name": "李军英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "58",
+                    "patient_id": "0000516065",
+                    "total_info": "",
+                    "patient_name": "李小江",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "62",
+                    "patient_id": "0000690117",
+                    "total_info": "",
+                    "patient_name": "刘江辉",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "65",
+                    "patient_id": "0000690205",
+                    "total_info": "",
+                    "patient_name": "叶炳红",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "105",
+                    "patient_id": "0000688760",
+                    "total_info": "",
+                    "patient_name": "陶尝菊",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "106",
+                    "patient_id": "0000152266",
+                    "total_info": "",
+                    "patient_name": "陈柏初",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "107",
+                    "patient_id": "0000048397",
+                    "total_info": "",
+                    "patient_name": "蔡玉梅",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "108",
+                    "patient_id": "0000600487",
+                    "total_info": "",
+                    "patient_name": "王亮",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "109",
+                    "patient_id": "0000639360",
+                    "total_info": "",
+                    "patient_name": "王廼平",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "110",
+                    "patient_id": "0000689617",
+                    "total_info": "",
+                    "patient_name": "宫五连",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "111",
+                    "patient_id": "0000022251",
+                    "total_info": "",
+                    "patient_name": "韦骏",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "112",
+                    "patient_id": "0000689293",
+                    "total_info": "",
+                    "patient_name": "熊金山",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "116",
+                    "patient_id": "0000614486",
+                    "total_info": "",
+                    "patient_name": "戴碧娥",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "118",
+                    "patient_id": "0000682881",
+                    "total_info": "",
+                    "patient_name": "于放",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "119",
+                    "patient_id": "0000363917",
+                    "total_info": "",
+                    "patient_name": "胡根水",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "c2f2e42a0546428e92b4efd38ee1adbd",
+            "labelName": "悬空灸",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "f8bfb6a5d99a46f7be0bd39bbdee3b75",
+            "labelValue": "[{\"is_exec\":\"1\",\"bed_name\":\"3\",\"patient_id\":\"0000689253\",\"total_info\":\"\",\"patient_name\":\"李永\"},{\"is_exec\":\"1\",\"bed_name\":\"11\",\"patient_id\":\"0000006547\",\"total_info\":\"\",\"patient_name\":\"何伯成\"},{\"is_exec\":\"1\",\"bed_name\":\"13\",\"patient_id\":\"0000069844\",\"total_info\":\"\",\"patient_name\":\"马修来\"},{\"is_exec\":\"1\",\"bed_name\":\"21\",\"patient_id\":\"0000688902\",\"total_info\":\"\",\"patient_name\":\"温作英\"},{\"is_exec\":\"1\",\"bed_name\":\"26\",\"patient_id\":\"0000527807\",\"total_info\":\"\",\"patient_name\":\"陈忠德\"},{\"is_exec\":\"1\",\"bed_name\":\"27\",\"patient_id\":\"0000688338\",\"total_info\":\"\",\"patient_name\":\"王琦\"},{\"is_exec\":\"1\",\"bed_name\":\"30\",\"patient_id\":\"0000690032\",\"total_info\":\"\",\"patient_name\":\"巢华辉\"},{\"is_exec\":\"1\",\"bed_name\":\"38\",\"patient_id\":\"0000228057\",\"total_info\":\"\",\"patient_name\":\"陈书妹\"},{\"is_exec\":\"1\",\"bed_name\":\"39\",\"patient_id\":\"0000101135\",\"total_info\":\"\",\"patient_name\":\"吴何香\"},{\"is_exec\":\"1\",\"bed_name\":\"50\",\"patient_id\":\"0000095538\",\"total_info\":\"\",\"patient_name\":\"熊金保\"},{\"is_exec\":\"1\",\"bed_name\":\"51\",\"patient_id\":\"0000690067\",\"total_info\":\"\",\"patient_name\":\"吴重耀\"},{\"is_exec\":\"1\",\"bed_name\":\"56\",\"patient_id\":\"0000690136\",\"total_info\":\"\",\"patient_name\":\"李明春\"},{\"is_exec\":\"1\",\"bed_name\":\"57\",\"patient_id\":\"0000689909\",\"total_info\":\"\",\"patient_name\":\"李军英\"},{\"is_exec\":\"1\",\"bed_name\":\"58\",\"patient_id\":\"0000516065\",\"total_info\":\"\",\"patient_name\":\"李小江\"},{\"is_exec\":\"1\",\"bed_name\":\"63\",\"patient_id\":\"0000690202\",\"total_info\":\"\",\"patient_name\":\"叶薇\"},{\"is_exec\":\"1\",\"bed_name\":\"65\",\"patient_id\":\"0000690205\",\"total_info\":\"\",\"patient_name\":\"叶炳红\"},{\"is_exec\":\"1\",\"bed_name\":\"101\",\"patient_id\":\"0000560494\",\"total_info\":\"\",\"patient_name\":\"丁亚今\"},{\"is_exec\":\"1\",\"bed_name\":\"115\",\"patient_id\":\"0000669306\",\"total_info\":\"\",\"patient_name\":\"张朋朋\"},{\"is_exec\":\"1\",\"bed_name\":\"118\",\"patient_id\":\"0000682881\",\"total_info\":\"\",\"patient_name\":\"于放\"}]",
+            "positionList": {
+                "pad": "1",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "1",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "1",
+                    "bed_name": "3",
+                    "patient_id": "0000689253",
+                    "total_info": "",
+                    "patient_name": "李永",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "11",
+                    "patient_id": "0000006547",
+                    "total_info": "",
+                    "patient_name": "何伯成",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "13",
+                    "patient_id": "0000069844",
+                    "total_info": "",
+                    "patient_name": "马修来",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "21",
+                    "patient_id": "0000688902",
+                    "total_info": "",
+                    "patient_name": "温作英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "26",
+                    "patient_id": "0000527807",
+                    "total_info": "",
+                    "patient_name": "陈忠德",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "27",
+                    "patient_id": "0000688338",
+                    "total_info": "",
+                    "patient_name": "王琦",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "30",
+                    "patient_id": "0000690032",
+                    "total_info": "",
+                    "patient_name": "巢华辉",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "38",
+                    "patient_id": "0000228057",
+                    "total_info": "",
+                    "patient_name": "陈书妹",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "39",
+                    "patient_id": "0000101135",
+                    "total_info": "",
+                    "patient_name": "吴何香",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "50",
+                    "patient_id": "0000095538",
+                    "total_info": "",
+                    "patient_name": "熊金保",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "51",
+                    "patient_id": "0000690067",
+                    "total_info": "",
+                    "patient_name": "吴重耀",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "56",
+                    "patient_id": "0000690136",
+                    "total_info": "",
+                    "patient_name": "李明春",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "57",
+                    "patient_id": "0000689909",
+                    "total_info": "",
+                    "patient_name": "李军英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "58",
+                    "patient_id": "0000516065",
+                    "total_info": "",
+                    "patient_name": "李小江",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "63",
+                    "patient_id": "0000690202",
+                    "total_info": "",
+                    "patient_name": "叶薇",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "65",
+                    "patient_id": "0000690205",
+                    "total_info": "",
+                    "patient_name": "叶炳红",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "101",
+                    "patient_id": "0000560494",
+                    "total_info": "",
+                    "patient_name": "丁亚今",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "115",
+                    "patient_id": "0000669306",
+                    "total_info": "",
+                    "patient_name": "张朋朋",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "118",
+                    "patient_id": "0000682881",
+                    "total_info": "",
+                    "patient_name": "于放",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "09a0bb554f0d49fea4dd7ee28b6a77ff",
+            "labelName": "中药贴敷-中药封包",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "edbebd73d31c4ca0945f7505a7a5f38f",
+            "labelValue": "",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": []
+        },
+        {
+            "labelId": "c42e546080cb457a9db81cd026baf421",
+            "labelName": "中药贴敷",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "53fbdb31852b4d2e91957f5fc36534d0",
+            "labelValue": "[{\"is_exec\":\"0\",\"bed_name\":\"6\",\"patient_id\":\"0000685169\",\"total_info\":\"\",\"patient_name\":\"周金龙\"},{\"is_exec\":\"0\",\"bed_name\":\"9\",\"patient_id\":\"0000688792\",\"total_info\":\"\",\"patient_name\":\"高任香\"},{\"is_exec\":\"0\",\"bed_name\":\"21\",\"patient_id\":\"0000688902\",\"total_info\":\"\",\"patient_name\":\"温作英\"},{\"is_exec\":\"0\",\"bed_name\":\"26\",\"patient_id\":\"0000527807\",\"total_info\":\"\",\"patient_name\":\"陈忠德\"},{\"is_exec\":\"0\",\"bed_name\":\"30\",\"patient_id\":\"0000690032\",\"total_info\":\"\",\"patient_name\":\"巢华辉\"},{\"is_exec\":\"0\",\"bed_name\":\"38\",\"patient_id\":\"0000228057\",\"total_info\":\"\",\"patient_name\":\"陈书妹\"},{\"is_exec\":\"0\",\"bed_name\":\"50\",\"patient_id\":\"0000095538\",\"total_info\":\"\",\"patient_name\":\"熊金保\"},{\"is_exec\":\"0\",\"bed_name\":\"56\",\"patient_id\":\"0000690136\",\"total_info\":\"\",\"patient_name\":\"李明春\"},{\"is_exec\":\"0\",\"bed_name\":\"57\",\"patient_id\":\"0000689909\",\"total_info\":\"\",\"patient_name\":\"李军英\"},{\"is_exec\":\"0\",\"bed_name\":\"60\",\"patient_id\":\"0000691010\",\"total_info\":\"\",\"patient_name\":\"高龙生\"},{\"is_exec\":\"0\",\"bed_name\":\"62\",\"patient_id\":\"0000690117\",\"total_info\":\"\",\"patient_name\":\"刘江辉\"},{\"is_exec\":\"0\",\"bed_name\":\"63\",\"patient_id\":\"0000690202\",\"total_info\":\"\",\"patient_name\":\"叶薇\"},{\"is_exec\":\"0\",\"bed_name\":\"65\",\"patient_id\":\"0000690205\",\"total_info\":\"\",\"patient_name\":\"叶炳红\"},{\"is_exec\":\"0\",\"bed_name\":\"103\",\"patient_id\":\"0000010954\",\"total_info\":\"\",\"patient_name\":\"林金东\"},{\"is_exec\":\"0\",\"bed_name\":\"105\",\"patient_id\":\"0000688760\",\"total_info\":\"\",\"patient_name\":\"陶尝菊\"},{\"is_exec\":\"0\",\"bed_name\":\"110\",\"patient_id\":\"0000689617\",\"total_info\":\"\",\"patient_name\":\"宫五连\"},{\"is_exec\":\"0\",\"bed_name\":\"112\",\"patient_id\":\"0000689293\",\"total_info\":\"\",\"patient_name\":\"熊金山\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "0",
+                    "bed_name": "6",
+                    "patient_id": "0000685169",
+                    "total_info": "",
+                    "patient_name": "周金龙",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "9",
+                    "patient_id": "0000688792",
+                    "total_info": "",
+                    "patient_name": "高任香",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "21",
+                    "patient_id": "0000688902",
+                    "total_info": "",
+                    "patient_name": "温作英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "26",
+                    "patient_id": "0000527807",
+                    "total_info": "",
+                    "patient_name": "陈忠德",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "30",
+                    "patient_id": "0000690032",
+                    "total_info": "",
+                    "patient_name": "巢华辉",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "38",
+                    "patient_id": "0000228057",
+                    "total_info": "",
+                    "patient_name": "陈书妹",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "50",
+                    "patient_id": "0000095538",
+                    "total_info": "",
+                    "patient_name": "熊金保",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "56",
+                    "patient_id": "0000690136",
+                    "total_info": "",
+                    "patient_name": "李明春",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "57",
+                    "patient_id": "0000689909",
+                    "total_info": "",
+                    "patient_name": "李军英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "60",
+                    "patient_id": "0000691010",
+                    "total_info": "",
+                    "patient_name": "高龙生",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "62",
+                    "patient_id": "0000690117",
+                    "total_info": "",
+                    "patient_name": "刘江辉",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "63",
+                    "patient_id": "0000690202",
+                    "total_info": "",
+                    "patient_name": "叶薇",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "65",
+                    "patient_id": "0000690205",
+                    "total_info": "",
+                    "patient_name": "叶炳红",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "103",
+                    "patient_id": "0000010954",
+                    "total_info": "",
+                    "patient_name": "林金东",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "105",
+                    "patient_id": "0000688760",
+                    "total_info": "",
+                    "patient_name": "陶尝菊",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "110",
+                    "patient_id": "0000689617",
+                    "total_info": "",
+                    "patient_name": "宫五连",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "112",
+                    "patient_id": "0000689293",
+                    "total_info": "",
+                    "patient_name": "熊金山",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "55ef57249f7e40efaabee3461f6ddbc7",
+            "labelName": "中药热奄包",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "f523e8f801b24f6ea5d42e9e780b55d1",
+            "labelValue": "[{\"is_exec\":\"1\",\"bed_name\":\"21\",\"patient_id\":\"0000688902\",\"total_info\":\"\",\"patient_name\":\"温作英\"},{\"is_exec\":\"1\",\"bed_name\":\"22\",\"patient_id\":\"0000690219\",\"total_info\":\"\",\"patient_name\":\"李丹\"},{\"is_exec\":\"1\",\"bed_name\":\"26\",\"patient_id\":\"0000527807\",\"total_info\":\"\",\"patient_name\":\"陈忠德\"},{\"is_exec\":\"1\",\"bed_name\":\"30\",\"patient_id\":\"0000690032\",\"total_info\":\"\",\"patient_name\":\"巢华辉\"},{\"is_exec\":\"1\",\"bed_name\":\"37\",\"patient_id\":\"0000689803\",\"total_info\":\"\",\"patient_name\":\"沈雪英\"},{\"is_exec\":\"1\",\"bed_name\":\"38\",\"patient_id\":\"0000228057\",\"total_info\":\"\",\"patient_name\":\"陈书妹\"},{\"is_exec\":\"1\",\"bed_name\":\"50\",\"patient_id\":\"0000095538\",\"total_info\":\"\",\"patient_name\":\"熊金保\"},{\"is_exec\":\"1\",\"bed_name\":\"51\",\"patient_id\":\"0000690067\",\"total_info\":\"\",\"patient_name\":\"吴重耀\"},{\"is_exec\":\"1\",\"bed_name\":\"57\",\"patient_id\":\"0000689909\",\"total_info\":\"\",\"patient_name\":\"李军英\"},{\"is_exec\":\"1\",\"bed_name\":\"60\",\"patient_id\":\"0000691010\",\"total_info\":\"\",\"patient_name\":\"高龙生\"},{\"is_exec\":\"1\",\"bed_name\":\"65\",\"patient_id\":\"0000690205\",\"total_info\":\"\",\"patient_name\":\"叶炳红\"},{\"is_exec\":\"1\",\"bed_name\":\"110\",\"patient_id\":\"0000689617\",\"total_info\":\"\",\"patient_name\":\"宫五连\"},{\"is_exec\":\"1\",\"bed_name\":\"115\",\"patient_id\":\"0000669306\",\"total_info\":\"\",\"patient_name\":\"张朋朋\"},{\"is_exec\":\"1\",\"bed_name\":\"117\",\"patient_id\":\"0000685903\",\"total_info\":\"\",\"patient_name\":\"谢明榜\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "1",
+                    "bed_name": "21",
+                    "patient_id": "0000688902",
+                    "total_info": "",
+                    "patient_name": "温作英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "22",
+                    "patient_id": "0000690219",
+                    "total_info": "",
+                    "patient_name": "李丹",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "26",
+                    "patient_id": "0000527807",
+                    "total_info": "",
+                    "patient_name": "陈忠德",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "30",
+                    "patient_id": "0000690032",
+                    "total_info": "",
+                    "patient_name": "巢华辉",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "37",
+                    "patient_id": "0000689803",
+                    "total_info": "",
+                    "patient_name": "沈雪英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "38",
+                    "patient_id": "0000228057",
+                    "total_info": "",
+                    "patient_name": "陈书妹",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "50",
+                    "patient_id": "0000095538",
+                    "total_info": "",
+                    "patient_name": "熊金保",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "51",
+                    "patient_id": "0000690067",
+                    "total_info": "",
+                    "patient_name": "吴重耀",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "57",
+                    "patient_id": "0000689909",
+                    "total_info": "",
+                    "patient_name": "李军英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "60",
+                    "patient_id": "0000691010",
+                    "total_info": "",
+                    "patient_name": "高龙生",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "65",
+                    "patient_id": "0000690205",
+                    "total_info": "",
+                    "patient_name": "叶炳红",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "110",
+                    "patient_id": "0000689617",
+                    "total_info": "",
+                    "patient_name": "宫五连",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "115",
+                    "patient_id": "0000669306",
+                    "total_info": "",
+                    "patient_name": "张朋朋",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "117",
+                    "patient_id": "0000685903",
+                    "total_info": "",
+                    "patient_name": "谢明榜",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "e26c72f70f9a4942865fddbfc63c82a4",
+            "labelName": "中药溻渍",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "e66dce95bb634ecfbbb18c13715e460c",
+            "labelValue": "[{\"is_exec\":\"1\",\"bed_name\":\"37\",\"patient_id\":\"0000689803\",\"total_info\":\"\",\"patient_name\":\"沈雪英\"},{\"is_exec\":\"1\",\"bed_name\":\"60\",\"patient_id\":\"0000691010\",\"total_info\":\"\",\"patient_name\":\"高龙生\"},{\"is_exec\":\"1\",\"bed_name\":\"118\",\"patient_id\":\"0000682881\",\"total_info\":\"\",\"patient_name\":\"于放\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "1",
+                    "bed_name": "37",
+                    "patient_id": "0000689803",
+                    "total_info": "",
+                    "patient_name": "沈雪英",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "60",
+                    "patient_id": "0000691010",
+                    "total_info": "",
+                    "patient_name": "高龙生",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "118",
+                    "patient_id": "0000682881",
+                    "total_info": "",
+                    "patient_name": "于放",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "294542e990a04f05af701d6bd28d45e9",
+            "labelName": "中药烫熨",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "d2dee2f603c04d9ca7cf7c4285255400",
+            "labelValue": "",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": []
+        },
+        {
+            "labelId": "3adddc435b4642f295b050e7e6840711",
+            "labelName": "隔物灸",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "1c4ed5c50d8c48fabd52818c3f978660",
+            "labelValue": "[{\"is_exec\":\"1\",\"bed_name\":\"1\",\"patient_id\":\"0000439503\",\"total_info\":\"\",\"patient_name\":\"李丽\"},{\"is_exec\":\"1\",\"bed_name\":\"3\",\"patient_id\":\"0000689253\",\"total_info\":\"\",\"patient_name\":\"李永\"},{\"is_exec\":\"1\",\"bed_name\":\"11\",\"patient_id\":\"0000006547\",\"total_info\":\"\",\"patient_name\":\"何伯成\"},{\"is_exec\":\"1\",\"bed_name\":\"13\",\"patient_id\":\"0000069844\",\"total_info\":\"\",\"patient_name\":\"马修来\"},{\"is_exec\":\"1\",\"bed_name\":\"39\",\"patient_id\":\"0000101135\",\"total_info\":\"\",\"patient_name\":\"吴何香\"},{\"is_exec\":\"1\",\"bed_name\":\"51\",\"patient_id\":\"0000690067\",\"total_info\":\"\",\"patient_name\":\"吴重耀\"},{\"is_exec\":\"1\",\"bed_name\":\"55\",\"patient_id\":\"0000615955\",\"total_info\":\"\",\"patient_name\":\"熊燕\"},{\"is_exec\":\"1\",\"bed_name\":\"58\",\"patient_id\":\"0000516065\",\"total_info\":\"\",\"patient_name\":\"李小江\"},{\"is_exec\":\"1\",\"bed_name\":\"101\",\"patient_id\":\"0000560494\",\"total_info\":\"\",\"patient_name\":\"丁亚今\"},{\"is_exec\":\"1\",\"bed_name\":\"115\",\"patient_id\":\"0000669306\",\"total_info\":\"\",\"patient_name\":\"张朋朋\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "1",
+                    "bed_name": "1",
+                    "patient_id": "0000439503",
+                    "total_info": "",
+                    "patient_name": "李丽",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "3",
+                    "patient_id": "0000689253",
+                    "total_info": "",
+                    "patient_name": "李永",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "11",
+                    "patient_id": "0000006547",
+                    "total_info": "",
+                    "patient_name": "何伯成",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "13",
+                    "patient_id": "0000069844",
+                    "total_info": "",
+                    "patient_name": "马修来",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "39",
+                    "patient_id": "0000101135",
+                    "total_info": "",
+                    "patient_name": "吴何香",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "51",
+                    "patient_id": "0000690067",
+                    "total_info": "",
+                    "patient_name": "吴重耀",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "55",
+                    "patient_id": "0000615955",
+                    "total_info": "",
+                    "patient_name": "熊燕",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "58",
+                    "patient_id": "0000516065",
+                    "total_info": "",
+                    "patient_name": "李小江",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "101",
+                    "patient_id": "0000560494",
+                    "total_info": "",
+                    "patient_name": "丁亚今",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "115",
+                    "patient_id": "0000669306",
+                    "total_info": "",
+                    "patient_name": "张朋朋",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "d0c4b8a13e554dd1885ae3cfa1512ec9",
+            "labelName": "中医刮痧",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "2ec7269a58c54240abf9f4e4f4d2218c",
+            "labelValue": "[{\"is_exec\":\"1\",\"bed_name\":\"32\",\"patient_id\":\"0000690174\",\"total_info\":\"\",\"patient_name\":\"周玉梅\"},{\"is_exec\":\"1\",\"bed_name\":\"36\",\"patient_id\":\"0000686578\",\"total_info\":\"\",\"patient_name\":\"欧阳邑亭\"},{\"is_exec\":\"1\",\"bed_name\":\"107\",\"patient_id\":\"0000048397\",\"total_info\":\"\",\"patient_name\":\"蔡玉梅\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "1",
+                    "bed_name": "32",
+                    "patient_id": "0000690174",
+                    "total_info": "",
+                    "patient_name": "周玉梅",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "36",
+                    "patient_id": "0000686578",
+                    "total_info": "",
+                    "patient_name": "欧阳邑亭",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "107",
+                    "patient_id": "0000048397",
+                    "total_info": "",
+                    "patient_name": "蔡玉梅",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "9262a263ee714637ad16cf4b5d65f98a",
+            "labelName": "中药涂擦",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 1,
+            "usedId": "7aca64fb3ca54f6da09c1115571164b7",
+            "labelValue": "[{\"is_exec\":\"1\",\"bed_name\":\"6\",\"patient_id\":\"0000685169\",\"total_info\":\"\",\"patient_name\":\"周金龙\"},{\"is_exec\":\"1\",\"bed_name\":\"30\",\"patient_id\":\"0000690032\",\"total_info\":\"\",\"patient_name\":\"巢华辉\"},{\"is_exec\":\"1\",\"bed_name\":\"38\",\"patient_id\":\"0000228057\",\"total_info\":\"\",\"patient_name\":\"陈书妹\"},{\"is_exec\":\"1\",\"bed_name\":\"56\",\"patient_id\":\"0000690136\",\"total_info\":\"\",\"patient_name\":\"李明春\"},{\"is_exec\":\"1\",\"bed_name\":\"107\",\"patient_id\":\"0000048397\",\"total_info\":\"\",\"patient_name\":\"蔡玉梅\"},{\"is_exec\":\"1\",\"bed_name\":\"108\",\"patient_id\":\"0000600487\",\"total_info\":\"\",\"patient_name\":\"王亮\"},{\"is_exec\":\"1\",\"bed_name\":\"109\",\"patient_id\":\"0000639360\",\"total_info\":\"\",\"patient_name\":\"王廼平\"},{\"is_exec\":\"1\",\"bed_name\":\"110\",\"patient_id\":\"0000689617\",\"total_info\":\"\",\"patient_name\":\"宫五连\"},{\"is_exec\":\"1\",\"bed_name\":\"118\",\"patient_id\":\"0000682881\",\"total_info\":\"\",\"patient_name\":\"于放\"},{\"is_exec\":\"1\",\"bed_name\":\"119\",\"patient_id\":\"0000363917\",\"total_info\":\"\",\"patient_name\":\"胡根水\"}]",
+            "positionList": {
+                "pad": "1",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "1",
+                    "bed_name": "6",
+                    "patient_id": "0000685169",
+                    "total_info": "",
+                    "patient_name": "周金龙",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "30",
+                    "patient_id": "0000690032",
+                    "total_info": "",
+                    "patient_name": "巢华辉",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "38",
+                    "patient_id": "0000228057",
+                    "total_info": "",
+                    "patient_name": "陈书妹",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "56",
+                    "patient_id": "0000690136",
+                    "total_info": "",
+                    "patient_name": "李明春",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "107",
+                    "patient_id": "0000048397",
+                    "total_info": "",
+                    "patient_name": "蔡玉梅",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "108",
+                    "patient_id": "0000600487",
+                    "total_info": "",
+                    "patient_name": "王亮",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "109",
+                    "patient_id": "0000639360",
+                    "total_info": "",
+                    "patient_name": "王廼平",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "110",
+                    "patient_id": "0000689617",
+                    "total_info": "",
+                    "patient_name": "宫五连",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "118",
+                    "patient_id": "0000682881",
+                    "total_info": "",
+                    "patient_name": "于放",
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "1",
+                    "bed_name": "119",
+                    "patient_id": "0000363917",
+                    "total_info": "",
+                    "patient_name": "胡根水",
+                    "patient_label": null
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,735 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "labelId": "a51ecc2c413f11edbe99fa163e7bfe47",
+            "labelName": "接触隔离",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "985b2574748d49b9883602cabcc7e7a2",
+            "labelValue": "[{\"is_exec\":\"0\",\"bed_name\":\"6\",\"total_info\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"108\",\"total_info\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"119\",\"total_info\":\"\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "is_exec": "0",
+                    "bed_name": "6",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "108",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "119",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "a527295c413f11edbe99fa163e7bfe47",
+            "labelName": "过敏史",
+            "inputType": 2,
+            "dataSources": 1,
+            "relationField": "allergy",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\",\"4\":\"#555555;allergy\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "c9a9f596ecd44ac9bfc53b67ca259677",
+            "labelValue": "[{\"bed_name\":\"39\",\"patient_id\":\"0000101135\",\"total_info\":\"\",\"patient_name\":\"吴何香\",\"patient_label\":\"阿莫西林\"},{\"bed_name\":\"57\",\"patient_id\":\"0000689909\",\"total_info\":\"\",\"patient_name\":\"李军英\",\"patient_label\":\"磺胺类\"},{\"bed_name\":\"116\",\"patient_id\":\"0000614486\",\"total_info\":\"\",\"patient_name\":\"戴碧娥\",\"patient_label\":\"青霉素\"}]",
+            "positionList": {
+                "pad": "1",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "1",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "bed_name": "39",
+                    "patient_id": "0000101135",
+                    "total_info": "",
+                    "patient_name": "吴何香",
+                    "patient_label": "阿莫西林"
+                },
+                {
+                    "bed_name": "57",
+                    "patient_id": "0000689909",
+                    "total_info": "",
+                    "patient_name": "李军英",
+                    "patient_label": "磺胺类"
+                },
+                {
+                    "bed_name": "116",
+                    "patient_id": "0000614486",
+                    "total_info": "",
+                    "patient_name": "戴碧娥",
+                    "patient_label": "青霉素"
+                }
+            ]
+        },
+        {
+            "labelId": "a52a81ce413f11edbe99fa163e7bfe47",
+            "labelName": "管路风险",
+            "inputType": 2,
+            "dataSources": 3,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "db5bc9b2c6ae40198501f367e1424f58",
+            "labelValue": "[{\"bed_name\":\"2\",\"patient_id\":\"0000242532\",\"total_info\":\"\",\"patient_name\":\"杨柳枝\"},{\"bed_name\":\"6\",\"patient_id\":\"0000685169\",\"total_info\":\"\",\"patient_name\":\"周金龙\"},{\"bed_name\":\"26\",\"patient_id\":\"0000527807\",\"total_info\":\"\",\"patient_name\":\"陈忠德\"},{\"bed_name\":\"38\",\"patient_id\":\"0000228057\",\"total_info\":\"\",\"patient_name\":\"陈书妹\"},{\"bed_name\":\"51\",\"patient_id\":\"0000690067\",\"total_info\":\"\",\"patient_name\":\"吴重耀\"},{\"bed_name\":\"62\",\"patient_id\":\"0000690117\",\"total_info\":\"\",\"patient_name\":\"刘江辉\"},{\"bed_name\":\"103\",\"patient_id\":\"0000010954\",\"total_info\":\"\",\"patient_name\":\"林金东\"},{\"bed_name\":\"106\",\"patient_id\":\"0000152266\",\"total_info\":\"\",\"patient_name\":\"陈柏初\"},{\"bed_name\":\"107\",\"patient_id\":\"0000048397\",\"total_info\":\"\",\"patient_name\":\"蔡玉梅\"},{\"bed_name\":\"108\",\"patient_id\":\"0000600487\",\"total_info\":\"\",\"patient_name\":\"王亮\"},{\"bed_name\":\"110\",\"patient_id\":\"0000689617\",\"total_info\":\"\",\"patient_name\":\"宫五连\"},{\"bed_name\":\"112\",\"patient_id\":\"0000689293\",\"total_info\":\"\",\"patient_name\":\"熊金山\"},{\"bed_name\":\"118\",\"patient_id\":\"0000682881\",\"total_info\":\"\",\"patient_name\":\"于放\"},{\"bed_name\":\"119\",\"patient_id\":\"0000363917\",\"total_info\":\"\",\"patient_name\":\"胡根水\"}]",
+            "positionList": {
+                "pad": "1",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "1",
+                "bedCard": "1",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "bed_name": "2",
+                    "patient_id": "0000242532",
+                    "total_info": "",
+                    "patient_name": "杨柳枝",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "6",
+                    "patient_id": "0000685169",
+                    "total_info": "",
+                    "patient_name": "周金龙",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "26",
+                    "patient_id": "0000527807",
+                    "total_info": "",
+                    "patient_name": "陈忠德",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "38",
+                    "patient_id": "0000228057",
+                    "total_info": "",
+                    "patient_name": "陈书妹",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "51",
+                    "patient_id": "0000690067",
+                    "total_info": "",
+                    "patient_name": "吴重耀",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "62",
+                    "patient_id": "0000690117",
+                    "total_info": "",
+                    "patient_name": "刘江辉",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "103",
+                    "patient_id": "0000010954",
+                    "total_info": "",
+                    "patient_name": "林金东",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "106",
+                    "patient_id": "0000152266",
+                    "total_info": "",
+                    "patient_name": "陈柏初",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "107",
+                    "patient_id": "0000048397",
+                    "total_info": "",
+                    "patient_name": "蔡玉梅",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "108",
+                    "patient_id": "0000600487",
+                    "total_info": "",
+                    "patient_name": "王亮",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "110",
+                    "patient_id": "0000689617",
+                    "total_info": "",
+                    "patient_name": "宫五连",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "112",
+                    "patient_id": "0000689293",
+                    "total_info": "",
+                    "patient_name": "熊金山",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "118",
+                    "patient_id": "0000682881",
+                    "total_info": "",
+                    "patient_name": "于放",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "119",
+                    "patient_id": "0000363917",
+                    "total_info": "",
+                    "patient_name": "胡根水",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "a5204784413f11edbe99fa163e7bfe47",
+            "labelName": "跌倒高危",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "c7f1644693db4280b36fedae0d13fbb2",
+            "labelValue": "[{\"bed_name\":\"2\",\"patient_id\":\"0000242532\",\"total_info\":\"\"},{\"bed_name\":\"5\",\"patient_id\":\"0000062797\",\"total_info\":\"\"},{\"bed_name\":\"6\",\"patient_id\":\"0000685169\",\"total_info\":\"\"},{\"bed_name\":\"13\",\"patient_id\":\"0000069844\",\"total_info\":\"\"},{\"bed_name\":\"26\",\"patient_id\":\"0000527807\",\"total_info\":\"\"},{\"bed_name\":\"28\",\"patient_id\":\"0000673718\",\"total_info\":\"\"},{\"bed_name\":\"33\",\"patient_id\":\"0000681312\",\"total_info\":\"\"},{\"bed_name\":\"38\",\"patient_id\":\"0000228057\",\"total_info\":\"\"},{\"bed_name\":\"50\",\"patient_id\":\"0000095538\",\"total_info\":\"\"},{\"bed_name\":\"51\",\"patient_id\":\"0000690067\",\"total_info\":\"\"},{\"bed_name\":\"56\",\"patient_id\":\"0000690136\",\"total_info\":\"\"},{\"bed_name\":\"62\",\"patient_id\":\"0000690117\",\"total_info\":\"\"},{\"bed_name\":\"65\",\"patient_id\":\"0000690205\",\"total_info\":\"\"},{\"bed_name\":\"106\",\"patient_id\":\"0000152266\",\"total_info\":\"\"},{\"bed_name\":\"107\",\"patient_id\":\"0000048397\",\"total_info\":\"\"},{\"bed_name\":\"108\",\"patient_id\":\"0000600487\",\"total_info\":\"\"},{\"bed_name\":\"109\",\"patient_id\":\"0000639360\",\"total_info\":\"\"},{\"bed_name\":\"110\",\"patient_id\":\"0000689617\",\"total_info\":\"\"},{\"bed_name\":\"111\",\"patient_id\":\"0000022251\",\"total_info\":\"\"},{\"bed_name\":\"112\",\"patient_id\":\"0000689293\",\"total_info\":\"\"},{\"bed_name\":\"117\",\"patient_id\":\"0000685903\",\"total_info\":\"\"},{\"bed_name\":\"119\",\"patient_id\":\"0000363917\",\"total_info\":\"\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "bed_name": "2",
+                    "patient_id": "0000242532",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "5",
+                    "patient_id": "0000062797",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "6",
+                    "patient_id": "0000685169",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "13",
+                    "patient_id": "0000069844",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "26",
+                    "patient_id": "0000527807",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "28",
+                    "patient_id": "0000673718",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "33",
+                    "patient_id": "0000681312",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "38",
+                    "patient_id": "0000228057",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "50",
+                    "patient_id": "0000095538",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "51",
+                    "patient_id": "0000690067",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "56",
+                    "patient_id": "0000690136",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "62",
+                    "patient_id": "0000690117",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "65",
+                    "patient_id": "0000690205",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "106",
+                    "patient_id": "0000152266",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "107",
+                    "patient_id": "0000048397",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "108",
+                    "patient_id": "0000600487",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "109",
+                    "patient_id": "0000639360",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "110",
+                    "patient_id": "0000689617",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "111",
+                    "patient_id": "0000022251",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "112",
+                    "patient_id": "0000689293",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "117",
+                    "patient_id": "0000685903",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "119",
+                    "patient_id": "0000363917",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "a1649db463c4497b8653a33c76a31046",
+            "labelName": "VTE高危",
+            "inputType": 2,
+            "dataSources": 3,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "74b0f5fcf996420fb99344ab41d38c4b",
+            "labelValue": "[{\"bed_name\":\"26\",\"patient_id\":\"0000527807\",\"total_info\":\"\",\"patient_name\":\"陈忠德\"},{\"bed_name\":\"50\",\"patient_id\":\"0000095538\",\"total_info\":\"\",\"patient_name\":\"熊金保\"},{\"bed_name\":\"51\",\"patient_id\":\"0000690067\",\"total_info\":\"\",\"patient_name\":\"吴重耀\"},{\"bed_name\":\"52\",\"patient_id\":\"0000596176\",\"total_info\":\"\",\"patient_name\":\"夏梦川\"},{\"bed_name\":\"105\",\"patient_id\":\"0000688760\",\"total_info\":\"\",\"patient_name\":\"陶尝菊\"},{\"bed_name\":\"106\",\"patient_id\":\"0000152266\",\"total_info\":\"\",\"patient_name\":\"陈柏初\"},{\"bed_name\":\"108\",\"patient_id\":\"0000600487\",\"total_info\":\"\",\"patient_name\":\"王亮\"},{\"bed_name\":\"110\",\"patient_id\":\"0000689617\",\"total_info\":\"\",\"patient_name\":\"宫五连\"},{\"bed_name\":\"119\",\"patient_id\":\"0000363917\",\"total_info\":\"\",\"patient_name\":\"胡根水\"}]",
+            "positionList": {
+                "pad": "1",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "1",
+                "bedCard": "1",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "bed_name": "26",
+                    "patient_id": "0000527807",
+                    "total_info": "",
+                    "patient_name": "陈忠德",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "50",
+                    "patient_id": "0000095538",
+                    "total_info": "",
+                    "patient_name": "熊金保",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "51",
+                    "patient_id": "0000690067",
+                    "total_info": "",
+                    "patient_name": "吴重耀",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "52",
+                    "patient_id": "0000596176",
+                    "total_info": "",
+                    "patient_name": "夏梦川",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "105",
+                    "patient_id": "0000688760",
+                    "total_info": "",
+                    "patient_name": "陶尝菊",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "106",
+                    "patient_id": "0000152266",
+                    "total_info": "",
+                    "patient_name": "陈柏初",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "108",
+                    "patient_id": "0000600487",
+                    "total_info": "",
+                    "patient_name": "王亮",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "110",
+                    "patient_id": "0000689617",
+                    "total_info": "",
+                    "patient_name": "宫五连",
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "119",
+                    "patient_id": "0000363917",
+                    "total_info": "",
+                    "patient_name": "胡根水",
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "4c54c92fe5f74837a0b2227b6a5c063a",
+            "labelName": "输液Qn",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "f7fe758ab375487aba4c8a026ab32e95",
+            "labelValue": "",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": []
+        },
+        {
+            "labelId": "155383e6044548a3a551f14570246b33",
+            "labelName": "输液Q8h",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "55fa66ab4c544056ae2bf4c562162245",
+            "labelValue": "",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": []
+        },
+        {
+            "labelId": "3232301594c64d66ba214bb8ef35cabf",
+            "labelName": "输液Q12h",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "93cdbb06679f47a3ba564eedcddcffe6",
+            "labelValue": "",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": []
+        },
+        {
+            "labelId": "12de5c5ef826486788f3d59cb4e362da",
+            "labelName": "输液Bid",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "5e430b129a00401e9b9950fa5281e115",
+            "labelValue": "",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "0",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": []
+        },
+        {
+            "labelId": "93923f83218347248a091832b2221a0b",
+            "labelName": "压疮高危",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "a0a9119f633546dcae4eeb9585947661",
+            "labelValue": "[{\"bed_name\":\"33\",\"patient_id\":\"0000681312\",\"total_info\":\"\"},{\"bed_name\":\"103\",\"patient_id\":\"0000010954\",\"total_info\":\"\"},{\"bed_name\":\"106\",\"patient_id\":\"0000152266\",\"total_info\":\"\"},{\"bed_name\":\"107\",\"patient_id\":\"0000048397\",\"total_info\":\"\"},{\"bed_name\":\"108\",\"patient_id\":\"0000600487\",\"total_info\":\"\"},{\"bed_name\":\"110\",\"patient_id\":\"0000689617\",\"total_info\":\"\"},{\"bed_name\":\"118\",\"patient_id\":\"0000682881\",\"total_info\":\"\"},{\"bed_name\":\"119\",\"patient_id\":\"0000363917\",\"total_info\":\"\"}]",
+            "positionList": {
+                "pad": "0",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "0",
+                "bedCard": "1",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "bed_name": "33",
+                    "patient_id": "0000681312",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "103",
+                    "patient_id": "0000010954",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "106",
+                    "patient_id": "0000152266",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "107",
+                    "patient_id": "0000048397",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "108",
+                    "patient_id": "0000600487",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "110",
+                    "patient_id": "0000689617",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "118",
+                    "patient_id": "0000682881",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "119",
+                    "patient_id": "0000363917",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                }
+            ]
+        },
+        {
+            "labelId": "a8251415a8514ebca2b72e71f2e02ab0",
+            "labelName": "压疮中危",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "ffe530f6e4f34417a929703bddfd2f65",
+            "labelValue": "",
+            "positionList": {
+                "pad": "1",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "1",
+                "bedCard": "1",
+                "board": "1"
+            },
+            "bedList": []
+        },
+        {
+            "labelId": "607d9994455849e1b1a591df300fc5bd",
+            "labelName": "压疮低危",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"1\":\"#555555\",\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "usedId": "da9f7e5e773f4ded90b9ab4935c7ac17",
+            "labelValue": "[{\"bed_name\":\"26\",\"patient_id\":\"0000527807\",\"total_info\":\"\"},{\"bed_name\":\"30\",\"patient_id\":\"0000690032\",\"total_info\":\"\"},{\"bed_name\":\"112\",\"patient_id\":\"0000689293\",\"total_info\":\"\"}]",
+            "positionList": {
+                "pad": "1",
+                "DNHost": "0",
+                "boardPatient": "1",
+                "patientCard": "0",
+                "pda": "1",
+                "bedCard": "0",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "bed_name": "26",
+                    "patient_id": "0000527807",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "30",
+                    "patient_id": "0000690032",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                },
+                {
+                    "bed_name": "112",
+                    "patient_id": "0000689293",
+                    "total_info": "",
+                    "patient_name": null,
+                    "patient_label": null
+                }
+            ]
+        }
+    ]
+}

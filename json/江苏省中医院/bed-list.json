@@ -1,0 +1,384 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "bedId": "eef816e26ec94ca29c232f2a34f1f993",
+            "bedName": "1",
+            "patientId": "0000439503",
+            "patientName": "李丽"
+        },
+        {
+            "bedId": "4fb9dbf25cdf494dbafedbd5cb077437",
+            "bedName": "2",
+            "patientId": "0000242532",
+            "patientName": "杨柳枝"
+        },
+        {
+            "bedId": "9cc7c18a2f9540fa843f0929b02f8605",
+            "bedName": "3",
+            "patientId": "0000689253",
+            "patientName": "李永"
+        },
+        {
+            "bedId": "ed8ca27e36ec4a77bc87da61e1716287",
+            "bedName": "5",
+            "patientId": "0000062797",
+            "patientName": "童瑞祥"
+        },
+        {
+            "bedId": "9db8b8b7f79f4910a3082c9dbdb35d74",
+            "bedName": "6",
+            "patientId": "0000685169",
+            "patientName": "周金龙"
+        },
+        {
+            "bedId": "0b05454ebcf9435c9b93809dab54b753",
+            "bedName": "7",
+            "patientId": "0000247041",
+            "patientName": "崔萍"
+        },
+        {
+            "bedId": "fac90ed6fd2c4bc6906cad18fdd2257d",
+            "bedName": "8",
+            "patientId": "0000083447",
+            "patientName": "叶浔生"
+        },
+        {
+            "bedId": "df7f34fa70c0417f9c8ad324ca01e59a",
+            "bedName": "9",
+            "patientId": "0000688792",
+            "patientName": "高任香"
+        },
+        {
+            "bedId": "2fe5a01fda824f1ab7c775d067f01de2",
+            "bedName": "10",
+            "patientId": "0000683677",
+            "patientName": "陈春荣"
+        },
+        {
+            "bedId": "187e3ca140e14d918fe92768772acc21",
+            "bedName": "11",
+            "patientId": "0000006547",
+            "patientName": "何伯成"
+        },
+        {
+            "bedId": "08ec27bd672f4922a50c6469e98f3262",
+            "bedName": "12",
+            "patientId": "0000093578",
+            "patientName": "夏洪源"
+        },
+        {
+            "bedId": "244fbd01680b46ed81d22bb15f9544af",
+            "bedName": "13",
+            "patientId": "0000069844",
+            "patientName": "马修来"
+        },
+        {
+            "bedId": "dd3eba9c9463459da4460e2c3459ae26",
+            "bedName": "15",
+            "patientId": "0000691046",
+            "patientName": "陈绪君"
+        },
+        {
+            "bedId": "a43cfb1839994a20b572cb5c33046ff7",
+            "bedName": "16",
+            "patientId": "0000217136",
+            "patientName": "侯昌风"
+        },
+        {
+            "bedId": "72f490d549a84c90a6579e841c33c49a",
+            "bedName": "17",
+            "patientId": "0000379609",
+            "patientName": "刘桂云"
+        },
+        {
+            "bedId": "5d62226c237e410eab142846fd7f8712",
+            "bedName": "18",
+            "patientId": "0000267931",
+            "patientName": "卓军"
+        },
+        {
+            "bedId": "33aacca34dc24f9db6c2f39a8b16683b",
+            "bedName": "19",
+            "patientId": "0000358491",
+            "patientName": "林楠楠"
+        },
+        {
+            "bedId": "d1af967e25e645d18e9ea81cc460b268",
+            "bedName": "21",
+            "patientId": "0000688902",
+            "patientName": "温作英"
+        },
+        {
+            "bedId": "2be5373170b645cc9c10a6ad7cd4279f",
+            "bedName": "22",
+            "patientId": "0000690219",
+            "patientName": "李丹"
+        },
+        {
+            "bedId": "f3fae80c840241008ef3d18caa506417",
+            "bedName": "26",
+            "patientId": "0000527807",
+            "patientName": "陈忠德"
+        },
+        {
+            "bedId": "43b8332cc4f841b592e2db514aae541b",
+            "bedName": "27",
+            "patientId": "0000688338",
+            "patientName": "王琦"
+        },
+        {
+            "bedId": "d722dea32a674ff4921378831e6562c3",
+            "bedName": "28",
+            "patientId": "0000673718",
+            "patientName": "赵美桃"
+        },
+        {
+            "bedId": "5f535b15cd0d48f1bd166c27414b07f7",
+            "bedName": "30",
+            "patientId": "0000690032",
+            "patientName": "巢华辉"
+        },
+        {
+            "bedId": "5090bf1ec90143778268f5d3ea74d073",
+            "bedName": "31",
+            "patientId": "0000018248",
+            "patientName": "曹明星"
+        },
+        {
+            "bedId": "01b538fc7a00409bac77351e0acc03e1",
+            "bedName": "32",
+            "patientId": "0000690174",
+            "patientName": "周玉梅"
+        },
+        {
+            "bedId": "b2ed1227c335456f835a0fcd1b77545b",
+            "bedName": "33",
+            "patientId": "0000681312",
+            "patientName": "邹香桂"
+        },
+        {
+            "bedId": "564e94feac084e4584bce872fe3ca8f1",
+            "bedName": "35",
+            "patientId": "0000685660",
+            "patientName": "陶陵花"
+        },
+        {
+            "bedId": "3c0ff001848545e49cec23fafa3386a4",
+            "bedName": "36",
+            "patientId": "0000686578",
+            "patientName": "欧阳邑亭"
+        },
+        {
+            "bedId": "4098edc27bba4a079d69b3f07dab9add",
+            "bedName": "37",
+            "patientId": "0000689803",
+            "patientName": "沈雪英"
+        },
+        {
+            "bedId": "a78b5ab36327431291552d815e32baab",
+            "bedName": "38",
+            "patientId": "0000228057",
+            "patientName": "陈书妹"
+        },
+        {
+            "bedId": "9ea84b486ad240478b9af533c2b44c77",
+            "bedName": "39",
+            "patientId": "0000101135",
+            "patientName": "吴何香"
+        },
+        {
+            "bedId": "86f83706559547dbbd1d76913ad85724",
+            "bedName": "50",
+            "patientId": "0000095538",
+            "patientName": "熊金保"
+        },
+        {
+            "bedId": "59e14f8e7fb3483aa6d310a2e250a731",
+            "bedName": "51",
+            "patientId": "0000690067",
+            "patientName": "吴重耀"
+        },
+        {
+            "bedId": "21b11b0e1c484f72b0f7c2083022c41e",
+            "bedName": "52",
+            "patientId": "0000596176",
+            "patientName": "夏梦川"
+        },
+        {
+            "bedId": "61bdb317f1064fb18dbfaf1158b185a4",
+            "bedName": "53",
+            "patientId": "0000686873",
+            "patientName": "李幼华"
+        },
+        {
+            "bedId": "1a35e9cb0207423e86a2d7602fbc47a1",
+            "bedName": "55",
+            "patientId": "0000615955",
+            "patientName": "熊燕"
+        },
+        {
+            "bedId": "d65ac80013b9467eb4c6152cf5c82df1",
+            "bedName": "56",
+            "patientId": "0000690136",
+            "patientName": "李明春"
+        },
+        {
+            "bedId": "6e7c5c0333e54140bc7878d76eabcfca",
+            "bedName": "57",
+            "patientId": "0000689909",
+            "patientName": "李军英"
+        },
+        {
+            "bedId": "a4a3b6dc27d2422584b339e68976a6c8",
+            "bedName": "58",
+            "patientId": "0000516065",
+            "patientName": "李小江"
+        },
+        {
+            "bedId": "b12b0a0db01e41929a325d1b923a8c6b",
+            "bedName": "59",
+            "patientId": "0000686471",
+            "patientName": "叶丑喜"
+        },
+        {
+            "bedId": "6f4a7cf7ebc0494bb3152e8b81cd4994",
+            "bedName": "60",
+            "patientId": "0000691010",
+            "patientName": "高龙生"
+        },
+        {
+            "bedId": "4f9b0f6aa9764f50bc19f285a5140125",
+            "bedName": "62",
+            "patientId": "0000690117",
+            "patientName": "刘江辉"
+        },
+        {
+            "bedId": "2e00835187414bafadf2818cd16b50ca",
+            "bedName": "63",
+            "patientId": "0000690202",
+            "patientName": "叶薇"
+        },
+        {
+            "bedId": "3b2add002aa1444f8b9f873578fc2c62",
+            "bedName": "65",
+            "patientId": "0000690205",
+            "patientName": "叶炳红"
+        },
+        {
+            "bedId": "c555f6a9486d4c359bca3fcbce2509c3",
+            "bedName": "101",
+            "patientId": "0000560494",
+            "patientName": "丁亚今"
+        },
+        {
+            "bedId": "79664015cb294de0b02cb9b061959f0c",
+            "bedName": "103",
+            "patientId": "0000010954",
+            "patientName": "林金东"
+        },
+        {
+            "bedId": "a8e290f9567d46e190880bbff63414a9",
+            "bedName": "105",
+            "patientId": "0000688760",
+            "patientName": "陶尝菊"
+        },
+        {
+            "bedId": "4f74a61040454785aa9d14fe23ca285a",
+            "bedName": "106",
+            "patientId": "0000152266",
+            "patientName": "陈柏初"
+        },
+        {
+            "bedId": "72c4bc367e6e4ca89ad5f934f3c33191",
+            "bedName": "107",
+            "patientId": "0000048397",
+            "patientName": "蔡玉梅"
+        },
+        {
+            "bedId": "91b6b3d1514445cd86627fb104e3195e",
+            "bedName": "108",
+            "patientId": "0000600487",
+            "patientName": "王亮"
+        },
+        {
+            "bedId": "93efbbd3765c4da6bcf93a067d8a8bd9",
+            "bedName": "109",
+            "patientId": "0000639360",
+            "patientName": "王廼平"
+        },
+        {
+            "bedId": "8ed71dd865bf4c59a65c907a3b0255dd",
+            "bedName": "110",
+            "patientId": "0000689617",
+            "patientName": "宫五连"
+        },
+        {
+            "bedId": "0315086aa26e4fa4950c5f0dfdb096f9",
+            "bedName": "111",
+            "patientId": "0000022251",
+            "patientName": "韦骏"
+        },
+        {
+            "bedId": "4c8c52ddb2654faf8250593df4db28a6",
+            "bedName": "112",
+            "patientId": "0000689293",
+            "patientName": "熊金山"
+        },
+        {
+            "bedId": "72de3a63ccc7492fb7e421d21e9a98d3",
+            "bedName": "113",
+            "patientId": "0000498986",
+            "patientName": "吴若溪"
+        },
+        {
+            "bedId": "44d599b843964b588da6c21218476300",
+            "bedName": "115",
+            "patientId": "0000669306",
+            "patientName": "张朋朋"
+        },
+        {
+            "bedId": "64147b5e1f6a41a7b0fffeb31cb98b10",
+            "bedName": "116",
+            "patientId": "0000614486",
+            "patientName": "戴碧娥"
+        },
+        {
+            "bedId": "020114e1b15d4909be659b5d7cf6ca39",
+            "bedName": "117",
+            "patientId": "0000685903",
+            "patientName": "谢明榜"
+        },
+        {
+            "bedId": "17b96fb410704f14a9bca6a47fe3b059",
+            "bedName": "118",
+            "patientId": "0000682881",
+            "patientName": "于放"
+        },
+        {
+            "bedId": "79e413df273940c8b742c2df128ec32e",
+            "bedName": "119",
+            "patientId": "0000363917",
+            "patientName": "胡根水"
+        },
+        {
+            "bedId": "42a054ffe3584af4b4f550173da578c6",
+            "bedName": "120",
+            "patientId": "0000017246",
+            "patientName": "龚南星"
+        },
+        {
+            "bedId": "47d3dd25ae1e4c2599d64d2682e220db",
+            "bedName": "81",
+            "patientId": "0000676195",
+            "patientName": "许子扬"
+        },
+        {
+            "bedId": "6e411817629645378c83ee70a0d31874",
+            "bedName": "82",
+            "patientId": "0000637518",
+            "patientName": "黄丽萍"
+        }
+    ]
+}

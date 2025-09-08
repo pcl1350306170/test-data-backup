@@ -1,0 +1,789 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "labelId": "1f468ed9a89711efaed80cda411de3c6",
+            "labelName": "空床数",
+            "labelValue": "7",
+            "sort": 1,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [
+                {
+                    "bed_name": "9",
+                    "total_info": 7
+                },
+                {
+                    "bed_name": "16",
+                    "total_info": 7
+                },
+                {
+                    "bed_name": "19",
+                    "total_info": 7
+                },
+                {
+                    "bed_name": "22",
+                    "total_info": 7
+                },
+                {
+                    "bed_name": "26",
+                    "total_info": 7
+                },
+                {
+                    "bed_name": "36",
+                    "total_info": 7
+                },
+                {
+                    "bed_name": "53",
+                    "total_info": 7
+                }
+            ],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f490055a89711efaed80cda411de3c6",
+            "labelName": "自费",
+            "labelValue": "0",
+            "sort": 2,
+            "labelEvent": "{\"patientInCondition\":\" and insurance_type='自费'\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f457779a89711efaed80cda411de3c6",
+            "labelName": "医保",
+            "labelValue": "0",
+            "sort": 3,
+            "labelEvent": "{\"patientInCondition\":\" and insurance_type='医保'\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f49b444a89711efaed80cda411de3c6",
+            "labelName": "新农合",
+            "labelValue": "0",
+            "sort": 4,
+            "labelEvent": "{\"patientInCondition\":\" and insurance_type='新农合'\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f45fe6da89711efaed80cda411de3c6",
+            "labelName": "昨日手术",
+            "labelValue": "0",
+            "sort": 5,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f47a2e6a89711efaed80cda411de3c6",
+            "labelName": "明日手术",
+            "labelValue": "0",
+            "sort": 6,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f465a55a89711efaed80cda411de3c6",
+            "labelName": "今日手术",
+            "labelValue": "1",
+            "sort": 7,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [
+                {
+                    "bed_name": "1",
+                    "total_info": 1,
+                    "patient_name": "林兴彪"
+                }
+            ],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f4ae9bca89711efaed80cda411de3c6",
+            "labelName": "明日出院",
+            "labelValue": "0",
+            "sort": 8,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f484cc8a89711efaed80cda411de3c6",
+            "labelName": "明日入院",
+            "labelValue": "",
+            "sort": 9,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 1,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f453df0a89711efaed80cda411de3c6",
+            "labelName": "转出",
+            "labelValue": "0",
+            "sort": 10,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f45cd70a89711efaed80cda411de3c6",
+            "labelName": "转入",
+            "labelValue": "0",
+            "sort": 11,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f48cad6a89711efaed80cda411de3c6",
+            "labelName": "今日出院",
+            "labelValue": "0",
+            "sort": 12,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f46f264a89711efaed80cda411de3c6",
+            "labelName": "今日入院",
+            "labelValue": "0",
+            "sort": 13,
+            "labelEvent": "{\"patientInCondition\":\" and TO_DAYS(in_time)=TO_DAYS(NOW())\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f4a1c08a89711efaed80cda411de3c6",
+            "labelName": "一般",
+            "labelValue": "0",
+            "sort": 14,
+            "labelEvent": "{\"patientInCondition\":\" and illness_status='一般'\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f472479a89711efaed80cda411de3c6",
+            "labelName": "病重",
+            "labelValue": "0",
+            "sort": 15,
+            "labelEvent": "{\"patientInCondition\":\" and illness_status='病重'\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f4878fba89711efaed80cda411de3c6",
+            "labelName": "病危",
+            "labelValue": "0",
+            "sort": 16,
+            "labelEvent": "{\"patientInCondition\":\" and illness_status='病危'\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f4985d5a89711efaed80cda411de3c6",
+            "labelName": "三级护理",
+            "labelValue": "0",
+            "sort": 17,
+            "labelEvent": "{\"patientInCondition\":\" and nurse_level='三级护理'\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1,2",
+            "bedList": [],
+            "nurseLevelConfigDTO": {
+                "nurseLevelName": "三级护理",
+                "nurseLevelShort": "三",
+                "fontColor": "#FFFFFF",
+                "backgroundColor": "#7FFF00"
+            }
+        },
+        {
+            "labelId": "1f44c9b4a89711efaed80cda411de3c6",
+            "labelName": "一级护理",
+            "labelValue": "16",
+            "sort": 18,
+            "labelEvent": "{\"patientInCondition\":\" and nurse_level='一级护理'\"}",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [
+                {
+                    "bed_name": "8",
+                    "total_info": 16,
+                    "patient_name": "陈阿宝"
+                },
+                {
+                    "bed_name": "12",
+                    "total_info": 16,
+                    "patient_name": "朱道良"
+                },
+                {
+                    "bed_name": "17",
+                    "total_info": 16,
+                    "patient_name": "成玉珍"
+                },
+                {
+                    "bed_name": "18",
+                    "total_info": 16,
+                    "patient_name": "高秀荣"
+                },
+                {
+                    "bed_name": "28",
+                    "total_info": 16,
+                    "patient_name": "肖志平"
+                },
+                {
+                    "bed_name": "33",
+                    "total_info": 16,
+                    "patient_name": "周瑞月"
+                },
+                {
+                    "bed_name": "35",
+                    "total_info": 16,
+                    "patient_name": "吴建军"
+                },
+                {
+                    "bed_name": "39",
+                    "total_info": 16,
+                    "patient_name": "赵兴旺"
+                },
+                {
+                    "bed_name": "40",
+                    "total_info": 16,
+                    "patient_name": "唐小武"
+                },
+                {
+                    "bed_name": "41",
+                    "total_info": 16,
+                    "patient_name": "赵爱成"
+                },
+                {
+                    "bed_name": "42",
+                    "total_info": 16,
+                    "patient_name": "唐永福"
+                },
+                {
+                    "bed_name": "45",
+                    "total_info": 16,
+                    "patient_name": "张焕春"
+                },
+                {
+                    "bed_name": "46",
+                    "total_info": 16,
+                    "patient_name": "张永国"
+                },
+                {
+                    "bed_name": "48",
+                    "total_info": 16,
+                    "patient_name": "乐平"
+                },
+                {
+                    "bed_name": "50",
+                    "total_info": 16,
+                    "patient_name": "张桂荣"
+                },
+                {
+                    "bed_name": "56",
+                    "total_info": 16,
+                    "patient_name": "韩美娣"
+                }
+            ],
+            "nurseLevelConfigDTO": {
+                "nurseLevelName": "一级护理",
+                "nurseLevelShort": "一",
+                "fontColor": "#FFFFFF",
+                "backgroundColor": "#0000FF"
+            }
+        },
+        {
+            "labelId": "1f47d157a89711efaed80cda411de3c6",
+            "labelName": "患者数",
+            "labelValue": "43",
+            "sort": 19,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [
+                {
+                    "bed_name": "1",
+                    "total_info": 43,
+                    "patient_name": "林兴彪"
+                },
+                {
+                    "bed_name": "2",
+                    "total_info": 43,
+                    "patient_name": "杨宇艇"
+                },
+                {
+                    "bed_name": "3",
+                    "total_info": 43,
+                    "patient_name": "毛满申"
+                },
+                {
+                    "bed_name": "5",
+                    "total_info": 43,
+                    "patient_name": "严根发"
+                },
+                {
+                    "bed_name": "6",
+                    "total_info": 43,
+                    "patient_name": "金梅德"
+                },
+                {
+                    "bed_name": "7",
+                    "total_info": 43,
+                    "patient_name": "王建达"
+                },
+                {
+                    "bed_name": "8",
+                    "total_info": 43,
+                    "patient_name": "陈阿宝"
+                },
+                {
+                    "bed_name": "10",
+                    "total_info": 43,
+                    "patient_name": "蔡兰"
+                },
+                {
+                    "bed_name": "11",
+                    "total_info": 43,
+                    "patient_name": "任开祥"
+                },
+                {
+                    "bed_name": "12",
+                    "total_info": 43,
+                    "patient_name": "朱道良"
+                },
+                {
+                    "bed_name": "13",
+                    "total_info": 43,
+                    "patient_name": "胡伟伟"
+                },
+                {
+                    "bed_name": "15",
+                    "total_info": 43,
+                    "patient_name": "马恩花"
+                },
+                {
+                    "bed_name": "17",
+                    "total_info": 43,
+                    "patient_name": "成玉珍"
+                },
+                {
+                    "bed_name": "18",
+                    "total_info": 43,
+                    "patient_name": "高秀荣"
+                },
+                {
+                    "bed_name": "20",
+                    "total_info": 43,
+                    "patient_name": "童金仙"
+                },
+                {
+                    "bed_name": "21",
+                    "total_info": 43,
+                    "patient_name": "李亚红"
+                },
+                {
+                    "bed_name": "23",
+                    "total_info": 43,
+                    "patient_name": "陈云年"
+                },
+                {
+                    "bed_name": "25",
+                    "total_info": 43,
+                    "patient_name": "泮昌菊"
+                },
+                {
+                    "bed_name": "27",
+                    "total_info": 43,
+                    "patient_name": "孙萍娟"
+                },
+                {
+                    "bed_name": "28",
+                    "total_info": 43,
+                    "patient_name": "肖志平"
+                },
+                {
+                    "bed_name": "29",
+                    "total_info": 43,
+                    "patient_name": "孙林萍"
+                },
+                {
+                    "bed_name": "30",
+                    "total_info": 43,
+                    "patient_name": "朱梦莹"
+                },
+                {
+                    "bed_name": "31",
+                    "total_info": 43,
+                    "patient_name": "张杏仙"
+                },
+                {
+                    "bed_name": "32",
+                    "total_info": 43,
+                    "patient_name": "仇银连"
+                },
+                {
+                    "bed_name": "33",
+                    "total_info": 43,
+                    "patient_name": "周瑞月"
+                },
+                {
+                    "bed_name": "35",
+                    "total_info": 43,
+                    "patient_name": "吴建军"
+                },
+                {
+                    "bed_name": "37",
+                    "total_info": 43,
+                    "patient_name": "陈文华"
+                },
+                {
+                    "bed_name": "38",
+                    "total_info": 43,
+                    "patient_name": "王玉菊"
+                },
+                {
+                    "bed_name": "39",
+                    "total_info": 43,
+                    "patient_name": "赵兴旺"
+                },
+                {
+                    "bed_name": "40",
+                    "total_info": 43,
+                    "patient_name": "唐小武"
+                },
+                {
+                    "bed_name": "41",
+                    "total_info": 43,
+                    "patient_name": "赵爱成"
+                },
+                {
+                    "bed_name": "42",
+                    "total_info": 43,
+                    "patient_name": "唐永福"
+                },
+                {
+                    "bed_name": "43",
+                    "total_info": 43,
+                    "patient_name": "李国成"
+                },
+                {
+                    "bed_name": "45",
+                    "total_info": 43,
+                    "patient_name": "张焕春"
+                },
+                {
+                    "bed_name": "46",
+                    "total_info": 43,
+                    "patient_name": "张永国"
+                },
+                {
+                    "bed_name": "47",
+                    "total_info": 43,
+                    "patient_name": "顾国定"
+                },
+                {
+                    "bed_name": "48",
+                    "total_info": 43,
+                    "patient_name": "乐平"
+                },
+                {
+                    "bed_name": "49",
+                    "total_info": 43,
+                    "patient_name": "毛均宜"
+                },
+                {
+                    "bed_name": "50",
+                    "total_info": 43,
+                    "patient_name": "张桂荣"
+                },
+                {
+                    "bed_name": "51",
+                    "total_info": 43,
+                    "patient_name": "何志聪"
+                },
+                {
+                    "bed_name": "52",
+                    "total_info": 43,
+                    "patient_name": "鲁满珍"
+                },
+                {
+                    "bed_name": "55",
+                    "total_info": 43,
+                    "patient_name": "田彬"
+                },
+                {
+                    "bed_name": "56",
+                    "total_info": 43,
+                    "patient_name": "韩美娣"
+                }
+            ],
+            "nurseLevelConfigDTO": null
+        },
+        {
+            "labelId": "1f48206ca89711efaed80cda411de3c6",
+            "labelName": "总床位",
+            "labelValue": "50",
+            "sort": 20,
+            "labelEvent": "",
+            "labelSql": "",
+            "inputType": 2,
+            "boardShowValue": "1",
+            "bedList": [
+                {
+                    "bed_name": "1",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "2",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "3",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "5",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "6",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "7",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "8",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "9",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "10",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "11",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "12",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "13",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "15",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "16",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "17",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "18",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "19",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "20",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "21",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "22",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "23",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "25",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "26",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "27",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "28",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "29",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "30",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "31",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "32",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "33",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "35",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "36",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "37",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "38",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "39",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "40",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "41",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "42",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "43",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "45",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "46",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "47",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "48",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "49",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "50",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "51",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "52",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "53",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "55",
+                    "total_info": 50
+                },
+                {
+                    "bed_name": "56",
+                    "total_info": 50
+                }
+            ],
+            "nurseLevelConfigDTO": null
+        }
+    ]
+}

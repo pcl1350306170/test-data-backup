@@ -1,0 +1,20 @@
+E:\www\yh\看板\看板10\vue.config.js
+
+    proxy: {
+      '/bnms/app-bn/homepage': {
+        target: 'http://localhost:28019/',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/bnms/app-bn/homepage': '/jiangsushengzhongyiyuan'
+        }
+      },
+      '/': {
+        target: 'http://192.168.31.97/',
+        changeOrigin: true,
+        ws: false,
+        pathRewrite: {
+          '^/': ''
+        }
+      }
+    }

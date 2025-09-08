@@ -1,0 +1,54 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "id": null,
+            "shiftChildId": null,
+            "shiftMainId": null,
+            "shiftName": "白班",
+            "beginTime": "08:00",
+            "endTime": "20:00",
+            "sort": 1,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": null,
+            "isDelete": null,
+            "remarks": null
+        },
+        {
+            "id": null,
+            "shiftChildId": null,
+            "shiftMainId": null,
+            "shiftName": "小夜",
+            "beginTime": "20:00",
+            "endTime": "08:00",
+            "sort": 2,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": null,
+            "isDelete": null,
+            "remarks": null
+        },
+        {
+            "id": null,
+            "shiftChildId": null,
+            "shiftMainId": null,
+            "shiftName": "大夜",
+            "beginTime": "20:00",
+            "endTime": "08:00",
+            "sort": 2,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": null,
+            "isDelete": null,
+            "remarks": null
+        }
+    ]
+}

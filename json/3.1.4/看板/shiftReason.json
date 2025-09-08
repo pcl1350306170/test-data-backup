@@ -1,0 +1,116 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "shiftReasonId": "d3b117ed514a44e5b29ecd899004f628",
+            "shiftReasonName": "正常",
+            "shiftReasonSql": "",
+            "sort": 1,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "277b11bcbde84246876c63a305d6a249",
+            "shiftReasonName": "入院",
+            "shiftReasonSql": "SELECT A.patient_id, A.patient_name, A.bed_name, inp_no, A.in_time, B.#value# as shift_text, A.sex, A.birthday FROM (( SELECT patient_id, inp_no, bed_name, patient_name, sex, in_time, birthday FROM bn_patient_in WHERE dept_id = '#deptId#' and in_time between '#dutyBegin#' and '#dutyEnd#' ) A LEFT JOIN ( select bpi.patient_id, bpi.#value# from bn_patient_info as bpi, ( select patient_id,label_sql,max(in_fqcy) as in_fqcy from bn_patient_info group by patient_id,label_sql ) as pp where bpi.patient_id = pp.patient_id and bpi.label_sql = pp.label_sql and bpi.in_fqcy = pp.in_fqcy and bpi.label_sql = 'diagnosis' ) B ON A.patient_id=B.patient_id )",
+            "sort": 2,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "0a02207ac16549e0be877e97284236bc",
+            "shiftReasonName": "预手术",
+            "shiftReasonSql": "select pi.patient_id, pi.inp_no, pi.bed_name, pi.patient_name, pi.diagnose, pi.sex, pi.in_time, pi.birthday from bn_patient_in as pi where pi.dept_id = '#deptId#' and TO_DAYS(pi.operation_time) - TO_DAYS('#shiftTime#') = 1",
+            "sort": 3,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "1207d3cc7d494de78988d45856059388",
+            "shiftReasonName": "手术",
+            "shiftReasonSql": "select pi.patient_id, pi.patient_name, pi.bed_name, pi.inp_no, pi.in_time, pi.diagnose as shift_text, pi.sex, pi.birthday from bn_patient_in as pi where pi.dept_id='#deptId#' and pi.operation_time between '#dutyBegin#' and '#dutyEnd#'",
+            "sort": 4,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "7cbab5d628904e04bf3fd6fe1aa16070",
+            "shiftReasonName": "危重",
+            "shiftReasonSql": "SELECT C.patient_id, C.patient_name, C.bed_name, C.inp_no, C.in_time, D.#value# AS shift_text, C.sex, C.birthday FROM ( SELECT A.patient_id, A.inp_no, A.bed_name, A.patient_name, A.sex, A.in_time, A.birthday FROM bn_patient_in A WHERE A.dept_id = '#deptId#' and (A.illness_status = '病危' or A.illness_status = '病重')) C LEFT JOIN ( select bpi.patient_id, bpi.#value# from bn_patient_info as bpi,(select patient_id,label_sql,max(in_fqcy) as in_fqcy from bn_patient_info group by patient_id,label_sql) as pp where bpi.patient_id = pp.patient_id and bpi.label_sql = pp.label_sql and bpi.in_fqcy = pp.in_fqcy and bpi.label_sql = 'diagnosis' ) D ON C.patient_id=D.patient_id",
+            "sort": 5,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "e0d741e1435f43558f96402cb2afe5f8",
+            "shiftReasonName": "出院",
+            "shiftReasonSql": "select poh.patient_id, poh.patient_name, poh.bed_name, poh.inp_no, poh.in_time, poh.out_hospital_diagnose shift_text, poh.sex, poh.birthday from bn_patient_out_hospital as poh where poh.dept_id = '#deptId#' and poh.out_hospital_time between '#dutyBegin#' and '#dutyEnd#'",
+            "sort": 6,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "be6e3d1b02b4403f8c057a1a575eea06",
+            "shiftReasonName": "转入",
+            "shiftReasonSql": "SELECT A.patient_id, A.patient_name, A.bed_name, A.inp_no, A.in_time, B.#value# AS shift_text, A.sex, A.birthday FROM (( SELECT A.patient_id, A.inp_no, B.bed_name, B.patient_name, A.sex, A.in_time, A.birthday FROM bn_patient_in A, bn_patient_transfer B WHERE A.patient_id = B.patient_id AND B.dept_id = '#deptId#' and B.transfer_time BETWEEN '#dutyBegin#' and '#dutyEnd#') A LEFT JOIN (select bpi.patient_id, bpi.#value# from bn_patient_info as bpi,(select patient_id,label_sql,max(in_fqcy) as in_fqcy from bn_patient_info group by patient_id,label_sql) as pp where bpi.patient_id = pp.patient_id and bpi.label_sql = pp.label_sql and bpi.in_fqcy = pp.in_fqcy and bpi.label_sql = 'diagnosis' ) B ON A.patient_id=B.patient_id)",
+            "sort": 7,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "b8beee7be2a947cabb511a0826b70a7f",
+            "shiftReasonName": "转出",
+            "shiftReasonSql": "SELECT A.patient_id, A.patient_name, A.bed_name, A.inp_no, A.in_time, B.#value# as shift_text, A.sex, A.birthday FROM( ( SELECT A.patient_id, A.inp_no, B.bed_name, B.patient_name, A.sex, A.in_time, A.birthday FROM bn_patient_in A, bn_patient_transfer B WHERE A.patient_id = B.patient_id AND B.from_dept_id = '#deptId#' and B.transfer_time BETWEEN '#dutyBegin#' and '#dutyEnd#' ) A  LEFT JOIN ( select bpi.patient_id, bpi.#value# from bn_patient_info as bpi, ( select patient_id,label_sql,max(in_fqcy) as in_fqcy from bn_patient_info group by patient_id,label_sql ) as pp where bpi.patient_id = pp.patient_id and bpi.label_sql = pp.label_sql and bpi.in_fqcy = pp.in_fqcy and bpi.label_sql = 'diagnosis' ) B ON A.patient_id=B.patient_id )",
+            "sort": 8,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "5d32dc92f1a94b4cb90f8122ecc85c07",
+            "shiftReasonName": "分娩",
+            "shiftReasonSql": "SELECT A.patient_id, A.patient_name, A.bed_name, A.inp_no, A.in_time, B.#value# AS shift_text, A.sex, A.birthday FROM (( SELECT A.patient_id, A.inp_no, B.bed_name, B.patient_name, A.sex, A.in_time, A.birthday FROM bn_patient_in A, bn_patient_childbirth B WHERE A.patient_id = B.patient_id AND B.dept_id = '#deptId#' and B.childbirth_time BETWEEN '#dutyBegin#' and '#dutyEnd#') A LEFT JOIN ( select bpi.patient_id, bpi.#value# from bn_patient_info as bpi,(select patient_id,label_sql,max(in_fqcy) as in_fqcy from bn_patient_info group by patient_id,label_sql) as pp where bpi.patient_id = pp.patient_id and bpi.label_sql = pp.label_sql and bpi.in_fqcy = pp.in_fqcy and bpi.label_sql = 'diagnosis' ) B ON A.patient_id=B.patient_id)",
+            "sort": 9,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "90cac9e61c3d41dd9f2e24df771380ec",
+            "shiftReasonName": "死亡",
+            "shiftReasonSql": "select pd.patient_id, pd.patient_name, pd.bed_name, pd.inp_no, pd.in_time, pd.diagnosis as shift_text, pd.sex, pd.birthday from bn_patient_death as pd where pd.dept_id = '#deptId#' and pd.death_time between '#dutyBegin#' and '#dutyEnd#'",
+            "sort": 10,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        },
+        {
+            "shiftReasonId": "07dc05b4885a4645b29adb5260b6a0b5",
+            "shiftReasonName": "其他",
+            "shiftReasonSql": "",
+            "sort": 11,
+            "formId": "fa7d8a8a1a1d4cf6b63901c436db8e01",
+            "deptId": null,
+            "remark": null,
+            "remark1": null
+        }
+    ]
+}

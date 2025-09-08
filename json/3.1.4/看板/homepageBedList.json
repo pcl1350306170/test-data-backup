@@ -1,0 +1,246 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "bedId": "cf2b6bf5a9a54d4a9e0edc32b9810a8f",
+            "bedName": "1",
+            "patientId": "GK7Q347866",
+            "patientName": "唐树宝"
+        },
+        {
+            "bedId": "7a31d4b8db5f49f096a4ec56c40bf158",
+            "bedName": "2",
+            "patientId": "GK7Q347596",
+            "patientName": "蒋宇杰"
+        },
+        {
+            "bedId": "84052c9e279a4bf498f125a9ba9758d7",
+            "bedName": "3",
+            "patientId": "GK7Q347854",
+            "patientName": "纪玉成"
+        },
+        {
+            "bedId": "561c5b5c6670443c9fcf865b732bfc1e",
+            "bedName": "4",
+            "patientId": "GK7Q346841",
+            "patientName": "陈凤友"
+        },
+        {
+            "bedId": "32f95afb602144908bf5a5873ac3538b",
+            "bedName": "5",
+            "patientId": "GK7Q346954",
+            "patientName": "熊翌玮"
+        },
+        {
+            "bedId": "cca2a6bdf72b4b3b8a614b943c0f4725",
+            "bedName": "6",
+            "patientId": "GK7Q347929",
+            "patientName": "汤素珍"
+        },
+        {
+            "bedId": "482325a9344e4d719a7dd1a8f8bb0834",
+            "bedName": "7",
+            "patientId": "GK7Q346460",
+            "patientName": "杨宝陆"
+        },
+        {
+            "bedId": "48f63dd790ac47a3925701d76491acff",
+            "bedName": "8",
+            "patientId": "GK7Q347751",
+            "patientName": "严梅"
+        },
+        {
+            "bedId": "920a4ad4f30749289805d0d5f55e6087",
+            "bedName": "9",
+            "patientId": "GK7Q346907",
+            "patientName": "徐贵华"
+        },
+        {
+            "bedId": "7714a7e40db44fa89ecfa39c7fc13a9f",
+            "bedName": "10",
+            "patientId": "GK7Q343443",
+            "patientName": "张佩林"
+        },
+        {
+            "bedId": "4de5aa7586d6456f9052bb44238891e0",
+            "bedName": "11",
+            "patientId": "GK7Q347915",
+            "patientName": "仇腊梅"
+        },
+        {
+            "bedId": "07ae901859d34ac59905c198bed09047",
+            "bedName": "12",
+            "patientId": "GK7Q347814",
+            "patientName": "陈金林"
+        },
+        {
+            "bedId": "531393f76a794d91ad0915c92d6e7bb9",
+            "bedName": "13",
+            "patientId": "GK7Q344791",
+            "patientName": "赵启章"
+        },
+        {
+            "bedId": "cdf428590660443bbb5f914468ae5d51",
+            "bedName": "14",
+            "patientId": "GK7Q348028",
+            "patientName": "张少来"
+        },
+        {
+            "bedId": "d13acd392ae74cda9cfde38c54ffcd68",
+            "bedName": "15",
+            "patientId": "GK7Q347707",
+            "patientName": "朱茂英"
+        },
+        {
+            "bedId": "12b94255804942b49b1a7ccde70c6a7d",
+            "bedName": "16",
+            "patientId": "GK7Q347709",
+            "patientName": "牛苏"
+        },
+        {
+            "bedId": "c2a4bdff130547a2a2dc4edfcbf688e6",
+            "bedName": "18",
+            "patientId": "GK7Q348054",
+            "patientName": "韦成玉"
+        },
+        {
+            "bedId": "90161bb901554fc681986853ff71ff7d",
+            "bedName": "20",
+            "patientId": "GK7Q344054",
+            "patientName": "侯洪英"
+        },
+        {
+            "bedId": "9d7a07c62f1445cf85bc53bb9066a160",
+            "bedName": "21",
+            "patientId": "GK7Q346997",
+            "patientName": "许惠"
+        },
+        {
+            "bedId": "613a19d5da884c5789ce9f310a31b36a",
+            "bedName": "22",
+            "patientId": "GK7Q347897",
+            "patientName": "胡海军"
+        },
+        {
+            "bedId": "56a35ecc563d41a98766251359ff272c",
+            "bedName": "23",
+            "patientId": "GK7Q347910",
+            "patientName": "邵怀标"
+        },
+        {
+            "bedId": "3292af7f5b114b96ae208ffa08f9bf58",
+            "bedName": "24",
+            "patientId": "GK7Q347903",
+            "patientName": "鲍中华"
+        },
+        {
+            "bedId": "0882323bb3f84e67a7d7803c89c50501",
+            "bedName": "25",
+            "patientId": "GK7Q347403",
+            "patientName": "徐歆言"
+        },
+        {
+            "bedId": "2a8f616c386d419d8ed7bf2e1c3f48bf",
+            "bedName": "27",
+            "patientId": "GK7Q347554",
+            "patientName": "杨正喜"
+        },
+        {
+            "bedId": "674873e0857049f3ba8a29809e78804d",
+            "bedName": "28",
+            "patientId": "GK7Q347851",
+            "patientName": "开正芳"
+        },
+        {
+            "bedId": "a343b781353e4878991ea971c888f3ff",
+            "bedName": "29",
+            "patientId": "GK7Q347944",
+            "patientName": "孙凤英"
+        },
+        {
+            "bedId": "e24a0d7cd1b6408db6332ab0e765fed1",
+            "bedName": "30",
+            "patientId": "GK7Q346927",
+            "patientName": "贺玉梅"
+        },
+        {
+            "bedId": "746b456c99ee43539f379e969082a9f9",
+            "bedName": "31",
+            "patientId": "GK7Q346140",
+            "patientName": "何维武"
+        },
+        {
+            "bedId": "6a3556b0d9284ff18100bacc1c1590aa",
+            "bedName": "32",
+            "patientId": "GK7Q347072",
+            "patientName": "郭学明"
+        },
+        {
+            "bedId": "0fd7b699dfab49679a2c45670d085184",
+            "bedName": "33",
+            "patientId": "GK7Q347698",
+            "patientName": "胡志友"
+        },
+        {
+            "bedId": "59451aa4bfb74681bac7994f4535a367",
+            "bedName": "34",
+            "patientId": "GK7Q347922",
+            "patientName": "颜路"
+        },
+        {
+            "bedId": "4722aa5ce70e4bbab57d9bd9a5fdbcf6",
+            "bedName": "35",
+            "patientId": "GK7Q347150",
+            "patientName": "朱正和"
+        },
+        {
+            "bedId": "699db34c941049cabe12ab647bf6f703",
+            "bedName": "36",
+            "patientId": "GK7Q347405",
+            "patientName": "徐哲析"
+        },
+        {
+            "bedId": "e78c3ac5b2af4e368c62ba2e52edb0f3",
+            "bedName": "37",
+            "patientId": "GK7Q347369",
+            "patientName": "陈凤英"
+        },
+        {
+            "bedId": "57cde5b8e6ca498babd0af751ffe3e0a",
+            "bedName": "38",
+            "patientId": "GK7Q346903",
+            "patientName": "汤同生"
+        },
+        {
+            "bedId": "c5fd951887554e12ae26aee3177be1ed",
+            "bedName": "39",
+            "patientId": "GK7Q346621",
+            "patientName": "费玉梅"
+        },
+        {
+            "bedId": "bca8113d27af44d1ac3b2de03ab48fe2",
+            "bedName": "40",
+            "patientId": "GK7Q347711",
+            "patientName": "孔凡珍"
+        },
+        {
+            "bedId": "ec16e36b405f42d4b39a38de15db858a",
+            "bedName": "41",
+            "patientId": "GK7Q347928",
+            "patientName": "韩志怀"
+        },
+        {
+            "bedId": "08c571ae894941c89ade4147dde171d1",
+            "bedName": "42",
+            "patientId": "GK7Q348055",
+            "patientName": "张怀稳"
+        },
+        {
+            "bedId": "4233f199ed5f47e684bbd6620ce0e90a",
+            "bedName": "43",
+            "patientId": "GK7Q347406",
+            "patientName": "吴健"
+        }
+    ]
+}

@@ -1,0 +1,102 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "classId": "1f55bd54a89711efaed80cda411de3c6",
+            "className": "专科护理治疗",
+            "sort": 1,
+            "labelType": 201,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+            "isDelete": 0
+        },
+        {
+            "classId": "1f555577a89711efaed80cda411de3c6",
+            "className": "基础护理治疗",
+            "sort": 2,
+            "labelType": 201,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+            "isDelete": 0
+        },
+        {
+            "classId": "1f550df0a89711efaed80cda411de3c6",
+            "className": "统计信息",
+            "sort": 3,
+            "labelType": 201,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+            "isDelete": 0
+        },
+        {
+            "classId": "1f5486e0a89711efaed80cda411de3c6",
+            "className": "护理信息",
+            "sort": 4,
+            "labelType": 201,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+            "isDelete": 0
+        },
+        {
+            "classId": "1f542c98a89711efaed80cda411de3c6",
+            "className": "病区概况",
+            "sort": 5,
+            "labelType": 201,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+            "isDelete": 0
+        },
+        {
+            "classId": "1f53a637a89711efaed80cda411de3c6",
+            "className": "高危管理",
+            "sort": 6,
+            "labelType": 201,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+            "isDelete": 0
+        },
+        {
+            "classId": "fff50f3a80b74b96a99113bfa16a509b",
+            "className": "过渡标签",
+            "sort": 7,
+            "labelType": 201,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+            "isDelete": 0
+        },
+        {
+            "classId": "d52894ea9e8b47409a104df30834c5db",
+            "className": "分级护理",
+            "sort": 8,
+            "labelType": 201,
+            "createTime": null,
+            "createUser": null,
+            "updateTime": null,
+            "updateUser": null,
+            "orgId": "9e1a5b7484744aeeb35241fb9ba09732",
+            "isDelete": 0
+        }
+    ]
+}

@@ -1,0 +1,67 @@
+{
+    "status": 0,
+    "desc": "操作成功",
+    "data": {
+        "25447f316219450486d17053d5b064ac": [
+            {
+                "deviceId": "123a",
+                "productId": "25447f316219450486d17053d5b064ac",
+                "productName": "空气检测仪",
+                "productKey": "air_monitor",
+                "deviceName": "空气检测仪2号",
+                "deviceKey": "",
+                "deviceType": "2",
+                "deviceSubType": "21",
+                "orgId": "",
+                "deptId": "",
+                "roomId": ""
+            },
+            {
+                "deviceId": "123b",
+                "productId": "25447f316219450486d17053d5b064ac",
+                "productName": "空气检测仪",
+                "productKey": "air_monitor",
+                "deviceName": "空气检测仪3号",
+                "deviceKey": "",
+                "deviceType": "2",
+                "deviceSubType": "21",
+                "orgId": "",
+                "deptId": "",
+                "roomId": ""
+            }
+        ],
+        "13ca96a26d6b454d9330a3080a863e4f": [
+            {
+                "deviceId": "123c",
+                "productId": "25447f316219450486d17053d5b064ac",
+                "productName": "光照传感器",
+                "productKey": "light_sensor",
+                "deviceName": "光照传感器壹",
+                "deviceKey": "",
+                "deviceType": "2",
+                "deviceSubType": "21",
+                "orgId": "",
+                "deptId": "",
+                "roomId": ""
+            }
+        ],
+        "ca006241a08d47bc80ad523939188769": [
+            {
+                "deviceId": "123d",
+                "productId": "25447f316219450486d17053d5b064ac",
+                "productName": "噪声仪",
+                "productKey": "noise_meter",
+                "deviceName": "噪声仪壹",
+                "deviceKey": "",
+                "deviceType": "2",
+                "deviceSubType": "21",
+                "orgId": "",
+                "deptId": "",
+                "roomId": ""
+            }
+        ]
+    },
+    "traceId": null,
+    "transparent": 0,
+    "success": true
+}

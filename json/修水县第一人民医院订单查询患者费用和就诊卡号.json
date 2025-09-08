@@ -1,0 +1,10 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": {
+        "money": 10000,
+        "prePayBal": 1251.3,
+        "perPayMoney": 5000,
+        "cardNo": "asd123"
+    }
+}

@@ -1,0 +1,45 @@
+{
+    "status": 0,
+    "desc": "操作成功",
+    "data": {
+            "id": "111",
+            "deviceId": "123a",
+            "deviceName": "体征检测仪2号",
+            "productId": "",
+            "deviceDataMap": {
+                "deviceType": null,
+                "null": null,
+                "loraMode": null,
+                "productId": null,
+                "detectStatus": null,
+                "detectTime": null,
+                "protocolVersion": null,
+                "hardwareVersion": null,
+                "deviceId": null,
+                "deviceName": null,
+                "softwareVersion": null,
+                "pulse": "112",
+                "breatheRate": "33",
+                "temperature": "36.6",
+                "heartRate": "55",
+                "systolicBloodPressure": "136",
+                "diastolicBloodPressure": "221",
+                "averageBloodPressure": "150",
+                "bloodSugar": "53",
+                "bloodOxygen": "333"
+            },
+            "deptId": "",
+            "roomId": "",
+            "bedId": "",
+            "patientId": "",
+            "detectTime": "",
+            "detectStatus": ""
+        }
+}
+
+    function getDivPosition(div){
+        var x = div.getBoundingClientRect().left;
+        var y = div.getBoundingClientRect().top;
+        return {x:x,y:y};
+    }
+

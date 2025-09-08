@@ -1,0 +1,276 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "itemCode": "J76A1",
+            "costItemName": "床位管理费J76A1",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "IS233",
+            "costItemName": "床位管理费IS233",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "RSPEV",
+            "costItemName": "床位管理费RSPEV",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "KVU6G",
+            "costItemName": "床位管理费KVU6G",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "OD306",
+            "costItemName": "床位管理费OD306",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "MWB7O",
+            "costItemName": "床位管理费MWB7O",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "2GG69",
+            "costItemName": "床位管理费2GG69",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "GIUD8",
+            "costItemName": "床位管理费GIUD8",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "5B37C",
+            "costItemName": "床位管理费5B37C",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "I1611",
+            "costItemName": "床位管理费I1611",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "RE1IO",
+            "costItemName": "床位管理费RE1IO",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "P7A16",
+            "costItemName": "床位管理费P7A16",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "5ICLC",
+            "costItemName": "床位管理费5ICLC",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "MJ3PB",
+            "costItemName": "床位管理费MJ3PB",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "V16RV",
+            "costItemName": "床位管理费V16RV",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "QNEFT",
+            "costItemName": "床位管理费QNEFT",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "DDD6O",
+            "costItemName": "床位管理费DDD6O",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "L0AKQ",
+            "costItemName": "床位管理费L0AKQ",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "9QEWW",
+            "costItemName": "床位管理费9QEWW",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "VQDUK",
+            "costItemName": "床位管理费VQDUK",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "G99FE",
+            "costItemName": "床位管理费G99FE",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "6448N",
+            "costItemName": "床位管理费6448N",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "O0EVG",
+            "costItemName": "床位管理费O0EVG",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "FGG98",
+            "costItemName": "床位管理费FGG98",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "MM4NC",
+            "costItemName": "床位管理费MM4NC",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "H1FD7",
+            "costItemName": "床位管理费H1FD7",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "6GOI2",
+            "costItemName": "床位管理费6GOI2",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "WWT0L",
+            "costItemName": "床位管理费WWT0L",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "UDT1N",
+            "costItemName": "床位管理费UDT1N",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        },
+        {
+            "itemCode": "6ODJN",
+            "costItemName": "床位管理费6ODJN",
+            "costItemPrice": "192.33",
+            "costItemCount": "3",
+            "costItemUnit": "元",
+            "costItemTotal": "600",
+            "medicalInsuranceType": "城镇医保"
+        }
+    ]
+}

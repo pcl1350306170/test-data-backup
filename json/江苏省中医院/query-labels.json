@@ -1,0 +1,242 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "labelId": "4e2b127197c84d448b5aa077586f6168",
+            "labelName": "测血压：",
+            "inputType": 2,
+            "dataSources": 4,
+            "relationField": "",
+            "relationValue": "",
+            "labelSql": null,
+            "boardShowValue": "{\"2\":\"#555555\"}",
+            "boardUpdate": 0,
+            "isShowStatus": 0,
+            "isOpenFrequency": 1,
+            "usedId": "4c4e52fc93874c209dd5df6fd11fc7c4",
+            "labelValue": "[{\"is_exec\":\"0\",\"bed_name\":\"1\",\"total_info\":\"\",\"patient_id\":\"1006808374\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"17\",\"total_info\":\"\",\"patient_id\":\"1001564945\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"18\",\"total_info\":\"\",\"patient_id\":\"1000823649\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"20\",\"total_info\":\"\",\"patient_id\":\"1004012128\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"24\",\"total_info\":\"\",\"patient_id\":\"1006886453\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"26\",\"total_info\":\"\",\"patient_id\":\"1001171866\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"27\",\"total_info\":\"\",\"patient_id\":\"1003903657\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"28\",\"total_info\":\"\",\"patient_id\":\"1004129679\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"34\",\"total_info\":\"\",\"patient_id\":\"1007451981\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"35\",\"total_info\":\"\",\"patient_id\":\"1007561052\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"37\",\"total_info\":\"\",\"patient_id\":\"1007615127\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"38\",\"total_info\":\"\",\"patient_id\":\"1004044149\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"40\",\"total_info\":\"\",\"patient_id\":\"1001481055\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"41\",\"total_info\":\"\",\"patient_id\":\"1000583342\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"42\",\"total_info\":\"\",\"patient_id\":\"1005261326\",\"patient_name\":\"\",\"patient_label\":\"\"},{\"is_exec\":\"0\",\"bed_name\":\"43\",\"total_info\":\"\",\"patient_id\":\"1007314346\",\"patient_name\":\"\",\"patient_label\":\"\"}]",
+            "positionList": {
+                "pad": "1",
+                "DNHost": "1",
+                "boardPatient": "1",
+                "patientCard": "1",
+                "pda": "1",
+                "bedCard": "1",
+                "board": "1"
+            },
+            "bedList": [
+                {
+                    "bed_name": "4",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "1"
+                },
+                {
+                    "bed_name": "8",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "2"
+                },
+                {
+                    "bed_name": "11",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "3"
+                },
+                {
+                    "bed_name": "19",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "4"
+                },
+                {
+                    "bed_name": "24",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "9"
+                },
+                {
+                    "bed_name": "26",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "5"
+                },
+                {
+                    "bed_name": "28",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "8"
+                },
+                {
+                    "bed_name": "35",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "6"
+                },
+                {
+                    "bed_name": "45",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "6"
+                },
+                {
+                    "bed_name": "50",
+                    "total_info": "",
+                    "patient_name": "",
+                    "patient_label": "",
+                    "executed_times": "10",
+                    "executed_frequency": "7"
+                }
+            ],
+            "bedListNotHis": [
+                {
+                    "is_exec": "0",
+                    "bed_name": "1",
+                    "total_info": "",
+                    "patient_id": "1006808374",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "17",
+                    "total_info": "",
+                    "patient_id": "1001564945",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "18",
+                    "total_info": "",
+                    "patient_id": "1000823649",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "20",
+                    "total_info": "",
+                    "patient_id": "1004012128",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "24",
+                    "total_info": "",
+                    "patient_id": "1006886453",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "26",
+                    "total_info": "",
+                    "patient_id": "1001171866",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "27",
+                    "total_info": "",
+                    "patient_id": "1003903657",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "28",
+                    "total_info": "",
+                    "patient_id": "1004129679",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "34",
+                    "total_info": "",
+                    "patient_id": "1007451981",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "35",
+                    "total_info": "",
+                    "patient_id": "1007561052",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "37",
+                    "total_info": "",
+                    "patient_id": "1007615127",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "38",
+                    "total_info": "",
+                    "patient_id": "1004044149",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "40",
+                    "total_info": "",
+                    "patient_id": "1001481055",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "41",
+                    "total_info": "",
+                    "patient_id": "1000583342",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "42",
+                    "total_info": "",
+                    "patient_id": "1005261326",
+                    "patient_name": "",
+                    "patient_label": ""
+                },
+                {
+                    "is_exec": "0",
+                    "bed_name": "43",
+                    "total_info": "",
+                    "patient_id": "1007314346",
+                    "patient_name": "",
+                    "patient_label": ""
+                }
+            ]
+        }
+    ]
+}

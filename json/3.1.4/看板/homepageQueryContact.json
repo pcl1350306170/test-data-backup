@@ -1,0 +1,16 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": [
+        {
+            "contactId": "4cdb00d5d7d146079edc99d5623de86d",
+            "contactName": "测试",
+            "contactNum": "18560665523",
+            "sort": null,
+            "deptId": null,
+            "orgId": null,
+            "contactType": 0,
+            "contactShow": 1
+        }
+    ]
+}

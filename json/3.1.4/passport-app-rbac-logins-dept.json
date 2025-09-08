@@ -1,0 +1,85 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": {
+        "userInfo": {
+            "jobTypeCodes": "[\"NURSE\"]",
+            "empId": "b912910b162a48f7a28be70697b88536",
+            "userStatus": 1,
+            "sex": 2,
+            "deptId": "8f7e5bef263c471fa919918fb11831c4",
+            "workingPicture": null,
+            "orgLevel": 2,
+            "phoneNum": null,
+            "userName": "pcl",
+            "userId": "b912910b162a48f7a28be70697b88536",
+            "orgId": "418a60e43c0145629bc477010c2f1bdd",
+            "cordNum": null,
+            "isSpeciallyInvite": 0,
+            "jobIds": "[\"81c6b63e806242e8a3603bbc42d846a8\"]",
+            "dataDeptIds": [
+                {
+                    "deptName": "测试部门",
+                    "deptLevel": 1,
+                    "ipNum": "",
+                    "isDelete": 0,
+                    "inpatient": 0,
+                    "deptId": "8f7e5bef263c471fa919918fb11831c4",
+                    "updateUser": "7de059acab0f4457ae36251eaa091760",
+                    "remark": null,
+                    "updateTime": "2024-07-11 15:43:26",
+                    "deptType": null,
+                    "ward": 0,
+                    "outpatient": 0,
+                    "parentId": "0",
+                    "orgId": "418a60e43c0145629bc477010c2f1bdd",
+                    "deptIcon": null,
+                    "deptKey": "Z094710050628614",
+                    "areaId": null,
+                    "createTime": "2024-01-26 14:44:49",
+                    "deptNameCode": null,
+                    "maxVisitCode": 50,
+                    "createUser": "7de059acab0f4457ae36251eaa091760",
+                    "deptCode": 1,
+                    "status": null,
+                    "medicalSkill": 0
+                }
+            ],
+            "empName": "pcl",
+            "intro": null,
+            "empNameCode": null,
+            "empKey": null,
+            "isFrozen": 0,
+            "empTitle": null
+        },
+        "loginToken": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBY2Nlc3NUb2tlbiIsImF1ZCI6IkFuZHJvaWRBcHAiLCJMb2dpblVzZXJJZCI6IjhhYjNiYWI0MjZiZTQ4ZjA5MzdkZjRkMjhiNDJhMjU5IiwiQXBwSWQiOiJiOTEyOTEwYjE2MmE0OGY3YTI4YmU3MDY5N2I4ODUzNiIsImlzcyI6IldlYlNlcnZlciIsImV4cCI6MTcyOTU3NjgxNiwiaWF0IjoxNzIxODAwODE2fQ.bG6MfuVrC_g_XZuFtFF5rqlJQt7XiaHa7DGxYH5YRAk",
+        "landingEndList": [
+            {
+                "landingEndId": "ed45e87e75cc4a718c1043ee023878a5",
+                "deviceType": "[\"wnBedSideExtension\"]",
+                "landingEndCode": "nurse",
+                "dataDept": 0,
+                "landingEndName": "床旁分机护士端",
+                "createTime": "2023-12-15 10:37:40",
+                "updateUser": "admin",
+                "remark": "",
+                "createUser": "admin",
+                "updateTime": "2023-12-15 10:37:40",
+                "sort": 0
+            },
+            {
+                "landingEndId": "4459cf9ec229478ba8fdba7aff5cd17d",
+                "deviceType": "[\"wnBedSideExtension\"]",
+                "landingEndCode": "doctor",
+                "dataDept": 0,
+                "landingEndName": "床旁分机医生端",
+                "createTime": "2023-12-15 10:37:40",
+                "updateUser": "admin",
+                "remark": "",
+                "createUser": "admin",
+                "updateTime": "2023-12-15 10:37:40",
+                "sort": 0
+            }
+        ]
+    }
+}

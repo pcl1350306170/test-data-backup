@@ -1,0 +1,8 @@
+{
+    "status": 200,
+    "desc": "操作成功",
+    "data": {
+        "orderId": "112564fagad454",
+        "qrCode": "https://pdai.tech/md/db/sql-lan/sql-lan.html"
+    }
+}

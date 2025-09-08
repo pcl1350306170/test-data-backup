@@ -1,0 +1,306 @@
+患者入院评估单 -- /mws/patientAdmissionAssessmentForm
+一般护理记录单 -- /mws/generalNursingRecordForm
+病例病程 -- /mws/outLinkCaseCourse
+检验结果 -- /mws/outLinkTestResult
+
+[
+  {
+    "label": "检验结果",
+    "camelCase": "testResult",
+    "kebabCase": "test-result"
+  },
+  {
+    "label": "病例病程",
+    "camelCase": "caseCourse",
+    "kebabCase": "case-course"
+  }
+]
+
+E:\www\yh\床旁\床旁3.1.3\src\zhbfbed\viewsmws\api\assessmentRecordForm.js
+E:\www\yh\床旁\床旁3.1.3\src\zhbfbed\viewsmws\views\assessmentRecordForm\views\patientAdmissionAssessmentForm.js
+
+呼和浩特市第一医院
+HUHEHAOTESHIDIYIYIYUAN
+
+测试数据：
+http://localhost:28019/huhehaoteshidiyiyiyuan-test/patientAdmissionAssessmentForm
+http://localhost:8080/bnms/app-bn/assessment/patientAdmissionAssessmentForm
+配置
+ '/bnms/app-bn/assessment': {
+        target: 'http://localhost:28019/',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/bnms/app-bn/assessment': '/huhehaoteshidiyiyiyuan-test'
+        }
+      },
+
+患者入院评估单====
+
+后台给我一个视图文档，给我整理到本地数据里面，变量是“dataInfo”，整理后的格式是：
+ dataInfo: {
+        recordId:"",//记录id，唯一标识
+      }
+视图如下：
+view_inhospitalEvaluationForm
+序号	字段	类型	长度	非空	唯一	说明
+1.	recordId	varchar	32	是	是	记录id，唯一标识
+2.	patientId	varchar	32	是		患者ID
+3.	phoneNumber	varchar	11	否		联系电话
+4.	degreeEducation	varchar	32	否		文化程度
+5.	marriage	varchar	10	否		婚姻状态
+6.	career	varchar	32	否		职业
+7.	nativePlace	varchar	500	否		籍贯
+8.	nationality	varchar	32	否		民族
+9.	religion	varchar	32	否		宗教
+10.	inhospitalDisposal	varchar	32	否		入院处置
+11.	inhospitalType	varchar	32	否		入院方式
+12.	inhospitalIntroduce	varchar	50	否		入院介绍
+13.	allergyHistory	varchar	50	否		过敏史
+14.	pastHistory	varchar	50	否		既往史
+15.	familyHistory	varchar	50	否		家族史
+16.	eatingHabits	varchar	50	否		饮食习惯
+17.	appetite	varchar	50	否		食欲
+18.	chewingDifficulty	varchar	50	否		咀嚼困难
+19.	dysphagia	varchar	50	否		吞咽困难
+20.	sleep	varchar	50	否		睡眠
+21.	assistedSleep	varchar	50	否		辅助睡眠
+22.	stool	varchar	50	否		大便
+23.	urinate	varchar	50	否		小便
+24.	healthAwareness	varchar	50	否		健康意识
+25.	smoke	varchar	50	否		吸烟
+26.	stopSmokeDay	varchar	10	否		停止吸烟天数
+27.	drinkingFrequency	varchar	50	否		饮酒频率
+28.	psychologicalState	varchar	50	否		心理状态
+29.	socialSkills	varchar	50	否		社交能力
+30.	concernsHospitalization	varchar	50	否		住院顾虑
+31.	temperature	varchar	5	否		体温
+32.	diastolicPressure	varchar	5	否		舒张压
+33.	systolicPressure	varchar	5	否		收缩压
+34.	pulse	varchar	5	否		脉搏
+35.	respiratoryRate	varchar	5	否		呼吸频率
+36.	height	varchar	5	否		身高
+37.	weight	varchar	5	否		体重
+38.	mind	varchar	50	否		神志
+39.	leftPupil	varchar	50	否		瞳孔-左
+40.	rightPupil	varchar	50	否		瞳孔-右
+41.	photoreaction	varchar	50	否		对光反应
+42.	expression	varchar	50	否		表情
+43.	nutritionalStatus	varchar	50	否		全身营养状态
+44.	mucocutaneous	varchar	50	否		皮肤黏膜
+45.	pressureInjury	varchar	50	否		压力性损伤
+46.	painRating	varchar	5	否		疼痛评级
+47.	isPain	varchar	5	否		是否有疼痛
+48.	barthelRating	varchar	5	否		Barthel评分
+49.	isDependent	varchar	5	否		是否需要依赖
+50.	bradenRating	varchar	5	否		Braden 评分
+51.	bradenLevel	varchar	10	否		评分风险等级（中高危）
+52.	fallPreventionRating	varchar	5	否		预防跌倒评分
+53.	fallPreventionLevel	varchar	10	否		预防跌倒等级（中高危）
+54.	caprimiRating	varchar	5	否		Caprimi评分
+55.	caprimiLevel	varchar	10	否		Caprimi等级（中高危）
+56.	paduaRating	varchar	5	否		Padua评分
+57.	nutritionalAssessment	varchar	5	否		营养评估
+58.	leftEarCondition	varchar	50	否		左耳状态
+59.	rightEarCondition	varchar	50	否		右耳状态
+60.	leftEyeCondition	varchar	50	否		左眼状态
+61.	rightEyeCondition	varchar	50	否		右眼状态
+62.	speakCondition	varchar	50	否		言语
+63.	senseOfSmell	varchar	50	否		嗅觉
+64.	oralCavity	varchar	50	否		口腔
+65.	tongue	varchar	50	否		舌头
+66.	missingTooth	varchar	50	否		缺牙
+67.	denture	varchar	50	否		假牙
+68.	gingiva	varchar	50	否		牙龈
+69.	woundCondition	varchar	500	否		伤口情况
+70.	catheterCondition	varchar	50	否		各种导管情况
+71.	signature	varchar	50	否		签名
+72.	inTime	date		否		入院时间
+73.	createUser	varchar	50	否		创建人
+74.	createtime	date		否		创建时间
+
+   dataInfo: {
+        recordId: "", // 记录id，唯一标识
+        patientId: "", // 患者ID
+        phoneNumber: "", // 联系电话
+        degreeEducation: "", // 文化程度
+        marriage: "", // 婚姻状态
+        career: "", // 职业
+        nativePlace: "", // 籍贯
+        nationality: "", // 民族
+        religion: "", // 宗教
+        inhospitalDisposal: "", // 入院处置
+        inhospitalType: "", // 入院方式
+        inhospitalIntroduce: "", // 入院介绍
+        allergyHistory: "", // 过敏史
+        pastHistory: "", // 既往史
+        familyHistory: "", // 家族史
+        eatingHabits: "", // 饮食习惯
+        appetite: "", // 食欲
+        chewingDifficulty: "", // 咀嚼困难
+        dysphagia: "", // 吞咽困难
+        sleep: "", // 睡眠
+        assistedSleep: "", // 辅助睡眠
+        stool: "", // 大便
+        urinate: "", // 小便
+        healthAwareness: "", // 健康意识
+        smoke: "", // 吸烟
+        stopSmokeDay: "", // 停止吸烟天数
+        drinkingFrequency: "", // 饮酒频率
+        psychologicalState: "", // 心理状态
+        socialSkills: "", // 社交能力
+        concernsHospitalization: "", // 住院顾虑
+        temperature: "", // 体温
+        diastolicPressure: "", // 舒张压
+        systolicPressure: "", // 收缩压
+        pulse: "", // 脉搏
+        respiratoryRate: "", // 呼吸频率
+        height: "", // 身高
+        weight: "", // 体重
+        mind: "", // 神志
+        leftPupil: "", // 瞳孔-左
+        rightPupil: "", // 瞳孔-右
+        photoreaction: "", // 对光反应
+        expression: "", // 表情
+        nutritionalStatus: "", // 全身营养状态
+        mucocutaneous: "", // 皮肤黏膜
+        pressureInjury: "", // 压力性损伤
+        painRating: "", // 疼痛评级
+        isPain: "", // 是否有疼痛
+        barthelRating: "", // Barthel评分
+        isDependent: "", // 是否需要依赖
+        bradenRating: "", // Braden 评分
+        bradenLevel: "", // 评分风险等级（中高危）
+        fallPreventionRating: "", // 预防跌倒评分
+        fallPreventionLevel: "", // 预防跌倒等级（中高危）
+        caprimiRating: "", // Caprimi评分
+        caprimiLevel: "", // Caprimi等级（中高危）
+        paduaRating: "", // Padua评分
+        nutritionalAssessment: "", // 营养评估
+        leftEarCondition: "", // 左耳状态
+        rightEarCondition: "", // 右耳状态
+        leftEyeCondition: "", // 左眼状态
+        rightEyeCondition: "", // 右眼状态
+        speakCondition: "", // 言语
+        senseOfSmell: "", // 嗅觉
+        oralCavity: "", // 口腔
+        tongue: "", // 舌头
+        missingTooth: "", // 缺牙
+        denture: "", // 假牙
+        gingiva: "", // 牙龈
+        woundCondition: "", // 伤口情况
+        catheterCondition: "", // 各种导管情况
+        signature: "", // 签名
+        inTime: "", // 入院时间
+        createUser: "", // 创建人
+        createtime: "" // 创建时间
+      },
+
+
+根据上面的数据，给我生成html页面代码，以第一行为例
+“1、床号、姓名、性别”
+html代码如下：
+<div class="h-content">
+        <div class="content-view">
+          <div class="label">
+            <span>床</span>
+            <span>号：</span>
+          </div>
+          <div class="value">{{dataInfo.bedName}}</div>
+        </div>
+        <div class="content-view">
+          <div class="label">
+            <span>姓</span>
+            <span>名：</span>
+          </div>
+          <div class="value">{{dataInfo.patientName}}</div>
+        </div>
+        <div class="content-view">
+          <div class="label">
+            <span>性</span>
+            <span>别：</span>
+          </div>
+          <div class="value">{{dataInfo.sex}}</div>
+        </div>
+      </div>
+
+
+所有需要显示的字段如下：
+1、床号、姓名、性别
+2、年龄、科室
+3、住院号、联系电话
+4、入院诊断
+5、文化程度、婚姻、职业
+6、籍贯、民族、宗教
+7、入院处置、入院方式
+8、入院介绍
+9、过敏史、既往史、家族史
+10、饮食习惯、食欲
+11、咀嚼困难、吞咽困难
+12、睡眠、辅助睡眠
+13、大便、小便
+14、健康意识、吸烟、停止吸烟天数
+15、饮酒
+16、心理状态、社交能力、住院顾虑
+17、体征T、BP、P、K
+18、身高、体重
+19、神志
+20、瞳孔-左、瞳孔-右
+21、对光反射
+22、表情、全身营养状况、皮肤黏膜
+23、压力性损伤
+24、疼痛评分、是否有疼痛
+25、Barthel评分、是否需要依赖
+26、Braden评分、评分风险等级（中高危）
+27、预防跌倒评分、预防跌倒等级（中高危）
+28、Caprimi评分、Caprimi等级（中高危）
+29、Padua评分、营养评估
+30、左耳状态、右耳状态、左眼状态、右眼状态
+31、言语、嗅觉、口腔、舌头
+32、缺牙、假牙、牙龈
+33、伤口情况
+34、各种导管情况
+35、签名、入院时间
+36、营养护理、饮食指导、心理护理
+37、精神状态是否正常、心理状态、一般健康状态标识
+38、吸烟状况、日吸烟量
+39、饮酒频率、日饮酒量、安全护理
+
+要求如下：
+1、每一行放在“<div class="h-content">”里面
+2、每一行的具体标签名称和值，放在“<div class="content-view">”里面
+3、具体标签名称放在“<div class="label">”里面，需要用“span”标签分割
+4、标签的值，匹配上面给的数据，没有的话，先生成一个驼峰格式的，前面加一个“__”标识，例如"__bedName"
+
+没问题的话给我生成这些代码吧。
+
+     
+给我生成合理的数据，以json格式返回  
+
+一般护理记录单  generalNursingRecordForm =======
+
+一般护理记录单
+后台提供视图字段如下，给我写一个js方法，可以生成100条数据，字段内容稍微合理即可。
+视图名：view_nursingRecordForm
+序号	字段	类型	长度	非空	唯一	说明
+1.	record_id	varchar	32	是	是	记录id，唯一标识
+2.	patient_id	varchar	32	是		患者ID
+3.	nursingTime	Date	32	是		护理时间
+4.	temperature	varchar	10	否		体温
+5.	heartRate	varchar	10	否		心率
+6.	pulse	varchar	10	否		脉搏
+7.	respiratoryRate	varchar	10	否		呼吸频率
+8.	bloodOxygenSaturation	varchar	10	否		血氧饱和度
+9.	diastolicPressure	varchar	5	否		舒张压
+10.	systolicPressure	varchar	5	否		收缩压
+11.	inProject	varchar	50	否		入项
+12.	intake	varchar	10	否		入量
+13.	outProject	varchar	50	否		出项
+14.	outtake	varchar	10	否		出量
+15.	remark	varchar	5000	否		病情观察/护理措施/效果
+16.	signature	varchar	50	否		签名
+17.	createUser	varchar	50	否		创建人
+18.	createtime	date		否		创建时间
+
+member.userInfo.empKey
+.patients[0].patientInViewDTO.personIdNo

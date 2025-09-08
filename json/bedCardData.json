@@ -1,0 +1,824 @@
+ {
+  status: 200,
+  desc: "操作成功",
+  data: {
+    enableHis: false,
+    patientInfos:[
+      {
+          "labelShowInfo": "#fefefe|#3bea60|标识|http://192.168.31.85/resource/img/icon_ht8lda0lsqt/1.svg",
+          "labelId": "b13aba33b9ec4a9898fd6dced02e2a68",
+          "labelShowType": 4,
+          "labelName": "VTE高危",
+          "labelSql": "VTEhighRisk",
+          "icon":""
+      },
+      {
+          "labelShowInfo": "#fefefe|#3bea60|标识|http://192.168.31.85/resource/img/icon_ht8lda0lsqt/2.svg",
+          "labelId": "4e0f6ab996fc11ecaec7005056858b32",
+          "labelShowType": 4,
+          "labelName": "飞沫隔离",
+          "labelSql": "",
+          "icon":""
+      },
+      {
+          "labelShowInfo": "#fefefe|#3bea60|标识|http://192.168.31.85/resource/img/icon_ht8lda0lsqt/3.svg",
+          "labelId": "6d15a76fe05d11eaaac50894ef61e244",
+          "labelShowType": 4,
+          "labelName": "多重耐药",
+          "icon":""
+      },
+      {
+          "labelShowInfo": "#fefefe|#3bea60|标识|http://192.168.31.85/resource/img/icon_ht8lda0lsqt/4.svg",
+          "labelId": "6d15a76fe05d11eaaac50894ef61e244",
+          "labelShowType": 4,
+          "labelName": "防跌倒",
+          "icon":""
+      },
+      {
+          "labelShowInfo": "#fefefe|#3bea60|标识|http://192.168.31.85/resource/img/icon_ht8lda0lsqt/5.svg",
+          "labelId": "6d15a76fe05d11eaaac50894ef61e244",
+          "labelShowType": 4,
+          "labelName": "防飞沫",
+          "icon":""
+      },
+      {
+          "labelShowInfo": "#fefefe|#3bea60|标识|http://192.168.31.85/resource/img/icon_ht8lda0lsqt/6.svg",
+          "labelId": "6bf1e18fe05d11eaaac50894ef61e244",
+          "labelShowType": 4,
+          "labelName": "控制滴速",
+          "icon":""
+      },
+      {
+          "labelShowInfo": "#fefefe|#3bea60|标识|http://192.168.31.85/resource/img/icon_ht8lda0lsqt/7.svg",
+          "labelId": "6bf1e18fe05d11eaaac50894ef61e244",
+          "labelShowType": 4,
+          "labelName": "绝对卧床",
+          "icon":""
+      },
+      {
+          "labelShowInfo": "#fefefe|#3bea60|标识|http://192.168.31.85/resource/img/icon_ht8lda0lsqt/8.svg",
+          "labelId": "6bf1e18fe05d11eaaac50894ef61e244",
+          "labelShowType": 4,
+          "labelName": "海鲜过敏过敏嘿严重嘿",
+          "icon":""
+      }
+  ],
+    orgInfo: {
+      deptName: "产房病区",
+      orgName: "成都京东方医院",
+      orgImage: "http://192.168.31.85/resource/img/99ac72a4f6fb494083fb9e29e9678f34.png",
+      orgCode: 2,
+      deptId: "1aeeb0b2017c11ec84dc005056a0a153",
+      orgId: "fe7a95dc1d1f4094b59f9c4e60fcd57f"
+    },
+    nurseLevelConfig: {
+      nurseLevelName: "一级护理",
+      nurseLevelShort: "一",
+      fontColor: "#FFFFFF",
+      backgroundColor: "#FF00FF"
+    },
+    bedName: "2",
+    patientIn: {
+      id: null,
+      patientId: {
+        labelId: "d585daeb7b3011eb8e44005056a0a153",
+        labelName: "患者ID",
+        labelSql: "patientId",
+        inputType: 1,
+        sort: 24,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: "0102",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      deptId: null,
+      personIdNo: {
+        labelId: "d5821fcd7b3011eb8e44005056a0a153",
+        labelName: "身份证件号码",
+        labelSql: "personIdNo",
+        inputType: 1,
+        sort: 15,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: "45102819431122033X",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      inFqcy: {
+        labelId: "d584f3f67b3011eb8e44005056a0a153",
+        labelName: "入院次数",
+        labelSql: "inFqcy",
+        inputType: 1,
+        sort: 14,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: 3,
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      patientName: {
+        labelId: "d57bdac77b3011eb8e44005056a0a153",
+        labelName: "患者姓名",
+        labelSql: "patientName",
+        inputType: 1,
+        sort: 21,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: "裘佳怡",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      sex: {
+        labelId: "d579eeef7b3011eb8e44005056a0a153",
+        labelName: "性别",
+        labelSql: "sex",
+        inputType: 1,
+        sort: 19,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: "男",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "男",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "女",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "未知",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "select"
+        }
+      },
+      doctorName: {
+        labelId: "d55e42fc7b3011eb8e44005056a0a153",
+        labelName: "主治医生",
+        labelSql: "doctorName",
+        inputType: 1,
+        sort: 17,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: '钟南山钟南山',
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "doctor"
+        }
+      },
+      doctorInfo: null,
+      nurseName: {
+        labelId: "d56449e27b3011eb8e44005056a0a153",
+        labelName: "责任护士",
+        labelSql: "nurseName",
+        inputType: 1,
+        sort: 16,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: '南丁格尔南丁格尔',
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "nurse"
+        }
+      },
+      nurseInfo: null,
+      inpNo: {
+        labelId: "d55ee3777b3011eb8e44005056a0a153",
+        labelName: "住院号",
+        labelSql: "inpNo",
+        inputType: 1,
+        sort: 23,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: "01020102010201020102",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      bedName: {
+        labelId: "d565dbfb7b3011eb8e44005056a0a153",
+        labelName: "床位号",
+        labelSql: "bedName",
+        inputType: 1,
+        sort: 22,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: "2",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      nurseLevel: {
+        labelId: "d56e83257b3011eb8e44005056a0a153",
+        labelName: "护理级别",
+        labelSql: "nurseLevel",
+        inputType: 1,
+        sort: 20,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: "一级护理",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "特级护理",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "一级护理",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "二级护理",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "三级护理",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "select"
+        }
+      },
+      birthday: {
+        labelId: "d55f7d337b3011eb8e44005056a0a153",
+        labelName: "出生日期",
+        labelSql: "birthday",
+        inputType: 1,
+        sort: 18,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: "2005-06-07 00:00:00",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "datetime"
+        }
+      },
+      inTime: {
+        labelId: "d5712a877b3011eb8e44005056a0a153",
+        labelName: "入院时间",
+        labelSql: "inTime",
+        inputType: 1,
+        sort: 2,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: "2021-12-28 16:20:22",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "datetime"
+        }
+      },
+      patientAge: {
+        labelId: "d55b832a7b3011eb8e44005056a0a153",
+        labelName: "年龄",
+        labelSql: "patientAge",
+        inputType: 1,
+        sort: 3,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 1,
+        isInitialize: 1,
+        value: "1岁10月10天",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      illnessStatus: {
+        labelId: "d575a0b37b3011eb8e44005056a0a153",
+        labelName: "病情",
+        labelSql: "illnessStatus",
+        inputType: 2,
+        sort: 13,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: "",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "病危",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "病重",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "一般",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "select"
+        }
+      },
+      insuranceType: {
+        labelId: "d562b3947b3011eb8e44005056a0a153",
+        labelName: "费别",
+        labelSql: "insuranceType",
+        inputType: 1,
+        sort: 12,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: "商业保险",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "自费",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "医保",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "商业保险",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "军人",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "新农合",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "select"
+        }
+      },
+      diagnose: {
+        labelId: "d56af6877b3011eb8e44005056a0a153",
+        labelName: "诊断",
+        labelSql: "diagnose",
+        inputType: 1,
+        sort: 9,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: "道令道令郎真郎真道令郎真道令郎真道令郎真",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      diet: {
+        labelId: "d5672c8f7b3011eb8e44005056a0a153",
+        labelName: "饮食",
+        labelSql: "diet",
+        inputType: 1,
+        sort: 10,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: "话说宝玉，举目见北静王世荣，头上戴着净白簪缨银翅王帽，穿着江牙海水五爪龙白蟒袍，系着碧玉红带，面如美玉，目似明星，真好秀丽人物。宝玉忙抢上来参见，世荣从轿内伸手搀住。见宝玉戴着束发银冠，勒着双龙出海抹额，穿着白蟒箭袖",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#346CEE",
+                fontColor: "#fff"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      allergy: {
+        labelId: "d582b7927b3011eb8e44005056a0a153",
+        labelName: "过敏",
+        labelSql: "allergy",
+        inputType: 1,
+        sort: 11,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: "彼时贾珍带着贾蓉来到诸长辈前让坐轿上马，因而贾赦一辈的各自上了车轿，贾珍一辈的也将要上马。凤姐因惦记着宝玉，怕他在郊外纵性不服家人的话，",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#f56c6c",
+                fontColor: "#FF4500"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      operationTime: null,
+      wristband: {
+        labelId: "d55a78cd7b3011eb8e44005056a0a153",
+        labelName: "腕带编码",
+        labelSql: "wristband",
+        inputType: 1,
+        sort: 8,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 1,
+        value: "123456",
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "input"
+        }
+      },
+      inDeptTime: null,
+      contentIsolation: {
+        labelId: "d55c1ee77b3011eb8e44005056a0a153",
+        labelName: "隔离",
+        labelSql: "contentIsolation",
+        inputType: 1,
+        sort: 4,
+        labelShowType: 1,
+        labelShowInfo: null,
+        isMiddle: 0,
+        isInitialize: 0,
+        value: null,
+        labelShowInfoObj: {
+          item: [
+            {
+              name: "空气隔离",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "飞沫隔离",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            },
+            {
+              name: "接触隔离",
+              config: {
+                backGroundColor: "#fff",
+                fontColor: "#000"
+              }
+            }
+          ],
+          style: "select"
+        }
+      },
+      qrcode: {
+        value: "123456"
+      },
+      other: [
+        {
+          labelId: "d59e589a7b3011eb8e44005056a0a153",
+          labelName: "入院诊断",
+          labelSql: "inDiagnose",
+          inputType: 1,
+          sort: 1,
+          labelShowType: 1,
+          labelShowInfo: null,
+          isMiddle: 0,
+          isInitialize: 0,
+          value: null,
+          labelShowInfoObj: {
+            item: [
+              {
+                name: "",
+                config: {
+                  backGroundColor: "#fff",
+                  fontColor: "#000"
+                }
+              }
+            ],
+            style: "input"
+          }
+        },
+        {
+          labelId: "d56032317b3011eb8e44005056a0a153",
+          labelName: "余额",
+          labelSql: "balance",
+          inputType: 2,
+          sort: 5,
+          labelShowType: 1,
+          labelShowInfo: null,
+          isMiddle: 0,
+          isInitialize: 0,
+          value: null,
+          labelShowInfoObj: {
+            item: [
+              {
+                name: "",
+                config: {
+                  backGroundColor: "#fff",
+                  fontColor: "#000"
+                }
+              }
+            ],
+            style: "input"
+          }
+        },
+        {
+          labelId: "d57029cb7b3011eb8e44005056a0a153",
+          labelName: "预交金额",
+          labelSql: "prepayment",
+          inputType: 1,
+          sort: 6,
+          labelShowType: 1,
+          labelShowInfo: null,
+          isMiddle: 0,
+          isInitialize: 0,
+          value: null,
+          labelShowInfoObj: {
+            item: [
+              {
+                name: "",
+                config: {
+                  backGroundColor: "#fff",
+                  fontColor: "#000"
+                }
+              }
+            ],
+            style: "input"
+          }
+        },
+        {
+          labelId: "d560d9df7b3011eb8e44005056a0a153",
+          labelName: "费用合计",
+          labelSql: "totalAmount",
+          inputType: 1,
+          sort: 7,
+          labelShowType: 1,
+          labelShowInfo: null,
+          isMiddle: 0,
+          isInitialize: 0,
+          value: null,
+          labelShowInfoObj: {
+            item: [
+              {
+                name: "",
+                config: {
+                  backGroundColor: "#fff",
+                  fontColor: "#000"
+                }
+              }
+            ],
+            style: "input"
+          }
+        },
+        {
+          labelId: "0d2fb6c7642944be8622a3c189a12c07",
+          labelName: "床头卡护士",
+          labelSql: "bedHeadNurse",
+          inputType: 1,
+          sort: 25,
+          labelShowType: 1,
+          labelShowInfo: null,
+          isMiddle: 0,
+          isInitialize: 0,
+          value: "李思思思思飞飞飞",
+          labelShowInfoObj: {
+            item: [
+              {
+                name: "",
+                config: {
+                  backGroundColor: "#fff",
+                  fontColor: "#000"
+                }
+              }
+            ],
+            style: "input"
+          }
+        },
+        {
+          labelId: "babcb778c4ac47d397afaf020f3fa3b1",
+          labelName: "床头卡医生",
+          labelSql: "bedHeadDoctor",
+          inputType: 1,
+          sort: 26,
+          labelShowType: 1,
+          labelShowInfo: null,
+          isMiddle: 0,
+          isInitialize: 0,
+          value: "撒旦发生的发撒旦法撒旦法",
+          labelShowInfoObj: {
+            item: [
+              {
+                name: "",
+                config: {
+                  backGroundColor: "#fff",
+                  fontColor: "#000"
+                }
+              }
+            ],
+            style: "input"
+          }
+        }
+      ]
+    },
+    roomInfo: [
+      {
+        deptId: "1aeeb0b2017c11ec84dc005056a0a153",
+        roomId: "777deb54706347138237b6a7b8278c76",
+        roomCode: "777deb54706347138237b6a7b8278c76",
+        roomName: "待产室",
+        director: null,
+        directorName: null,
+        matron: null,
+        matronName: null,
+        nursingLeader: [],
+        medicalLeader: []
+      }
+    ]
+  }
+}
