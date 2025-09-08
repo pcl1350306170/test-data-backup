@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="156px" height="123px" viewBox="0 0 156 123" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>多重耐药</title>
+    <defs>
+        <path d="M141.787333,119.462 L26.8333333,119.462 C20.93,119.462 16.1,114.632 16.1,108.728667 L16.1,26.8333333 C16.1,20.93 20.93,16.1 26.8333333,16.1 L141.787333,16.1 C147.690667,16.1 152.520667,20.93 152.520667,26.8333333 L152.520667,108.782333 C152.520667,114.685667 147.74487,119.462 141.787333,119.462" id="path-1"></path>
+        <filter x="-11.4%" y="-14.0%" width="122.7%" height="130.0%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <path d="M130.785667,70.0886667 L90.6966667,70.0886667 C86.8326667,70.0886667 83.72,66.976 83.72,63.112 L83.72,23.0766667 C83.72,19.2126667 86.8326667,16.1 90.6966667,16.1 L130.785667,16.1 C134.649667,16.1 137.762333,19.2126667 137.762333,23.0766667 L137.762333,63.1656667 C137.762333,66.976 134.596,70.0886667 130.785667,70.0886667" id="path-3"></path>
+        <filter x="-14.8%" y="-13.0%" width="129.6%" height="129.6%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.0117647059   0 0 0 0 0.654901961   0 0 0 0 0.941176471  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="padCard-床头卡" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="多重耐药备份" transform="translate(-203.000000, -475.000000)">
+            <g id="多重耐药" transform="translate(201.000000, 471.000000)">
+                <g id="编组" transform="translate(-4.293333, -3.440000)">
+                    <g id="Fill-2">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                        <use fill="#FFFFFF" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    </g>
+                    <g id="Fill-5">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                        <use fill="#03A7F0" fill-rule="evenodd" xlink:href="#path-3"></use>
+                    </g>
+                </g>
+                <g id="图标位置" transform="translate(90.160000, 22.856667)">
+                    <g id="编组" transform="translate(0.000000, 0.000000)" fill="#FFB400" opacity="0">
+                        <g id="图标背景底板60*60px" transform="translate(0.000000, 0.000000)">
+                            <rect x="3.55271368e-15" y="3.55271368e-15" width="32.2" height="32.2"></rect>
+                        </g>
+                    </g>
+                    <rect id="矩形" fill="#FFFFFF" x="3.22" y="10.1966667" width="12.3433333" height="4.83" rx="0.536666667"></rect>
+                    <path d="M14.49,15.5633333 L14.49,26.8780556 C14.49,27.149749 14.2726094,27.37 14.0044444,27.37 L4.77888889,27.37 C4.51072396,27.37 4.29333333,27.149749 4.29333333,26.8780556 L4.29333333,15.5633333" id="路径" stroke="#FFFFFF" stroke-width="1.07333333"></path>
+                    <path d="M15.0266667,12.3433333 L18.1133514,10.1966667 L18.1133514,7.23164787 L25.5346711,7.23164787 L25.5346711,10.1966667 L28.4433333,12.3433333 L28.4433333,24.6866667 C28.4433333,24.9830595 28.1801763,25.2233333 27.8555556,25.2233333 L14.49,25.2233333" id="路径" stroke="#FFFFFF" stroke-width="1.07333333"></path>
+                    <rect id="矩形备份" fill="#FFFFFF" x="16.6366667" y="2.68333333" width="10.1966667" height="4.83" rx="0.536666667"></rect>
+                    <rect id="矩形备份-2" fill="#FFFFFF" x="4.29333333" y="17.1733333" width="7.51333333" height="1.07333333" rx="0.536666667"></rect>
+                    <rect id="矩形备份-3" fill="#FFFFFF" x="4.29333333" y="20.3933333" width="7.51333333" height="1.07333333" rx="0.536666667"></rect>
+                    <rect id="矩形备份-4" fill="#FFFFFF" x="4.29333333" y="23.6133333" width="7.51333333" height="1.07333333" rx="0.536666667"></rect>
+                    <path d="M25.2233333,12.410899 L26.8333333,14.020899 L26.8333333,23.680899 C24.9604017,23.2718436 23.3504017,23.0929547 22.0033333,23.1442323 C20.2984872,23.0929547 18.5095983,23.2718436 16.6366667,23.680899 L16.6366667,14.020899 L18.2466667,12.410899 L25.2233333,12.410899 Z M22.54,15.0266667 L20.93,15.0266667 L20.9296667,17.172899 L18.7833333,17.1733333 L18.7833333,18.7833333 L20.9296667,18.782899 L20.93,20.93 L22.54,20.93 L22.5396667,18.782899 L24.6866667,18.7833333 L24.6866667,17.1733333 L22.5396667,17.172899 L22.54,15.0266667 Z" id="形状结合" fill="#FFFFFF"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

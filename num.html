@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字循环显示</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            color: white;
+            font-size: 40vw; /* 字体大小为视口宽度的10% */
+            font-family: Arial, sans-serif;
+			overflow:hidden;
+        }
+        #number {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="number">1</div>
+
+    <script>
+        let numberElement = document.getElementById('number');
+        let currentNumber = 1;
+
+        function updateNumber() {
+            numberElement.textContent = currentNumber;
+            currentNumber++;
+            if (currentNumber > 9999) {
+                currentNumber = 1;
+            }
+        }
+
+        setInterval(updateNumber, 1000);
+    </script>
+</body>
+</html>

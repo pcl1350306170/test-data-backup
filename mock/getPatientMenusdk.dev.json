@@ -1,0 +1,13 @@
+[
+  {"id":"1", "menuName":"床头卡", "menuCode": "sh", "icon": "/assets/images/home_menu_01.png", "url": ""},
+  {"id":"2", "menuName":"生活服务", "menuCode": "sh", "icon": "/assets/images/home_menu_02.png", "url": ""},
+  {"id":"3", "menuName":"健康宣教", "menuCode": "sh", "icon": "/assets/images/home_menu_03.png", "url": ""},
+  {"id":"4", "menuName":"消息提醒", "menuCode": "sh", "icon": "/assets/images/home_menu_04.png", "url": "msgIndex"},
+  {"id":"5", "menuName":"信息查询", "menuCode": "sh", "icon": "/assets/images/home_menu_05.png", "url": ""},
+  {"id":"6", "menuName":"充值估算", "menuCode": "sh", "icon": "/assets/images/home_menu_06.png", "url": ""},
+  {"id":"7", "menuName":"体征数据", "menuCode": "sh", "icon": "/assets/images/home_menu_07.png", "url": ""},
+  {"id":"8", "menuName":"护理任务", "menuCode": "sh", "icon": "/assets/images/home_menu_08.png", "url": ""},
+  {"id":"9", "menuName":"医疗计算", "menuCode": "sh", "icon": "/assets/images/home_menu_09.png", "url": ""},
+  {"id":"10", "menuName":"定时闹钟", "menuCode": "sh", "icon": "/assets/images/home_menu_10.png", "url": ""}
+  {"id":"11", "menuName":"床位一览", "menuCode": "sh", "icon": "/assets/images/home_menu_10.png", "url": ""}
+]

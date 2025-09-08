@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="171px" height="125px" viewBox="0 0 171 125" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 2</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="149" height="103" rx="10.6666667"></rect>
+        <filter x="-11.4%" y="-15.5%" width="122.8%" height="133.0%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="5.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <rect id="path-3" x="74" y="0" width="54" height="54" rx="6.93333333"></rect>
+        <filter x="-31.5%" y="-29.6%" width="163.0%" height="163.0%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="5.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="6297i-贵州省人民医院（有隔离内容" transform="translate(-171.000000, -456.000000)">
+            <g id="护理标识" transform="translate(23.000000, 466.000000)">
+                <g id="编组-2" transform="translate(159.000000, 0.000000)">
+                    <g id="矩形" fill-rule="nonzero">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                        <use fill="#FFFFFF" xlink:href="#path-1"></use>
+                    </g>
+                    <g id="矩形" fill-rule="nonzero">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-4)" xlink:href="#path-3"></use>
+                        <use fill="#03A7F0" xlink:href="#path-3"></use>
+                    </g>
+                    <g id="VTE风险" transform="translate(71.000000, -3.000000)">
+                        <g id="图标背景底板60*60px"></g>
+                        <path d="M20.073,41.2416 L24.7158,18.6 L21.2814,18.6 L18.6738,34.4046 L18.6102,34.4046 L16.0344,18.6 L12.6,18.6 L17.211,41.2416 L20.073,41.2416 Z M32.6298,41.2416 L32.6298,21.6528 L36.3822,21.6528 L36.3822,18.6 L25.6338,18.6 L25.6338,21.6528 L29.3862,21.6528 L29.3862,41.2416 L32.6298,41.2416 Z M47.4804,41.2416 L47.4804,37.998 L41.0568,37.998 L41.0568,31.3518 L46.6536,31.3518 L46.6536,28.299 L41.0568,28.299 L41.0568,21.6528 L47.4804,21.6528 L47.4804,18.6 L37.8132,18.6 L37.8132,41.2416 L47.4804,41.2416 Z" id="VTE" fill="#FEFEFE" fill-rule="nonzero"></path>
+                    </g>
+                    <text id="VTE高危" fill="#333333" fill-rule="nonzero" font-family="SourceHanSansCN-Regular, Source Han Sans CN" font-size="22" font-weight="normal">
+                        <tspan x="32.618" y="87">VTE高危</tspan>
+                    </text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
