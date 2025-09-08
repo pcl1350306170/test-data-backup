@@ -5,28 +5,28 @@
         "enableHis": false,
         "patientInfos": [
             {
-                "labelShowInfo": "http://localhost:89/test/img/label/失智.svg",
+                "labelShowInfo": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/label/失智.svg",
                 "labelId": "110001",
                 "labelShowType": 4,
                 "labelName": "失智",
                 "labelSql": "VTE"
             },
             {
-                "labelShowInfo": "http://localhost:89/test/img/label/VTE高危.svg",
+                "labelShowInfo": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/label/VTE高危.svg",
                 "labelId": "110002",
                 "labelShowType": 4,
                 "labelName": "VTE高危",
                 "labelSql": "VTE"
             },
             {
-                "labelShowInfo": "http://localhost:89/test/img/label/查房.svg",
+                "labelShowInfo": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/label/查房.svg",
                 "labelId": "110003",
                 "labelShowType": 4,
                 "labelName": "查房",
                 "labelSql": ""
             },
             {
-                "labelShowInfo": "http://localhost:89/test/img/label/多重耐药.svg",
+                "labelShowInfo": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/label/多重耐药.svg",
                 "labelId": "110004",
                 "labelShowType": 4,
                 "labelName": "多重耐药",
