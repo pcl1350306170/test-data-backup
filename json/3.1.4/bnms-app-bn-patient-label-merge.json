@@ -422,22 +422,22 @@
                         {
                             "name": "病危",
                             "config": {
-                                "backGroundColor": "#fff",
-                                "fontColor": "#000"
+                                "backGroundColor": "#ff4d4f",
+                                "fontColor": "#ffffff"
                             }
                         },
                         {
                             "name": "病重",
                             "config": {
-                                "backGroundColor": "#fff",
-                                "fontColor": "#000"
+                                "backGroundColor": "#faad14",
+                                "fontColor": "#ffffff"
                             }
                         },
                         {
                             "name": "一般",
                             "config": {
-                                "backGroundColor": "#fff",
-                                "fontColor": "#000"
+                                "backGroundColor": "#52c41a",
+                                "fontColor": "#ffffff"
                             }
                         }
                     ],
