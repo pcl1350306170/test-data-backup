@@ -10,6 +10,12 @@
                 "labelShowType": 4,
                 "labelName": "失智",
                 "labelSql": "VTE"
+            }, {
+                "labelShowInfo": "#472326|#514c4d",
+                "labelId": "110001",
+                "labelShowType": 1,
+                "labelName": "CSSZ失智",
+                "labelSql": "VTE"
             },
             {
                 "labelShowInfo": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/label/VTE高危.svg",
