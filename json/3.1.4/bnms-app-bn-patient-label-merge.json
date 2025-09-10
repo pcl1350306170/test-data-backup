@@ -42,7 +42,7 @@
         "orgInfo": {
             "deptName": "测试部门",
             "orgName": "3.1.4_Release",
-            "orgImage": "/resource/img/20240126/693fb2a7b0ca4734870ad11e7a3203d6.png",
+            "orgImage": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/logo.png",
             "orgCode": 2,
             "deptId": "8f7e5bef263c471fa919918fb11831c4",
             "orgId": "418a60e43c0145629bc477010c2f1bdd"
