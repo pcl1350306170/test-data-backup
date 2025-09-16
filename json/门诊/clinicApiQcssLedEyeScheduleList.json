@@ -1,0 +1,2319 @@
+{
+    "code": 200,
+    "msg": "操作成功",
+    "data": {
+        "scheduleList": [
+            {
+                "deptName": "医生科室",
+                "doctorList": [
+                    {
+                        "doctorKey": "024266",
+                        "doctorName": "王小娟",
+                        "doctorTitle": "主任医师,博士",
+                        "doctorDegree": "",
+                        "introduction": "本硕毕业于温州医学院眼视光专业,博士毕业于天津医科大学斜视与小儿眼科专业,师从赵堪兴教授,美国新英格兰视光学院和俄亥俄州立大学访问学者。从事眼视光专业二十年,擅长于儿童青少年近视防控、斜视、弱视、视功能检查与训练、RGP与角膜塑形镜验配等。",
+                        "expertise": "擅长于儿童青少年近视防控、斜视、弱视、视功能检查与训练、RGP与角膜塑形镜验配等。",
+                        "doctorPic": "/upload/plsc/024266.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午",
+                            "周四下午",
+                            "周日上午"
+                        ],
+                        "listSpecial": [
+                            "周三下午",
+                            "周四上午"
+                        ],
+                        "expertStr": "专家门诊:周一上午、周四下午、周日上午",
+                        "specialStr": "特需门诊:周三下午、周四上午"
+                    },
+                    {
+                        "doctorKey": "002398",
+                        "doctorName": "邹海东",
+                        "doctorTitle": "主任医师 教授 博士生导师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于复旦大学上海医学院，德国汉堡大学UKE临床医学中心博士后。眼科副主任兼任上海市眼病防治中心副主任，上海眼科学会青年委员，防盲和流行病学学组副组长，白内障学组组员。擅长治疗各种类型白内障、青光眼、眼外伤等疾病的诊断和治疗。",
+                        "expertise": "擅长白内障的诊断治疗、防盲和眼流行病学，及玻璃体视网膜显微手术等多种大中型眼科复杂手术",
+                        "doctorPic": "/upload/plsc/002398.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周一上午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "002115",
+                        "doctorName": "曹晖",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于上海医科大学，现复旦大学上海医学院，获硕士学位。擅长治疗视网膜脱离及糖尿病视网膜病变的诊断、激光及手术治疗。",
+                        "expertise": "糖尿病视网膜病变的随访、激光、手术治疗",
+                        "doctorPic": "/upload/plsc/002115.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周六下午",
+                            "周日下午"
+                        ],
+                        "listSpecial": [
+                            "周二上午"
+                        ],
+                        "expertStr": "专家门诊:周六下午、周日下午",
+                        "specialStr": "特需门诊:周二上午"
+                    },
+                    {
+                        "doctorKey": "002281",
+                        "doctorName": "吴星伟",
+                        "doctorTitle": "主任医师  博士生导师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于中国协和医科大学和中国中医科学院，获博士学位。中华医学会上海市眼科学会眼底病学组组长。擅长眼科出血性疾病、黄斑疾病、神经眼科疾病及葡萄膜疾病的诊治。对眼底激光与光动力治疗具有丰富经验。擅长应用中西医结合方法诊治各类眼科疑难杂症。",
+                        "expertise": "擅长眼科出血性疾病、黄斑疾病、神经眼科疾病及葡萄膜疾病的诊治",
+                        "doctorPic": "/upload/plsc/002281.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午",
+                            "周一下午",
+                            "周二上午",
+                            "周三上午",
+                            "周六上午",
+                            "周六下午",
+                            "周日上午",
+                            "周日下午"
+                        ],
+                        "listSpecial": [
+                            "周二下午"
+                        ],
+                        "expertStr": "专家门诊:周一上午、周一下午、周二上午、周三上午、周六上午、周六下午、周日上午、周日下午",
+                        "specialStr": "特需门诊:周二下午"
+                    },
+                    {
+                        "doctorKey": "002349",
+                        "doctorName": "刘海芸",
+                        "doctorTitle": "主任医师 副教授 硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于原上海医科大学，获硕士学位。长期从事眼科临床和教学工作，尤其在视网膜疾病、玻璃体疾病、眼外伤诊治及眼科超声诊断方面有较为丰富的临床经验。",
+                        "expertise": "复杂视网膜脱离、晚期糖尿病视网膜病变、黄斑病变、眼外伤等玻璃体视网膜疾病的诊断和治疗",
+                        "doctorPic": "/upload/plsc/002349.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周二上午"
+                        ],
+                        "listSpecial": [
+                            "周六下午",
+                            "周六上午"
+                        ],
+                        "expertStr": "专家门诊:周二上午",
+                        "specialStr": "特需门诊:周六下午、周六上午"
+                    },
+                    {
+                        "doctorKey": "025128",
+                        "doctorName": "季迅达",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "美国WILLS眼科医院访问学者,曾荣获上海市科学技术奖一等奖、全国妇幼健康科学技术奖三等奖,发表柳叶刀子刊等SCI论著十余篇。从事眼科临床二十余年,擅长视网膜母细胞瘤综合治疗,小儿眼底病诊治,眼内肿瘤、黄斑疾病、视网膜脱离及糖尿病性视网膜病变等眼底病的诊治。",
+                        "expertise": "擅长视网膜母细胞瘤综合治疗,小儿眼底病诊治,眼内肿瘤、黄斑疾病、视网膜脱离及糖尿病性视网膜病变等眼底病的诊治。",
+                        "doctorPic": "/upload/photo/0152a8c5b22e4e1bb927d34eb19cee64.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午",
+                            "周六上午"
+                        ],
+                        "listSpecial": [
+                            "周二下午",
+                            "周二上午",
+                            "周三上午",
+                            "周三下午",
+                            "周六下午",
+                            "周日上午",
+                            "周日下午"
+                        ],
+                        "expertStr": "专家门诊:周一上午、周六上午",
+                        "specialStr": "特需门诊:周二下午、周二上午、周三上午、周三下午、周六下午、周日上午、周日下午"
+                    },
+                    {
+                        "doctorKey": "015180",
+                        "doctorName": "张健",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "上睑下垂、重睑及内外眦成形、眼袋、睑退缩、睑外翻、倒睫等眼部整形手术,眼眶肿瘤、眼睑肿瘤的手术治疗,泪道阻塞;眼周瘢痕改善;眼部年轻化等眼周微整形,甲状腺相关眼病等。",
+                        "expertise": "上睑下垂、重睑及内外眦成形、眼袋、睑退缩、睑外翻、倒睫等眼部整形手术,眼眶肿瘤、眼睑肿瘤的手术治疗,泪道阻塞;眼周瘢痕改善;眼部年轻化等眼周微整形,甲状腺相关眼病等。",
+                        "doctorPic": "/upload/plsc/015180.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周日下午",
+                            "周日上午"
+                        ],
+                        "listSpecial": [
+                            "周五上午",
+                            "周六下午"
+                        ],
+                        "expertStr": "专家门诊:周日下午、周日上午",
+                        "specialStr": "特需门诊:周五上午、周六下午"
+                    },
+                    {
+                        "doctorKey": "014174",
+                        "doctorName": "郑颖",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "长期从事白内障及糖尿病眼病的基础及临床研究。对各类型白内障,尤其是糖尿病性白内障的诊疗具有丰富的临床经验。",
+                        "expertise": "擅长复杂性白内障超乳手术、散光矫正型人工晶体及多焦点人工晶体植入手术、飞秒激光白内障手术等。",
+                        "doctorPic": "/upload/plsc/014174.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一下午",
+                            "周六上午"
+                        ],
+                        "listSpecial": [
+                            "周四上午"
+                        ],
+                        "expertStr": "专家门诊:周一下午、周六上午",
+                        "specialStr": "特需门诊:周四上午"
+                    },
+                    {
+                        "doctorKey": "014173",
+                        "doctorName": "杨晓璐",
+                        "doctorTitle": "副主任医师,硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "上海交通大学眼科学博士,美国Wills Eye Hospital访问学者,上海市浦江人才计划获得者,上海市医学会眼科专科分会青年委员,眼科玻璃体视网膜学组秘书,承担国家、省部级课题6项,发表SCI收录论著25篇;授权国家发明专利2项。",
+                        "expertise": "视网膜脱离、糖尿病性视网膜病变、黄斑疾病、眼底出血以及眼内肿瘤的诊断与手术治疗。",
+                        "doctorPic": "/upload/photo/9baae59511974e94becec29dd2fc705b.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周三上午",
+                            "周日上午"
+                        ],
+                        "listSpecial": [
+                            "周一下午"
+                        ],
+                        "expertStr": "专家门诊:周三上午、周日上午",
+                        "specialStr": "特需门诊:周一下午"
+                    },
+                    {
+                        "doctorKey": "014171",
+                        "doctorName": "金慧昳",
+                        "doctorTitle": "副主任医师、医学博士",
+                        "doctorDegree": "",
+                        "introduction": "毕业于上海交通大学,美国Bascpm Palmer眼科研究所访问学者,擅长各类白内障和眼外伤诊治(包括老视矫正型白内障手术、飞秒激光辅助的白内障手术);主要从事晶状体疾病和眼底炎症性疾病的研究,发表论文20余篇,主持国自然基金1项,获得发明专利2项。",
+                        "expertise": "擅长各类白内障和眼外伤诊治(包括老视矫正型白内障手术、飞秒激光辅助的白内障手术)。",
+                        "doctorPic": "/upload/plsc/014171.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午",
+                            "周一下午",
+                            "周六下午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周一上午、周一下午、周六下午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "000008",
+                        "doctorName": "刘焰",
+                        "doctorTitle": "主任医师、医学博士、硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "干眼、胬肉、视疲劳、角结膜病、外伤、联合白内障、青光眼、玻切的角膜移植。",
+                        "expertise": "干眼、胬肉、视疲劳、角结膜病、外伤、联合白内障、青光眼、玻切的角膜移植。",
+                        "doctorPic": "/upload/plsc/000008.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周五上午"
+                        ],
+                        "listSpecial": [
+                            "周三下午"
+                        ],
+                        "expertStr": "专家门诊:周五上午",
+                        "specialStr": "特需门诊:周三下午"
+                    },
+                    {
+                        "doctorKey": "090006",
+                        "doctorName": "陈凤娥",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于上海第二医科大学,获学士学位。长期从事眼科临床诊治工作,有丰富的临床经验。擅长复杂性视网膜、糖尿病视网膜病变。",
+                        "expertise": "复杂性视网膜脱离、糖尿病视网膜病变的诊断和治疗",
+                        "doctorPic": "/upload/plsc/090006.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [],
+                        "expertStr": "",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "002748",
+                        "doctorName": "唐敏",
+                        "doctorTitle": "主任医师  博士 硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "上海医学会眼科分会青光眼学组委员,擅长各种类型青光眼、白内障、眼外伤的诊治,以及多种眼科激光治疗。",
+                        "expertise": "擅长青光眼、白内障、眼外伤的诊治，以及多种眼科激光治疗。",
+                        "doctorPic": "/upload/plsc/002748.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [
+                            "周三上午"
+                        ],
+                        "expertStr": "",
+                        "specialStr": "特需门诊:周三上午"
+                    },
+                    {
+                        "doctorKey": "014175",
+                        "doctorName": "周民稳",
+                        "doctorTitle": "主任医师,博士生导师",
+                        "doctorDegree": "",
+                        "introduction": "中华医学会眼科分会会员,毕业于中山大学中山眼科中心,获博士学历。美国匹兹堡大学眼科博士后,从事白内障,青光眼的基础和临床研究近20年,对白内障核晶状体疾病以及青光眼有较深造诣,擅长各种类型的白内障超声乳化手术如老年性白内障,外伤性白内障,高度近视硬核,青光眼术后白内障。擅长各种类型青光眼手术。第一作者发表SCI论文近30篇。主持完成国家自然科学基金1项,主持上海市自然科学基金1项。参与获得省级科技进步二等奖1项。上海市浦江人才,上海交通大学晨星青年学者。",
+                        "expertise": "擅长青光眼、白内障诊治;擅长各种类型的白内障超声乳化手术及青光眼手术。",
+                        "doctorPic": "/upload/plsc/014175.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周六上午",
+                            "周日下午",
+                            "周日上午"
+                        ],
+                        "listSpecial": [
+                            "周二上午"
+                        ],
+                        "expertStr": "专家门诊:周六上午、周日下午、周日上午",
+                        "specialStr": "特需门诊:周二上午"
+                    },
+                    {
+                        "doctorKey": "002353",
+                        "doctorName": "刘堃",
+                        "doctorTitle": "主任医师 教授 博士生导师",
+                        "doctorDegree": "",
+                        "introduction": "擅长糖尿病性视网膜疾病、黄斑疾病、视网膜脱离、白内障的诊断与治疗。擅长玻璃体视网膜手术及眼底血管性疾病的激光治疗.",
+                        "expertise": "糖尿病性视网膜病变、黄斑变性，视网膜脱离以及白内障的诊疗",
+                        "doctorPic": "/upload/plsc/002353.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午"
+                        ],
+                        "listSpecial": [
+                            "周三上午",
+                            "周六上午"
+                        ],
+                        "expertStr": "专家门诊:周一上午",
+                        "specialStr": "特需门诊:周三上午、周六上午"
+                    },
+                    {
+                        "doctorKey": "024122",
+                        "doctorName": "胡颖",
+                        "doctorTitle": "主任医师,医学博士,硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "上海激光医学分会眼科学组委员,上海医学会屈光及视光学组委员,上海中西医结合学会眼科分会委员。开展近视矫正手术20余年,国内较早开展激光治疗近视的专家,擅长各种近视手术(全飞秒手术,个性化飞秒手术,ICL晶体手术)。致力于青少年近视防控,并获得上海市近视防控先进个人称号。",
+                        "expertise": "各种近视手术(全飞秒手术,个性化飞秒手术,ICL晶体手术),斜视的手术治疗,青少年近视的综合防控。",
+                        "doctorPic": "/upload/plsc/024122.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周二下午",
+                            "周二上午",
+                            "周四下午"
+                        ],
+                        "listSpecial": [
+                            "周四上午"
+                        ],
+                        "expertStr": "专家门诊:周二下午、周二上午、周四下午",
+                        "specialStr": "特需门诊:周四上午"
+                    },
+                    {
+                        "doctorKey": "021251",
+                        "doctorName": "赵慧",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "中华医学会上海眼科分会眼表角膜学组副组长,中国医师协会眼表干眼学组委员。处理复杂眼表角膜疾病拥有丰富临床经验,擅长各类角膜移植手术,屈光白内障手术。长期专注干眼、泪液、眼表角膜疾病研究。",
+                        "expertise": "擅长各类角膜移植手术,屈光白内障手术。长期专注干眼、泪液、眼表角膜疾病研究。",
+                        "doctorPic": "/upload/plsc/021251.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [
+                            "周日上午"
+                        ],
+                        "expertStr": "",
+                        "specialStr": "特需门诊:周日上午"
+                    },
+                    {
+                        "doctorKey": "002138",
+                        "doctorName": "俞素勤",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于上海医科大学,曾在美国曼哈顿眼耳喉医院视网膜研究中心访学,目前担任中国医师协会眼科医师分会眼底病学组委员,中国老年医学学会眼科学分会委员,海峡两岸医药卫生交流协会眼科学专业委员会黄斑病学组和视网膜血管病学组委员,中国罕见病联盟眼科罕见病专业委员会委员,上海眼科学会眼底病学组副组长.",
+                        "expertise": "眼底影像的解读与分析,玻璃体-视网膜-黄斑疾病的诊断与治疗,多种眼底激光治疗技术。",
+                        "doctorPic": "/upload/plsc/002138.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午",
+                            "周一下午"
+                        ],
+                        "listSpecial": [
+                            "周二下午",
+                            "周六下午"
+                        ],
+                        "expertStr": "专家门诊:周一上午、周一下午",
+                        "specialStr": "特需门诊:周二下午、周六下午"
+                    },
+                    {
+                        "doctorKey": "021296",
+                        "doctorName": "李保江",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "中华医学会眼科学分会青年委员,从事眼科临床二十余年,擅长超声乳化白内障的手术治疗,青光眼的诊治,尤其擅长复杂白内障的手术、屈光白内障手术、飞秒辅助白内障手术、先天性白内障手术、人工晶状体悬吊手术,单线法人工晶体悬吊术设计者。",
+                        "expertise": "擅长超声乳化白内障的手术治疗,青光眼的诊治,尤其擅长复杂白内障的手术、屈光白内障手术、飞秒辅助白内障手术、先天性白内障手术、人工晶状体悬吊手术。",
+                        "doctorPic": "/upload/plsc/021296.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午"
+                        ],
+                        "listSpecial": [
+                            "周六下午",
+                            "周日上午"
+                        ],
+                        "expertStr": "专家门诊:周一上午",
+                        "specialStr": "特需门诊:周六下午、周日上午"
+                    },
+                    {
+                        "doctorKey": "002414",
+                        "doctorName": "朱弼珺",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "白内障 眼底激光 人工晶体植入",
+                        "expertise": "白内障的超声乳化手术、囊外摘除手术，人工晶体植入手术",
+                        "doctorPic": "/upload/plsc/002414.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一下午",
+                            "周三上午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周一下午、周三上午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "016182",
+                        "doctorName": "马明明",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "上海交通大学眼科学博士,长期致力于眼底病的诊治。擅长各种复杂眼底病的微创手术,如视网膜脱离、糖尿病视网膜病变、玻璃体积血、黄斑疾病、早产儿视网膜病变等。”全心全意为每一位患者解决眼部疾患“。",
+                        "expertise": "擅长眼底病微创手术,如糖尿病视网膜病变、视网膜脱离、玻璃体积血、黄斑疾病及小儿眼底病等的诊断和手术治疗。",
+                        "doctorPic": "/upload/plsc/016182.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一下午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周一下午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "016183",
+                        "doctorName": "石广森",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于香港理工大学眼视光学院,博士研究生学历,从事眼视光学临床和教研工作10余年,在青少年近视控制,斜弱视治疗、视疲劳、干眼病、角膜病以及低视力康复领域有较丰富的临床经验,尤其擅长特需隐形眼镜的验配,如角膜塑形镜、PRG等。",
+                        "expertise": "青少年近视矫治、斜视、弱视、视疲劳、干眼症、角膜病",
+                        "doctorPic": "/upload/plsc/016183.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一下午",
+                            "周一上午",
+                            "周日上午",
+                            "周日下午"
+                        ],
+                        "listSpecial": [
+                            "周四上午",
+                            "周五上午"
+                        ],
+                        "expertStr": "专家门诊:周一下午、周一上午、周日上午、周日下午",
+                        "specialStr": "特需门诊:周四上午、周五上午"
+                    },
+                    {
+                        "doctorKey": "024246",
+                        "doctorName": "桑延智",
+                        "doctorTitle": "副主任医师 、博士、副教授、硕导",
+                        "doctorDegree": "",
+                        "introduction": "第二军医大学本硕博,美国UW眼科访问学兼博后。军医30载,富于临床经验,精于显微手术。主刀手术万余例,连续两年长海医院“金牌主刀奖”。尤擅长黄斑、网脱手术、屈光白内障手术、超高度近视个性化设计手术。任上海白内障学组委员、中西医眼科常委。曾获军队三等功、上海市社会实践优秀指导教师、院十佳临床医师、优秀基层干部。",
+                        "expertise": "黄斑裂孔前膜、视网膜脱离、玻血、增殖糖网手术,复杂白内障高端晶体、超高度近视手术,视疲劳诊治。",
+                        "doctorPic": "/upload/plsc/024246.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周二上午",
+                            "周六下午",
+                            "周六上午",
+                            "周日上午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周二上午、周六下午、周六上午、周日上午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "002255",
+                        "doctorName": "王卫峻",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于上海第二医科大学，获复旦大学上海医学院硕士学位。长期从事各类眼底病：包括视网膜脱离、视网膜血管疾病及黄斑病变等的诊断和治疗工作。并擅长各类眼部整形修复及美容手术。",
+                        "expertise": "复杂玻璃体视网膜手术、严重糖尿病视网膜病变玻璃体手术、眼外伤手术、黄斑疾病微创玻璃体手术以及眼睑修复整形手术",
+                        "doctorPic": "/upload/plsc/002255.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周二上午"
+                        ],
+                        "listSpecial": [
+                            "周二下午",
+                            "周六上午"
+                        ],
+                        "expertStr": "专家门诊:周二上午",
+                        "specialStr": "特需门诊:周二下午、周六上午"
+                    },
+                    {
+                        "doctorKey": "023116",
+                        "doctorName": "张妍",
+                        "doctorTitle": "主任医师,医学博士,研究生导师",
+                        "doctorDegree": "",
+                        "introduction": "美国哈佛大学眼科博士后,中国女医生协会眼科专委会角膜屈光手术学组委员,全飞秒手术培训基地带教专家。擅长成人个性化屈光手术(全飞秒激光SMILE/飞秒激光FLAP/准分子激光LASEK/ICL晶体植入术),青少年屈光不正诊治。",
+                        "expertise": "擅长成人个性化屈光手术(全飞秒激光SMILE/飞秒激光FLAP/准分子激光LASEK/ICL晶体植入术),青少年屈光不正诊治。",
+                        "doctorPic": "/upload/plsc/023116.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [],
+                        "expertStr": "",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "090072",
+                        "doctorName": "李洁",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "1987年本科毕业于上海中医学院医疗系,同年进上海市中医医院中医眼科工作至今。1993年进上海市第一人民医院进修,2003年参加卫生局小科紧缺人才培养两年。目前退休。\r\n擅长用中药调理各种与全身疾病相关的眼病(葡萄膜炎等)、用针灸治疗与神经系统相关的眼病(视神经萎缩等)",
+                        "expertise": "擅长用中药调理各种与全身疾病相关的眼病(葡萄膜炎等)、用针灸治疗与神经系统相关的眼病(视神经萎缩等)",
+                        "doctorPic": "/upload/photo/fc4c2c5df361433fa2500a9fecbb51ab.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [
+                            "周三上午",
+                            "周日上午"
+                        ],
+                        "expertStr": "",
+                        "specialStr": "特需门诊:周三上午、周日上午"
+                    },
+                    {
+                        "doctorKey": "002412",
+                        "doctorName": "傅扬",
+                        "doctorTitle": "副主任医师  硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "    毕业于上海医科大学,美国密歇根大学眼科中心访问学者。斜视与小儿眼科副主任,中国医师协会斜视和小儿眼病专家委员会委员,上海市卫生系统脱贫攻坚先进个人。\r\n    擅长成人和小儿斜视的微创手术、复杂疑难手术及术后修复,弱视矫治,近视防控和儿童眼病。",
+                        "expertise": "擅长成人和小儿斜视的微创手术、复杂疑难手术及术后修复,弱视矫治,近视防控和儿童眼病。",
+                        "doctorPic": "/upload/plsc/002412.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周六下午"
+                        ],
+                        "listSpecial": [
+                            "周五上午"
+                        ],
+                        "expertStr": "专家门诊:周六下午",
+                        "specialStr": "特需门诊:周五上午"
+                    },
+                    {
+                        "doctorKey": "022228",
+                        "doctorName": "李宁东",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "原国家儿童医学中心、首都医科大学附属北京儿童医院眼科副主任,首都儿科研究所儿童医院眼科主任,原天津市眼科研究所常务副所长,斜视与小儿眼科二科科主任。首都医科大学、天津医科大学、南开大学研究生导师。美国国立眼科研究所NEI/NIH博士后以及约翰霍普斯金大学/约翰霍普斯金大学医学院威尔玛眼科研究所(Wilmer Eye Institute/the Johns Hopkins Hospital)高级访问学者。",
+                        "expertise": "擅长儿童视觉发育和遗传眼科的诊治,以及斜视、弱视的诊疗,特别擅长成人和儿童复杂斜视的手术治疗以及斜视再手术的修复。",
+                        "doctorPic": "/upload/plsc/022228.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周二上午"
+                        ],
+                        "listSpecial": [
+                            "周六上午",
+                            "周日上午"
+                        ],
+                        "expertStr": "专家门诊:周二上午",
+                        "specialStr": "特需门诊:周六上午、周日上午"
+                    },
+                    {
+                        "doctorKey": "017113",
+                        "doctorName": "沈胤忱",
+                        "doctorTitle": "副主任医师,医学博士",
+                        "doctorDegree": "",
+                        "introduction": "上海交通大学眼科学博士,长期从事眼底疾病诊疗,临床经验丰富。主持国家自然科学基金等4项课题,《我国糖尿病视网膜病变临床诊疗指南》等3项全国性临床指南和共识主要执笔人之一,获上海市“医苑新星”青年医学人才、上海交通大学医学院“九龙”优秀医学青年人才奖、上海交通大学“三八红旗手”、院优秀共产党员。",
+                        "expertise": "各类眼底及视网膜疾病手术及治疗,尤其擅长糖尿病视网膜病变、视网膜脱离、黄斑疾病等。",
+                        "doctorPic": "/upload/plsc/017113.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [],
+                        "expertStr": "",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "025100",
+                        "doctorName": "邵毅",
+                        "doctorTitle": "主任医师,教授,医学博士,博导,博士后导师",
+                        "doctorDegree": "",
+                        "introduction": "角膜病与眼表疾病中心主任、国际转化医学会副会长兼眼科学专委会主任委员,国际智能医学会副会长兼眼科学专委会主任委员,中国医药教育协会眼科影像与智能医疗专委会主任委员,英国皇家医学会会士、国际转化医学会会士、Bascom Palmer眼科访问学者,美国眼科学与视觉科学奖获得者、全球前2%顶尖科学家(2021、2023、2024)全国眼科专家学术影响力百强学者(排名15)、全球干眼顶尖专家(排名19),中国科协青年领军人才、省双千领军人才、省井冈学者、省百千万人才、省杰青、省主要学术与学科带头人、赣江青年学者,发表SCI论著312篇、牵头国家指南共识28部(英文6部)、牵头国家标准2项、团体标准20部、专利32项、主编教材4本、主编书籍32本、特邀述评92篇,主持国家级课题6项、省部级课题12项,第一完成人获省部级奖15项(一等奖6项)",
+                        "expertise": "疑难性角膜病,干眼,近视,屈光手术,眼眶病与眼整形,儿童眼科,眼视光学",
+                        "doctorPic": "/upload/plsc/025100.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午",
+                            "周二下午",
+                            "周二上午",
+                            "周六下午"
+                        ],
+                        "listSpecial": [
+                            "周六上午",
+                            "周日下午"
+                        ],
+                        "expertStr": "专家门诊:周一上午、周二下午、周二上午、周六下午",
+                        "specialStr": "特需门诊:周六上午、周日下午"
+                    },
+                    {
+                        "doctorKey": "002204",
+                        "doctorName": "樊莹",
+                        "doctorTitle": "主任医师 副教授 硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "视网膜脱离  黄斑病变  眼外伤",
+                        "expertise": "擅长复杂性视网膜脱离、糖尿病视网膜病变、高度近视黄斑病变、黄斑裂孔等微创手术和激光治疗,眼底感染性和出血性疾病的临床治疗。",
+                        "doctorPic": "/upload/plsc/002204.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [
+                            "周日上午"
+                        ],
+                        "expertStr": "",
+                        "specialStr": "特需门诊:周日上午"
+                    },
+                    {
+                        "doctorKey": "001952",
+                        "doctorName": "许迅",
+                        "doctorTitle": "主任医师 教授 博士生导师",
+                        "doctorDegree": "",
+                        "introduction": "视网膜脱离、糖尿病性眼病、 眼底病的诊断、治疗",
+                        "expertise": "玻璃体视网膜疾病、新生血管性眼病及眼部炎症的诊治",
+                        "doctorPic": "/upload/plsc/001952.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周日下午"
+                        ],
+                        "listSpecial": [
+                            "周日上午"
+                        ],
+                        "expertStr": "专家门诊:周日下午",
+                        "specialStr": "特需门诊:周日上午"
+                    },
+                    {
+                        "doctorKey": "002206",
+                        "doctorName": "王泓",
+                        "doctorTitle": "主任医师  硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于上海交通大学医学院，获硕士学位。十余年来一直从事眼科临床诊治工作，积累了丰富的临床经验。尤其擅长于复杂性视网膜脱离、糖尿病视网膜病变的手术，激光治疗，复杂性葡萄膜炎的诊治，尤其对激光和其他免疫抑制剂的使用有较丰富的经验。",
+                        "expertise": "葡萄膜炎及其并发症的治疗、眼底激光治疗",
+                        "doctorPic": "/upload/plsc/002206.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周二上午"
+                        ],
+                        "listSpecial": [
+                            "周日上午",
+                            "周日下午"
+                        ],
+                        "expertStr": "专家门诊:周二上午",
+                        "specialStr": "特需门诊:周日上午、周日下午"
+                    },
+                    {
+                        "doctorKey": "023246",
+                        "doctorName": "陈雪莉",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "复旦大学附属眼耳鼻喉科医院眼科博士,美国哈佛大学麻省眼耳医院眼遗传博士后,主持国家自然科学基金青年项目及面上项目2项,参与的科普项目“了解青光眼 战胜青光眼”或国家科技进步二等奖。",
+                        "expertise": "擅长各种类型青光眼及遗传性眼病的精确诊断和综合治疗。",
+                        "doctorPic": "/upload/plsc/023246.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周六上午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周六上午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "021101",
+                        "doctorName": "陈辉",
+                        "doctorTitle": "主任医师 博士生导师",
+                        "doctorDegree": "",
+                        "introduction": "美国眼科博士后,美容主诊医师;现任国家临床眼部疾病研究中心眼眶及眼整形美容科主任。擅长:1)甲亢/先天/近视突眼整形;2)眼眶骨折/凹陷修复;3)眼睑、眼眶肿瘤诊治;4)眼部整形美容,畸形矫正,面部年轻化;5)视神经病变诊治。",
+                        "expertise": "擅长:1)甲亢/先天/近视突眼整形;2)眼眶骨折/凹陷修复;3)眼睑、眼眶肿瘤诊治;4)眼部整形美容,畸形矫正,面部年轻化;5)视神经病变诊治。",
+                        "doctorPic": "/upload/plsc/021101.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周六下午"
+                        ],
+                        "listSpecial": [
+                            "周一上午",
+                            "周一下午"
+                        ],
+                        "expertStr": "专家门诊:周六下午",
+                        "specialStr": "特需门诊:周一上午、周一下午"
+                    },
+                    {
+                        "doctorKey": "002526",
+                        "doctorName": "宫媛媛",
+                        "doctorTitle": "主任医师  医学博士 硕导",
+                        "doctorDegree": "",
+                        "introduction": "眼科学博士,毕业于上海交通大学医学院。负责多项眼底病,神经眼科和遗传病相关临床试验研究。现为中华医学会神经眼科学组委员,上海葡萄膜炎神经眼科学组副组长等等。专长各类眼底病诊治,眼底影像分析,眼内药物注射及眼底激光治疗。",
+                        "expertise": "眼底黄斑及血管病变,葡萄莫炎,遗传性病变,神经眼科疾病诊治。",
+                        "doctorPic": "/upload/plsc/002526.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午",
+                            "周二上午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周一上午、周二上午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "025103",
+                        "doctorName": "江利红",
+                        "doctorTitle": "主任医师,眼科学博士",
+                        "doctorDegree": "",
+                        "introduction": "中国医师学会视觉康复委员会委员,上海市医学会眼科分会委员,上海市医学会视光分会青年委员,上海市医师学会眼科分会委员,上海市中西医结合学会眼科分会常委,上海市医学会医疗事故鉴定技术专家,上海市医苑新星讲师团组长。主持承担市局级科研项目多项,发表中英文论著20多篇,擅长各类复杂白内障,屈光性白内障,晶体脱位,人工晶体置换,玻璃体切割等手术,手术获得患者的认可并口口相传。热爱公益,经常参加各类义诊,多次去青海,云南,新疆,宁夏等边远贫困山区进行光明行复明手术,获评“上海市优秀志愿者”。",
+                        "expertise": "擅长各类复杂白内障,屈光性白内障,晶体脱位,人工晶体置换,玻璃体切割等手术。",
+                        "doctorPic": "/upload/plsc/025103.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周六上午"
+                        ],
+                        "listSpecial": [
+                            "周日上午"
+                        ],
+                        "expertStr": "专家门诊:周六上午",
+                        "specialStr": "特需门诊:周日上午"
+                    },
+                    {
+                        "doctorKey": "002203",
+                        "doctorName": "孙晓东",
+                        "doctorTitle": "主任医师 教授 博士生导师",
+                        "doctorDegree": "",
+                        "introduction": "美国Paimer研究所博士后。中华眼科学会全国委员、上海眼科学会委员、玻璃体视网膜专业委员、美国眼科学会会员、国家人事部国家级人才。从事视网膜脱离、糖尿病眼病、黄斑变性、外伤等玻璃体眼底疑难眼病诊治，开展微创显微手术、抗新生血管治疗等。",
+                        "expertise": "视网膜脱离、糖尿病视网膜病变、老年黄斑变性等眼底疾病诊治与显微外科手术",
+                        "doctorPic": "/upload/plsc/002203.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [
+                            "周一上午"
+                        ],
+                        "expertStr": "",
+                        "specialStr": "特需门诊:周一上午"
+                    },
+                    {
+                        "doctorKey": "013140",
+                        "doctorName": "王海燕",
+                        "doctorTitle": "主任医师,硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "美国Bascom Palmer Eye Institute访问学者。从事眼科临床工作10年,擅长白内障、青光眼、玻璃体视网膜疾病诊治;擅长青光眼白内障联合术、白内障超声乳化术、微创眼科显微手术。主持国家级课题2项,人事部博士后基金1项,上海市局级项目1项。发表SCI论文10余篇。获上海交通大学“九龙医学奖”提名奖。",
+                        "expertise": "擅长白内障、青光眼、玻璃体视网膜疾病诊治;擅长青光眼白内障联合术、白内障超声乳化术、微创眼科显微手术。",
+                        "doctorPic": "/upload/plsc/013140.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周六下午",
+                            "周日上午"
+                        ],
+                        "listSpecial": [
+                            "周二上午",
+                            "周四上午"
+                        ],
+                        "expertStr": "专家门诊:周六下午、周日上午",
+                        "specialStr": "特需门诊:周二上午、周四上午"
+                    },
+                    {
+                        "doctorKey": "017101",
+                        "doctorName": "刘文佳",
+                        "doctorTitle": "副主任医师,医学博士",
+                        "doctorDegree": "",
+                        "introduction": "上海交通大学眼科学博士,中国科学院脑科学与智能技术卓越创新中心博士后,长期从事各类复杂眼底疾病的诊治工作,尤其在糖尿病视网膜病变、黄斑疾病、视网膜血管性疾病的综合诊疗方面积累了丰富的经验,为患者制定个体化诊疗方案,全病程跟踪管理,主持国家自然科学基金、上海市科委等多项国家级、省部级项目,发表SCI论文20余篇,主编、参编写多本著作、译著。\r\n擅长各类视网膜、黄斑疾病,如黄斑变性、糖尿病性视网膜病变、视网膜血管疾病、葡萄膜炎等眼底病变。",
+                        "expertise": "擅长各类视网膜、黄斑疾病,如黄斑变性、糖尿病性视网膜病变、视网膜血管疾病、葡萄膜炎等眼底病变。",
+                        "doctorPic": "/upload/plsc/017101.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周二上午",
+                            "周四上午",
+                            "周日下午",
+                            "周日上午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周二上午、周四上午、周日下午、周日上午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "090023",
+                        "doctorName": "蔡文泉",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于中国人民解放军第二军医大学军医系,获医学学士学位。1988年进入上海市第一人民医院眼科工作至今,一直从事眼科临床医疗、科研和教学工作。",
+                        "expertise": "擅长各种视网膜脱离的诊断、治疗及手术,对糖网病、眼外伤、眼病理及眼底病亦有一定造诣。",
+                        "doctorPic": "/upload/plsc/090023.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [],
+                        "expertStr": "",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "001959",
+                        "doctorName": "徐娴",
+                        "doctorTitle": "副主任医师 硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "眼科学博士,日本东京医科齿科大学访问学者。主持和参与完成国家自然科学基金5项,发表SCI论文30余篇。",
+                        "expertise": "从事眼科临床工作20余年,擅长视网膜脱离,糖尿病性视网膜病变及病理性近视,黄斑疾病的诊断和治疗。",
+                        "doctorPic": "/upload/plsc/001959.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周日下午",
+                            "周日上午"
+                        ],
+                        "listSpecial": [
+                            "周三上午"
+                        ],
+                        "expertStr": "专家门诊:周日下午、周日上午",
+                        "specialStr": "特需门诊:周三上午"
+                    },
+                    {
+                        "doctorKey": "090068",
+                        "doctorName": "缪浴宇",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于上海医科大学，获学士学位。擅长治疗各种白内障及人工晶体植入术、白内障超声乳化手术、复杂白内障的显微手术，多种功能性人工晶体植入及无晶体假人工晶体植入、眼外伤后眼前段功能的重建手术。",
+                        "expertise": "白内障与晶状体疾病的诊断与治疗",
+                        "doctorPic": "/upload/plsc/090068.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [],
+                        "listSpecial": [
+                            "周日上午",
+                            "周日下午"
+                        ],
+                        "expertStr": "",
+                        "specialStr": "特需门诊:周日上午、周日下午"
+                    },
+                    {
+                        "doctorKey": "013144",
+                        "doctorName": "朱鸿",
+                        "doctorTitle": "主任医师",
+                        "doctorDegree": "",
+                        "introduction": "近视屈光手术,眼表及角膜病的临床诊治.",
+                        "expertise": "近视屈光手术,眼表及角膜病的临床诊治.",
+                        "doctorPic": "/upload/plsc/013144.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一下午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周一下午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "013143",
+                        "doctorName": "苏莉",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "黄斑变性,糖尿病视网膜病变,视网膜血管疾病,葡萄膜炎等,擅长眼内注药,眼底病激光治疗。",
+                        "expertise": "黄斑变性,糖尿病视网膜病变,视网膜血管疾病,葡萄膜炎等,擅长眼内注药,眼底病激光治疗。",
+                        "doctorPic": "/upload/plsc/013143.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周三上午",
+                            "周六上午"
+                        ],
+                        "listSpecial": [
+                            "周四上午",
+                            "周日下午"
+                        ],
+                        "expertStr": "专家门诊:周三上午、周六上午",
+                        "specialStr": "特需门诊:周四上午、周日下午"
+                    },
+                    {
+                        "doctorKey": "090069",
+                        "doctorName": "富名水",
+                        "doctorTitle": "副主任医师",
+                        "doctorDegree": "",
+                        "introduction": "毕业于华中科技大学同济医学院,获医学博士学位。擅长各种复杂、疑难眼病的诊断治疗,对各种眼病手术有丰富的经验,特别对各种青光眼的诊治有独到之处。",
+                        "expertise": "各种青光眼及白内障手术",
+                        "doctorPic": "/upload/plsc/090069.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周六下午",
+                            "周六上午"
+                        ],
+                        "listSpecial": [
+                            "周一上午"
+                        ],
+                        "expertStr": "专家门诊:周六下午、周六上午",
+                        "specialStr": "特需门诊:周一上午"
+                    },
+                    {
+                        "doctorKey": "001958",
+                        "doctorName": "罗大卫",
+                        "doctorTitle": "副主任医师,医学博士",
+                        "doctorDegree": "",
+                        "introduction": "长期从事晶体状疾病及糖尿病眼病的基础及研究。对白\n内障,晶状体疾病、眼底病的诊治具有丰富的临床经验。",
+                        "expertise": "擅长各类白内障、眼底病的手术治疗。",
+                        "doctorPic": "/upload/plsc/001958.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周三上午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周三上午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "012127",
+                        "doctorName": "张志华",
+                        "doctorTitle": "副主任医师,硕士生导师",
+                        "doctorDegree": "",
+                        "introduction": "上海市激光医学会分会青年委员,上海市第一人民医院屈光科行政副主任。上海交通大学医学博士,美国维克森林大学博士后。主持国家级等各类基金项目4项。入选上海市“医苑新星”青年医学人才,并获上海交通大学“九龙医学奖”。",
+                        "expertise": "各类近视矫正手术,尤其擅长Zeiss全飞秒激光、准分子激光和有晶体眼人工晶体植入术(ICL)。",
+                        "doctorPic": "/upload/plsc/012127.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一上午",
+                            "周一下午",
+                            "周日下午"
+                        ],
+                        "listSpecial": [
+                            "周四上午",
+                            "周四下午"
+                        ],
+                        "expertStr": "专家门诊:周一上午、周一下午、周日下午",
+                        "specialStr": "特需门诊:周四上午、周四下午"
+                    },
+                    {
+                        "doctorKey": "020303",
+                        "doctorName": "陈洁琼",
+                        "doctorTitle": "副主任医师、医学博士",
+                        "doctorDegree": "",
+                        "introduction": "中国医药教育协会眼科装备发展促进分会委员,中国康复技术转化及发展促进会眼科康复专业委员会委员,上海市生物医药协会眼基因与细胞治疗专委会委员兼秘书长,国际ARVO会员,亚洲防盲基金会先进个人。聚焦黄斑变性疾病、遗传性眼病的致病机制研究,擅长黄斑及视网膜疾病、遗传性眼病的诊断与治疗,负责多项遗传眼病基因治疗和细胞治疗IIT、国际多中心IND临床研究和老年性黄斑变性新药临床研究,主持和参与国家自然基金3项,发表SCI论文50余篇,中文述评2篇,作为主要执笔人之一参与制定我国遗传性眼病基因治疗专家共识2项。",
+                        "expertise": "擅长黄斑及视网膜疾病、遗传性眼病的诊断与治疗,负责多项遗传眼病基因和细胞治疗临床研究。",
+                        "doctorPic": "/upload/plsc/020303.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周一下午",
+                            "周四上午",
+                            "周六上午",
+                            "周六下午"
+                        ],
+                        "listSpecial": [],
+                        "expertStr": "专家门诊:周一下午、周四上午、周六上午、周六下午",
+                        "specialStr": ""
+                    },
+                    {
+                        "doctorKey": "025111",
+                        "doctorName": "宋毅",
+                        "doctorTitle": "副主任医师、医学博士、硕导",
+                        "doctorDegree": "",
+                        "introduction": "国医大师唐由之教授学术传承人,上海交通大学眼科学博士,美国南卡罗来纳大学医学院访问学者。从事中医眼科近二十年。上海市中医药学会眼科分会常委,中华中医药学会眼科分会委员,上海市中西医结合学会眼科分会委员,上海市针灸学会眼耳鼻喉专业委员会委员。",
+                        "expertise": "擅长中西医结合及针灸治疗干眼症、黄斑及血管病变、神经眼科疾病、葡萄膜炎、青少年近视防控及疑难杂症等。",
+                        "doctorPic": "/upload/plsc/025111.jpg",
+                        "orderNum": 0,
+                        "deptName": "眼科",
+                        "deptList": [
+                            {
+                                "createBy": 1,
+                                "createTime": "2025-02-20 10:55:46",
+                                "updateBy": 1,
+                                "updateTime": "2025-03-08 14:45:48",
+                                "tenantId": "000000",
+                                "deptId": 2873,
+                                "deptCode": "0000",
+                                "parentId": 1,
+                                "parentCode": "1",
+                                "shortCode": "ysks",
+                                "ancestors": "0,1",
+                                "deptName": "医生科室",
+                                "shortName": "",
+                                "introduction": "",
+                                "orderNum": 10,
+                                "tenantGroup": "",
+                                "deptGroup": "",
+                                "position": "",
+                                "status": "0",
+                                "delFlag": "0"
+                            }
+                        ],
+                        "listExpert": [
+                            "周二上午",
+                            "周二下午",
+                            "周六上午",
+                            "周六下午"
+                        ],
+                        "listSpecial": [
+                            "周四下午",
+                            "周四上午",
+                            "周日下午"
+                        ],
+                        "expertStr": "专家门诊:周二上午、周二下午、周六上午、周六下午",
+                        "specialStr": "特需门诊:周四下午、周四上午、周日下午"
+                    }
+                ]
+            }
+        ],
+        "stopWorkerList": [
+            "沈胤忱(周一上午)",
+            "陈凤娥(周一上午)",
+            "季迅达(周一下午)",
+            "江利红(周二上午)",
+            "陈凤娥(周二上午)",
+            "蔡文泉(周三全天)",
+            "沈胤忱(周三上午)",
+            "金慧昳(周三下午)",
+            "胡颖(周三上午)",
+            "沈胤忱(周四上午)",
+            "张妍(周六上午)",
+            "宫媛媛(周日全天)",
+            "李浩然(周一全天)",
+            "王佳琪(周一下午)",
+            "赵思远(周二下午)",
+            "刘若曦(周二全天)",
+            "孙明哲(周三上午)",
+            "周雨彤(周四下午)",
+            "吴宇轩(周四全天)",
+            "郑欣怡(周五上午)",
+            "马子昂(周五下午)",
+            "朱雨薇(周五全天)",
+            "何嘉乐(周六下午)",
+            "高思琪(周六全天)",
+            "林浩宇(周日上午)",
+            "郭雨桐(周日下午)",
+            "黄梓轩(周一上午)",
+            "徐欣妍(周二下午)",
+            "罗子墨(周三下午)",
+            "韩雨辰(周四上午)",
+            "邓佳宁(周五上午)",
+            "萧雨泽(周六下午)"
+        ],
+        "specialDeptList": [
+            "产科(上午)",
+            "产科(下午)",
+            "呼吸科(上午)",
+            "呼吸科(下午)",
+            "核医学科(上午)",
+            "核医学科(下午)",
+            "普内科(上午)",
+            "普内科(下午)",
+            "口腔科(上午)",
+            "口腔科(下午)",
+            "骨科脊柱三科(上午)",
+            "骨科脊柱三科(下午)",
+            "心内科(上午)",
+            "心内科(下午)",
+            "耳鼻喉科(上午)",
+            "耳鼻喉科(下午)",
+            "针灸科(上午)",
+            "针灸科(下午)",
+            "普外肝胆外科(上午)",
+            "普外肝胆外科(下午)",
+            "风湿免疫和变态反应科(上午)",
+            "风湿免疫和变态反应科(下午)",
+            "神经内科(上午)",
+            "神经内科(下午)",
+            "皮肤科(上午)",
+            "皮肤科(下午)",
+            "中医科(上午)",
+            "中医科(下午)",
+            "消化科(上午)",
+            "消化科(下午)",
+            "眼科(上午)",
+            "眼科(下午)",
+            "肾内科(上午)",
+            "肾内科(下午)",
+            "肿瘤科(上午)",
+            "肿瘤科(下午)",
+            "泌尿科(上午)",
+            "泌尿科(下午)",
+            "脑血管病科(上午)",
+            "脑血管病科(下午)",
+            "内分泌科(上午)",
+            "内分泌科(下午)",
+            "超声科(上午)",
+            "超声科(下午)",
+            "心理学科(上午)",
+            "心理学科(下午)",
+            "普外胃肠外科(上午)",
+            "普外胃肠外科(下午)",
+            "病理科(上午)",
+            "病理科(下午)",
+            "血液科(上午)",
+            "血液科(下午)",
+            "胸外科(上午)",
+            "胸外科(下午)",
+            "心超室(上午)",
+            "心超室(下午)",
+            "骨科脊柱一科(上午)",
+            "骨科脊柱一科(下午)",
+            "整形外科(上午)",
+            "整形外科(下午)",
+            "普外胰腺外科(上午)",
+            "普外胰腺外科(下午)",
+            "推拿科(上午)",
+            "推拿科(下午)",
+            "骨肿瘤科(上午)",
+            "骨肿瘤科(下午)",
+            "心外科(上午)",
+            "心外科(下午)",
+            "全科(上午)",
+            "全科(下午)",
+            "血管外科(上午)",
+            "血管外科(下午)",
+            "骨科脊柱二科(上午)",
+            "骨科脊柱二科(下午)",
+            "肿瘤放疗科(上午)",
+            "肿瘤放疗科(下午)",
+            "创伤骨科(上午)",
+            "创伤骨科(下午)",
+            "普外甲乳外科(上午)",
+            "普外甲乳外科(下午)",
+            "介入中心(上午)",
+            "介入中心(下午)",
+            "康复科(上午)",
+            "康复科(下午)",
+            "骨科运动医学科(上午)",
+            "骨科运动医学科(下午)",
+            "骨关节外科(上午)",
+            "骨关节外科(下午)",
+            "神经外科(上午)",
+            "神经外科(下午)",
+            "妇科(上午)",
+            "妇科(下午)",
+            "儿内科(上午)",
+            "儿内科(下午)",
+            "感染科(上午)",
+            "感染科(下午)",
+            "生殖医学中心(上午)",
+            "生殖医学中心(下午)"
+        ]
+    }
+}
