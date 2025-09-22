@@ -1,669 +1,847 @@
 {
-    "visitTransfer": true,
+    "IDconfirmationIoTPhysical": true,
+    "MinimumRechargeAmountBedHead": "500",
+    "MinimumRechargeAmountBedSide": "30",
+    "QRCodeLabelBedHead": "",
+    "QRCodeLabelBedSide": "",
+    "RayRehearse": {
+        "day": [
+            "yesterDay",
+            "toDay",
+            "tomorDay"
+        ],
+        "type": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            99,
+            7
+        ]
+    },
+    "RechargeIdentityBedHead": false,
+    "RechargeIdentityBedSide": true,
+    "SBARshiftHandover": false,
+    "SimMedAdvice": true,
+    "wegingCode": 11,
+    "adminPwd": 1337,
+    "advancePaymentUrls": [
+        {
+            "fileName": "预交款二维码",
+            "url": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/ll/3.png"
+        }
+    ],
+    "answerWayBedHead": 0,
+    "answerWayBedSide": 0,
+    "audioAndVideoRecordingsOtherPath": "/resource/mango",
+    "audioMaxVolumeBedSide": "15",
+    "autoCloseDoorTimeGuard": 5,
+    "autoGoIndex": false,
+    "autoGoIndexTime": 15,
+    "bedHeadCallScreening": false,
+    "bedHeadMenuArrayList": [
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "c8d8984ccf07444db5d9ff3dd16a38b4",
+            "menuCode": "_bedHead_bh",
+            "menuFrom": "bedHead",
+            "menuName": "床头卡",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "0",
+            "sort": 1
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "d5ca70d4b4444783bb6e6d507f3c17b8",
+            "menuCode": "_shopMain_bh",
+            "menuFrom": "bedHead",
+            "menuName": "生活服务",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/shopMain",
+            "parentId": "0",
+            "sort": 2
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "af54cac8a96a4d348d34ae7c8437b092",
+            "menuCode": "_edu_bh",
+            "menuFrom": "bedHead",
+            "menuName": "健康宣教",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/edu?type=myEdu&index=1",
+            "parentId": "0",
+            "sort": 3
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "94e1c095ab4c456d9ab4ef46489bc0dc",
+            "menuCode": "_msgIndex_bh",
+            "menuFrom": "bedHead",
+            "menuName": "消息提醒",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/msgIndex",
+            "parentId": "0",
+            "sort": 4
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "1cb7823edb3e4be9aa5c285e94f52fa9",
+            "menuCode": "_infoSearch_bh",
+            "menuFrom": "bedHead",
+            "menuName": "信息查询",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/infoSearch",
+            "parentId": "0",
+            "sort": 5
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "73ffbfbe527d4ea2bc09b0dc079786a9",
+            "menuCode": "_change_bh",
+            "menuFrom": "bedHead",
+            "menuName": "预交款",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/advancePayment",
+            "parentId": "0",
+            "sort": 6
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "b001bfd43ec84fe7b09017fef103918b",
+            "menuCode": "_calculator_bh",
+            "menuFrom": "bedHead",
+            "menuName": "医疗计算",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/calculator",
+            "parentId": "0",
+            "sort": 9
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "5400e7708ef1497c87ca21b1ac01629f",
+            "menuCode": "_clock_bh",
+            "menuFrom": "bedHead",
+            "menuName": "定时闹钟",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "0",
+            "sort": 10
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "07870cdf878f49a59dc1e652fecdca44",
+            "menuCode": "_call_bh",
+            "menuFrom": "bedHead",
+            "menuName": "呼叫按钮",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "0",
+            "sort": 11
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "7395c74e94e44a7f8c90fbce0d8fc69e",
+            "menuCode": "singleQuestionsList",
+            "menuFrom": "bedHead",
+            "menuName": "调查问卷",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/singleQuestionsList",
+            "parentId": "0",
+            "sort": 12
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "e1e1fa8bcdaa4767925d6e7dd546e1af",
+            "menuCode": "smmsCostQuery",
+            "menuFrom": "bedHead",
+            "menuName": "费用查询",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/smmsCostQuery",
+            "parentId": "0",
+            "sort": 13
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "a8f7bbac1ffb4e71ab17ac577340aec8",
+            "menuCode": "_pain_bh",
+            "menuFrom": "bedHead",
+            "menuName": "疼痛评分",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/painScore",
+            "parentId": "0",
+            "sort": 14
+        }
+    ],
+    "bedSideCallScreening": false,
+    "bedSideMenuArrayList": [
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "3838520ac96c46cd9ffdb17f27d17443",
+            "menuCode": "home",
+            "menuFrom": "bedSide",
+            "menuName": "首页",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/home",
+            "parentId": "0",
+            "sort": 1
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "99cfd361cdf9449aa03e836427f51a20",
+            "menuCode": "search",
+            "menuFrom": "bedSide",
+            "menuName": "宣教搜索",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/edu?type=search&index=0",
+            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f",
+            "sort": 1
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "b7bb08c0d8c04fb792ad040c0380e862",
+            "menuCode": "winehouse",
+            "menuFrom": "bedSide",
+            "menuName": "餐厅点餐",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "10a74598b6b64c0c8230f5f12c8a172a",
+            "sort": 1
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "ba269dff13024dc68ba758312b5106da",
+            "menuCode": "pCostManage",
+            "menuFrom": "bedSide",
+            "menuName": "费用查询",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/pCostManage",
+            "parentId": "ca2c00efa05d420380cb23e19afbf6da",
+            "sort": 1
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "d80b8a7be272445bb2fe44da7e25669c",
+            "menuCode": "_clock",
+            "menuFrom": "bedSide",
+            "menuName": "闹钟",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "3838520ac96c46cd9ffdb17f27d17443",
+            "sort": 1
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "de37b4e1ef3a4648bb84992d46f80ed1",
+            "menuCode": "video",
+            "menuFrom": "bedSide",
+            "menuName": "视频点播",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "6be860b88eea4872b1d7f17046a2b7d0",
+            "sort": 1
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "6be860b88eea4872b1d7f17046a2b7d0",
+            "menuCode": "amusementIndex",
+            "menuFrom": "bedSide",
+            "menuName": "娱乐",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/amusementIndex",
+            "parentId": "0",
+            "sort": 2
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "9c994f7be02540e89a191307dc869c65",
+            "menuCode": "myEdu",
+            "menuFrom": "bedSide",
+            "menuName": "我的宣教",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/edu?type=myEdu&index=1",
+            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f",
+            "sort": 2
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "cb4660e32bcb453fa57f8fad4d821562",
+            "menuCode": "signData",
+            "menuFrom": "bedSide",
+            "menuName": "体征数据",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/signData",
+            "parentId": "ca2c00efa05d420380cb23e19afbf6da",
+            "sort": 2
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "d9b074bcfc5d42d99cd0b789267da7d2",
+            "menuCode": "_tour",
+            "menuFrom": "bedSide",
+            "menuName": "医护巡视",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "3838520ac96c46cd9ffdb17f27d17443",
+            "sort": 2
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "e21c5062a7224d8f9ffd5324c838ba3b",
+            "menuCode": "shopping",
+            "menuFrom": "bedSide",
+            "menuName": "购物中心",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "10a74598b6b64c0c8230f5f12c8a172a",
+            "sort": 2
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "fb65476a306e4e0db360e3bdc6c5d3af",
+            "menuCode": "live",
+            "menuFrom": "bedSide",
+            "menuName": "电视直播",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "6be860b88eea4872b1d7f17046a2b7d0",
+            "sort": 2
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "10a74598b6b64c0c8230f5f12c8a172a",
+            "menuCode": "shopMain",
+            "menuFrom": "bedSide",
+            "menuName": "服务",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/shopMain",
+            "parentId": "0",
+            "sort": 3
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "219cc328333242628720646b39134fbd",
+            "menuCode": "music",
+            "menuFrom": "bedSide",
+            "menuName": "音乐戏曲",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/music",
+            "parentId": "6be860b88eea4872b1d7f17046a2b7d0",
+            "sort": 3
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "386d6665656345d985c7d7b439ea3e26",
+            "menuCode": "leaveHospitalPay",
+            "menuFrom": "bedSide",
+            "menuName": "费用结算",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/leaveHospitalPay",
+            "parentId": "ca2c00efa05d420380cb23e19afbf6da",
+            "sort": 3
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "45523dcd3dff4ad5bd56386a540d9d2e",
+            "menuCode": "workers",
+            "menuFrom": "bedSide",
+            "menuName": "护工聘请",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "10a74598b6b64c0c8230f5f12c8a172a",
+            "sort": 3
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "720e540570404605ba710f9983fb794f",
+            "menuCode": "_sign",
+            "menuFrom": "bedSide",
+            "menuName": "体征采集",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "3838520ac96c46cd9ffdb17f27d17443",
+            "sort": 3
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "fa6cc5c474844ed8b16beef5702af996",
+            "menuCode": "areaEdu",
+            "menuFrom": "bedSide",
+            "menuName": "病区宣教",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/edu?type=areaEdu&index=2",
+            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f",
+            "sort": 3
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "138e27f120ee419d9f1b5637a91bb3f0",
+            "menuCode": "_bedsideCard",
+            "menuFrom": "bedSide",
+            "menuName": "床头卡",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/bedsideIndex",
+            "parentId": "3838520ac96c46cd9ffdb17f27d17443",
+            "sort": 4
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "577eef8cbeed4b31999547f7d90d2b40",
+            "menuCode": "book",
+            "menuFrom": "bedSide",
+            "menuName": "电子书",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "6be860b88eea4872b1d7f17046a2b7d0",
+            "sort": 4
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "62a1bb39cd7541abba0dff9cbdadb4e3",
+            "menuCode": "allEdu",
+            "menuFrom": "bedSide",
+            "menuName": "全院宣教",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/edu?type=allEdu&index=3",
+            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f",
+            "sort": 4
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "645149041c4645a8a460e294ad9d8562",
+            "menuCode": "patient_inspection",
+            "menuFrom": "bedSide",
+            "menuName": "检查报告",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/clinical_report/patient_inspection",
+            "parentId": "ca2c00efa05d420380cb23e19afbf6da",
+            "sort": 4
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "49f0e9f77854423dbea5a4712123a15c",
+            "menuCode": "recharge",
+            "menuFrom": "bedSide",
+            "menuName": "在线充值",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/recharge",
+            "parentId": "ca2c00efa05d420380cb23e19afbf6da",
+            "sort": 5
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "807099533b754025bdf7889a499278b0",
+            "menuCode": "_stopwatch",
+            "menuFrom": "bedSide",
+            "menuName": "计时器",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "3838520ac96c46cd9ffdb17f27d17443",
+            "sort": 5
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "a9ab43c8640a4d929c73fb842844c274",
+            "menuCode": "questionnaireList",
+            "menuFrom": "bedSide",
+            "menuName": "问卷调查",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/edu?type=questionnaireList&index=4",
+            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f",
+            "sort": 5
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "b1f4804ad1c640fba25e31fd1b532f9f",
+            "menuCode": "edu",
+            "menuFrom": "bedSide",
+            "menuName": "宣教",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/edu",
+            "parentId": "0",
+            "sort": 5
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "ef42c3e9d9cb45e1bc0addf331217f45",
+            "menuCode": "game",
+            "menuFrom": "bedSide",
+            "menuName": "游戏",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "6be860b88eea4872b1d7f17046a2b7d0",
+            "sort": 5
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "0864539330714d889d724048f01654d7",
+            "menuCode": "hospitalMap",
+            "menuFrom": "bedSide",
+            "menuName": "院内地图",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "",
+            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f",
+            "sort": 6
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "35a180ce9a6f4bda8be60e2432536619",
+            "menuCode": "msgIndex",
+            "menuFrom": "bedSide",
+            "menuName": "提醒",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/msgIndex",
+            "parentId": "0",
+            "sort": 6
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "c2b3384b28654174ad2a65f0a2dbbe3e",
+            "menuCode": "_calculator",
+            "menuFrom": "bedSide",
+            "menuName": "医学计算器",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/calculator",
+            "parentId": "3838520ac96c46cd9ffdb17f27d17443",
+            "sort": 6
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "bc9067ba011c4f7c9e9d82769547e703",
+            "menuCode": "patient_examine",
+            "menuFrom": "bedSide",
+            "menuName": "检验结果",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/clinical_report/patient_examine",
+            "parentId": "ca2c00efa05d420380cb23e19afbf6da",
+            "sort": 7
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "ca2c00efa05d420380cb23e19afbf6da",
+            "menuCode": "mine",
+            "menuFrom": "bedSide",
+            "menuName": "我的",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/mine",
+            "parentId": "0",
+            "sort": 7
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "ef884a22f7424cab9eb8db4a7f1c3521",
+            "menuCode": "_user",
+            "menuFrom": "bedSide",
+            "menuName": "医护登录",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/docLogin",
+            "parentId": "3838520ac96c46cd9ffdb17f27d17443",
+            "sort": 7
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "c67a5fa3105f4da79a1f1c88ebf8ed88",
+            "menuCode": "patLogin",
+            "menuFrom": "bedSide",
+            "menuName": "退出登录",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "/patLogin",
+            "parentId": "ca2c00efa05d420380cb23e19afbf6da",
+            "sort": 9
+        },
+        {
+            "deviceId": "default",
+            "icon": "",
+            "id": "c8d891e5f042457b81da534ac01d88d0",
+            "menuCode": "call",
+            "menuFrom": "bedSide",
+            "menuName": "呼叫按钮",
+            "nurseUnitId": "1643cb4cf9e54857bc38df92b269cd93",
+            "pageUrl": "call",
+            "parentId": "0",
+            "sort": 999
+        }
+    ],
+    "bedsSwitchBedSide": false,
+    "bigWordType": "false",
+    "bodyTmperature": "37.5",
+    "brightViewBedHead": 15,
+    "brightViewBedSide": 15,
+    "brightViewDutyRoom": 30,
+    "broadCastShowFloat": false,
+    "broadcastEncryption": false,
+    "CallCenterDeviceList": [],
+    "CallCenterDeviceListHead": [],
+    "callClear": true,
+    "callPatient": 1,
+    "callPatientMainHost": 0,
+    "callToVerifyGate": false,
+    "callToVerifyPasswordGate": "3585668",
+    "cancelClickScreenToEnter": true,
+    "cardTemplateBedHead": {
+        "image": "/resource/json/bedHead/M2/index.jpg",
+        "label": "M8床头-九江",
+        "path": "/a10/bedhead/bedSideCard8-jiujiang.html"
+    },
+    "cardTemplateBedSide": {
+        "image": "/resource/json/bedHead/M2/index.jpg",
+        "label": "M8床旁-九江",
+        "path": "/a10/bedside/bedSideCard8-jiujiang.html"
+    },
+    "cardTransmissionOrder": "",
+    "circleTime": 10,
+    "closeScreenBedHead": {
+        "endTime": "06:00:00",
+        "startTime": "20:00:00"
+    },
+    "closeScreenBedSide": {
+        "endTime": "06:00:00",
+        "startTime": "20:00:00"
+    },
+    "colorLevelGate": [
+        {
+            "nurseLevelColor": "#FF0000",
+            "nurseLevelId": "0",
+            "nurseLevelName": "特级护理"
+        },
+        {
+            "nurseLevelColor": "#FF0000",
+            "nurseLevelId": "1",
+            "nurseLevelName": "一级护理"
+        },
+        {
+            "nurseLevelColor": "#FFFF00",
+            "nurseLevelId": "2",
+            "nurseLevelName": "二级护理"
+        },
+        {
+            "nurseLevelColor": "#00FF00",
+            "nurseLevelId": "3",
+            "nurseLevelName": "三级护理"
+        },
+        {
+            "nurseLevelColor": "#FFFFFF",
+            "nurseLevelId": "4",
+            "nurseLevelName": "四级护理"
+        },
+        {
+            "nurseLevelColor": "#FFFFFF",
+            "nurseLevelId": "5",
+            "nurseLevelName": "五级护理"
+        },
+        {
+            "nurseLevelColor": "#FFFFFF",
+            "nurseLevelId": "6",
+            "nurseLevelName": "六级护理"
+        },
+        {
+            "nurseLevelColor": "#FFFFFF",
+            "nurseLevelId": "7",
+            "nurseLevelName": "七级护理"
+        }
+    ],
+    "controlType": 0,
+    "controlTypeCardNumber": "",
+    "education": {
+        "educationId": "9a26cebe569649d8a66aadd83bdad86e",
+        "educationTitle": "中医经典病区门口机文章"
+    },
+    "deptNameColor": "#D7B369",
+    "doorLampList": [
+        {
+            "backgroundColor": "#FFFFFF",
+            "name": "护士进入",
+            "partColor": [
+                {
+                    "name": "上段",
+                    "value": "#FFFFFF"
+                },
+                {
+                    "name": "中段",
+                    "value": "#FFFFFF"
+                },
+                {
+                    "name": "下段",
+                    "value": "#FFFFFF"
+                }
+            ],
+            "radioValue": "1"
+        },
+        {
+            "backgroundColor": "#FFFFFF",
+            "name": "卫生间呼叫",
+            "partColor": [
+                {
+                    "name": "上段",
+                    "value": "#FFFFFF"
+                },
+                {
+                    "name": "中段",
+                    "value": "#FFFFFF"
+                },
+                {
+                    "name": "下段",
+                    "value": "#FFFFFF"
+                }
+            ],
+            "radioValue": "1"
+        }
+    ],
+    "doorLampOpen": false,
+    "doorLampOpenBedHead": false,
+    "doorLampOpenBedSide": false,
+    "doorOpenType": [],
+    "ecgFrequency": 60,
+    "eduAutoPlayBedhead": false,
+    "eduAutoPlayBedside": false,
+    "eduStyleBedHead": "list",
+    "eduStyleBedSide": "list",
+    "faceKey": "",
+    "faceSession": "",
+    "hangUpCall": false,
+    "horizontalImage": "",
+    "hostPlay": false,
+    "informationQueryAuthBedHead": false,
+    "isAlwaysBedHead": false,
+    "isAutoLogin": false,
+    "isBackBedSide": true,
+    "deviceSettingBedHead": false,
+    "deviceSettingBedSide": false,
+    "isBusinessBedSide": [],
+    "isBusinessBedHead": [
+        {
+            "isShow": true,
+            "title": "餐厅点餐"
+        },
+        {
+            "isShow": true,
+            "title": "商超便利"
+        },
+        {
+            "isShow": true,
+            "title": "护工中心"
+        }
+    ],
+    "isCallBedHead": true,
+    "isCallBedSide": true,
+    "isCallCenterUseHead": false,
+    "isCallGate": true,
+    "callForwarding": false,
+    "isCircle": true,
+    "isCostDetailsBedSide": true,
+    "isCostDetailsBedHead": true,
+    "isCostLevelBedSide": true,
+    "deviceSettingGuard": false,
+    "isdoorshow": "doorroom",
+    "deviceSettingDutyRoom": false,
+    "isFilterNameBedHead": false,
+    "isFilterNameBedSide": false,
+    "deviceSettingMainHost": false,
+    "isIPTVBedSide": [
+        {
+            "isShow": true,
+            "title": "电视直播"
+        },
+        {
+            "isShow": true,
+            "title": "视频点播"
+        }
+    ],
     "isAlways": false,
-    "isCostLevelBedHead": true,
-    "stopBedHeadCall": false,
-    "autoRestartAssistant": {
+    "isNavi": false,
+    "isNonePatientBedSide": false,
+    "isPayBedSide": true,
+    "isAudioAndVideoRecordingsOther": true,
+    "deviceSettingGate": true,
+    "isScreenOffDoor": false,
+    "isShowDeptName": false,
+    "isShowNameGate": true,
+    "deviceSettingVisit": false,
+    "isWardRoundGate": true,
+    "iscloseScreenBedHead": true,
+    "iscloseScreenBedSide": true,
+    "iscloseScreenDutyRoom": false,
+    "isopenScreenQrBedSide": false,
+    "kHandlerCallTypeBedHead": 1,
+    "kHandlerCallTypeBedSide": 1,
+    "loginMode": [
+        "1"
+    ],
+    "loginPwd": false,
+    "autoGetSignOther": {
+        "autoGetSignTime": 1,
+        "isAutoGetSign": true
+    },
+    "lightBedHead": [
+        {
+            "Light": "50",
+            "Time": "08:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "12:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "14:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "18:00:00"
+        }
+    ],
+    "autoRestartBedHead": {
         "state": false,
         "time": "20:00:00"
     },
-    "emptyBedAutoStopScreen": true,
-    "pIDFlagOther": "1",
-    "nurseLevelInterrupt": "0",
-    "QRCodeBedSide": {
-        "code": 1,
-        "text": "",
-        "state": false,
-        "type": "custom"
-    },
-    "aiWaterdropStatusBedHead": true,
-    "allowEtnOther": true,
-    "suffixCog": "室",
-    "volumeMainHost": [
-        {
-            "Vol": "7",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "7",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "18:00:00"
-        }
-    ],
-    "faceKey": "",
-    "SBARshiftHandover": false,
-    "mainCallScreening": false,
-    "isCheckCostBedHead": true,
-    "radioVolumeBedSide": [
-        {
-            "Vol": "5",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "18:00:00"
-        }
-    ],
-    "informationQueryAuthBedHead": true,
-    "nursingTasksAllowedBedHead": false,
-    "normalOpenTimeGuard": [],
-    "callToVerifyGate": false,
-    "volumeAssistant": [
-        {
-            "Vol": "10",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "8",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "10",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "6",
-            "Time": "18:00:00"
-        }
-    ],
-    "cancelClickScreenToEnter": false,
-    "volumeBedSide": [
-        {
-            "Vol": "10",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "8",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "10",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "6",
-            "Time": "18:00:00"
-        }
-    ],
-    "QRCodeLabelBedHead": "",
-    "CallCenterDeviceListHead": [],
-    "isAlwaysBedHead": false,
-    "isPayBedSide": true,
-    "preventRemoveWarning": false,
-    "bigWordType": false,
-    "SimMedAdvice": true,
-    "eduStyleBedSide": "list",
-    "brightViewMainHost": "30",
-    "deviceSettingGuard": false,
-    "callToVerifyPasswordGate": "3585668",
-    "callTimeoutDurationMainHost": "30",
-    "isBusinessBedSide": [],
-    "MinimumRechargeAmountBedSide": "30",
-    "radioVolumeGate": [
-        {
-            "Vol": "5",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "18:00:00"
-        }
-    ],
-    "brightViewBedSide": "15",
-    "isAudioAndVideoRecordingsOther": "false",
-    "isdoorshow": "doorbed",
-    "backDurationBedSide": "60",
-    "bedHeadMenuArrayList": [
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/4eb023dc102b416387d57d8b90b8fd7f.png",
-                    "name": "icon_menu_01.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "_bedHead_bh",
-            "icon": "",
-            "menuName": "床头卡",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "",
-            "id": "c8d8984ccf07444db5d9ff3dd16a38b4",
-            "sort": 2,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/7d0671dfb7234773a2dd5b40ed07d727.png",
-                    "name": "icon_menu_03.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "_edu_bh",
-            "icon": "",
-            "menuName": "健康宣教",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/edu?type=myEdu&index=1",
-            "id": "af54cac8a96a4d348d34ae7c8437b092",
-            "sort": 3,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/4e09b60f79bb4bc79cfe9ce287b6cc75.png",
-                    "name": "icon_menu_04.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "_msgIndex_bh",
-            "icon": "",
-            "menuName": "消息提醒",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/msgIndex",
-            "id": "94e1c095ab4c456d9ab4ef46489bc0dc",
-            "sort": 4,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/a6b7d672947b48e0b56aa86a3bd5a9da.png",
-                    "name": "icon_menu_05.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "_infoSearch_bh",
-            "icon": "",
-            "menuName": "信息查询",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/infoSearch",
-            "id": "1cb7823edb3e4be9aa5c285e94f52fa9",
-            "sort": 5,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/341bb18a7e90454c8ed33be968a84c35.png",
-                    "name": "icon_menu_07.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "_signData_bh",
-            "icon": "",
-            "menuName": "体征数据",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/signData",
-            "id": "45b7941c98d4471db6d6f505c9fc284e",
-            "sort": 7,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/9a85aec1d6df4ee08c7c4f649e6d0875.png",
-                    "name": "icon_menu_08.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "_nurseTask_bh",
-            "icon": "",
-            "menuName": "护理任务",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/nurseTask",
-            "id": "445700bb310b4ccdafe95e3eb74bb439",
-            "sort": 8,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/fcd6ca7d1e9f4c2dbd4f81dc0451472c.png",
-                    "name": "icon_menu_09.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "_calculator_bh",
-            "icon": "",
-            "menuName": "医疗计算",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/calculator",
-            "id": "b001bfd43ec84fe7b09017fef103918b",
-            "sort": 9,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/149ee81604a74af7b2a2afab12c963f4.png",
-                    "name": "icon-call-00.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "_call_bh",
-            "icon": "",
-            "menuName": "呼叫按钮",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "",
-            "id": "07870cdf878f49a59dc1e652fecdca44",
-            "sort": 11,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250620/6c59c242ceb247258cc9aa19e9063d09.png",
-                    "name": "painRatingScale.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "painRatingScale",
-            "icon": "",
-            "menuName": "疼痛评分尺",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/painRatingScale",
-            "id": "606a7273e34e44389687a5d21d47ce6e",
-            "sort": 11,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250620/27a7ddfbef6c49609cbe73b41052ec40.png",
-                    "name": "翻身记录卡.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "turnOver",
-            "icon": "",
-            "menuName": "翻身记录卡",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/turnOver",
-            "id": "6d103b72dab2478eba525750946f95d3",
-            "sort": 12,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/b72ace1b3cc2421684114c741ff0cdcf.png",
-                    "name": "icon_menu_11.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "singleQuestionsList",
-            "icon": "",
-            "menuName": "调查问卷",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/singleQuestionsList",
-            "id": "7395c74e94e44a7f8c90fbce0d8fc69e",
-            "sort": 12,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250620/6f9683df821742dd96fd87d6c951fac5.png",
-                    "name": "微泵注射卡.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "micropump",
-            "icon": "",
-            "menuName": "微泵注射卡",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/micropump",
-            "id": "290013600ad34266ae7b1fbf2e32da2d",
-            "sort": 13,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250620/17cbcd3e321b4bdb8642e9ed89e52252.png",
-                    "name": "出入量登记表.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "intakeAndOutput",
-            "icon": "",
-            "menuName": "出入量登记表",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/intakeAndOutput",
-            "id": "75abae8178664911abf72508b895ee16",
-            "sort": 14,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedhead/80dd4cc4b8144238bca7a3fcb80cc313.png",
-                    "name": "费用查询备份.png"
-                },
-                ""
-            ],
-            "menuFrom": "bedHead",
-            "menuCode": "smmsCostQuery",
-            "icon": "",
-            "menuName": "费用查询",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/smmsCostQuery",
-            "id": "e1e1fa8bcdaa4767925d6e7dd546e1af",
-            "sort": 14,
-            "deviceId": "default",
-            "parentId": "0"
-        }
-    ],
-    "hostCallType": "voiceCall",
-    "autoBedHead": true,
-    "stopReinforceCall": false,
-    "volumeGate": [
-        {
-            "Vol": "10",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "8",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "10",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "6",
-            "Time": "18:00:00"
-        }
-    ],
-    "cardTransmissionOrder": "",
-    "callBedSideSettings": 1,
-    "ywhColorLevelGate": [
-        {
-            "backgroundColor": "#FFFFFF",
-            "color": "#FFFFFF",
-            "nurseLevelName": "特级护理",
-            "nurseLevelShort": "特",
-            "createTime": "2020-02-08 00:00:00",
-            "nurseLevelId": "6e83f5dfe05d11eaaac50894ef61e244",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF"
-        },
-        {
-            "backgroundColor": "#FFFFFF",
-            "color": "#FFFFFF",
-            "nurseLevelName": "一级护理",
-            "nurseLevelShort": "一",
-            "createTime": "2020-02-08 00:00:01",
-            "nurseLevelId": "6e9183dce05d11eaaac50894ef61e244",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF"
-        },
-        {
-            "backgroundColor": "#FFFFFF",
-            "color": "#FFFFFF",
-            "nurseLevelName": "二级护理",
-            "nurseLevelShort": "二",
-            "createTime": "2020-02-08 00:00:02",
-            "nurseLevelId": "6e9e3b03e05d11eaaac50894ef61e244",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF"
-        },
-        {
-            "backgroundColor": "#FFFFFF",
-            "color": "#FFFFFF",
-            "nurseLevelName": "三级护理",
-            "nurseLevelShort": "三",
-            "createTime": "2020-02-08 00:00:03",
-            "nurseLevelId": "6eaaf777e05d11eaaac50894ef61e244",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF"
-        }
-    ],
-    "callPasswordGate": "123456",
-    "volBedHead": [
-        {
-            "Vol": "10",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "8",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "10",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "6",
-            "Time": "18:00:00"
-        }
-    ],
-    "circleTime": 10,
-    "deviceSettingBedSide": false,
-    "audioAndVideoRecordingsOtherPath": "/resource/mango",
-    "broadcastEncryption": false,
-    "audioAndVideoCallSolution": "videoPaas",
-    "questionQrcodeHost": "",
-    "mulAcceptRequestsDevices": [],
-    "wardSwitchBedSide": false,
-    "saveAudioAndVideoFiles": false,
-    "isCheckoutResultBedSide": true,
-    "unCallReminderMainHost": "1",
-    "callClear": true,
-    "new_isStandbyBedHead": 2000,
-    "volumeDutyRoom": [
-        {
-            "Vol": "10",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "8",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "10",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "6",
-            "Time": "18:00:00"
-        }
-    ],
-    "brightViewDoorHost": "30",
-    "deviceSettingVisit": false,
-    "roomModelGate": "0",
-    "bedSideCallScreening": false,
-    "isNonePatientBedSide": false,
-    "isShowDeptName": false,
-    "closeScreenBedHead": {
-        "startTime": "20:00:00",
-        "endTime": "06:00:00"
-    },
-    "isFilterNameBedSide": true,
-    "doorLampOpenBedSide": false,
-    "isCostLevelBedSide": true,
-    "isStandbyTimeBedHead": "5000",
-    "NavigationBarConfigDoor": [
-        {
-            "tabid": "roominfo",
-            "tabname": "房间信息",
-            "showinfotype": "安卓页面",
-            "eduids": "",
-            "medicalids": "",
-            "showinfo": []
-        },
-        {
-            "tabid": "doctorinfo",
-            "tabname": "医护列表",
-            "showinfotype": "安卓页面",
-            "eduids": "",
-            "medicalids": "",
-            "showinfo": []
-        }
-    ],
-    "healthcareInterfacePageLinkConfiguration": {
-        "name": "",
-        "link": "",
-        "status": false
-    },
-    "isStandbyBedHead": true,
-    "isCheckCostBedSide": true,
-    "callPatientMainHost": "1",
-    "callBedHeadSettings": 1,
-    "isOtherDataSourcesOther": true,
-    "maxReportingNumMainHost": 5,
-    "isBusinessBedHead": [
-        {
-            "title": "餐厅点餐",
-            "isShow": true
-        },
-        {
-            "title": "商超便利",
-            "isShow": true
-        },
-        {
-            "title": "护工中心",
-            "isShow": true
-        }
-    ],
-    "showRoomName": true,
-    "isAutoLogin": false,
-    "isCallBedSide": false,
-    "messageSilenceBedSide": [
-        {
-            "start": "20:00:00",
-            "end": "07:00:00"
-        }
-    ],
-    "isStandbyTimeBedSide": "3000",
-    "homePageTips": "请靠近自动识别人脸后开门",
-    "lightAssistant": [
-        {
-            "Light": "50",
-            "Time": "08:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "12:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "14:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "18:00:00"
-        }
-    ],
-    "menuArrayList": [],
-    "MinimumRechargeAmountBedHead": 500,
-    "offLineDeviceName": "",
-    "msgForwardApi": "http://服务器IP/nmbm/app-nm/call/no-convert",
-    "autoBedHeadTime": "200",
-    "closeScreenBedSide": {
-        "startTime": "20:00:00",
-        "endTime": "06:00:00"
-    },
-    "blockUnhandledCallVoice": false,
-    "hangUpCall": false,
-    "doorOpenType": [],
-    "lightVisit": [
-        {
-            "Light": "50",
-            "Time": "08:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "12:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "14:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "18:00:00"
-        }
-    ],
-    "ywhColorToiletGate": "#FF00FF",
-    "deviceSettingGate": false,
-    "answerWayBedHead": "0",
-    "notice": "",
-    "iscloseScreenBedHead": true,
-    "autoRestarDutyRoom": {
-        "time": "20:00:00",
-        "state": true
-    },
-    "oneKeyToOpenTheDoor": false,
-    "paymentMode": "NotDockedMode",
-    "callPatient": "1",
-    "isCheckResultBedSide": true,
-    "WegingCode": 11,
-    "bedsSwitchBedSide": false,
-    "hostPlay": false,
-    "iscloseScreenDoorHost": false,
-    "eduStyleBedHead": "list",
-    "QRCodeLabel": "",
-    "eduAutoPlayBedside": false,
-    "autoGetSignOther": {
-        "isAutoGetSign": true,
-        "autoGetSignTime": 1
-    },
-    "colorNurseGate": "#FFFF00",
     "lightBedSide": [
         {
             "Light": "50",
@@ -682,34 +860,50 @@
             "Time": "18:00:00"
         }
     ],
-    "deviceSettingBedHead": false,
-    "education": {},
-    "adContent": "adContent",
-    "iscloseScreenMainHost": true,
-    "IDconfirmationIoTPhysical": true,
-    "volumeVisit": [
+    "autoRestartBedSide": {
+        "state": false,
+        "time": "20:00:00"
+    },
+    "volumeBedSide": [
         {
-            "Vol": "10",
-            "Time": "08:00:00"
+            "Time": "08:00:00",
+            "Vol": "10"
         },
         {
-            "Vol": "8",
-            "Time": "12:00:00"
+            "Time": "12:00:00",
+            "Vol": "8"
         },
         {
-            "Vol": "10",
-            "Time": "14:00:00"
+            "Time": "14:00:00",
+            "Vol": "10"
         },
         {
-            "Vol": "6",
-            "Time": "18:00:00"
+            "Time": "18:00:00",
+            "Vol": "6"
         }
     ],
-    "eduAutoPlayBedhead": false,
-    "dutyRoomHostCallType": "voiceCall",
-    "nurseIntoOutTime": 100,
-    "isFilterNameGate": true,
-    "callBellingMethod": 0,
+    "volBedHead": [
+        {
+            "Time": "08:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "12:00:00",
+            "Vol": "8"
+        },
+        {
+            "Time": "14:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "18:00:00",
+            "Vol": "6"
+        }
+    ],
+    "autoRestarGuard": {
+        "state": false,
+        "time": "08:00:00"
+    },
     "lightGuard": [
         {
             "Light": "50",
@@ -728,239 +922,192 @@
             "Time": "18:00:00"
         }
     ],
-    "ywhColorNurseGate": "#FF0000",
-    "new_isStandbyBedSide": 2,
-    "horizontalImage": "",
-    "doorLampList": [
-        {
-            "backgroundColor": "#FFFFFF",
-            "name": "护士进入",
-            "radioValue": "1",
-            "partColor": [
-                {
-                    "name": "上段",
-                    "value": "#FFFFFF"
-                },
-                {
-                    "name": "中段",
-                    "value": "#FFFFFF"
-                },
-                {
-                    "name": "下段",
-                    "value": "#FFFFFF"
-                }
-            ]
-        },
-        {
-            "backgroundColor": "#FFFFFF",
-            "name": "卫生间呼叫",
-            "radioValue": "1",
-            "partColor": [
-                {
-                    "name": "上段",
-                    "value": "#FFFFFF"
-                },
-                {
-                    "name": "中段",
-                    "value": "#FFFFFF"
-                },
-                {
-                    "name": "下段",
-                    "value": "#FFFFFF"
-                }
-            ]
-        }
-    ],
     "volumeGuard": [
         {
-            "Vol": "10",
+            "Time": "08:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "12:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "14:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "18:00:00",
+            "Vol": "10"
+        }
+    ],
+    "lightDutyRoom": [
+        {
+            "Light": "70",
             "Time": "08:00:00"
         },
         {
-            "Vol": "10",
+            "Light": "70",
             "Time": "12:00:00"
         },
         {
-            "Vol": "10",
+            "Light": "70",
             "Time": "14:00:00"
         },
         {
-            "Vol": "10",
+            "Light": "70",
             "Time": "18:00:00"
         }
     ],
-    "unlockDutyRoomOpenTime": [
+    "autoRestarDutyRoom": {
+        "state": true,
+        "time": "20:00:00"
+    },
+    "volumeDutyRoom": [
         {
-            "start": "00:00:00",
-            "end": "23:59:59"
+            "Time": "08:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "12:00:00",
+            "Vol": "8"
+        },
+        {
+            "Time": "14:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "18:00:00",
+            "Vol": "6"
         }
     ],
-    "callForwarding": false,
-    "bedSideCardRemarkBedHead": "保留进入之前订单特制的进入首页菜单时调起数字人，其他菜单页关",
-    "RechargeIdentityBedHead": true,
-    "loginMode": [
-        "1"
+    "lightMainHost": [
+        {
+            "Light": "50",
+            "Time": "08:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "12:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "14:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "18:00:00"
+        }
     ],
-    "autoCloseDoorTimeGuard": 5,
-    "CallCenterDeviceList": [],
-    "isFilterNameBedHead": true,
-    "visitModeContent": "",
-    "isStandbyBedSide": false,
-    "bedheadBrightness": {
-        "light": "",
-        "state": false
-    },
-    "kHandlerCallTypeBedSide": 1,
-    "msgForwardDeviceName": "",
-    "isCallCenterUse": false,
-    "cardTemplateBedSide": {
-        "path": "/a10/bedside/bedSideCard.html",
-        "image": "/resource/json/bedHead/M2/index.jpg",
-        "label": "M0"
-    },
-    "isBackBedSide": true,
-    "autoGoIndex": false,
-    "downtimeCallIp": "10.10.87.70",
-    "RayRehearse": {
-        "type": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            99,
-            7
-        ],
-        "day": [
-            "yesterDay",
-            "toDay",
-            "tomorDay"
-        ]
-    },
     "autoRestarMainHost": {
-        "time": "20:00:00",
-        "state": true
+        "state": false,
+        "time": "20:00:00"
     },
-    "callVolumeBedHead": [
+    "volumeMainHost": [
         {
-            "Vol": "5",
+            "Time": "08:00:00",
+            "Vol": "15"
+        },
+        {
+            "Time": "12:00:00",
+            "Vol": "15"
+        },
+        {
+            "Time": "14:00:00",
+            "Vol": "15"
+        },
+        {
+            "Time": "18:00:00",
+            "Vol": "6"
+        }
+    ],
+    "isDoctorAdviceOther": true,
+    "isFilterNameGate": true,
+    "isCostLevelBedHead": true,
+    "lightGate": [
+        {
+            "Light": "70",
             "Time": "08:00:00"
         },
         {
-            "Vol": "5",
+            "Light": "70",
             "Time": "12:00:00"
         },
         {
-            "Vol": "5",
+            "Light": "70",
             "Time": "14:00:00"
         },
         {
-            "Vol": "5",
+            "Light": "70",
             "Time": "18:00:00"
         }
     ],
-    "selectHealthCareList": [],
-    "isWardRoundGate": true,
-    "answerWayBedSide": "0",
-    "colorLevelGate": [
+    "autoRestarGate": {
+        "state": false,
+        "time": "20:00:00"
+    },
+    "volumeGate": [
         {
-            "backgroundColor": "#FF0000",
-            "nurseLevelName": "特级护理",
-            "nurseLevelShort": "特",
-            "createTime": "2020-02-08 00:00:00",
-            "nurseLevelId": "0",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF",
-            "nurseLevelColor": "#FFFFFF"
+            "Time": "08:00:00",
+            "Vol": "10"
         },
         {
-            "backgroundColor": "#0000FF",
-            "nurseLevelName": "一级护理",
-            "nurseLevelShort": "一",
-            "createTime": "2020-02-08 00:00:01",
-            "nurseLevelId": "1",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF",
-            "nurseLevelColor": "#FFFFFF"
+            "Time": "12:00:00",
+            "Vol": "8"
         },
         {
-            "backgroundColor": "#FFFF00",
-            "nurseLevelName": "二级护理",
-            "nurseLevelShort": "二",
-            "createTime": "2020-02-08 00:00:02",
-            "nurseLevelId": "2",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#000000",
-            "nurseLevelColor": "#FFFFFF"
+            "Time": "14:00:00",
+            "Vol": "10"
         },
         {
-            "backgroundColor": "#7FFF00",
-            "nurseLevelName": "三级护理",
-            "nurseLevelShort": "三",
-            "createTime": "2020-02-08 00:00:03",
-            "nurseLevelId": "3",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF",
-            "nurseLevelColor": "#FFFFFF"
-        },
-        {
-            "backgroundColor": "#FF0000",
-            "nurseLevelName": "四级护理",
-            "nurseLevelShort": "四",
-            "createTime": "2020-02-08 00:00:00",
-            "nurseLevelId": "4",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF",
-            "nurseLevelColor": "#FFFFFF"
-        },
-        {
-            "backgroundColor": "#0000FF",
-            "nurseLevelName": "五级护理",
-            "nurseLevelShort": "五",
-            "createTime": "2020-02-08 00:00:01",
-            "nurseLevelId": "5",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF",
-            "nurseLevelColor": "#FFFFFF"
-        },
-        {
-            "backgroundColor": "#FFFF00",
-            "nurseLevelName": "六级护理",
-            "nurseLevelShort": "六",
-            "createTime": "2020-02-08 00:00:02",
-            "nurseLevelId": "6",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#000000",
-            "nurseLevelColor": "#FFFFFF"
-        },
-        {
-            "backgroundColor": "#7FFF00",
-            "nurseLevelName": "七级护理",
-            "nurseLevelShort": "七",
-            "createTime": "2020-02-08 00:00:03",
-            "nurseLevelId": "7",
-            "canDelete": 0,
-            "userId": "wj",
-            "fontColor": "#FFFFFF",
-            "nurseLevelColor": "#FFFFFF"
+            "Time": "18:00:00",
+            "Vol": "8"
         }
     ],
-    "doorLampOpen": false,
-    "isCallBedHead": true,
-    "aiWaterdropTimesBedHead": {
-        "startTime": "21:00:00",
-        "endTime": "06:30:00"
+    "lightVisit": [
+        {
+            "Light": "50",
+            "Time": "08:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "12:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "14:00:00"
+        },
+        {
+            "Light": "50",
+            "Time": "18:00:00"
+        }
+    ],
+    "notice": "",
+    "autoRestarVisit": {
+        "state": false,
+        "time": "20:00:00"
     },
-    "downtimeCallId": "5ed4242bb9154e178a9b5d4d7d299822",
-    "warningColor": "#FF0000",
+    "businessHours": [],
+    "volumeVisit": [
+        {
+            "Time": "08:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "12:00:00",
+            "Vol": "8"
+        },
+        {
+            "Time": "14:00:00",
+            "Vol": "10"
+        },
+        {
+            "Time": "18:00:00",
+            "Vol": "6"
+        }
+    ],
+    "mainCallScreening": false,
+    "mainHostlistBed": "0",
+    "menuArrayList": [],
     "menuList": [
         "3838520ac96c46cd9ffdb17f27d17443",
         "ef884a22f7424cab9eb8db4a7f1c3521",
@@ -1000,889 +1147,195 @@
         "c67a5fa3105f4da79a1f1c88ebf8ed88",
         "c8d891e5f042457b81da534ac01d88d0"
     ],
-    "lightMainHost": [
-        {
-            "Light": "50",
-            "Time": "08:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "12:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "14:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "18:00:00"
-        }
-    ],
-    "ageTypeOther": "1",
-    "closeScreenMainHost": {
-        "startTime": "23:00:00",
-        "endTime": "05:00:00"
-    },
-    "businessHours": [],
-    "isTestTept": true,
-    "lightBedHead": [
-        {
-            "Light": "50",
-            "Time": "08:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "12:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "14:00:00"
-        },
-        {
-            "Light": "50",
-            "Time": "18:00:00"
-        }
-    ],
-    "bedsideBrightness": {
-        "light": "",
-        "state": false
-    },
-    "colorToiletGate": "#FF00FF",
-    "onceVisitDuration": "15",
-    "bedSideMenuArrayList": [
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/d7daed321f554b628105b57156b0e5ca.png",
-                    "name": "Snipaste_2025-06-27_17-12-51.png"
-                },
-                {
-                    "path": "/resource/img/bedside/a3b8a98b8586454ba24b51fe5aee1169.png",
-                    "name": "Snipaste_2025-06-27_17-12-51.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "home",
-            "icon": "",
-            "menuName": "首页",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/home",
-            "id": "8381f8a6a1e44026be660a37e21e5fd1",
-            "sort": 1000,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/7a388d0a024b412bb340085a647bc27b.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/6922faf68bf04296a54617e7d6f7ebee.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "amusementIndex",
-            "icon": "",
-            "menuName": "患者功能",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/home/patient",
-            "id": "95e2c45c6d344f0b94f4e85971f5db8e",
-            "sort": 2000,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/8.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/8.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "healthEducation",
-            "icon": "",
-            "menuName": "健康宣教",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/edu",
-            "id": "1bc6409005894df9893b15fdda46e74e",
-            "sort": 2100,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/3.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/3.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "hospitalNotice",
-            "icon": "",
-            "menuName": "住院须知",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/content/in",
-            "id": "61c5c7500278433ca56c1f69a70f265a",
-            "sort": 2101,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/4.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/4.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "deptIntro",
-            "icon": "",
-            "menuName": "科室介绍",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/content/dept",
-            "id": "743f47af3c174d4ca46025a123558814",
-            "sort": 2102,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/1.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/1.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "costList",
-            "icon": "",
-            "menuName": "费用清单",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/pCostManage",
-            "id": "f0f625a3018544f5a57d2545028fead9",
-            "sort": 2103,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/7.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/7.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "infoPublish",
-            "icon": "",
-            "menuName": "信息发布",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "调用安卓",
-            "id": "8930ace868c9407fa948df50398e1b4d",
-            "sort": 2104,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/17.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/17.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "messageNotification",
-            "icon": "",
-            "menuName": "消息提醒",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/msgIndex",
-            "id": "12378433ca56c1f69a70f265a",
-            "sort": 2111,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250701/fb116c7ae0a3467982fa44148b872221.png",
-                    "name": "美女.png"
-                },
-                {
-                    "path": "/resource/img/20250701/11cb7462811a44289b8a187598d85784.png",
-                    "name": "美女 (1).png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl1",
-            "icon": "",
-            "menuName": "外链1",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://pdai.tech/md/outline/x-outline.html#%E9%80%82%E5%90%88%E4%BB%80%E4%B9%88%E6%A0%B7%E7%9A%84%E4%BA%BA%E7%BE%A4%E9%98%85%E8%AF%BB",
-            "id": "ff34010151ec451f8d5c11f287fe4b1a",
-            "sort": 2150,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl2",
-            "icon": "",
-            "menuName": "外链外链外链2",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://pdai.tech/md/resource/tools.html",
-            "id": "30f66d465c214ebead1ea599b3c80b22",
-            "sort": 2151,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl1",
-            "icon": "",
-            "menuName": "外链1",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://www.baidu.com",
-            "id": "b1c48cd0b51a46769f810980887ab7a8",
-            "sort": 2151,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl2",
-            "icon": "",
-            "menuName": "外链2",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://www.bing.com",
-            "id": "300efb8773934e88a34a68fcf6cbadd2",
-            "sort": 2152,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl3",
-            "icon": "",
-            "menuName": "外链3",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://www.zhihu.com",
-            "id": "e76ac6ba452b4477a2eb585e3c60d854",
-            "sort": 2153,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl3",
-            "icon": "",
-            "menuName": "外链3",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://pdai.tech/md/interview/x-interview.html",
-            "id": "fd582419c88a42c2a301ebbbe7d35834",
-            "sort": 2153,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl4",
-            "icon": "",
-            "menuName": "外链4",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://juejin.cn",
-            "id": "09c6dbc75880457f94c6a2d4d30180ef",
-            "sort": 2154,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl5",
-            "icon": "",
-            "menuName": "外链5",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://pdai.tech/md/interview/x-interview.html",
-            "id": "a9779b89b9b84439a071a5b1685bedae",
-            "sort": 2155,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl6",
-            "icon": "",
-            "menuName": "外链6",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://www.csdn.net",
-            "id": "da420c3c9a914ecf916890c4ef656790",
-            "sort": 2156,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl7",
-            "icon": "",
-            "menuName": "外链7",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://developer.mozilla.org",
-            "id": "1bb16a58d3884ce2bb39a7c3846ec928",
-            "sort": 2157,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl8",
-            "icon": "",
-            "menuName": "外链8",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://www.w3schools.com",
-            "id": "769811a5bed64b2b96c651be4c1aa2d2",
-            "sort": 2158,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl9",
-            "icon": "",
-            "menuName": "外链9",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://www.runoob.com",
-            "id": "d2803d798cbf407a8533417e88828b04",
-            "sort": 2159,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                "",
-                ""
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_wl10",
-            "icon": "",
-            "menuName": "外链10",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://www.google.com",
-            "id": "03cababb2b4d483495a804683ae1e6a2",
-            "sort": 2160,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b94f4e85971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/13.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/13.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "lifeMarket",
-            "icon": "",
-            "menuName": "生活超市",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "",
-            "id": "46df81e0c72d433aa38447f440a20a72",
-            "sort": 2200,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b942285971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/12.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/12.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "mealOrder",
-            "icon": "",
-            "menuName": "营养点餐",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "",
-            "id": "094ffff8d378440cbbb5f992f3fc96e0",
-            "sort": 2201,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b942285971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/14.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/14.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "nurseBooking",
-            "icon": "",
-            "menuName": "陪护预约",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "",
-            "id": "bd612b57067d4d0d855e0fe8e6ad4412",
-            "sort": 2202,
-            "deviceId": "default",
-            "parentId": "95e2c45c6d344f0b942285971f5db8e"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/7aad7fc2575c4a8a91306ae09d21161f.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/653863134509419780ddfed368f58066.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "shopMain",
-            "icon": "",
-            "menuName": "生活服务",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/home/shop",
-            "id": "95e2c45c6d344f0b942285971f5db8e",
-            "sort": 3000,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/3eb015cb43b64d92acfb984034a78dff.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/0d821bd57d624dddbacd15e1544b4ec9.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "edu",
-            "icon": "",
-            "menuName": "医护功能",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/home/function",
-            "id": "b1f4804ad1c640fba25e31fd1b532f9f",
-            "sort": 4000,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/11.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/11.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "nurseTimer",
-            "icon": "",
-            "menuName": "护理计时",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "",
-            "id": "1fcfb2bf9ce44de8bc51e432051a10b5",
-            "sort": 4300,
-            "deviceId": "default",
-            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/15.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/15.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "alarmClock",
-            "icon": "",
-            "menuName": "闹钟",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "",
-            "id": "8f3b5adea8004badb3743223ac46d583",
-            "sort": 4400,
-            "deviceId": "default",
-            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/bedside/16.png",
-                    "name": "a选中.png"
-                },
-                {
-                    "path": "/resource/img/bedside/16.png",
-                    "name": "a取消.png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "docLogin",
-            "icon": "",
-            "menuName": "医护登录",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/docLogin",
-            "id": "0d3ded82517d4118923af75cf2128b30",
-            "sort": 4500,
-            "deviceId": "default",
-            "parentId": "b1f4804ad1c640fba25e31fd1b532f9f"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250701/c3d86dac6fb74bfa9eb901a1c11d28ae.png",
-                    "name": "西装.png"
-                },
-                {
-                    "path": "/resource/img/20250701/8435db77c12f4942b87dea386a53fab7.png",
-                    "name": "西装 (1).png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "outlink_cs1",
-            "icon": "",
-            "menuName": "测试哦1",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "https://javaguide.cn/open-source-project/",
-            "id": "1c8adf2714164dcf8291408d122e40fa",
-            "sort": 5000,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250701/bfdc9d69784548eaabe25f2460d3d8a9.png",
-                    "name": "连衣裙.png"
-                },
-                {
-                    "path": "/resource/img/20250701/45ef0df6a9c94f15b963048121b4a6dd.png",
-                    "name": "连衣裙 (1).png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "cs2",
-            "icon": "",
-            "menuName": "测试2",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "/cs2",
-            "id": "8e0d2b97d1bd48d7b46c5c681ed2309a",
-            "sort": 6000,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250701/f7ecac9351ad403d89104f81a5e71bb7.png",
-                    "name": "食物.png"
-                },
-                {
-                    "path": "/resource/img/20250701/b5de828bf048460fbd26f543d647d5b9.png",
-                    "name": "食物 (1).png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "cs3",
-            "icon": "",
-            "menuName": "测试3",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "cs3",
-            "id": "624b5eb421b748869e52a8519a874b69",
-            "sort": 7000,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250701/383e50ef4ebf4438a22ace963b768f56.png",
-                    "name": "女人.png"
-                },
-                {
-                    "path": "/resource/img/20250701/0c9c28e7a1b445f0bf690c99bf944820.png",
-                    "name": "女人 (1).png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "cs4",
-            "icon": "",
-            "menuName": "测试4",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "cs4",
-            "id": "3f03ae739f824497a327bc77909b725b",
-            "sort": 8000,
-            "deviceId": "default",
-            "parentId": "0"
-        },
-        {
-            "iconObject": [
-                {
-                    "path": "/resource/img/20250701/30a6f554169a4453a945b8debef36a83.png",
-                    "name": "美女.png"
-                },
-                {
-                    "path": "/resource/img/20250701/f82642a34b024d66b2323f3308898c40.png",
-                    "name": "美女 (1).png"
-                }
-            ],
-            "menuFrom": "bedSide",
-            "menuCode": "cs5",
-            "icon": "",
-            "menuName": "测试5",
-            "nurseUnitId": "731db922a1134aa983574d1da0601adb",
-            "pageUrl": "cs5",
-            "id": "53d52e38071f4f78a7e5b6fb9b81f2bb",
-            "sort": 8000,
-            "deviceId": "default",
-            "parentId": "0"
-        }
-    ],
-    "doorGuardPasswordGuard": "3585668",
-    "autoRestartBedHead": {
-        "time": "21:00:00",
-        "state": false
-    },
-    "menuListString": "",
-    "testTeptCompensate": "",
-    "isCircle": true,
-    "visitMode": false,
-    "QRCodeBedHead": {
-        "text": "http://www.yarward.com",
-        "state": false,
-        "type": "custom"
-    },
-    "autoRestarVisit": {
-        "state": false,
-        "time": "20:00:00"
-    },
-    "iscloseScreenBedSide": true,
-    "isCostDetailsBedHead": true,
-    "brightViewBedHead": "15",
-    "medicalids": "",
-    "QRCodeLabelBedSide": "",
-    "radioVolumeBedHead": [
-        {
-            "Vol": "5",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "18:00:00"
-        }
-    ],
-    "RechargeIdentityBedSide": true,
-    "audioMaxVolumeBedSide": "15",
-    "faceSession": "",
-    "kHandlerCallTypeBedHead": 1,
-    "mainHostlistBed": "0",
     "messageSilenceBedHead": [
         {
-            "start": "20:00:00",
-            "end": "07:00:00"
+            "end": "07:00:00",
+            "start": "20:00:00"
         }
     ],
-    "ShowNavigationBarDoor": true,
-    "testTeptRange": [
-        35,
-        42
+    "messageSilenceBedSide": [
+        {
+            "end": "07:00:00",
+            "start": "20:00:00"
+        }
     ],
-    "autoRestarGuard": {
-        "time": "08:00:00",
-        "state": false
+    "msgForwardApi": "http://172.31.1.49/nmbm/app-nm/call/no-convert",
+    "msgForwardDeviceId": "830c70abad8a4b3c88b2be257554a835",
+    "mulAcceptRequestsDevices": [],
+    "NavigationBarConfigDoor": [
+        {
+            "eduids": "",
+            "isshow": false,
+            "medicalids": "",
+            "showinfotype": "安卓页面",
+            "tabid": "roominfo",
+            "tabname": "房间信息"
+        },
+        {
+            "eduids": "",
+            "isshow": false,
+            "medicalids": "",
+            "showinfotype": "安卓页面",
+            "tabid": "doctorinfo",
+            "tabname": "医护列表"
+        }
+    ],
+    "new_isStandbyBedSide": 2,
+    "new_isStandbyBedHead": 2,
+    "noPersoncloseScreenBedHead": true,
+    "noPersoncloseScreenBedSide": true,
+    "noPersoncloseScreenGateHost": true,
+    "normalOpenTimeGuard": [],
+    "nurseIntoOutTime": 100,
+    "nursingTasksAllowedBedHead": false,
+    "offlineIp": "192.168.124.1",
+    "onceVisitDuration": 15,
+    "oneKeyToOpenTheDoor": false,
+    "operateRemindText": "请联系护士询问注意事项",
+    "painScoreImgUrl": "",
+    "patientPwd": 8888,
+    "paymentMode": "NotDockedMode",
+    "QRCodeBedHead": {
+        "code": 0,
+        "state": true,
+        "text": "|inpNo|",
+        "type": "custom"
     },
-    "cardTemplateBedHead": {
-        "path": "./bedSideCard12.html",
-        "image": "/resource/json/bedHead/M2/index.jpg",
-        "label": "M11"
+    "QRCodeBedSide": {
+        "code": 1,
+        "state": true,
+        "text": "|inpNo|",
+        "type": "custom"
     },
-    "updateNursesAccordingDutyOther": true,
+    "questionQrcodeHost": "",
+    "radioVolumeBedHead": [
+        {
+            "Time": "08:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "12:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "14:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "18:00:00",
+            "Vol": "5"
+        }
+    ],
+    "radioVolumeBedSide": [
+        {
+            "Time": "08:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "12:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "14:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "18:00:00",
+            "Vol": "5"
+        }
+    ],
+    "radioVolumeGate": [
+        {
+            "Time": "08:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "12:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "14:00:00",
+            "Vol": "5"
+        },
+        {
+            "Time": "18:00:00",
+            "Vol": "5"
+        }
+    ],
     "ReturnHomePage": 10,
-    "callVolumeBedSide": [
-        {
-            "Vol": "5",
-            "Time": "08:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "12:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "14:00:00"
-        },
-        {
-            "Vol": "5",
-            "Time": "18:00:00"
-        }
-    ],
-    "controlTypeCardNumber": "",
-    "isIPTVBedSide": [
-        {
-            "title": "电视直播",
-            "isShow": true
-        },
-        {
-            "title": "视频点播",
-            "isShow": true
-        }
-    ],
-    "deviceSettingMainHost": false,
-    "bodyTmperature": "37.5",
-    "lightDutyRoom": [
-        {
-            "Light": "70",
-            "Time": "08:00:00"
-        },
-        {
-            "Light": "70",
-            "Time": "12:00:00"
-        },
-        {
-            "Light": "70",
-            "Time": "14:00:00"
-        },
-        {
-            "Light": "70",
-            "Time": "18:00:00"
-        }
-    ],
-    "cardTransmissionHex": "",
-    "bedSideCardRemarkBedSide": "配置的菜单可以在床头床旁终端批量配置中设置是否勾选显示（原",
-    "isShowNameGate": true,
-    "deptNameColor": "#D7B369",
-    "lightGate": [
-        {
-            "Light": "70",
-            "Time": "08:00:00"
-        },
-        {
-            "Light": "70",
-            "Time": "12:00:00"
-        },
-        {
-            "Light": "70",
-            "Time": "14:00:00"
-        },
-        {
-            "Light": "70",
-            "Time": "18:00:00"
-        }
-    ],
-    "offLineDeptId": "",
-    "isDoctorAdviceOther": true,
-    "isCallCenterUseHead": false,
-    "isCallGate": true,
-    "controlType": "0",
-    "autoGoIndexTime": 15,
+    "screenOffIntervalDoor": "30",
+    "screenOffTimesDoor": {
+        "endTime": "06:00:00",
+        "startTime": "20:00:00"
+    },
+    "iscloseScreenMainHost": false,
+    "brightViewMainHost": "30",
+    "brightViewDoorHost": "30",
+    "iscloseScreenDoorHost": false,
+    "selectHealthCareList": [],
+    "isCallCenterUse": false,
+    "ShowNavigationBarDoor": true,
+    "showRoomName": true,
+    "suffixCog": "室",
+    "openScreenQrBedSide": {
+        "endTime": "06:00:00",
+        "startTime": "20:00:00"
+    },
+    "closeScreenMainHost": {
+        "endTime": "06:00:00",
+        "startTime": "20:00:00"
+    },
     "closeScreenDoorHost": {
-        "startTime": "23:00:00",
-        "endTime": "05:00:00"
+        "endTime": "06:00:00",
+        "startTime": "20:00:00"
     },
-    "autoRestartBedSide": {
-        "time": "20:00:00",
-        "state": false
-    },
+    "toiletCallScreening": false,
+    "topDoctorNurseInfoGate": [
+        {
+            "user": "eddf0f189f3842a5a40ca2dbd3462f3e",
+            "station": "科室主任"
+        },
+        {
+            "user": "479e2ada01c24aa99d9275679933fe8e",
+            "station": "护士长"
+        }
+    ],
+    "unlockDutyRoomOpenTime": [
+        {
+            "end": "23:59:59",
+            "start": "00:00:00"
+        }
+    ],
+    "updateNursesAccordingDutyOther": true,
     "verticalImage": "",
-    "autoRestarGate": {
-        "time": "20:00:00",
-        "state": false
-    }
+    "visitMode": false,
+    "visitModeContent": "",
+    "visitTransfer": true,
+    "wardSwitchBedSide": false,
+    "warningColor": "#FF0000",
+    "isSignCurveBedSide": false,
+    "isCheckCostBedHead": true,
+    "backDurationBedSide": 60,
+    "callTimeoutDurationMainHost": "30",
+    "isCheckCostBedSide": true,
+    "isCheckResultBedSide": true,
+    "isCheckoutResultBedSide": true,
+    "ageTypeOther": "1",
+    "allowEtnOther": true,
+    "isStandbyBedHead": true,
+    "isStandbyTimeBedHead": 30,
+    "autoBedHead": true,
+    "autoBedHeadTime": 200,
+    "callPasswordGate": "123456",
+    "doorGuardPasswordGuard": "3585668",
+    "balanceRemindBedSide": false,
+    "isStandbyBedSide": false,
+    "colorNurseGate": "#FFFF00",
+    "pIDFlagOther": "1",
+    "roomModelGate": "0",
+    "colorToiletGate": "#FF00FF",
+    "maxReportingNumMainHost": 5,
+    "minCostBedSide": 0,
+    "unCallReminderMainHost": 0,
+    "isStandbyTimeBedSide": 60
 }

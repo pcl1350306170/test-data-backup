@@ -4,12 +4,7 @@
 无暇赐教您迎面，谢大讲，求师兄
 蛙滑牙快软大光，特约未遂，颇困卧桌
 
-http://localhost:89/test/img/ll/1.jpg
-http://localhost:89/test/img/ll/2.png
-http://localhost:89/test/img/ll/3.png
-http://localhost:89/test/img/ll/4.png
-http://localhost:89/test/img/ll/5.png
-http://localhost:89/test/img/ll/6.jpg
+
 
 http://localhost:89/test/img/ll/tx.png
 
@@ -21,7 +16,7 @@ http://localhost:28019/314-bedside/bnms/app-bn/patient-in-list/patient-label-mer
 
 ----------------------------------------------------------------------------------------------- 
 
-https://v33.d58gx9.cc/pw/thread1022.php?fid=210&page=70&pageFrom=wode
+https://v33.d58gx9.cc/pw/thread1022.php?fid=210&page=73&pageFrom=wode
 
 
 develop_sams 10 /  12 \ 3.0 、3.1.0、3.1.3
@@ -74,9 +69,9 @@ proxy: {
       },
  
     }
+上海十一：
 
-
-
+http://localhost:8080/#/tempView?modelId=1962715079420493825
 
 
 奥妹
@@ -237,33 +232,6 @@ hosts文件位置在哪
 1.
 hosts文件位置在: C:\windows\system32\drivers\etc。
 
-
-// 查看所有设备
-adb devices
-
-使用ADB命令查看日志后，怎么导出为 log.txt文件？
- adb -s 192.168.3.231 logcat
-
- adb -s 192.168.3.140 logcat > log.txt
-
-清空日志：
-adb -s 192.168.3.231 logcat -c
-
-adb 指定设备安装：
-adb -s 192.168.3.140 install -r -d E:\www\SVN\备份\3_a10BedSide_v3.0.4-20220819-239_release.apk
-
-A35 回桌面
-adb -s 192.168.3.140 shell am start -n com.android.launcher3/com.android.launcher3.uioverrides.QuickstepLauncher
-
-回桌面
-adb -s 192.168.150.152 shell am start -n com.android.launcher3/com.android.launcher3.Launcher
-
-一二三四五六七八九十
-
-https://img2022.cnblogs.com/blog/932676/202211/932676-20221121152500676-349467240.jpg
-
-
-blog-api/v1/blog/list?pageNumber=1&pageSize=10
 http://localhost:8019/blog-api/v1/blogTag/list?pageNumber=1&pageSize=10
 
 http://localhost:28019/blog-api/v1/blogTag/list?pageNumber=1&pageSize=10
@@ -303,19 +271,6 @@ https://www.sehuatang.org/forum-139-31.html
 var abc={"msgType":"message","data":[{"eventId":"7b3161c2e21042fa8ed82f1592f8c82a","excTime":"Mon May 17 11:24:32 CST 2021","messageId":"eb021123214c424594594b72927a9097","lastCount":"0","nowTimeMillis":1621221872267,"content":{"msgType":"病区消息","onlyFlag":"MANUAL-DEPT-MSG","content":"当主持人问及现在小米、360、大疆、滴滴都宣布要造车了，都会挤进你们的赛道，你对此有信心吗”时，李东辉称“我们充满了信心”，表示吉利将坚持发挥整个体系的竞争力，从整车制造、研究开发、软件、芯片、操作系统有全方位布局，并且整合全球的资源。同时，坚持在技术和客户体验各方面进行创新。“比如四年以前打造的领克品牌，四年多时间里，作为自主高端品牌，平均售价在 20 万元左右，达到累计销售 50 万台。","broadcastName":"病区消息"},"nowTime":"2021-05-17 11:24:32","methodType":"0","createTime":"Mon May 17 11:24:32 CST 2021","viewType":{"msgType":"message","messageType":"TYPE_SERVER_WEB","viewType":0},"interval":"0","taskId":"1a559af5fb7a473d90aceab94f09993c","eventProfessionType":"MANUAL-DEPT-MSG"}]}
 
 window.androidGetMessageFromNative(JSON.stringify(abc))
-
-床头升级：
-1、备份目录“/home/data/web/a10/bedhead”
-2、 不要清空目录
-3、“床头/bedhead”目录下的文件或者解压“bedhead-******.tar.gz”后，‘bedhead 的内容放在“/home/data/web/a10/bedhead”目录下
-4、重启终端
-
-床旁升级：
-1、备份目录“/home/data/web/a10/bedside”
-2、 清空目录
-3、“床/bedside”目录下的文件或者解压“bedside-******.tar.gz”后，‘bedside 的内容放在“/home/data/web/a10/bedside”目录下
-4、重启终端
-
 
 
 要将 `div` 里面的内容上下居中显示，可以使用以下几种方法之一：
@@ -397,31 +352,6 @@ div {
 ### 解释：
 - **单行文本：** 使用 `white-space: nowrap;` 防止文本换行，`overflow: hidden;` 隐藏超出部分，`text-overflow: ellipsis;` 显示省略号。
 - **多行文本：** 使用 `-webkit-line-clamp` 来指定显示的行数，并配合 `-webkit-box` 实现多行省略号效果。
-
-你可以根据具体需求选择单行或多行省略号样式。
-
-宣教详情页：
-http://192.168.3.40:8080/#/details?type=myEdu&index=1&eduID=739ae12ecc734f4098072a6789f06cb5&readState=未阅读&sendId=500bc26b6f9647c4bc3cc86e33e44014
-
-问卷详情页：
-http://192.168.3.40:8080/#/questionnaireDetails?paperId=2c61f97b1a854fac9e230a362db1d521
-
-
-
-
-
-window.location.href=''
-window.location.href=''
-window.location.href=''
-window.location.href=''
-window.location.href=''
-window.location.href=''
-window.location.href=''
-window.location.href=''
-window.location.href=''
-
-
-
 
 
 
