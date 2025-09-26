@@ -37,6 +37,27 @@
                 "labelShowType": 4,
                 "labelName": "多重耐药",
                 "labelSql": ""
+            },
+            {
+                "labelShowInfo": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/label/多重耐药.svg",
+                "labelId": "110004",
+                "labelShowType": 4,
+                "labelName": "多重耐药多重耐药",
+                "labelSql": ""
+            },
+            {
+                "labelShowInfo": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/label/多重耐药.svg",
+                "labelId": "110004",
+                "labelShowType": 4,
+                "labelName": "多多重耐药重耐药",
+                "labelSql": ""
+            },
+            {
+                "labelShowInfo": "https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/label/多重耐药.svg",
+                "labelId": "110004",
+                "labelShowType": 4,
+                "labelName": "多重多重耐药多重耐药耐药",
+                "labelSql": ""
             }
         ],
         "orgInfo": {
