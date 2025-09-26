@@ -11,7 +11,7 @@
                 "labelName": "失智",
                 "labelSql": "VTE"
             }, {
-                "labelShowInfo": "#472326|#514c4d",
+                "labelShowInfo": "#ffffff|#b84839",
                 "labelId": "110001",
                 "labelShowType": 1,
                 "labelName": "CSSZ失智",
@@ -551,13 +551,13 @@
                 "labelShowInfo": null,
                 "isMiddle": 0,
                 "isInitialize": 1,
-                "value": "普食:冀郤缺夫妻，相敬如宾；陈仲子夫妇，灌园食力。",
+                "value": "",
                 "labelShowInfoObj": {
                     "item": [
                         {
                             "name": "",
                             "config": {
-                                "backGroundColor": "#b1d0fe",
+                                "backGroundColor": "#d38326",
                                 "fontColor": "#61383e"
                             }
                         }
