@@ -20,7 +20,11 @@ https://v33.d58gx9.cc/pw/thread1022.php?fid=49&page=54&pageFrom=wode
 https://v33.d58gx9.cc/pw/thread1022.php?fid=193&page=3&pageFrom=novels
 https://raw.githubusercontent.com/pcl1350306170/98TNovels/refs/heads/main/98T2025/%E9%BE%99%E6%AC%B2%E9%83%BD%E5%B8%82%E5%B7%A8%E4%B9%B3%E7%BE%8E%E5%A5%B3%E5%86%9B%E5%9B%A2.txt?token=GHSAT0AAAAAADKWUU44RIDPLLIDZG5ECUMK2GSLYBA
 
+
+py脚本保存目录“E:\www\test\py”
 D:\tools\python\python.exe download_images.py
+D:\tools\python\python.exe multi_image_downloader.py  //批量下载
+D:\tools\python\python.exe crop_logo_recursive.py  // 裁剪图片
 
 自贡测试数据：
 http://192.168.31.77:28019/menzh/data-test/waitingColOptionZiGong
@@ -99,12 +103,27 @@ function exportLocalStorageAndToken() {
   if (token) {
     script.push(`document.cookie = "token=${token}; path=/";`);
   }
-  // 输出可执行的脚本
-  console.log(script.join('\n'));
+  
+  // 拼接所有脚本语句
+  const scriptContent = script.join('\n');
+  
+  // 将内容复制到剪贴板
+  navigator.clipboard.writeText(scriptContent)
+    .then(() => {
+      console.log('内容已成功复制到剪贴板');
+      alert('localStorage和token信息已复制到剪贴板');
+    })
+    .catch(err => {
+      console.error('复制失败:', err);
+      alert('复制失败，请手动复制控制台内容');
+      // 仍然在控制台输出，作为备选方案
+      console.log(scriptContent);
+    });
 }
 
-// 调用函数输出脚本
+// 调用函数执行复制
 exportLocalStorageAndToken();
+    
 
 //=====================================
 
