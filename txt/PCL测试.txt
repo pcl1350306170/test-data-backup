@@ -16,9 +16,11 @@ http://localhost:28019/314-bedside/bnms/app-bn/patient-in-list/patient-label-mer
 http://192.168.31.77:28019/314-bedside/bnms/app-bn/patient-in-list/patient-label-merge
 ----------------------------------------------------------------------------------------------- 
 
-https://v33.d58gx9.cc/pw/thread1022.php?fid=210&page=1&pageFrom=wode
+https://v33.d58gx9.cc/pw/thread1022.php?fid=49&page=54&pageFrom=wode
 https://v33.d58gx9.cc/pw/thread1022.php?fid=193&page=3&pageFrom=novels
 https://raw.githubusercontent.com/pcl1350306170/98TNovels/refs/heads/main/98T2025/%E9%BE%99%E6%AC%B2%E9%83%BD%E5%B8%82%E5%B7%A8%E4%B9%B3%E7%BE%8E%E5%A5%B3%E5%86%9B%E5%9B%A2.txt?token=GHSAT0AAAAAADKWUU44RIDPLLIDZG5ECUMK2GSLYBA
+
+D:\tools\python\python.exe download_images.py
 
 自贡测试数据：
 http://192.168.31.77:28019/menzh/data-test/waitingColOptionZiGong
