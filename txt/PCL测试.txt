@@ -21,10 +21,10 @@ https://v33.d58gx9.cc/pw/thread1022.php?fid=193&page=3&pageFrom=novels
 https://raw.githubusercontent.com/pcl1350306170/98TNovels/refs/heads/main/98T2025/%E9%BE%99%E6%AC%B2%E9%83%BD%E5%B8%82%E5%B7%A8%E4%B9%B3%E7%BE%8E%E5%A5%B3%E5%86%9B%E5%9B%A2.txt?token=GHSAT0AAAAAADKWUU44RIDPLLIDZG5ECUMK2GSLYBA
 
 
-py脚本保存目录“E:\www\test\py”
-D:\tools\python\python.exe download_images.py
-D:\tools\python\python.exe multi_image_downloader.py  //批量下载
+py脚本保存目录“E:\www\test\py”，目前有3个可执行脚本，给我出个方式，可以一键执行某一个。
+D:\tools\python\python.exe multi_image_downloader.py  //批量下载图片
 D:\tools\python\python.exe crop_logo_recursive.py  // 裁剪图片
+D:\tools\python\python.exe crop_logo_recursive_replace.py // 裁剪替换图片
 
 自贡测试数据：
 http://192.168.31.77:28019/menzh/data-test/waitingColOptionZiGong
@@ -127,7 +127,26 @@ exportLocalStorageAndToken();
 
 //=====================================
 
+function exportLocalStorageAndToken() {
+  var script = [];
+  // 遍历localStorage并生成对应的setItem语句
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    var value = localStorage.getItem(key);
+    script.push(`localStorage.setItem('${key}', ${JSON.stringify(value)});`);
+  }
 
+  // 获取token并生成设置cookie的语句
+  var token = localStorage.getItem("token");
+  if (token) {
+    script.push(`document.cookie = "token=${token}; path=/";`);
+  }
+  // 输出可执行的脚本
+  console.log(script.join('\n'));
+}
+
+// 调用函数输出脚本
+exportLocalStorageAndToken();
 
 
 在 **Windows CMD** 中，你可以使用以下命令删除 `node_modules` 目录：  
