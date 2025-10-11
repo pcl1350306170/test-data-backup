@@ -65,7 +65,7 @@ def process_image(image_path, output_path):
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             cropped_img.save(output_path)
 
-            print(f"✌ 裁剪完成: {os.path.basename(image_path)} (比例 {CROP_RATIO_BOTTOM})")
+            print(f"─=≡Σ(((つ•̀ω•́)つ=== 裁--剪---完-----成----: {os.path.basename(image_path)} (比例 {CROP_RATIO_BOTTOM})")
 
     except Exception as e:
         print(f"❌ 裁剪出错: {image_path} - {e}")
@@ -130,8 +130,8 @@ def main():
         while any(t.is_alive() for t in threads):
             done = len(progress_data)
             percent = (done / (total or 1)) * 100
-            print(f"进度: {done}/{total} ({percent:.2f}%)")
-            time.sleep(30)
+            print(f"￣へ￣  (｀⌒´メ)  (￣ェ￣;)进度: {done}/{total} ({percent:.2f}%)")
+            time.sleep(60)
     except KeyboardInterrupt:
         stop_event.set()
         print("\n🟥 用户中止，正在安全退出...")

@@ -4,11 +4,11 @@ import re
 
 # ========== 配置区域 ==========
 # 输入文件夹
-INPUT_DIR = r"F:\data\txt_in"
+INPUT_DIR = r"F:\book\txt2"
 # 输出文件夹
-OUTPUT_DIR = r"F:\data\txt_out"
+OUTPUT_DIR = r"F:\book\txt"
 # 关键词映射表文件
-MAPPING_FILE = r"F:\data\mapping.json"
+MAPPING_FILE = r"E:\www\test\py\json\novelMapping.json"
 # =============================
 
 def load_mapping():
@@ -57,9 +57,9 @@ def process_all():
                 process_file(src, dst, mapping)
 
     if total_files == 0:
-        print("⚠️ 未找到任何 .txt 文件！")
+        print("⚠ 未找到任何 .txt 文件！")
     else:
-        print(f"\n🎉 所有文件处理完成，共处理 {total_files} 个 .txt 文件。")
+        print(f"\n 所有文件处理完成，共处理 {total_files} 个 .txt 文件。")
 
 if __name__ == "__main__":
     process_all()

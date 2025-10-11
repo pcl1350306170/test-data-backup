@@ -19,11 +19,15 @@ echo  3. 裁剪并替换原图【单任务】（crop_logo_recursive_replace.py�
 echo ==============================
 echo  4. 图片裁剪任务并替换原图【批量任务】（crop_logo_advanced.py）
 echo ==============================
+echo  5. 替换txt文件（text_restore.py）
+echo ==============================
+echo  6. 从A目录复制X张图片到B目录（random_copy_vertical_images.py）
+echo ==============================
 echo [Q] 退出
 echo ==============================
 
 :menu
-set /p choice=请输入要运行的脚本编号（1-4 或 Q 退出）： 
+set /p choice=请输入要运行的脚本编号（或 Q 退出）：
 
 if /I "%choice%"=="1" (
     echo 正在执行：批量下载图片...
@@ -43,6 +47,16 @@ if /I "%choice%"=="3" (
 if /I "%choice%"=="4" (
     echo 正在执行：高级裁剪任务...
     "%PYTHON%" "%SCRIPT_DIR%\crop_logo_advanced.py"
+    goto end
+)
+if /I "%choice%"=="5" (
+    echo 正在执行：替换txt文件...
+    "%PYTHON%" "%SCRIPT_DIR%\text_restore.py"
+    goto end
+)
+if /I "%choice%"=="6" (
+    echo 正在执行：从A目录复制X张图片到B目录...
+    "%PYTHON%" "%SCRIPT_DIR%\random_copy_vertical_images.py"
     goto end
 )
 if /I "%choice%"=="Q" (
