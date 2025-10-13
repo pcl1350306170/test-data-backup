@@ -23,6 +23,10 @@ echo  5. 替换txt文件（text_restore.py）
 echo ==============================
 echo  6. 从A目录复制X张图片到B目录（random_copy_vertical_images.py）
 echo ==============================
+echo  7. A目录下面的所有txt文件转为epub（txt_to_epub_with_cover.py）
+echo ==============================
+echo  8. 爬取数据导出为txt文件（crawl_blog_content_with_directory.py）
+echo ==============================
 echo [Q] 退出
 echo ==============================
 
@@ -42,22 +46,32 @@ if /I "%choice%"=="2" (
 if /I "%choice%"=="3" (
     echo 正在执行：裁剪替换图片...
     "%PYTHON%" "%SCRIPT_DIR%\crop_logo_recursive_replace.py"
-    goto end
+    goto menu
 )
 if /I "%choice%"=="4" (
     echo 正在执行：高级裁剪任务...
     "%PYTHON%" "%SCRIPT_DIR%\crop_logo_advanced.py"
-    goto end
+    goto menu
 )
 if /I "%choice%"=="5" (
     echo 正在执行：替换txt文件...
     "%PYTHON%" "%SCRIPT_DIR%\text_restore.py"
-    goto end
+    goto menu
 )
 if /I "%choice%"=="6" (
     echo 正在执行：从A目录复制X张图片到B目录...
     "%PYTHON%" "%SCRIPT_DIR%\random_copy_vertical_images.py"
+    goto menu
+)
+if /I "%choice%"=="7" (
+    echo 正在执行：把A目录下面的所有txt文件转为epub...
+    "%PYTHON%" "%SCRIPT_DIR%\txt_to_epub_with_cover.py"
     goto end
+)
+if /I "%choice%"=="8" (
+    echo 正在执行：爬取数据导出为txt文件...
+    "%PYTHON%" "%SCRIPT_DIR%\crawl_blog_content_with_directory.py"
+    goto menu
 )
 if /I "%choice%"=="Q" (
     echo 已退出。
