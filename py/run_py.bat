@@ -11,21 +11,23 @@ set SCRIPT_DIR=E:\www\test\py
 echo ==============================
 echo        Python 工具箱
 echo ==============================
-echo  1. 批量下载图片（multi_image_downloader.py）
+echo  1. 批量下载图片【每个图片地址保存在数据库web_crawl_data-content用，分割】（multi_image_downloader.py）
 echo ==============================
-echo  2. 裁剪图片【生成新文件】（crop_logo_recursive.py）
+echo  2. 裁剪图片【生成新文件，单任务】（crop_logo_recursive.py）
 echo ==============================
 echo  3. 裁剪并替换原图【单任务】（crop_logo_recursive_replace.py）
 echo ==============================
 echo  4. 图片裁剪任务并替换原图【批量任务】（crop_logo_advanced.py）
 echo ==============================
-echo  5. 替换txt文件（text_restore.py）
+echo  5. 根据字段替换txt文件里面的关键字（text_restore.py）
 echo ==============================
 echo  6. 从A目录复制X张图片到B目录（random_copy_vertical_images.py）
 echo ==============================
-echo  7. A目录下面的所有txt文件转为epub（txt_to_epub_with_cover.py）
+echo  7. A目录下面的所有txt文件转为epub【不好用，epub读不出来】（txt_to_epub_with_cover.py）
 echo ==============================
-echo  8. 爬取数据导出为txt文件（crawl_blog_content_with_directory.py）
+echo  8. 根据小说地址爬取导出为txt文件（crawl_blog_content_with_directory.py）
+echo ==============================
+echo  9. 根据地址爬取v33的图片（downloadv33img.py）
 echo ==============================
 echo [Q] 退出
 echo ==============================
@@ -71,6 +73,11 @@ if /I "%choice%"=="7" (
 if /I "%choice%"=="8" (
     echo 正在执行：爬取数据导出为txt文件...
     "%PYTHON%" "%SCRIPT_DIR%\crawl_blog_content_with_directory.py"
+    goto menu
+)
+if /I "%choice%"=="9" (
+    echo 正在执行：根据地址爬取v33的图片...
+    "%PYTHON%" "%SCRIPT_DIR%\downloadv33img.py"
     goto menu
 )
 if /I "%choice%"=="Q" (

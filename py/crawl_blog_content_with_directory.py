@@ -2,6 +2,7 @@ import os
 import re
 import pymysql
 import requests
+import time
 from bs4 import BeautifulSoup
 
 # -------------------
@@ -75,33 +76,43 @@ def mark_as_deleted(conn, record_id):
     conn.commit()
 
 # -------------------
-# Fetch Blog Content
+# Fetch Blog Content with Retry Mechanism
 # -------------------
-def fetch_blog_text(url):
+def fetch_blog_text(url, retries=3, delay=5):
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
-    resp = requests.get(url, headers=headers, timeout=15)
-    resp.encoding = resp.apparent_encoding
-    if resp.status_code != 200:
-        raise Exception(f"Request failed: {resp.status_code}")
 
-    soup = BeautifulSoup(resp.text, "html.parser")
-    outer_div = soup.find("div", class_="date-outer")
-    if not outer_div:
-        raise Exception("Could not find the 'date-outer' class.")
+    for attempt in range(retries):
+        try:
+            resp = requests.get(url, headers=headers, timeout=15)
+            resp.encoding = resp.apparent_encoding
+            if resp.status_code != 200:
+                raise Exception(f"Request failed: {resp.status_code}")
+            soup = BeautifulSoup(resp.text, "html.parser")
+            outer_div = soup.find("div", class_="date-outer")
+            if not outer_div:
+                raise Exception("Could not find the 'date-outer' class.")
 
-    p_tags = outer_div.find_all("p")
-    lines = []
-    for p in p_tags:
-        text = p.get_text(strip=True)
-        if not text:
-            continue
-        # Filter keywords
-        if any(kw in text for kw in FILTER_KEYWORDS):
-            continue
-        lines.append(text)
-    return lines
+            p_tags = outer_div.find_all("p")
+            lines = []
+            for p in p_tags:
+                text = p.get_text(strip=True)
+                if not text:
+                    continue
+                # Filter keywords
+                if any(kw in text for kw in FILTER_KEYWORDS):
+                    continue
+                lines.append(text)
+            return lines
+
+        except Exception as e:
+            print(f"⚠️ Error on attempt {attempt + 1}/{retries}: {e}")
+            if attempt < retries - 1:
+                print(f"⏳ Retrying in {delay} seconds...")
+                time.sleep(delay)
+            else:
+                raise e
 
 # -------------------
 # Generate Subdirectory Name
