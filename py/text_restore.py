@@ -4,9 +4,9 @@ import re
 
 # ========== 配置区域 ==========
 # 输入文件夹
-INPUT_DIR = r"F:\book\txt2"
+INPUT_DIR = r"F:\download\txt\乱世佳人"
 # 输出文件夹
-OUTPUT_DIR = r"F:\book\txt"
+OUTPUT_DIR = r"F:\book\txt\乱世佳人"
 # 关键词映射表文件
 MAPPING_FILE = r"E:\www\test\py\json\novelMapping.json"
 # =============================

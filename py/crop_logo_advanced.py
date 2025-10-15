@@ -9,7 +9,7 @@ from queue import Queue
 # ==============================
 # 🧩 配置区域
 # ==============================
-INPUT_DIR = r"A:\IMAGE\V33\AI"        # 输入文件夹
+INPUT_DIR = r"F:\download\V33图片"        # 输入文件夹
 OUTPUT_DIR = r"F:\download\IMAGE3"  # 输出文件夹（与原结构一致）
 THREAD_COUNT = 5                         # 线程数量
 REPLACE_ORIGINAL = True                 # True = 覆盖原文件，False = 另存为

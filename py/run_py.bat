@@ -19,7 +19,9 @@ echo  3. 裁剪并替换原图【单任务】（crop_logo_recursive_replace.py�
 echo ==============================
 echo  4. 图片裁剪任务并替换原图【批量任务】（crop_logo_advanced.py）
 echo ==============================
-echo  5. 根据字段替换txt文件里面的关键字（text_restore.py）
+echo  5. txt文件根据字段替换里面的关键字（text_restore.py）
+echo ==============================
+echo  51. txt大文件关键字（txtReplace.py）
 echo ==============================
 echo  6. 从A目录复制X张图片到B目录（random_copy_vertical_images.py）
 echo ==============================
@@ -28,6 +30,8 @@ echo ==============================
 echo  8. 根据小说地址爬取导出为txt文件（crawl_blog_content_with_directory.py）
 echo ==============================
 echo  9. 根据地址爬取v33的图片（downloadv33img.py）
+echo ==============================
+echo  10. 导出替换字符生成字典（export_novel_mapping.py）
 echo ==============================
 echo [Q] 退出
 echo ==============================
@@ -60,6 +64,11 @@ if /I "%choice%"=="5" (
     "%PYTHON%" "%SCRIPT_DIR%\text_restore.py"
     goto menu
 )
+if /I "%choice%"=="51" (
+    echo 正在执行：txt大文件关键字...
+    "%PYTHON%" "%SCRIPT_DIR%\txtReplace.py"
+    goto menu
+)
 if /I "%choice%"=="6" (
     echo 正在执行：从A目录复制X张图片到B目录...
     "%PYTHON%" "%SCRIPT_DIR%\random_copy_vertical_images.py"
@@ -78,6 +87,11 @@ if /I "%choice%"=="8" (
 if /I "%choice%"=="9" (
     echo 正在执行：根据地址爬取v33的图片...
     "%PYTHON%" "%SCRIPT_DIR%\downloadv33img.py"
+    goto menu
+)
+if /I "%choice%"=="10" (
+    echo 正在执行：导出替换字符生成字典...
+    "%PYTHON%" "%SCRIPT_DIR%\export_novel_mapping.py"
     goto menu
 )
 if /I "%choice%"=="Q" (
