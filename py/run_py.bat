@@ -5,7 +5,7 @@ setlocal enabledelayedexpansion
 
 :: 设置 Python 路径和脚本目录
 set PYTHON=D:\tools\python\python.exe
-set SCRIPT_DIR=D:\www\test\py
+set SCRIPT_DIR=E:\www\test\py
 
 :: 菜单
 echo ==============================
