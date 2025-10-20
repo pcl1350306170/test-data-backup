@@ -14,7 +14,7 @@ http://localhost:89/test/img/logo.png
 本地床頭卡接口：
 http://localhost:28019/314-bedside/bnms/app-bn/patient-in-list/patient-label-merge
 http://192.168.31.77:28019/314-bedside/bnms/app-bn/patient-in-list/patient-label-merge
------------------------------------------------------------------------------------------------ 
+-----------------------------------------------------------------------------------------------
 
 https://v33.d58gx9.cc/pw/thread1022.php?fid=49&page=54&pageFrom=wode
 https://v33.d58gx9.cc/pw/thread1022.php?fid=193&page=3&pageFrom=novels
@@ -22,10 +22,10 @@ https://raw.githubusercontent.com/pcl1350306170/98TNovels/refs/heads/main/98T202
 blog小说
 https://blog.xbookcn.net/search/label/%E8%BF%91%E4%BA%B2%E4%B9%B1%E4%BC%A6?updated-max=2012-07-28T18:00:00%2B08:00&max-results=20&start=280&by-date=false
 
-py脚本保存目录“E:\www\test\py”，目前有3个可执行脚本，给我出个方式，可以一键执行某一个。
-E:\tools\python\python.exe multi_image_downloader.py  //批量下载图片
-E:\tools\python\python.exe crop_logo_recursive.py  // 裁剪图片
-E:\tools\python\python.exe crop_logo_recursive_replace.py // 裁剪替换图片
+py脚本保存目录“C:\www\test\py”，目前有3个可执行脚本，给我出个方式，可以一键执行某一个。
+C:\tools\python\python.exe multi_image_downloader.py  //批量下载图片
+C:\tools\python\python.exe crop_logo_recursive.py  // 裁剪图片
+C:\tools\python\python.exe crop_logo_recursive_replace.py // 裁剪替换图片
 
 自贡测试数据：
 http://192.168.31.77:28019/menzh/data-test/waitingColOptionZiGong
@@ -45,7 +45,7 @@ develop_sams 10 /  12 \ 3.0 、3.1.0、3.1.3
 
 看板 12 == 运行版本： 14.16.0
 
-E:\www\yh\门诊\self-low-code-template\ == 运行版本： 14.16.0
+C:\www\yh\门诊\self-low-code-template\ == 运行版本： 14.16.0
 
 门诊管理后台：1.5.1  18.19.0 == 都不行！新增依赖出问题了
 	      1.5.0  18.19.0
@@ -81,7 +81,7 @@ proxy: {
         changeOrigin: true,
         ws: false
       },
- 
+
     }
 上海十一：
 
@@ -106,10 +106,10 @@ function exportLocalStorageAndToken() {
   if (token) {
     script.push(`document.cookie = "token=${token}; path=/";`);
   }
-  
+
   // 拼接所有脚本语句
   const scriptContent = script.join('\n');
-  
+
   // 将内容复制到剪贴板
   navigator.clipboard.writeText(scriptContent)
     .then(() => {
@@ -126,7 +126,7 @@ function exportLocalStorageAndToken() {
 
 // 调用函数执行复制
 exportLocalStorageAndToken();
-    
+
 
 //=====================================
 
@@ -152,7 +152,7 @@ function exportLocalStorageAndToken() {
 exportLocalStorageAndToken();
 
 
-在 **Windows CMD** 中，你可以使用以下命令删除 `node_modules` 目录：  
+在 **Windows CMD** 中，你可以使用以下命令删除 `node_modules` 目录：
 
 ---
 rd /s /q node_module
@@ -160,10 +160,10 @@ rd /s /q node_module
 ```cmd
 rd /s /q node_modules
 ```
-✅ **解释：**  
-- `rd`（`rmdir`）：删除目录的命令。  
-- `/s`：删除目录及其所有子文件。  
-- `/q`：静默删除，不提示确认。  
+✅ **解释：**
+- `rd`（`rmdir`）：删除目录的命令。
+- `/s`：删除目录及其所有子文件。
+- `/q`：静默删除，不提示确认。
 
 💡 **适用于：** 绝大多数情况下，快速删除 `node_modules` 目录。
 
@@ -192,9 +192,9 @@ Remove-Item -Recurse -Force node_modules
 ```cmd
 npx rimraf node_modules
 ```
-✅ **适用于：**  
-- `node_modules` 体积特别大，导致 Windows 无法直接删除。  
-- **`rimraf`** 解决 Windows **路径过长** 问题。  
+✅ **适用于：**
+- `node_modules` 体积特别大，导致 Windows 无法直接删除。
+- **`rimraf`** 解决 Windows **路径过长** 问题。
 - **如果 `npx rimraf` 失败，可以全局安装**：
   ```cmd
   npm install -g rimraf
@@ -262,8 +262,8 @@ adb logcat
 isStandbyTimeBedHead
 
 
--javaagent:E:\data\idea\FineAgent.jar
-E:\www\mywww\php\backup\20220117123520_textreplace_v1.sql
+-javaagent:C:\data\idea\FineAgent.jar
+C:\www\mywww\php\backup\20220117123520_textreplace_v1.sql
 [密码jd]
 
 阿里云盘
@@ -296,7 +296,7 @@ rm -rf /home/data/web/static /home/data/web/assets;
 tar -zxvf /home/yahua/webapps/front/dist.tar.gz -C /home/data/web;
 
 git合并commit
-git cherry-pick 
+git cherry-pick
 
 
 src/views/hpms/eduCation/ward/add.vue
@@ -451,7 +451,7 @@ registerPlaySuspend
 
 
 page.curl(page.eduApi.getDetails, { id }).then((res) => {
-        
+
       }).catch((err) => {
         app.log.error(err)
       })

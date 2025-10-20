@@ -3,7 +3,7 @@ import re
 import chardet
 
 # ======== 可自定义配置区域 ========
-base_dir = r"E:\book\大于5M合并"  # 目标目录
+base_dir = r"C:\book\大于5M合并"  # 目标目录
 process_subdirs = True       # 是否处理子目录，False 时只处理当前目录
 replace_dict = {
     "欢迎光临翠微居": "",
