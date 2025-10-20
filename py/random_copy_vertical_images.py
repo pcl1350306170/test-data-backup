@@ -9,7 +9,7 @@ SOURCE_DIR = r"A:\IMAGE\V33\AI-去二维"      # 源目录（含子目录）
 TARGET_DIR = r"F:\book\封面"        # 目标目录
 HISTORY_FILE =r"./json/copy_history.json"   # 历史记录文件路径
 COPY_COUNT = 50                    # 每次复制多少张
-RANDOM_SKIP_RATE = 0.58             # 跳过比例（越大扫描越少，建议 0.7~0.95）
+RANDOM_SKIP_RATE = 0.5             # 跳过比例（越大扫描越少，建议 0.7~0.95）
 # ---------------------------------------
 
 
