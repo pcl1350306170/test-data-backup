@@ -16,8 +16,8 @@
   }
 ]
 
-E:\www\yh\床旁\床旁3.1.3\src\zhbfbed\viewsmws\api\assessmentRecordForm.js
-E:\www\yh\床旁\床旁3.1.3\src\zhbfbed\viewsmws\views\assessmentRecordForm\views\patientAdmissionAssessmentForm.js
+D:\www\yh\床旁\床旁3.1.3\src\zhbfbed\viewsmws\api\assessmentRecordForm.js
+D:\www\yh\床旁\床旁3.1.3\src\zhbfbed\viewsmws\views\assessmentRecordForm\views\patientAdmissionAssessmentForm.js
 
 呼和浩特市第一医院
 HUHEHAOTESHIDIYIYIYUAN

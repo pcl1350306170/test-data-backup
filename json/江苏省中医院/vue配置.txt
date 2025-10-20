@@ -1,4 +1,4 @@
-E:\www\yh\看板\看板10\vue.config.js
+D:\www\yh\看板\看板10\vue.config.js
 
     proxy: {
       '/bnms/app-bn/homepage': {

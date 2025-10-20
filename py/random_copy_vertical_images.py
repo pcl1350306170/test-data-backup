@@ -51,7 +51,7 @@ def find_vertical_images_fast(source_dir, needed, history):
         random.shuffle(files)  # 打乱，避免每次都一样
         for file in files:
             # 随机跳过大量文件
-            if random.random() < RANDOM_SKIP_RATE:
+            if random.random() < RANDOM_SKIP_RATD:
                 continue
 
             if not file.lower().endswith(image_ext):
