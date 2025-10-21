@@ -4,6 +4,7 @@
 无暇赐教您迎面，谢大讲，求师兄
 蛙滑牙快软大光，特约未遂，颇困卧桌
 
+{"status":200,"desc":"操作成功","data":{"deptName":"内分泌二科","orgName":"榆林市中医医院1","orgImage":"/resource/img/20251020/8e70c51033424c258183e9db29f5fbb7.png","orgCode":2,"deptId":"31f4c01e6b344f73b3ae6fe44369c5cd","orgId":"f43235a19a7e4594a737ad1fe6c820d0"}}
 
 
 http://localhost:89/test/img/ll/tx.png
@@ -614,3 +615,8 @@ https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main
 https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/ll/防导管脱落.png
 https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/ll/防深静脉血栓.png
 https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/ll/防跌倒.png
+
+
+npm install -g pnpm
+pnpm install
+pnpm run build
