@@ -33,6 +33,8 @@ echo  9. 根据地址爬取v33的图片（downloadv33img.py）
 echo ==============================
 echo  10. 导出替换字符生成字典（export_novel_mapping.py）
 echo ==============================
+echo  11. 把图片处理为可以进行打印的卡贴比例（cutImages.py）
+echo ==============================
 echo [Q] 退出
 echo ==============================
 
@@ -92,6 +94,11 @@ if /I "%choice%"=="9" (
 if /I "%choice%"=="10" (
     echo 正在执行：导出替换字符生成字典...
     "%PYTHON%" "%SCRIPT_DIR%\export_novel_mapping.py"
+    goto menu
+)
+if /I "%choice%"=="11" (
+    echo 正在执行：导把图片处理为可以进行打印的卡贴比例...
+    "%PYTHON%" "%SCRIPT_DIR%\cutImages.py"
     goto menu
 )
 if /I "%choice%"=="Q" (
