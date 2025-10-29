@@ -73,6 +73,19 @@
                 "contentType": 1,
                 "content": "/theme1/bedList",
                 "thumbnailUrl": "床位一览.jpg"
+            }, {
+                "pageType": 1,
+                "backgroundImageShow": 0,
+                "menuName": "床态监测",
+                "id": "79ee709a580047fb9f6583722c498785",
+                "sort": 2,
+                "initTag": 0,
+                "templateId": "9fe246d283a94f8ab914ce8c1bed129b",
+                "pageId": "1f67512ea89711efaed80cda411de3c6",
+                "pageName": "床态监测",
+                "contentType": 1,
+                "content": "/theme1/bedsmart",
+                "thumbnailUrl": "床位一览.jpg"
             },
             {
                 "pageType": 1,

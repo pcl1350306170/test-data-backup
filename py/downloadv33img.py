@@ -26,7 +26,7 @@ DB_CONFIG = {
 }
 
 # 保存目录
-SAVE_DIR = "A:\IMAGE\V33\已处理"
+SAVE_DIR = "H:\IMAGE\V33\已处理"
 
 # 多线程配置，默认5线程
 THREAD_COUNT = 5
@@ -68,7 +68,7 @@ def fetch_pending_data(conn):
     sql = """
         SELECT id, data_key, data_content, data_type
         FROM general_data
-        WHERE data_type LIKE 'V33-IMG-s%'
+        WHERE data_type LIKE 'V33-IMG-%'
           AND is_deleted=0
     """
     # 执行 SQL 查询

@@ -1,0 +1,96 @@
+{
+    "fullData": [
+        {
+            "workerId": 1,
+            "workStationId": 1,
+            "workStationName": "测试叫号器",
+            "registerObjIdList": [
+                1,
+                2
+            ],
+            "workerName": "PJCLLL",
+            "workerPicture": "",
+            "workerBusinessCard": "",
+            "workerTitle": "主任医师",
+            "workerIntro": "简介简介哈哈哈哈",
+            "workerDegree": "",
+            "workerSpecialty": "",
+            "deptName": "测试科室",
+            "isPause": false,
+            "onlineStatus": "0",
+            "preTreatingPatient": [],
+            "treatingPatient": {
+                "bookId": null,
+                "queuingId": null,
+                "deptName": "测试科室",
+                "orderNo": "预1",
+                "orderPrefix": null,
+                "orderNumber": null,
+                "orderTag": null,
+                "orderTagColor": null,
+                "orderColorPrefix": null,
+                "ftColor": null,
+                "bgColor": null,
+                "patientName": "李四",
+                "patientCardNo": null,
+                "patientId": "lisisi",
+                "patientShowNo": null,
+                "type": "0",
+                "treatStatus": null,
+                "registerObjName": "这是普通号",
+                "registerObjId": null,
+                "registerObjSimpleName": "2P通",
+                "registerObjGroupSimpleName": "2P通",
+                "registerObjGroupGroupName": "这是普通",
+                "workerStationId": null,
+                "treatmentRoomName": null,
+                "treatmentRoomShortName": null,
+                "deptCode": null,
+                "doctorCode": null,
+                "doctorName": null
+            },
+            "waitingPatientList": [],
+            "overPatientList": [],
+            "weekInfo": [],
+            "scheduleList": [],
+            "sortNumber": 0
+        },
+        {
+            "workerId": "",
+            "workStationId": "",
+            "registerObjIdList": [],
+            "workerName": "",
+            "workerPicture": "",
+            "workerBusinessCard": "",
+            "workerTitle": "",
+            "workerIntro": "",
+            "workerDegree": "",
+            "workerSpecialty": "",
+            "isPause": false,
+            "onlineStatus": "2",
+            "deptName": "",
+            "preTreatingPatient": [],
+            "treatingPatient": [],
+            "waitingPatientList": [],
+            "overPatientList": [],
+            "weekInfo": [],
+            "scheduleList": [],
+            "sortNumber": 0
+        }
+    ]
+}
+
+弹窗：
+<div data-v-2c573d6c="" class="van-popup van-popup--round van-popup--center van-popup--safe-area-inset-bottom" style="z-index: 2002; background-color: rgb(255, 255, 255);">
+    <div data-v-2c573d6c="" class="room-call-patient">
+        <div data-v-2c573d6c="" class="patient-info">
+            <div data-v-2c573d6c="" class="item current-patient">
+                <div data-v-2c573d6c="" class="title" style="font-weight: normal;">就诊</div>
+                <div data-v-2c573d6c="" class="content-wrap content-wrap-1">
+                    <div data-v-2c573d6c="" class="content" style="color: rgb(0, 89, 179); font-size: 6.45833rem; font-weight: normal;">预1 张*一</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
