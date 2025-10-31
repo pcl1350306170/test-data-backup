@@ -35,6 +35,8 @@ echo  10. 导出替换字符生成字典（export_novel_mapping.py）
 echo ==============================
 echo  11. 把图片处理为可以进行打印的卡贴比例（cutImages.py）
 echo ==============================
+echo  12. 删除小图片（delSmallImage.py）
+echo ==============================
 echo [Q] 退出
 echo ==============================
 
@@ -99,6 +101,11 @@ if /I "%choice%"=="10" (
 if /I "%choice%"=="11" (
     echo 正在执行：导把图片处理为可以进行打印的卡贴比例...
     "%PYTHON%" "%SCRIPT_DIR%\cutImages.py"
+    goto menu
+)
+if /I "%choice%"=="12" (
+    echo 正在执行：导删除小图片...
+    "%PYTHON%" "%SCRIPT_DIR%\delSmallImage.py"
     goto menu
 )
 if /I "%choice%"=="Q" (

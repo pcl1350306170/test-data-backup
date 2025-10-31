@@ -13,6 +13,8 @@ replace_dict = {
     "#": "",
     "=": "",
     "@": "",
+    "陆尔杰": "小俊",
+    "尔杰": "小俊",
     "欢迎光临翠微居小说阅读网www.cuiweiju.com": "",
     "www.cuiweiju.com": ""
 }
