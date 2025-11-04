@@ -1,0 +1,21 @@
+写一下java接口：
+1、根据前端表格代码，返回测试数据
+2、基本数据格式是：
+{
+    "status": 0,
+    "desc": "操作成功",
+    "data": []
+}
+数据放在data里面
+3、可以根据参数返回多少条数据
+
+http://localhost/Ceshi/api/bnms/watchDevice/select?deptName=&deviceId=&deviceName=&bindStatus=&patientName=&size=10&page=1&bindStartTime=&bindEndTime=&unbindStartTime=&unbindEndTime=
+
+
+http://localhost:28019/api/bnms/watchDevice/select
+
+data{
+list:[],
+
+}
+
