@@ -2,10 +2,10 @@ import os
 from PIL import Image
 
 # =================== 配置区 ===================
-image_dir = r"G:\图片\猫和老鼠"  # 图片所在目录
+image_dir = r"G:\图片\竖屏壁纸绝美"  # 图片所在目录
 process_subdirs = True              # 是否递归处理子目录
-min_width = 860
-min_height = 560
+min_width = 800
+min_height = 800
 # ============================================
 
 def is_image_file(filename):

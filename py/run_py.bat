@@ -37,6 +37,10 @@ echo  11. 把图片处理为可以进行打印的卡贴比例（cutImages.py）
 echo ==============================
 echo  12. 删除小图片（delSmallImage.py）
 echo ==============================
+echo  13. 过滤不合适的图片（check_nsfw_images.py）
+echo ==============================
+echo  14. 获取图片的EXIF 数据（extract_exif.py）
+echo ==============================
 echo [Q] 退出
 echo ==============================
 
@@ -106,6 +110,16 @@ if /I "%choice%"=="11" (
 if /I "%choice%"=="12" (
     echo 正在执行：导删除小图片...
     "%PYTHON%" "%SCRIPT_DIR%\delSmallImage.py"
+    goto menu
+)
+if /I "%choice%"=="13" (
+    echo 正在执行：过滤不合适的图片...
+    "%PYTHON%" "%SCRIPT_DIR%\check_nsfw_images.py"
+    goto menu
+)
+if /I "%choice%"=="14" (
+    echo 正在执行：获取图片的 EXIF 数据...
+    "%PYTHON%" "%SCRIPT_DIR%\extract_exif.py"
     goto menu
 )
 if /I "%choice%"=="Q" (
