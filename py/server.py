@@ -105,7 +105,7 @@ def download_images(task_id, data_type, save_dir, batch_size):
 @app.route("/crawl-api/v1/generalData/process/start", methods=["POST"])
 def start_task():
     data_type = request.args.get("dataType")
-    save_dir = request.args.get("saveDir", "F:\\download\\MTMT")
+    save_dir = request.args.get("saveDir", "D:\\download\\MTMT")
     batch_size = int(request.args.get("batchSize", 100))
 
     task_id = str(uuid.uuid4())

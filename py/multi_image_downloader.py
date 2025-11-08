@@ -17,7 +17,7 @@ DB_CONFIG = {
 }
 
 # 图片保存根目录
-BASE_DIR = r"F:\download\MTMT"
+BASE_DIR = r"D:\download\MTMT"
 os.makedirs(BASE_DIR, exist_ok=True)
 
 # 最大线程数

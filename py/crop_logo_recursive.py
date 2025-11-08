@@ -7,7 +7,7 @@ import threading
 
 # ============ 可配置参数 ============
 INPUT_DIR = r"A:\IMAGE\V33\AI-4"
-OUTPUT_DIR = r"F:\download\output"
+OUTPUT_DIR = r"D:\download\output"
 
 # 裁剪方式：按比例 或 固定像素
 CROP_MODE = "ratio"  # 可选: "ratio" 或 "pixel"

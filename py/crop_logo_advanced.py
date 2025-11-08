@@ -9,8 +9,8 @@ from queue import Queue
 # ==============================
 # 🧩 配置区域
 # ==============================
-INPUT_DIR = r"F:\download\V33图片"        # 输入文件夹
-OUTPUT_DIR = r"F:\download\IMAGE3"  # 输出文件夹（与原结构一致）
+INPUT_DIR = r"D:\download\V33图片"        # 输入文件夹
+OUTPUT_DIR = r"D:\download\IMAGE3"  # 输出文件夹（与原结构一致）
 THREAD_COUNT = 5                         # 线程数量
 REPLACE_ORIGINAL = True                 # True = 覆盖原文件，False = 另存为
 PROGRESS_FILE = "./json/crop_progress.json"     # 进度记录文件

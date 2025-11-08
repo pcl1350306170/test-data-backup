@@ -20,7 +20,7 @@ DB_CONFIG = {
 # -------------------
 # Save Directory
 # -------------------
-SAVE_DIR = "F:\\download\\txt"
+SAVE_DIR = "D:\\download\\txt"
 
 # -------------------
 # Filter Keywords
