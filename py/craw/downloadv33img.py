@@ -35,7 +35,7 @@ THREAD_COUNT = 5
 RETRY_COUNT = 3
 
 # 小图映射JSON路径
-SMALL_IMG_JSON = "C:\\www\\test\\py\\json\\imgSmallMapping.json"
+SMALL_IMG_JSON = ".\\json\\imgSmallMapping.json"
 
 # 安全停止标志
 STOP_FLAG = False

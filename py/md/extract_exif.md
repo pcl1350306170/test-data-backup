@@ -25,14 +25,17 @@ from PIL.ExifTags import TAGS
 
 # ================== 配置区 ==================
 source_dir = r"G:\图片\小学语文课本插图"  # 图片所在目录
-output_dir = r"C:\www\test\py\json"      # JSON 输出目录
+output_dir = r"/image/json"  # JSON 输出目录
 output_file = os.path.join(output_dir, "exif_data.json")  # 输出文件路径
-process_subdirs = True                    # 是否递归处理子目录
+process_subdirs = True  # 是否递归处理子目录
+
+
 # ===========================================
 
 def ensure_dir_exists(path):
     """确保目录存在，不存在则创建"""
     os.makedirs(path, exist_ok=True)
+
 
 def get_exif_data(image_path):
     """提取图片的 EXIF 数据"""
@@ -52,6 +55,7 @@ def get_exif_data(image_path):
         print(f"⚠️ 无法读取 EXIF 数据：{image_path} -> {e}")
         return None
 
+
 def get_all_images(root_dir):
     """递归获取所有图片路径"""
     image_files = []
@@ -63,13 +67,14 @@ def get_all_images(root_dir):
             break
     return image_files
 
+
 def process_images():
     """处理图片，提取 EXIF 数据并保存到 JSON"""
     ensure_dir_exists(output_dir)
-    
+
     image_paths = get_all_images(source_dir)
     exif_data_list = []
-    
+
     for img_path in image_paths:
         exif_data = get_exif_data(img_path)
         if exif_data is not None:
@@ -83,6 +88,7 @@ def process_images():
         json.dump(exif_data_list, f, ensure_ascii=False, indent=4)
 
     print(f"✅ EXIF 数据已保存到 {output_file}")
+
 
 if __name__ == "__main__":
     process_images()
@@ -185,14 +191,17 @@ import fractions  # 用来处理 IFDRational 类型
 
 # ================== 配置区 ==================
 source_dir = r"G:\图片\小学语文课本插图"  # 图片所在目录
-output_dir = r"C:\www\test\py\json"      # JSON 输出目录
+output_dir = r"/image/json"  # JSON 输出目录
 output_file = os.path.join(output_dir, "exif_data.json")  # 输出文件路径
-process_subdirs = True                    # 是否递归处理子目录
+process_subdirs = True  # 是否递归处理子目录
+
+
 # ===========================================
 
 def ensure_dir_exists(path):
     """确保目录存在，不存在则创建"""
     os.makedirs(path, exist_ok=True)
+
 
 def convert_to_serializable(value):
     """确保值是可被 JSON 序列化的，并跳过无法解析的字段"""
@@ -203,7 +212,7 @@ def convert_to_serializable(value):
         elif isinstance(value, datetime):
             # 如果是 datetime 类型，转换为字符串
             return value.strftime("%Y-%m-%d %H:%M:%S")
-        elif isinstance(value, fractions.Fraction):  
+        elif isinstance(value, fractions.Fraction):
             # 如果是 IFDRational 类型（EXIF 中的分数），转换为 float
             return float(value)
         elif isinstance(value, dict):
@@ -229,6 +238,7 @@ def convert_to_serializable(value):
         print(f"⚠️ 跳过无法解析的字段: {e}")
         return None  # 返回 None 跳过这个字段
 
+
 def get_exif_data(image_path):
     """提取图片的 EXIF 数据"""
     try:
@@ -247,6 +257,7 @@ def get_exif_data(image_path):
         print(f"⚠️ 无法读取 EXIF 数据：{image_path} -> {e}")
         return None
 
+
 def get_all_images(root_dir):
     """递归获取所有图片路径"""
     image_files = []
@@ -258,13 +269,14 @@ def get_all_images(root_dir):
             break
     return image_files
 
+
 def process_images():
     """处理图片，提取 EXIF 数据并保存到 JSON"""
     ensure_dir_exists(output_dir)
-    
+
     image_paths = get_all_images(source_dir)
     exif_data_list = []
-    
+
     for img_path in image_paths:
         exif_data = get_exif_data(img_path)
         if exif_data is not None:
@@ -278,6 +290,7 @@ def process_images():
         json.dump(exif_data_list, f, ensure_ascii=False, indent=4)
 
     print(f"✅ EXIF 数据已保存到 {output_file}")
+
 
 if __name__ == "__main__":
     process_images()
