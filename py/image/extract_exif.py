@@ -8,7 +8,7 @@ import fractions  # 用来处理 IFDRational 类型
 
 # ================== 配置区 ==================
 source_dir = r"D:\book\img"  # 图片所在目录
-output_dir = r"C:\www\test\py\json"      # JSON 输出目录
+output_dir = r"/json"  # JSON 输出目录
 output_file = os.path.join(output_dir, "exif_data.json")  # 输出文件路径
 process_subdirs = True                    # 是否递归处理子目录
 # ===========================================

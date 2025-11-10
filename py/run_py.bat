@@ -27,6 +27,8 @@ echo  25. 过滤不合适的图片【歰歰】（check_nsfw_images.py）
 echo ==============================
 echo  26. 获取图片的EXIF 数据（extract_exif.py）
 echo ==============================
+echo  27. 图片合并或者给他一个纯色背景（image_composer.py）
+echo ==============================
 echo  5. txt文件根据字段替换里面的关键字（text_restore.py）
 echo ==============================
 echo  51. txt大文件关键字（txtReplace.py）
@@ -53,77 +55,82 @@ set /p choice=请输入要运行的脚本编号（或 Q 退出）：
 
 if /I "%choice%"=="1" (
     echo 正在执行：批量下载图片...
-    "%PYTHON%" "%SCRIPT_DIR%\multi_image_downloader.py"
+    "%PYTHON%" "%SCRIPT_DIR%\craw\multi_image_downloader.py"
     goto end
 )
 if /I "%choice%"=="2" (
     echo 正在执行：裁剪图片...
-    "%PYTHON%" "%SCRIPT_DIR%\crop_logo_recursive.py"
+    "%PYTHON%" "%SCRIPT_DIR%\image\crop_logo_recursive.py"
     goto end
 )
 if /I "%choice%"=="21" (
     echo 正在执行：裁剪替换图片...
-    "%PYTHON%" "%SCRIPT_DIR%\crop_logo_recursive_replace.py"
+    "%PYTHON%" "%SCRIPT_DIR%\image\crop_logo_recursive_replace.py"
     goto menu
 )
 if /I "%choice%"=="22" (
     echo 正在执行：高级裁剪任务...
-    "%PYTHON%" "%SCRIPT_DIR%\crop_logo_advanced.py"
+    "%PYTHON%" "%SCRIPT_DIR%\image\crop_logo_advanced.py"
     goto menu
 )
 if /I "%choice%"=="5" (
     echo 正在执行：替换txt文件...
-    "%PYTHON%" "%SCRIPT_DIR%\text_restore.py"
+    "%PYTHON%" "%SCRIPT_DIR%\book\text_restore.py"
     goto menu
 )
 if /I "%choice%"=="51" (
     echo 正在执行：txt大文件关键字...
-    "%PYTHON%" "%SCRIPT_DIR%\txtReplace.py"
+    "%PYTHON%" "%SCRIPT_DIR%\book\txtReplace.py"
     goto menu
 )
 if /I "%choice%"=="6" (
     echo 正在执行：从A目录复制X张图片到B目录...
-    "%PYTHON%" "%SCRIPT_DIR%\random_copy_vertical_images.py"
+    "%PYTHON%" "%SCRIPT_DIR%\image\random_copy_vertical_images.py"
     goto menu
 )
 if /I "%choice%"=="7" (
     echo 正在执行：把A目录下面的所有txt文件转为epub...
-    "%PYTHON%" "%SCRIPT_DIR%\txt_to_epub_with_cover.py"
+    "%PYTHON%" "%SCRIPT_DIR%\book\txt_to_epub_with_cover.py"
     goto end
 )
 if /I "%choice%"=="8" (
     echo 正在执行：爬取数据导出为txt文件...
-    "%PYTHON%" "%SCRIPT_DIR%\crawl_blog_content_with_directory.py"
+    "%PYTHON%" "%SCRIPT_DIR%\craw\crawl_blog_content_with_directory.py"
     goto menu
 )
 if /I "%choice%"=="9" (
     echo 正在执行：根据地址爬取v33的图片...
-    "%PYTHON%" "%SCRIPT_DIR%\downloadv33img.py"
+    "%PYTHON%" "%SCRIPT_DIR%\craw\downloadv33img.py"
     goto menu
 )
 if /I "%choice%"=="52" (
     echo 正在执行：导出替换字符生成字典...
-    "%PYTHON%" "%SCRIPT_DIR%\export_novel_mapping.py"
+    "%PYTHON%" "%SCRIPT_DIR%\book\export_novel_mapping.py"
     goto menu
 )
 if /I "%choice%"=="23" (
     echo 正在执行：导把图片处理为可以进行打印的卡贴比例...
-    "%PYTHON%" "%SCRIPT_DIR%\cutImages.py"
+    "%PYTHON%" "%SCRIPT_DIR%\image\cutImages.py"
     goto menu
 )
 if /I "%choice%"=="24" (
     echo 正在执行：导删除小图片...
-    "%PYTHON%" "%SCRIPT_DIR%\delSmallImage.py"
+    "%PYTHON%" "%SCRIPT_DIR%\image\delSmallImage.py"
     goto menu
 )
 if /I "%choice%"=="25" (
     echo 正在执行：过滤不合适的图片...
-    "%PYTHON%" "%SCRIPT_DIR%\check_nsfw_images.py"
+    "%PYTHON%" "%SCRIPT_DIR%\image\check_nsfw_images.py"
     goto menu
 )
 if /I "%choice%"=="26" (
     echo 正在执行：获取图片的 EXIF 数据...
-    "%PYTHON%" "%SCRIPT_DIR%\extract_exif.py"
+    "%PYTHON%" "%SCRIPT_DIR%\image\extract_exif.py"
+    goto menu
+)
+if /I "%choice%"=="27" (
+    echo 正在执行：给图片一个图片或者纯色背景...
+    "%PYTHON%" "%SCRIPT_DIR%\image\image_composer.py"
     goto menu
 )
 if /I "%choice%"=="15" (
@@ -133,7 +140,7 @@ if /I "%choice%"=="15" (
 )
 if /I "%choice%"=="71" (
     echo 正在执行：给epub文件插入图片...
-    "%PYTHON%" "%SCRIPT_DIR%\epub_image_in.py"
+    "%PYTHON%" "%SCRIPT_DIR%\book\epub_image_in.py"
     goto menu
 )
 if /I "%choice%"=="Q" (

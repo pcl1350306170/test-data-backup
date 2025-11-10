@@ -56,7 +56,6 @@
 | ----- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------- |
 | **1** | 🐍 **PyWhatKit**<br>[github.com/Ankit404butfound/PyWhatKit](https://github.com/Ankit404butfound/PyWhatKit)                                    | 一个轻量实用的自动化工具包：可以用 Python 发送 WhatsApp 消息、自动播放 YouTube、执行 Google 搜索、生成艺术字等。 | 新增功能（如发送图片）、改善文档、修复小 bug。       |
 | **2** | 📝 **Auto-GPT-Plugin-Template**<br>[github.com/Torantulino/Auto-GPT-Plugin-Template](https://github.com/Torantulino/Auto-GPT-Plugin-Template) | 官方提供的 Auto-GPT 插件模板，学习如何编写智能体扩展。                                          | 创建你自己的 Auto-GPT 插件；添加工具或集成 API。 |
-| **3** | 🧠 **NeuralNine / Python Projects**<br>[github.com/NeuralNine/PythonProjects](https://github.com/NeuralNine/PythonProjects)                   | 收集了很多有趣的小项目（游戏、算法、加密、网络、GUI），结构清晰，适合学习。                                   | 完善文档、优化代码、增加新例子。                |
 | **4** | 📚 **Pillow**<br>[github.com/python-pillow/Pillow](https://github.com/python-pillow/Pillow)                                                   | Python 最常用的图像处理库之一（PIL 的升级版）。                                             | 修复 bug、改进性能、补测试或完善文档。           |
 | **5** | 🎮 **pygame**<br>[github.com/pygame/pygame](https://github.com/pygame/pygame)                                                                 | Python 的经典游戏开发引擎，社区非常活跃。                                                  | 提交小游戏 Demo、修复 issue、优化函数说明。     |
 
@@ -94,7 +93,7 @@
 我可以 **专门帮你筛选 5 个方向相符的开源项目**，并说明适合改进的代码部分。
 要我帮你定制这份列表吗？
 
-#5 🧩 这里推荐 **5 个面向“自动化”方向、使用 Python 的开源项目**。项目门槛较低、社区活跃，非常适合你参与贡献或借鉴学习。每个我都附上简介、亮点，以及建议你可以尝试的改进方向。
+# 🧩 这里推荐 **5 个面向“自动化”方向、使用 Python 的开源项目**。项目门槛较低、社区活跃，非常适合你参与贡献或借鉴学习。每个我都附上简介、亮点，以及建议你可以尝试的改进方向。
 
 ---
 
@@ -111,7 +110,7 @@
 
 ---
 
-### 2. Amazing‑Python‑Scripts
+### 2. Amazing‑Python‑Scripts === 已克隆
 
 * 仓库地址： [github.com/avinashkranjan/Amazing-Python-Scripts](https://github.com/avinashkranjan/Amazing-Python-Scripts) ([GitHub][2])
 * 简介：一个社区维护的集合库，收录了大量用 Python 实现的自动化任务脚本（从简单脚本到实用工具）。
@@ -137,7 +136,7 @@
 
 ---
 
-### 4. Awesome‑Python‑Scripts
+### 4. Awesome‑Python‑Scripts === 已克隆
 
 * 仓库地址： [github.com/hastagAB/Awesome-Python-Scripts](https://github.com/hastagAB/Awesome-Python-Scripts) ([GitHub][4])
 * 简介：一个精选脚本库，$「使生活更轻松」$为目标，专门收集可以通过 Python 自动化完成的小任务脚本。
@@ -147,10 +146,11 @@
    * 在每个脚本中补充“中文使用指南”或“视频演示”。
    * 优化脚本目录结构，统一脚本模板（比如加参数支持、日志输出、错误处理）。
    * 提出 Issue 或贡献你日常中遇到的任务脚本（例如：自动将邮件附件保存、自动整理下载文件夹等）。
+   * https://github.com/hastagAB/Awesome-Python-Scripts.git
 
 ---
 
-### 5. Python‑Scripts
+### 5. Python‑Scripts === 已克隆
 
 * 仓库地址： [github.com/DhanushNehru/Python-Scripts](https://github.com/DhanushNehru/Python-Scripts) ([GitHub][5])
 * 简介：包含 60 多个 Python 脚本，每个脚本主要实现一个小任务，如批量重命名、文件组织、数据转换等。
@@ -189,7 +189,7 @@
     * 编写更多中文使用文档或示例脚本。
     * 添加对复杂页面（如动态加载、框架嵌套）更健壮的处理。
 
-2. SeleniumBase
+2. SeleniumBase === 已克隆
 
   * 仓库地址： [seleniumbase/SeleniumBase](https://github.com/seleniumbase/SeleniumBase) ([GitHub][2])
   * 简介：一个专业的 Python 浏览器自动化框架，支持网站测试、自动化操作、绕过 anti-bot 措施、CAPTCHA 识别等。
