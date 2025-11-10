@@ -99,16 +99,16 @@ class ConvertThread(QThread):
                     processed_content = self.process_line_breaks(processed_content)
 
                     # 生成章节标题
-                    chapter_title = f"第{i+1}章 {os.path.splitext(os.path.basename(chapter['path']))[0]}"
+                    base_title = f"第{i+1}章 {os.path.splitext(os.path.basename(chapter['path']))[0]}"
 
                     processed_chapters.append({
-                        "title": chapter_title,
+                        "base_title": base_title,  # 基础标题，用于切割后的子章节
                         "content": processed_content,
                         "length": len(processed_content),
                         "original_length": chapter["length"]
                     })
 
-                    self.log_updated.emit(f"处理完成: {chapter_title}")
+                    self.log_updated.emit(f"处理完成: {base_title}")
                 except Exception as e:
                     self.log_updated.emit(f"处理文本失败 {chapter['path']}: {str(e)}")
 
@@ -132,7 +132,16 @@ class ConvertThread(QThread):
 
             # 5. 分配插图
             self.progress_updated.emit(55, "分配插图...")
-            image_allocation = self.allocate_images(processed_chapters, valid_images, total_length)
+            # 先展平所有章节（包括切割后的）再分配图片
+            flat_chapters = []
+            for chapter in processed_chapters:
+                # 根据配置切割章节
+                max_size_kb = self.config.get("max_chapter_size", 200)
+                max_size_bytes = max_size_kb * 1024  # 转换为字节
+                sub_chapters = self.split_chapter_by_size(chapter, max_size_bytes)
+                flat_chapters.extend(sub_chapters)
+
+            image_allocation = self.allocate_images(flat_chapters, valid_images, total_length)
 
             # 6. 生成EPUB
             self.progress_updated.emit(60, "生成EPUB...")
@@ -141,7 +150,7 @@ class ConvertThread(QThread):
             epub_path = os.path.join(self.output_dir, epub_filename)
 
             success = self.create_epub(
-                processed_chapters,
+                flat_chapters,  # 使用切割后的章节列表
                 epub_path,
                 self.cover_path,
                 valid_images,
@@ -159,6 +168,59 @@ class ConvertThread(QThread):
         except Exception as e:
             self.log_updated.emit(f"转换过程出错: {str(e)}")
             self.finished.emit(False, f"转换失败: {str(e)}")
+
+    def split_chapter_by_size(self, chapter, max_size_bytes):
+        """根据最大文件大小切割章节"""
+        content = chapter["content"]
+        base_title = chapter["base_title"]
+
+        # 估算当前内容转换为XHTML后的大小
+        # 经验系数：纯文本转换为XHTML后大约会增加30-50%的大小
+        estimated_xhtml_size = len(content.encode('utf-8')) * 1.4
+
+        # 如果小于最大限制，不需要切割
+        if estimated_xhtml_size <= max_size_bytes:
+            return [{
+                "title": base_title,
+                "content": content,
+                "length": len(content)
+            }]
+
+        # 需要切割，按段落分割内容
+        paragraphs = content.split('\n')
+        sub_chapters = []
+        current_paragraphs = []
+        current_size = 0
+
+        for para in paragraphs:
+            # 估算段落的XHTML大小
+            para_size = len(para.encode('utf-8')) * 1.4  # 应用同样的经验系数
+
+            # 如果添加当前段落后超过限制，则创建新的子章节
+            if current_size + para_size > max_size_bytes and current_paragraphs:
+                sub_content = '\n'.join(current_paragraphs)
+                sub_chapters.append({
+                    "title": f"{base_title}（{len(sub_chapters) + 1}）",
+                    "content": sub_content,
+                    "length": len(sub_content)
+                })
+                current_paragraphs = [para]
+                current_size = para_size
+            else:
+                current_paragraphs.append(para)
+                current_size += para_size
+
+        # 添加最后一个子章节
+        if current_paragraphs:
+            sub_content = '\n'.join(current_paragraphs)
+            sub_chapters.append({
+                "title": f"{base_title}（{len(sub_chapters) + 1}）",
+                "content": sub_content,
+                "length": len(sub_content)
+            })
+
+        self.log_updated.emit(f"章节 '{base_title}' 已切割为 {len(sub_chapters)} 个子章节")
+        return sub_chapters
 
     def init_logger(self):
         """初始化日志记录器"""
@@ -430,6 +492,10 @@ class ConvertThread(QThread):
                     with open(chapter_path, 'w', encoding='utf-8') as f:
                         f.write(str(soup))
 
+                    # 记录实际文件大小
+                    file_size = os.path.getsize(chapter_path)
+                    self.log_updated.emit(f"生成章节: {chapter['title']} ({file_size/1024:.1f}KB)")
+
                     chapter_files.append({
                         "title": chapter['title'],
                         "filename": chapter_filename
@@ -547,9 +613,21 @@ class ConvertThread(QThread):
         spine_items = []
 
         # 添加封面
+
         if cover_filename:
+            ext = os.path.splitext(cover_filename)[1].lower()
+            if ext == '.png':
+                cover_media_type = "image/png"
+            elif ext in ['.jpg', '.jpeg']:
+                cover_media_type = "image/jpeg"
+            elif ext == '.webp':
+                cover_media_type = "image/webp"
+            else:
+                cover_media_type = "image/*"
+
             manifest_items.append(f'<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>')
-            manifest_items.append(f'<item id="cover-img" href="{cover_filename}" media-type="image/jpeg"/>')
+            manifest_items.append(f'<item id="cover-img" href="{cover_filename}" media-type="{cover_media_type}"/>')
+
             spine_items.append('<itemref idref="cover" linear="yes"/>')
 
         # 添加目录
@@ -610,6 +688,7 @@ class EPubConverter(QMainWindow):
         # 更新UI显示
         self.cover_dir_edit.setText(self.default_cover_dir)
         self.output_dir_edit.setText(self.default_output_dir)
+        self.max_chapter_size.setValue(self.config.get("max_chapter_size", 200))
 
     def init_ui(self):
         """初始化UI界面"""
@@ -707,6 +786,13 @@ class EPubConverter(QMainWindow):
         self.max_images.setRange(1, 500)
         self.max_images.setValue(300)
         config_form.addRow("最大插图数量:", self.max_images)
+
+        # 章节大小限制
+        self.max_chapter_size = QSpinBox()
+        self.max_chapter_size.setRange(50, 1000)  # 50KB到1000KB
+        self.max_chapter_size.setValue(200)  # 默认200KB
+        self.max_chapter_size.setSuffix(" KB")
+        config_form.addRow("章节最大大小:", self.max_chapter_size)
 
         # 封面尺寸阈值
         self.cover_width = QSpinBox()
@@ -911,6 +997,7 @@ class EPubConverter(QMainWindow):
             config = {
                 "sort_method": "create_time" if self.sort_method.currentIndex() == 0 else "name",
                 "max_images": self.max_images.value(),
+                "max_chapter_size": self.max_chapter_size.value(),  # 新增配置项
                 "cover_width": self.cover_width.value(),
                 "cover_height": self.cover_height.value(),
                 "remove_chapter_marks": self.remove_chapter_marks.isChecked(),
@@ -938,6 +1025,7 @@ class EPubConverter(QMainWindow):
                 # 更新UI
                 self.sort_method.setCurrentIndex(0 if config.get("sort_method", "create_time") == "create_time" else 1)
                 self.max_images.setValue(config.get("max_images", 300))
+                self.max_chapter_size.setValue(config.get("max_chapter_size", 200))  # 加载章节大小配置
                 self.cover_width.setValue(config.get("cover_width", 800))
                 self.cover_height.setValue(config.get("cover_height", 1200))
                 self.remove_chapter_marks.setChecked(config.get("remove_chapter_marks", False))
@@ -957,6 +1045,7 @@ class EPubConverter(QMainWindow):
         return {
             "sort_method": "create_time",
             "max_images": 300,
+            "max_chapter_size": 200,  # 默认章节大小200KB
             "cover_width": 800,
             "cover_height": 1200,
             "remove_chapter_marks": False,
@@ -977,6 +1066,7 @@ class EPubConverter(QMainWindow):
         current_config = {
             "sort_method": "create_time" if self.sort_method.currentIndex() == 0 else "name",
             "max_images": self.max_images.value(),
+            "max_chapter_size": self.max_chapter_size.value(),  # 传递章节大小配置
             "cover_width": self.cover_width.value(),
             "cover_height": self.cover_height.value(),
             "remove_chapter_marks": self.remove_chapter_marks.isChecked()
