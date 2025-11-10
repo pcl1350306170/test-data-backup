@@ -1,812 +1,1035 @@
-# txt2epub_gui.py
 import os
 import sys
 import json
-import shutil
+import uuid
 import random
+import logging
+import shutil
+import zipfile
 import tempfile
-import traceback
 from datetime import datetime
-from functools import partial
 from pathlib import Path
-import threading
-
-import chardet
-from PIL import Image
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+                             QLabel, QPushButton, QFileDialog, QListWidget, QCheckBox,
+                             QProgressBar, QTextEdit, QMessageBox, QGroupBox, QRadioButton,
+                             QSpinBox, QDoubleSpinBox, QFormLayout, QComboBox, QSplitter,
+                             QTabWidget, QListWidgetItem)
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QDateTime, QSize
+from PyQt5.QtGui import QPixmap, QImage, QIcon
 from bs4 import BeautifulSoup
-from bs4 import XMLParsedAsHTMLWarning
-import warnings
-
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, simpledialog
-
-# ebooklib
-from ebooklib import epub
-
-# -------------------------
-# 默认配置文件位置
-# -------------------------
-DEFAULT_CONFIG = {
-    "txt_dir": r"D:\book\HH",
-    "recursive": True,
-    "cover_dir": r"D:\book\封面",
-    "fallback_dir": r"H:\IMAGE\V33\AI-去二维",
-    "output_dir": r"D:\book\epub-py",
-    "max_images": 50,
-    "cover_min_size": [800, 1200],
-    "image_min_size": [500, 500],
-    "sort_by": "ctime",  # or 'name'
-    "ignore_case_replace": False,
-    "images_source_shuffle": True,
-    "insert_mode": "proportional",  # or 'even'
-    "replace_json": r"C:\www\test\py\json\novelMapping.json"
-}
-CONFIG_PATH = "txt2epub_config.json"
-
-
-# -------------------------
-# 工具函数
-# -------------------------
-def load_config():
-    if os.path.exists(CONFIG_PATH):
-        try:
-            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-                cfg = json.load(f)
-                DEFAULT_CONFIG.update(cfg)
-        except Exception:
-            print("加载配置失败，使用默认配置。")
-
-
-def save_config(cfg):
-    try:
-        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-            json.dump(cfg, f, ensure_ascii=False, indent=4)
-    except Exception as e:
-        print("保存配置失败：", e)
-
-
-def detect_encoding(file_path, sample=8192):
-    try:
-        with open(file_path, "rb") as f:
-            raw = f.read(sample)
-        res = chardet.detect(raw)
-        enc = res.get("encoding") or "utf-8"
-        return enc
-    except Exception:
-        return "utf-8"
-
-
-# 清除章节标识的简单正则 / 处理
+import chardet
 import re
-CHAPTER_PATTERNS = [
-    r'^\s*第[一二三四五六七八九十零百千]+\s*章[\s\S]*',  # "第一章 ..." 前缀
-    r'^\s*第\s*\d+\s*章[\s\S]*',
-    r'^\s*\d+\.\s*',  # 1. ...
-    r'^\s*【.+】',  # 【章节名】
-    r'^\s*第[0-9一二三四五六七八九十]+\s*节',  # 节
-]
+
+# 默认配置路径
+CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "json", "txt_epub_config.json")
+
+# 确保配置目录存在
+os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
 
 
-def strip_chapter_headers(text):
-    # 逐行判断，若行匹配章标题模式则删除该行
-    lines = text.splitlines()
-    new_lines = []
-    for ln in lines:
-        s = ln.strip()
-        remove = False
-        for pat in CHAPTER_PATTERNS:
-            if re.match(pat, s):
-                remove = True
-                break
-        if not remove:
-            new_lines.append(ln)
-    return "\n".join(new_lines)
+class ConvertThread(QThread):
+    """转换线程，用于后台处理文件转换，不阻塞UI"""
+    progress_updated = pyqtSignal(int, str)  # 进度值，当前阶段
+    log_updated = pyqtSignal(str)            # 日志信息
+    finished = pyqtSignal(bool, str)         # 完成状态，消息
 
+    def __init__(self, txt_files, output_dir, cover_dir, cover_path, image_paths, config):
+        super().__init__()
+        self.txt_files = txt_files
+        self.output_dir = output_dir
+        self.cover_dir = cover_dir
+        self.cover_path = cover_path
+        self.image_paths = image_paths
+        self.config = config
+        self.log_file = None
+        self.logger = None
 
-# 合并乱换行
-def merge_lines(text):
-    lines = text.splitlines()
-    out = []
-    zh_punct = set(list("。！？；：”“’》】）】」、"))  # treat punctuation
-    i = 0
-    while i < len(lines):
-        line = lines[i].rstrip()
-        if line == "":
-            # collapse consecutive blank lines to single blank line
-            out.append("")
-            while i + 1 < len(lines) and lines[i + 1].strip() == "":
-                i += 1
-            i += 1
-            continue
-        # if current line does not end with punctuation and next line is normal, merge
-        if i + 1 < len(lines):
-            nxt = lines[i + 1].strip()
-            if line and (line[-1] not in zh_punct) and nxt:
-                # merge with a space
-                merged = line + " " + nxt
-                lines[i + 1] = merged
-                i += 1
-                continue
-        out.append(line)
-        i += 1
-    # remove trailing blanks
-    while out and out[-1] == "":
-        out.pop()
-    return "\n".join(out)
-
-
-def read_txt_file(path, log_func=None):
-    try:
-        enc = detect_encoding(path)
-        with open(path, "r", encoding=enc, errors="replace") as f:
-            content = f.read()
-        return content, enc
-    except Exception as e:
-        if log_func:
-            log_func(f"读取失败: {path} -> {e}")
-        return None, None
-
-
-def load_replace_rules(json_path, ignore_case=False):
-    if not os.path.exists(json_path):
-        return []
-    try:
-        with open(json_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        # ensure list of (old, new) pairs sorted by length desc
-        pairs = []
-        for k, v in data.items():
-            pairs.append((k, v))
-        pairs.sort(key=lambda x: -len(x[0]))
-        if ignore_case:
-            # return lambda or tuple that performs case-insensitive replacing
-            return pairs, True
-        return pairs, False
-    except Exception as e:
-        print("加载替换规则失败：", e)
-        return [], False
-
-
-def apply_replacements(text, pairs, ignore_case=False):
-    if not pairs:
-        return text, 0
-    count = 0
-    if ignore_case:
-        # replace case-insensitive: using re with flags
-        for old, new in pairs:
-            pattern = re.compile(re.escape(old), flags=re.IGNORECASE)
-            text, n = pattern.subn(new, text)
-            count += n
-    else:
-        for old, new in pairs:
-            if old in text:
-                text = text.replace(old, new)
-                # approximate count: number of replacements
-                count += text.count(new)  # not accurate but okay
-    return text, count
-
-
-def find_images_from_dir(primary_dir, fallback_dir, cfg, log_func=None):
-    # scan primary dir for images, filter by size thresholds
-    def scan_dir(d, min_w, min_h):
-        imgs = []
-        for root, _, files in os.walk(d):
-            for fn in files:
-                if fn.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
-                    p = os.path.join(root, fn)
-                    try:
-                        with Image.open(p) as im:
-                            w, h = im.size
-                        if w >= min_w and h >= min_h:
-                            imgs.append(p)
-                    except Exception:
-                        continue
-        return imgs
-
-    cover_imgs = []
-    insert_imgs = []
-    # primary cover dir
-    if os.path.isdir(primary_dir):
-        cover_imgs = scan_dir(primary_dir, cfg["cover_min_size"][0], cfg["cover_min_size"][1])
-        insert_imgs = scan_dir(primary_dir, cfg["image_min_size"][0], cfg["image_min_size"][1])
-    # fallback if not found
-    if (not cover_imgs) and os.path.isdir(fallback_dir):
-        # scan fallback entire tree quickly
-        imgs = scan_dir(fallback_dir, cfg["image_min_size"][0], cfg["image_min_size"][1])
-        # deduplicate
-        imgs = list(dict.fromkeys(imgs))
-        random.shuffle(imgs)
-        # use first as cover candidate
-        if imgs:
-            cover_imgs.append(imgs[0])
-        insert_imgs.extend(imgs[1:cfg["max_images"]+1])
-    else:
-        # we might fill insert_imgs from fallback if not enough
-        if len(insert_imgs) < cfg["max_images"] and os.path.isdir(fallback_dir):
-            more = scan_dir(fallback_dir, cfg["image_min_size"][0], cfg["image_min_size"][1])
-            for m in more:
-                if m not in insert_imgs:
-                    insert_imgs.append(m)
-                    if len(insert_imgs) >= cfg["max_images"]:
-                        break
-    # ensure uniqueness and limit
-    insert_imgs = list(dict.fromkeys(insert_imgs))[:cfg["max_images"]]
-    if cfg.get("images_source_shuffle", True):
-        random.shuffle(insert_imgs)
-    return cover_imgs, insert_imgs
-
-
-# -------------------------
-# EPUB 构造函数
-# -------------------------
-def build_epub_book(title_str, author, chapters, cover_path, images_paths, cfg, log_func=None, progress_callback=None):
-    """
-    chapters: list of tuples (chapter_title, chapter_html_content)
-    images_paths: list of image absolute paths to embed in book (<=100)
-    """
-    book = epub.EpubBook()
-    book.set_identifier(f"book-{random.randint(100000,999999)}")
-    book.set_title(title_str)
-    book.set_language("zh-CN")
-    book.add_author(author or "unknown")
-
-    # add cover
-    if cover_path and os.path.exists(cover_path):
+    def run(self):
         try:
-            with open(cover_path, "rb") as f:
-                cover_bytes = f.read()
-            book.set_cover(os.path.basename(cover_path), cover_bytes)
-            if log_func:
-                log_func(f"封面已添加: {cover_path}")
-        except Exception as e:
-            if log_func: log_func(f"添加封面失败: {e}")
+            # 初始化日志
+            self.init_logger()
 
-    # add images into book and remember name mapping
-    image_items = {}
-    for idx, imgp in enumerate(images_paths):
-        try:
-            with open(imgp, "rb") as f:
-                data = f.read()
-            imgname = f"img_{idx+1:03d}{Path(imgp).suffix.lower()}"
-            item = epub.EpubItem(uid=imgname, file_name=imgname, media_type=f"image/{Path(imgp).suffix.lower().lstrip('.')}", content=data)
-            book.add_item(item)
-            image_items[imgp] = imgname
-            if log_func: log_func(f"嵌入图片：{imgp} -> {imgname}")
-        except Exception as e:
-            if log_func: log_func(f"嵌入图片失败：{imgp} -> {e}")
-        if progress_callback:
-            progress_callback(idx+1, len(images_paths))
+            # 确保输出目录存在
+            os.makedirs(self.output_dir, exist_ok=True)
 
-    # create chapters
-    epub_chapters = []
-    for i, (title, html_content) in enumerate(chapters, start=1):
-        c = epub.EpubHtml(title=title, file_name=f"chap_{i:03d}.xhtml", lang='zh-CN')
-        # Ensure the inserted images reference the new filenames (image_items mapping)
-        # We assume html_content uses src="./Images/...." or "./..." absolute path; we replace by imgname mapping
-        soup = BeautifulSoup(html_content, "lxml")
-        for img_tag in soup.find_all("img"):
-            src = img_tag.get("src", "")
-            # try to map by basename to image_items key
-            bn = os.path.basename(src)
-            # find image_items value with same basename
-            mapped = None
-            for p, nm in image_items.items():
-                if os.path.basename(p) == bn:
-                    mapped = nm
-                    break
-            if mapped:
-                img_tag['src'] = mapped
+            # 1. 准备工作
+            self.progress_updated.emit(5, "准备转换...")
+
+            # 排序文件
+            sorted_files = self.sort_files(self.txt_files)
+            if not sorted_files:
+                self.log_updated.emit("没有要处理的文件")
+                self.finished.emit(False, "没有要处理的文件")
+                return
+
+            # 2. 读取文件
+            self.progress_updated.emit(10, "读取文件...")
+            chapters_data = []
+            total_files = len(sorted_files)
+
+            for i, file_path in enumerate(sorted_files):
+                try:
+                    content = self.read_file_with_encoding(file_path)
+                    chapters_data.append({
+                        "path": file_path,
+                        "content": content,
+                        "length": len(content)
+                    })
+                    self.log_updated.emit(f"成功读取文件: {os.path.basename(file_path)}")
+                except Exception as e:
+                    self.log_updated.emit(f"读取文件失败 {os.path.basename(file_path)}: {str(e)}")
+
+                progress = 10 + int(20 * (i + 1) / total_files)
+                self.progress_updated.emit(progress, f"读取文件... ({i+1}/{total_files})")
+
+            # 3. 处理文本
+            self.progress_updated.emit(30, "处理文本...")
+            processed_chapters = []
+            total_length = sum(chapter["length"] for chapter in chapters_data)
+
+            for i, chapter in enumerate(chapters_data):
+                try:
+                    # 清除原有章节标识
+                    if self.config.get("remove_chapter_marks", False):
+                        processed_content = self.remove_chapter_marks(chapter["content"])
+                    else:
+                        processed_content = chapter["content"]
+
+                    # 处理换行和空行
+                    processed_content = self.process_line_breaks(processed_content)
+
+                    # 生成章节标题
+                    chapter_title = f"第{i+1}章 {os.path.splitext(os.path.basename(chapter['path']))[0]}"
+
+                    processed_chapters.append({
+                        "title": chapter_title,
+                        "content": processed_content,
+                        "length": len(processed_content),
+                        "original_length": chapter["length"]
+                    })
+
+                    self.log_updated.emit(f"处理完成: {chapter_title}")
+                except Exception as e:
+                    self.log_updated.emit(f"处理文本失败 {chapter['path']}: {str(e)}")
+
+                progress = 30 + int(20 * (i + 1) / total_files)
+                self.progress_updated.emit(progress, f"处理文本... ({i+1}/{total_files})")
+
+            # 4. 准备图片
+            self.progress_updated.emit(50, "准备图片...")
+            valid_images = []
+            for img_path in self.image_paths:
+                try:
+                    if self.is_valid_image(img_path):
+                        valid_images.append(img_path)
+                except Exception as e:
+                    self.log_updated.emit(f"图片无效 {img_path}: {str(e)}")
+
+            # 限制图片数量
+            max_images = self.config.get("max_images", 300)
+            valid_images = valid_images[:max_images]
+            self.log_updated.emit(f"准备就绪 {len(valid_images)} 张插图")
+
+            # 5. 分配插图
+            self.progress_updated.emit(55, "分配插图...")
+            image_allocation = self.allocate_images(processed_chapters, valid_images, total_length)
+
+            # 6. 生成EPUB
+            self.progress_updated.emit(60, "生成EPUB...")
+            book_title = os.path.basename(os.path.dirname(sorted_files[0])) if sorted_files else "未知书籍"
+            epub_filename = self.generate_epub_filename(book_title)
+            epub_path = os.path.join(self.output_dir, epub_filename)
+
+            success = self.create_epub(
+                processed_chapters,
+                epub_path,
+                self.cover_path,
+                valid_images,
+                image_allocation,
+                book_title
+            )
+
+            if success:
+                self.progress_updated.emit(100, "转换完成")
+                self.log_updated.emit(f"成功生成EPUB: {epub_path}")
+                self.finished.emit(True, f"成功生成EPUB文件：\n{epub_path}")
             else:
-                # leave as-is; reader may still try to load but likely missing
-                pass
-        c.content = str(soup)
-        book.add_item(c)
-        epub_chapters.append(c)
+                self.finished.emit(False, "生成EPUB失败")
 
-    # Define Table Of Contents and spine
-    book.toc = tuple(epub_chapters)
-    book.spine = ['nav'] + epub_chapters
-    # add default NCX and Nav files
-    book.add_item(epub.EpubNcx())
-    book.add_item(epub.EpubNav())
+        except Exception as e:
+            self.log_updated.emit(f"转换过程出错: {str(e)}")
+            self.finished.emit(False, f"转换失败: {str(e)}")
 
-    # add CSS minimal
-    style = 'body { font-family: serif; line-height: 1.6; } img { max-width: 100%; height: auto; display:block; margin:0.6em auto; }'
-    nav_css = epub.EpubItem(uid="style_nav", file_name="style/style.css", media_type="text/css", content=style)
-    book.add_item(nav_css)
+    def init_logger(self):
+        """初始化日志记录器"""
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        self.log_file = os.path.join(self.output_dir, f"txt2epub_{timestamp}.log")
 
-    # write to temp file handled by caller
-    return book
+        self.logger = logging.getLogger("epub_converter")
+        self.logger.setLevel(logging.INFO)
 
+        # 清除现有处理器
+        if self.logger.handlers:
+            self.logger.handlers = []
 
-# -------------------------
-# 文本 -> HTML 处理函数
-# -------------------------
-def txt_to_html_chapters(file_paths, cfg, rules_pairs, ignore_case, log_func=None):
-    """
-    Reads files, cleans, applies replacements, returns list of (title, html_content)
-    file_paths: list of absolute txt paths in the order of chapters
-    """
-    chapters = []
-    total_replace_count = 0
-    for idx, fp in enumerate(file_paths, start=1):
-        basename = os.path.splitext(os.path.basename(fp))[0]
-        title = f"第{idx}章 {basename}"
+        # 添加文件处理器
+        file_handler = logging.FileHandler(self.log_file, encoding="utf-8")
+        formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+        file_handler.setFormatter(formatter)
+        self.logger.addHandler(file_handler)
 
-        text, enc = read_txt_file(fp, log_func=log_func)
-        if text is None:
-            if log_func:
-                log_func(f"跳过无法读取文件：{fp}")
-            continue
-        # strip chapter headers
-        text = strip_chapter_headers(text)
-        # merge lines
-        text = merge_lines(text)
-        # collapse multiple blank lines
-        text = re.sub(r'\n\s*\n+', '\n\n', text)
-        # apply replacements
-        replaced_text, cnt = apply_replacements(text, rules_pairs, ignore_case)
-        total_replace_count += cnt
+        self.log_updated.emit(f"日志文件已创建: {self.log_file}")
 
-        # wrap into simple xhtml body paragraphs
-        # Escape & maybe handled by BeautifulSoup below
-        paragraphs = []
-        for p in replaced_text.split("\n\n"):
-            p = p.strip()
-            if not p:
+    def sort_files(self, file_paths):
+        """根据配置排序文件"""
+        sort_method = self.config.get("sort_method", "create_time")
+
+        if sort_method == "create_time":
+            return sorted(file_paths, key=lambda x: os.path.getctime(x))
+        else:  # 字母顺序
+            return sorted(file_paths, key=lambda x: os.path.basename(x))
+
+    def read_file_with_encoding(self, file_path):
+        """自动识别编码并读取文件"""
+        try:
+            # 尝试UTF-8
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except UnicodeDecodeError:
+            try:
+                # 尝试GBK
+                with open(file_path, 'r', encoding='gbk') as f:
+                    return f.read()
+            except UnicodeDecodeError:
+                # 自动检测编码
+                with open(file_path, 'rb') as f:
+                    raw_data = f.read()
+                    result = chardet.detect(raw_data)
+                    encoding = result['encoding'] or 'utf-8'
+
+                try:
+                    return raw_data.decode(encoding, errors='replace')
+                except:
+                    raise Exception(f"无法解码文件，尝试过UTF-8、GBK和{encoding}")
+
+    def remove_chapter_marks(self, content):
+        """移除章节标识"""
+        import re
+
+        # 常见章节标识模式
+        patterns = [
+            r'^第[零一二三四五六七八九十百千万]+章.*$',  # 第X章
+            r'^[0-9]+\..*$',                              # 1. ...
+            r'^[一二三四五六七八九十]+、.*$',            # 一、...
+            r'^\【.*\】$',                                # 【章节名】
+            r'^章节.*$'                                   # 章节...
+        ]
+
+        lines = content.split('\n')
+        cleaned_lines = []
+
+        for line in lines:
+            stripped_line = line.strip()
+            if any(re.match(pattern, stripped_line) for pattern in patterns):
+                self.log_updated.emit(f"移除章节标识: {stripped_line}")
                 continue
-            paragraphs.append(f"<p>{p}</p>")
+            cleaned_lines.append(line)
 
-        body_html = "<body>\n" + "\n".join(paragraphs) + "\n</body>"
-        # compose full xhtml with header minimal
-        xhtml = f'''<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+        return '\n'.join(cleaned_lines)
+
+    def process_line_breaks(self, content):
+        """处理换行和空行"""
+        lines = [line.rstrip() for line in content.split('\n')]
+        processed = []
+        current_line = ""
+
+        # 处理未以中文标点结尾的行
+        for line in lines:
+            stripped = line.strip()
+            if not stripped:
+                if current_line:
+                    processed.append(current_line)
+                    current_line = ""
+                processed.append("")
+            else:
+                if current_line:
+                    current_line += " " + stripped
+                else:
+                    current_line = stripped
+
+                # 检查是否以中文标点结尾
+                if current_line and self.is_chinese_punctuation(current_line[-1]):
+                    processed.append(current_line)
+                    current_line = ""
+
+        # 添加最后一行
+        if current_line:
+            processed.append(current_line)
+
+        # 合并连续空行
+        result = []
+        prev_empty = False
+        for line in processed:
+            if not line.strip():
+                if not prev_empty:
+                    result.append("")
+                    prev_empty = True
+            else:
+                result.append(line)
+                prev_empty = False
+
+        return '\n'.join(result)
+
+    def is_chinese_punctuation(self, char):
+        """判断是否是中文标点结尾"""
+        return char in "。！？；：”“’》】）」"
+
+    def is_valid_image(self, img_path):
+        """检查图片是否有效"""
+        try:
+            from PIL import Image
+            with Image.open(img_path) as img:
+                return True
+        except:
+            return False
+
+    def allocate_images(self, chapters, images, total_length):
+        """按章节长度比例分配插图"""
+        if not images:
+            return {}
+
+        allocation = {}
+        remaining_images = images.copy()
+        random.shuffle(remaining_images)
+
+        # 计算每章应分配的图片数量
+        for i, chapter in enumerate(chapters):
+            if total_length == 0:
+                allocation[i] = []
+                continue
+
+            ratio = chapter["length"] / total_length
+            num_images = max(0, round(ratio * len(images)))
+            allocation[i] = remaining_images[:num_images]
+            remaining_images = remaining_images[num_images:]
+
+        # 分配剩余图片
+        i = 0
+        while remaining_images and i < len(chapters):
+            allocation[i].append(remaining_images.pop(0))
+            i = (i + 1) % len(chapters)
+
+        return allocation
+
+    def generate_epub_filename(self, book_title):
+        """生成EPUB文件名"""
+        timestamp = datetime.now().strftime('%Y%m%d')
+        base_name = f"{book_title}_{timestamp}.epub"
+        file_path = os.path.join(self.output_dir, base_name)
+
+        # 避免覆盖
+        counter = 1
+        while os.path.exists(file_path):
+            base_name = f"{book_title}_{timestamp}_{counter}.epub"
+            file_path = os.path.join(self.output_dir, base_name)
+            counter += 1
+
+        return base_name
+
+    def create_epub(self, chapters, output_path, cover_path, images, image_allocation, book_title):
+        """创建EPUB文件"""
+        try:
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # 创建目录结构
+                oebps_dir = os.path.join(temp_dir, "OEBPS")
+                os.makedirs(oebps_dir, exist_ok=True)
+
+                # 处理图片 - 使用UUID重命名
+                image_uuid_map = {}  # 原路径 -> UUID文件名
+                image_files = []
+
+                for img_path in images:
+                    try:
+                        # 获取文件扩展名
+                        ext = os.path.splitext(img_path)[1].lower()
+                        # 生成UUID作为文件名
+                        uuid_filename = f"{uuid.uuid4()}{ext}"
+                        dest_path = os.path.join(oebps_dir, uuid_filename)
+
+                        # 复制图片
+                        shutil.copy(img_path, dest_path)
+                        image_uuid_map[img_path] = uuid_filename
+                        image_files.append(uuid_filename)
+
+                        self.log_updated.emit(f"处理图片: {os.path.basename(img_path)} -> {uuid_filename}")
+                    except Exception as e:
+                        self.log_updated.emit(f"复制图片失败 {img_path}: {str(e)}")
+
+                # 处理章节
+                chapter_files = []
+                total_chapters = len(chapters)
+
+                for i, chapter in enumerate(chapters):
+                    # 生成XHTML内容
+                    chapter_filename = f"chapter_{i+1}.xhtml"
+                    chapter_path = os.path.join(oebps_dir, chapter_filename)
+
+                    # 创建基本XHTML结构
+                    xhtml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
 <head>
-<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
-<title>{title}</title>
-<link rel="stylesheet" href="style/style.css" type="text/css"/>
+    <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/>
+    <title>{chapter['title']}</title>
 </head>
-{body_html}
-</html>
-'''
-        chapters.append((title, xhtml))
-        if log_func:
-            log_func(f"章节生成：{title} (文件：{fp}) 编码：{enc} 段落：{len(paragraphs)}")
-    return chapters, total_replace_count
+<body>
+    <h2>{chapter['title']}</h2>
+</body>
+</html>"""
+
+                    soup = BeautifulSoup(xhtml, "lxml-xml")
+                    body = soup.find("body")
+
+                    # 添加段落
+                    paragraphs = chapter['content'].split('\n')
+                    for para in paragraphs:
+                        if para.strip():
+                            p_tag = soup.new_tag("p")
+                            p_tag.string = para.strip()
+                            body.append(p_tag)
+                        else:
+                            # 添加空行
+                            br_tag = soup.new_tag("br")
+                            body.append(br_tag)
+
+                    # 插入图片 - 使用UUID文件名
+                    chapter_images = image_allocation.get(i, [])
+                    if chapter_images and len(paragraphs) > 6:  # 确保有足够段落插入图片
+                        # 排除开头和结尾3行
+                        valid_positions = list(range(3, len(paragraphs) - 3))
+                        if valid_positions and chapter_images:
+                            # 计算插入位置
+                            step = max(1, len(valid_positions) // len(chapter_images))
+                            positions = valid_positions[::step][:len(chapter_images)]
+
+                            # 获取所有段落标签
+                            p_tags = soup.find_all("p")
+
+                            for idx, img_path in zip(positions, chapter_images):
+                                if idx < len(p_tags) and img_path in image_uuid_map:
+                                    img_tag = soup.new_tag("div")
+                                    img_tag['style'] = "text-align:center;margin:1em 0;"
+                                    img = soup.new_tag("img", alt="插图")
+                                    # 使用UUID文件名
+                                    img["src"] = image_uuid_map[img_path]
+                                    img["style"] = "max-width:100%;height:auto;"
+                                    img_tag.append(img)
+                                    p_tags[idx].insert_after(img_tag)
+                                    self.log_updated.emit(f"在 {chapter['title']} 插入图片: {os.path.basename(img_path)}")
+
+                    # 保存章节文件
+                    with open(chapter_path, 'w', encoding='utf-8') as f:
+                        f.write(str(soup))
+
+                    chapter_files.append({
+                        "title": chapter['title'],
+                        "filename": chapter_filename
+                    })
+
+                    # 更新进度
+                    progress = 60 + int(30 * (i + 1) / total_chapters)
+                    self.progress_updated.emit(progress, f"生成章节... ({i+1}/{total_chapters})")
+
+                # 处理封面 - 使用UUID重命名
+                cover_filename = None
+                if cover_path and os.path.exists(cover_path):
+                    try:
+                        # 获取文件扩展名
+                        ext = os.path.splitext(cover_path)[1].lower()
+                        # 生成UUID作为文件名
+                        cover_filename = f"{uuid.uuid4()}{ext}"
+                        shutil.copy(cover_path, os.path.join(oebps_dir, cover_filename))
+
+                        # 创建封面XHTML
+                        cover_xhtml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8"/>
+    <title>封面</title>
+</head>
+<body>
+    <div style="text-align:center; margin-top:50%;">
+        <img src="{cover_filename}" alt="封面" style="max-width:100%; height:auto;"/>
+    </div>
+</body>
+</html>"""
+                        with open(os.path.join(oebps_dir, "cover.xhtml"), 'w', encoding='utf-8') as f:
+                            f.write(cover_xhtml)
+
+                        self.log_updated.emit(f"处理封面: {os.path.basename(cover_path)} -> {cover_filename}")
+                    except Exception as e:
+                        self.log_updated.emit(f"处理封面失败: {str(e)}")
+                        cover_filename = None
+
+                # 创建目录文件
+                toc_path = os.path.join(oebps_dir, "toc.ncx")
+                self.create_toc(toc_path, chapter_files, book_title)
+
+                # 创建container.xml
+                meta_inf_dir = os.path.join(temp_dir, "META-INF")
+                os.makedirs(meta_inf_dir, exist_ok=True)
+                container_xml = """<?xml version="1.0" encoding="UTF-8"?>
+<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container">
+    <rootfiles>
+        <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
+    </rootfiles>
+</container>"""
+                with open(os.path.join(meta_inf_dir, "container.xml"), 'w', encoding='utf-8') as f:
+                    f.write(container_xml)
+
+                # 创建content.opf - 使用UUID文件名
+                self.create_content_opf(oebps_dir, chapter_files, image_files, cover_filename, book_title)
+
+                # 创建mimetype文件
+                with open(os.path.join(temp_dir, "mimetype"), 'w', encoding='utf-8') as f:
+                    f.write("application/epub+zip")
+
+                # 打包EPUB
+                with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as epub:
+                    # 首先添加mimetype，不压缩
+                    epub.write(os.path.join(temp_dir, "mimetype"), "mimetype", compress_type=zipfile.ZIP_STORED)
+
+                    # 添加其他文件
+                    for root, _, files in os.walk(temp_dir):
+                        for file in files:
+                            if file == "mimetype":
+                                continue
+                            file_path = os.path.join(root, file)
+                            arcname = os.path.relpath(file_path, temp_dir)
+                            epub.write(file_path, arcname)
+
+                return True
+        except Exception as e:
+            self.log_updated.emit(f"创建EPUB失败: {str(e)}")
+            return False
+
+    def create_toc(self, ncx_path, chapters, book_title):
+        """创建目录文件"""
+        ncx_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<ncx version="2005-1" xml:lang="zh-CN" xmlns="http://www.daisy.org/z3986/2005/ncx/">
+    <head>
+        <meta name="dtb:uid" content="{uuid.uuid4()}"/>
+        <meta name="dtb:depth" content="1"/>
+        <meta name="dtb:totalPageCount" content="0"/>
+        <meta name="dtb:maxPageNumber" content="0"/>
+    </head>
+    <docTitle>
+        <text>{book_title}</text>
+    </docTitle>
+    <navMap>
+"""
+        for i, chapter in enumerate(chapters, 1):
+            ncx_content += f"""        <navPoint id="chapter{i}" playOrder="{i}">
+            <navLabel>
+                <text>{chapter['title']}</text>
+            </navLabel>
+            <content src="{chapter['filename']}"/>
+        </navPoint>
+"""
+        ncx_content += """    </navMap>
+</ncx>"""
+
+        with open(ncx_path, 'w', encoding='utf-8') as f:
+            f.write(ncx_content)
+
+    def create_content_opf(self, oebps_dir, chapters, images, cover_filename, book_title):
+        """创建content.opf文件"""
+        manifest_items = []
+        spine_items = []
+
+        # 添加封面
+        if cover_filename:
+            manifest_items.append(f'<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>')
+            manifest_items.append(f'<item id="cover-img" href="{cover_filename}" media-type="image/jpeg"/>')
+            spine_items.append('<itemref idref="cover" linear="yes"/>')
+
+        # 添加目录
+        manifest_items.append('<item id="toc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>')
+
+        # 添加章节文件
+        for i, chapter in enumerate(chapters, 1):
+            manifest_items.append(f'<item id="chapter{i}" href="{chapter["filename"]}" media-type="application/xhtml+xml"/>')
+            spine_items.append(f'<itemref idref="chapter{i}" linear="yes"/>')
+
+        # 添加插图 - 使用UUID文件名
+        for i, img_filename in enumerate(images):
+            ext = os.path.splitext(img_filename)[1].lower()
+            if ext == '.png':
+                media_type = "image/png"
+            elif ext in ['.jpg', '.jpeg']:
+                media_type = "image/jpeg"
+            elif ext == '.webp':
+                media_type = "image/webp"
+            else:
+                media_type = "image/*"
+            manifest_items.append(f'<item id="img{i}" href="{img_filename}" media-type="{media_type}"/>')
+
+        opf_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+<package version="2.0" unique-identifier="bookid" xmlns="http://www.idpf.org/2007/opf">
+    <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+        <dc:title>{book_title}</dc:title>
+        <dc:language>zh-CN</dc:language>
+        <dc:identifier id="bookid" opf:scheme="UUID">{uuid.uuid4()}</dc:identifier>
+    </metadata>
+    <manifest>
+        {"\n        ".join(manifest_items)}
+    </manifest>
+    <spine>
+        {"\n        ".join(spine_items)}
+    </spine>
+</package>"""
+        with open(os.path.join(oebps_dir, "content.opf"), 'w', encoding='utf-8') as f:
+            f.write(opf_content)
 
 
-# -------------------------
-# GUI Implementation
-# -------------------------
-class Txt2EpubGUI:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("TXT -> EPUB 转换器 (GUI)")
-        self.cfg = DEFAULT_CONFIG.copy()
-        load_config()
-        self.cfg.update(DEFAULT_CONFIG)
-        # load config file if exists
-        if os.path.exists(CONFIG_PATH):
-            try:
-                with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-                    self.cfg.update(json.load(f))
-            except:
-                pass
+class EPubConverter(QMainWindow):
+    """TXT转EPUB可视化工具主窗口"""
+    def __init__(self):
+        super().__init__()
+        self.txt_files = []
+        self.selected_images = []
+        self.selected_cover = None
 
-        self.txt_files = []  # list of (path, checked)
-        self.images_cover = []
-        self.images_insert = []
+        # 先初始化UI，再加载配置（解决属性不存在问题）
+        self.init_ui()
+        self.config = self.load_config()
 
-        # GUI layout
-        self.create_widgets()
-        self.log("程序启动")
-        self.update_file_list()
+        # 从配置获取目录路径
+        self.default_cover_dir = self.config.get("default_cover_dir", r"D:\book\封面")
+        self.default_output_dir = self.config.get("default_output_dir", r"D:\book\epub-py")
 
-    def create_widgets(self):
-        # Left: file selection and list
-        left = ttk.Frame(self.root, padding=8)
-        left.pack(side=tk.LEFT, fill=tk.Y)
+        # 更新UI显示
+        self.cover_dir_edit.setText(self.default_cover_dir)
+        self.output_dir_edit.setText(self.default_output_dir)
 
-        ttk.Label(left, text="TXT 源目录:").pack(anchor=tk.W)
-        frame_dir = ttk.Frame(left)
-        frame_dir.pack(fill=tk.X)
-        self.entry_txt_dir = ttk.Entry(frame_dir)
-        self.entry_txt_dir.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        self.entry_txt_dir.insert(0, self.cfg.get("txt_dir", ""))
-        ttk.Button(frame_dir, text="选择", command=self.choose_txt_dir).pack(side=tk.LEFT)
+    def init_ui(self):
+        """初始化UI界面"""
+        self.setWindowTitle("TXT转EPUB工具")
+        self.setGeometry(100, 100, 1000, 700)
 
-        self.recursive_var = tk.BooleanVar(value=self.cfg.get("recursive", True))
-        ttk.Checkbutton(left, text="递归子目录", variable=self.recursive_var, command=self.update_file_list).pack(anchor=tk.W)
+        # 主部件和布局
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
 
-        # file listbox with checkboxes - simulate with treeview
-        ttk.Label(left, text="TXT 文件 (可选/调整顺序):").pack(anchor=tk.W, pady=(8,0))
-        self.tree_files = ttk.Treeview(left, columns=("path", "ctime"), show="headings", selectmode="browse", height=18)
-        self.tree_files.heading("path", text="文件路径")
-        self.tree_files.heading("ctime", text="创建时间")
-        self.tree_files.pack(fill=tk.BOTH, expand=True)
-        btnf = ttk.Frame(left)
-        btnf.pack(fill=tk.X)
-        ttk.Button(btnf, text="上移", command=self.move_file_up).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ttk.Button(btnf, text="下移", command=self.move_file_down).pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ttk.Button(btnf, text="刷新列表", command=self.update_file_list).pack(side=tk.LEFT, fill=tk.X, expand=True)
+        # 创建标签页
+        tab_widget = QTabWidget()
 
-        # Middle: image & cover config
-        mid = ttk.Frame(self.root, padding=8)
-        mid.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # 1. 文件选择标签页
+        file_tab = QWidget()
+        file_layout = QVBoxLayout(file_tab)
 
-        ttk.Label(mid, text="封面目录 (优先):").grid(row=0, column=0, sticky=tk.W)
-        self.entry_cover_dir = ttk.Entry(mid)
-        self.entry_cover_dir.grid(row=0, column=1, sticky=tk.EW)
-        self.entry_cover_dir.insert(0, self.cfg.get("cover_dir", ""))
-        ttk.Button(mid, text="选择", command=self.choose_cover_dir).grid(row=0, column=2)
+        # 文件选择区域
+        file_group = QGroupBox("选择TXT文件")
+        file_group_layout = QVBoxLayout()
 
-        ttk.Label(mid, text="备用图片目录:").grid(row=1, column=0, sticky=tk.W)
-        self.entry_fallback = ttk.Entry(mid)
-        self.entry_fallback.grid(row=1, column=1, sticky=tk.EW)
-        self.entry_fallback.insert(0, self.cfg.get("fallback_dir", ""))
-        ttk.Button(mid, text="选择", command=self.choose_fallback_dir).grid(row=1, column=2)
+        file_buttons_layout = QHBoxLayout()
+        self.select_files_btn = QPushButton("选择TXT文件")
+        self.select_files_btn.clicked.connect(self.select_txt_files)
+        self.clear_files_btn = QPushButton("清空列表")
+        self.clear_files_btn.clicked.connect(self.clear_txt_files)
+        file_buttons_layout.addWidget(self.select_files_btn)
+        file_buttons_layout.addWidget(self.clear_files_btn)
 
-        mid.columnconfigure(1, weight=1)
+        self.files_list = QListWidget()
+        file_group_layout.addLayout(file_buttons_layout)
+        file_group_layout.addWidget(self.files_list)
+        file_group.setLayout(file_group_layout)
 
-        # image options
-        img_opt_frame = ttk.LabelFrame(mid, text="插图配置", padding=6)
-        img_opt_frame.grid(row=2, column=0, columnspan=3, sticky=tk.EW, pady=6)
-        ttk.Label(img_opt_frame, text="插图最大数量:").grid(row=0, column=0, sticky=tk.W)
-        self.max_images_var = tk.IntVar(value=self.cfg.get("max_images", 50))
-        ttk.Entry(img_opt_frame, textvariable=self.max_images_var, width=6).grid(row=0, column=1, sticky=tk.W)
+        # 封面选择区域
+        cover_group = QGroupBox("封面设置")
+        cover_layout = QVBoxLayout()
 
-        ttk.Label(img_opt_frame, text="封面最小尺寸 (W x H)").grid(row=1, column=0, sticky=tk.W)
-        self.cover_w_var = tk.IntVar(value=self.cfg.get("cover_min_size", [800,1200])[0])
-        self.cover_h_var = tk.IntVar(value=self.cfg.get("cover_min_size", [800,1200])[1])
-        ttk.Entry(img_opt_frame, textvariable=self.cover_w_var, width=6).grid(row=1, column=1, sticky=tk.W)
-        ttk.Entry(img_opt_frame, textvariable=self.cover_h_var, width=6).grid(row=1, column=2, sticky=tk.W)
+        cover_buttons_layout = QHBoxLayout()
+        self.select_cover_btn = QPushButton("选择封面图片")
+        self.select_cover_btn.clicked.connect(self.select_cover)
+        self.random_cover_btn = QPushButton("随机选择封面")
+        self.random_cover_btn.clicked.connect(self.random_select_cover)
+        cover_buttons_layout.addWidget(self.select_cover_btn)
+        cover_buttons_layout.addWidget(self.random_cover_btn)
 
-        ttk.Label(img_opt_frame, text="插图最小尺寸 (W x H)").grid(row=2, column=0, sticky=tk.W)
-        self.img_w_var = tk.IntVar(value=self.cfg.get("image_min_size", [500,500])[0])
-        self.img_h_var = tk.IntVar(value=self.cfg.get("image_min_size", [500,500])[1])
-        ttk.Entry(img_opt_frame, textvariable=self.img_w_var, width=6).grid(row=2, column=1, sticky=tk.W)
-        ttk.Entry(img_opt_frame, textvariable=self.img_h_var, width=6).grid(row=2, column=2, sticky=tk.W)
+        self.cover_preview = QLabel("封面预览")
+        self.cover_preview.setAlignment(Qt.AlignCenter)
+        self.cover_preview.setMinimumHeight(150)
+        self.cover_preview.setStyleSheet("border: 1px solid #ccc;")
 
-        ttk.Label(img_opt_frame, text="插图分配方式:").grid(row=3, column=0, sticky=tk.W)
-        self.insert_mode_var = tk.StringVar(value=self.cfg.get("insert_mode", "proportional"))
-        ttk.Radiobutton(img_opt_frame, text="按章节长度分配", variable=self.insert_mode_var, value="proportional").grid(row=3, column=1, sticky=tk.W)
-        ttk.Radiobutton(img_opt_frame, text="均匀分布", variable=self.insert_mode_var, value="even").grid(row=3, column=2, sticky=tk.W)
+        cover_layout.addLayout(cover_buttons_layout)
+        cover_layout.addWidget(self.cover_preview)
+        cover_group.setLayout(cover_layout)
 
-        # Text processing config
-        text_opt_frame = ttk.LabelFrame(mid, text="文本处理与替换", padding=6)
-        text_opt_frame.grid(row=3, column=0, columnspan=3, sticky=tk.EW, pady=6)
-        ttk.Button(text_opt_frame, text="加载替换规则 (novelMapping.json)", command=self.select_replace_json).grid(row=0, column=0, sticky=tk.W)
-        self.replace_path_var = tk.StringVar(value=self.cfg.get("replace_json", ""))
-        ttk.Entry(text_opt_frame, textvariable=self.replace_path_var).grid(row=0, column=1, sticky=tk.EW)
-        self.ignore_case_var = tk.BooleanVar(value=self.cfg.get("ignore_case_replace", False))
-        ttk.Checkbutton(text_opt_frame, text="忽略替换大小写", variable=self.ignore_case_var).grid(row=1, column=0, sticky=tk.W)
-        self.sort_by_var = tk.StringVar(value=self.cfg.get("sort_by", "ctime"))
-        ttk.Radiobutton(text_opt_frame, text="按创建时间排序", variable=self.sort_by_var, value="ctime").grid(row=1, column=1, sticky=tk.W)
-        ttk.Radiobutton(text_opt_frame, text="按字母顺序排序", variable=self.sort_by_var, value="name").grid(row=1, column=2, sticky=tk.W)
-        text_opt_frame.columnconfigure(1, weight=1)
+        # 插图选择区域
+        image_group = QGroupBox("插图设置")
+        image_layout = QVBoxLayout()
 
-        # Output config
-        out_frame = ttk.LabelFrame(mid, text="输出配置", padding=6)
-        out_frame.grid(row=4, column=0, columnspan=3, sticky=tk.EW, pady=6)
-        ttk.Label(out_frame, text="输出目录:").grid(row=0, column=0, sticky=tk.W)
-        self.out_entry = ttk.Entry(out_frame)
-        self.out_entry.grid(row=0, column=1, sticky=tk.EW)
-        self.out_entry.insert(0, self.cfg.get("output_dir", ""))
-        ttk.Button(out_frame, text="选择", command=self.choose_output_dir).grid(row=0, column=2)
-        self.overwrite_var = tk.StringVar(value="auto")
-        ttk.Radiobutton(out_frame, text="自动加序号", variable=self.overwrite_var, value="auto").grid(row=1, column=0, sticky=tk.W)
-        ttk.Radiobutton(out_frame, text="覆盖已存在", variable=self.overwrite_var, value="overwrite").grid(row=1, column=1, sticky=tk.W)
+        image_buttons_layout = QHBoxLayout()
+        self.select_images_btn = QPushButton("选择插图")
+        self.select_images_btn.clicked.connect(self.select_images)
+        self.default_images_btn = QPushButton("使用默认插图")
+        self.default_images_btn.clicked.connect(self.use_default_images)
+        self.clear_images_btn = QPushButton("清空插图")
+        self.clear_images_btn.clicked.connect(self.clear_images)
+        image_buttons_layout.addWidget(self.select_images_btn)
+        image_buttons_layout.addWidget(self.default_images_btn)
+        image_buttons_layout.addWidget(self.clear_images_btn)
 
-        # Controls bottom: preview, start
-        bottom = ttk.Frame(self.root, padding=8)
-        bottom.pack(side=tk.BOTTOM, fill=tk.X)
-        ttk.Button(bottom, text="预览选中TXT（处理后）", command=self.preview_selected).pack(side=tk.LEFT, padx=4)
-        ttk.Button(bottom, text="开始转换", command=self.start_conversion).pack(side=tk.LEFT, padx=4)
+        self.images_list = QListWidget()
+        image_layout.addLayout(image_buttons_layout)
+        image_layout.addWidget(self.images_list)
+        image_group.setLayout(image_layout)
 
-        # progress and log panel on right
-        right = ttk.Frame(self.root, padding=8)
-        right.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
-        ttk.Label(right, text="进度与日志").pack(anchor=tk.W)
-        self.progress = ttk.Progressbar(right, mode="determinate")
-        self.progress.pack(fill=tk.X, pady=6)
-        self.log_text = tk.Text(right, height=30)
-        self.log_text.pack(fill=tk.BOTH, expand=True)
+        # 添加到文件标签页
+        file_layout.addWidget(file_group)
+        file_layout.addWidget(cover_group)
+        file_layout.addWidget(image_group)
 
-    # -------------------------
-    # GUI actions
-    # -------------------------
-    def log(self, msg):
-        ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.log_text.insert(tk.END, f"[{ts}] {msg}\n")
-        self.log_text.see(tk.END)
-        self.root.update()
+        # 2. 配置标签页
+        config_tab = QWidget()
+        config_layout = QVBoxLayout(config_tab)
 
-    def choose_txt_dir(self):
-        d = filedialog.askdirectory(title="选择TXT源目录", initialdir=self.entry_txt_dir.get() or ".")
-        if d:
-            self.entry_txt_dir.delete(0, tk.END)
-            self.entry_txt_dir.insert(0, d)
-            self.update_file_list()
+        config_form = QFormLayout()
 
-    def choose_cover_dir(self):
-        d = filedialog.askdirectory(title="选择封面目录", initialdir=self.entry_cover_dir.get() or ".")
-        if d:
-            self.entry_cover_dir.delete(0, tk.END)
-            self.entry_cover_dir.insert(0, d)
+        # 排序方式
+        self.sort_method = QComboBox()
+        self.sort_method.addItems(["创建时间", "字母顺序"])
+        config_form.addRow("章节排序方式:", self.sort_method)
 
-    def choose_fallback_dir(self):
-        d = filedialog.askdirectory(title="选择备用图片目录", initialdir=self.entry_fallback.get() or ".")
-        if d:
-            self.entry_fallback.delete(0, tk.END)
-            self.entry_fallback.insert(0, d)
+        # 最大插图数量
+        self.max_images = QSpinBox()
+        self.max_images.setRange(1, 500)
+        self.max_images.setValue(300)
+        config_form.addRow("最大插图数量:", self.max_images)
 
-    def choose_output_dir(self):
-        d = filedialog.askdirectory(title="选择输出目录", initialdir=self.out_entry.get() or ".")
-        if d:
-            self.out_entry.delete(0, tk.END)
-            self.out_entry.insert(0, d)
+        # 封面尺寸阈值
+        self.cover_width = QSpinBox()
+        self.cover_width.setRange(300, 2000)
+        self.cover_width.setValue(800)
+        self.cover_height = QSpinBox()
+        self.cover_height.setRange(500, 3000)
+        self.cover_height.setValue(1200)
 
-    def select_replace_json(self):
-        p = filedialog.askopenfilename(title="选择novelMapping.json", filetypes=[("JSON", "*.json")])
-        if p:
-            self.replace_path_var.set(p)
+        cover_size_layout = QHBoxLayout()
+        cover_size_layout.addWidget(self.cover_width)
+        cover_size_layout.addWidget(QLabel("×"))
+        cover_size_layout.addWidget(self.cover_height)
+        config_form.addRow("封面尺寸阈值:", cover_size_layout)
 
-    def update_file_list(self):
-        txt_dir = self.entry_txt_dir.get().strip()
-        recursive = self.recursive_var.get()
-        self.tree_files.delete(*self.tree_files.get_children())
-        self.txt_files.clear()
-        if not txt_dir or not os.path.isdir(txt_dir):
-            self.log("TXT目录无效")
-            return
-        files = []
-        for root, _, fnames in os.walk(txt_dir):
-            for fn in fnames:
-                if fn.startswith("."):
-                    continue
-                if fn.lower().endswith(".txt"):
-                    p = os.path.join(root, fn)
-                    st = os.stat(p)
-                    files.append((p, st.st_ctime))
-            if not recursive:
-                break
-        sort_by = self.sort_by_var.get()
-        if sort_by == "ctime":
-            files.sort(key=lambda x: x[1])
-        else:
-            files.sort(key=lambda x: os.path.basename(x[0]).lower())
-        for p, ctime in files:
-            short = os.path.relpath(p, txt_dir)
-            self.tree_files.insert("", tk.END, values=(short, datetime.fromtimestamp(ctime).strftime("%Y-%m-%d %H:%M:%S")))
-            self.txt_files.append(p)
-        self.log(f"已扫描到 {len(self.txt_files)} 个TXT文件")
+        # 文本处理选项
+        self.remove_chapter_marks = QCheckBox()
+        config_form.addRow("清除原有章节标识:", self.remove_chapter_marks)
 
-    def move_file_up(self):
-        sel = self.tree_files.selection()
-        if not sel:
-            return
-        idx = self.tree_files.index(sel[0])
-        if idx <= 0:
-            return
-        vals = self.tree_files.item(sel[0], "values")
-        prev = self.tree_files.get_children()[idx-1]
-        prev_vals = self.tree_files.item(prev, "values")
-        # swap treeview
-        self.tree_files.item(prev, values=vals)
-        self.tree_files.item(sel[0], values=prev_vals)
-        # swap underlying list
-        self.txt_files[idx], self.txt_files[idx-1] = self.txt_files[idx-1], self.txt_files[idx]
-        self.log("已上移文件")
+        # 目录设置
+        self.cover_dir_edit = QTextEdit()
+        self.cover_dir_edit.setMaximumHeight(50)
+        config_form.addRow("默认封面目录:", self.cover_dir_edit)
 
-    def move_file_down(self):
-        sel = self.tree_files.selection()
-        if not sel:
-            return
-        idx = self.tree_files.index(sel[0])
-        count = len(self.tree_files.get_children())
-        if idx >= count-1:
-            return
-        vals = self.tree_files.item(sel[0], "values")
-        next_item = self.tree_files.get_children()[idx+1]
-        next_vals = self.tree_files.item(next_item, "values")
-        self.tree_files.item(next_item, values=vals)
-        self.tree_files.item(sel[0], values=next_vals)
-        self.txt_files[idx], self.txt_files[idx+1] = self.txt_files[idx+1], self.txt_files[idx]
-        self.log("已下移文件")
+        self.output_dir_edit = QTextEdit()
+        self.output_dir_edit.setMaximumHeight(50)
+        config_form.addRow("默认输出目录:", self.output_dir_edit)
 
-    def preview_selected(self):
-        sel = self.tree_files.selection()
-        if not sel:
-            messagebox.showwarning("提示", "请先选择一个 TXT 文件以预览")
-            return
-        idx = self.tree_files.index(sel[0])
-        path = self.txt_files[idx]
-        content, enc = read_txt_file(path)
-        if content is None:
-            messagebox.showerror("错误", "读取失败")
-            return
-        text = strip_chapter_headers(content)
-        text = merge_lines(text)
-        pairs, ignore_case = load_replace_rules(self.replace_path_var.get() or "", self.ignore_case_var.get())
-        text, cnt = apply_replacements(text, pairs, ignore_case)
-        # show in a simple toplevel window
-        win = tk.Toplevel(self.root)
-        win.title("预览 - " + os.path.basename(path))
-        txt = tk.Text(win, wrap=tk.WORD)
-        txt.pack(fill=tk.BOTH, expand=True)
-        txt.insert(tk.END, text[:20000])  # show first 20k chars
-        self.log(f"预览已生成 (替换 {cnt} 次)")
+        # 配置按钮
+        config_buttons = QHBoxLayout()
+        self.save_config_btn = QPushButton("保存配置")
+        self.save_config_btn.clicked.connect(self.save_config)
+        self.load_config_btn = QPushButton("加载配置")
+        self.load_config_btn.clicked.connect(self.load_config)
+        config_buttons.addWidget(self.save_config_btn)
+        config_buttons.addWidget(self.load_config_btn)
+
+        config_layout.addLayout(config_form)
+        config_layout.addLayout(config_buttons)
+        config_layout.addStretch()
+
+        # 添加标签页
+        tab_widget.addTab(file_tab, "文件选择")
+        tab_widget.addTab(config_tab, "配置")
+
+        # 进度条和日志区域
+        progress_layout = QVBoxLayout()
+
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setTextVisible(True)
+        self.progress_bar.setRange(0, 100)
+
+        self.status_label = QLabel("就绪")
+
+        self.log_text = QTextEdit()
+        self.log_text.setReadOnly(True)
+
+        progress_layout.addWidget(self.status_label)
+        progress_layout.addWidget(self.progress_bar)
+        progress_layout.addWidget(QLabel("转换日志:"))
+        progress_layout.addWidget(self.log_text)
+
+        # 转换按钮
+        self.convert_btn = QPushButton("开始转换")
+        self.convert_btn.clicked.connect(self.start_conversion)
+        progress_layout.addWidget(self.convert_btn)
+
+        # 添加到主布局
+        main_layout.addWidget(tab_widget)
+        main_layout.addLayout(progress_layout)
+
+        # 初始化默认插图
+        self.use_default_images()
+
+    def select_txt_files(self):
+        """选择TXT文件"""
+        files, _ = QFileDialog.getOpenFileNames(self, "选择TXT文件", "", "TXT文件 (*.txt)")
+        if files:
+            for file in files:
+                if file not in self.txt_files:
+                    self.txt_files.append(file)
+                    self.files_list.addItem(os.path.basename(file))
+
+    def clear_txt_files(self):
+        """清空TXT文件列表"""
+        self.txt_files = []
+        self.files_list.clear()
+
+    def select_cover(self):
+        """选择封面图片"""
+        file, _ = QFileDialog.getOpenFileName(
+            self, "选择封面图片", self.default_cover_dir,
+            "图片文件 (*.png *.jpg *.jpeg *.webp)"
+        )
+        if file:
+            self.selected_cover = file
+            self.update_cover_preview()
+
+    def random_select_cover(self):
+        """随机选择封面图片"""
+        try:
+            if not os.path.exists(self.default_cover_dir):
+                QMessageBox.warning(self, "警告", f"默认封面目录不存在: {self.default_cover_dir}")
+                return
+
+            # 获取符合条件的图片
+            valid_images = []
+            for file in os.listdir(self.default_cover_dir):
+                file_path = os.path.join(self.default_cover_dir, file)
+                if file.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                    try:
+                        from PIL import Image
+                        with Image.open(file_path) as img:
+                            width, height = img.size
+                            if width >= self.cover_width.value() and height >= self.cover_height.value():
+                                valid_images.append(file_path)
+                    except:
+                        continue
+
+            if valid_images:
+                self.selected_cover = random.choice(valid_images)
+                self.update_cover_preview()
+                self.log(f"随机选择封面: {os.path.basename(self.selected_cover)}")
+            else:
+                QMessageBox.information(self, "提示", "没有找到符合尺寸要求的封面图片")
+        except Exception as e:
+            QMessageBox.warning(self, "错误", f"选择封面失败: {str(e)}")
+
+    def update_cover_preview(self):
+        """更新封面预览"""
+        if self.selected_cover and os.path.exists(self.selected_cover):
+            pixmap = QPixmap(self.selected_cover)
+            if not pixmap.isNull():
+                scaled_pixmap = pixmap.scaled(
+                    self.cover_preview.width(),
+                    self.cover_preview.height(),
+                    Qt.KeepAspectRatio,
+                    Qt.SmoothTransformation
+                )
+                self.cover_preview.setPixmap(scaled_pixmap)
+                return
+
+        self.cover_preview.setText("无法预览封面")
+
+    def select_images(self):
+        """选择插图"""
+        files, _ = QFileDialog.getOpenFileNames(
+            self, "选择插图", self.default_cover_dir,
+            "图片文件 (*.png *.jpg *.jpeg *.webp)"
+        )
+        if files:
+            for file in files:
+                if file not in self.selected_images:
+                    self.selected_images.append(file)
+                    self.images_list.addItem(os.path.basename(file))
+
+    def use_default_images(self):
+        """使用默认目录的插图"""
+        try:
+            if not os.path.exists(self.default_cover_dir):
+                self.log(f"默认封面目录不存在: {self.default_cover_dir}")
+                return
+
+            self.selected_images = []
+            self.images_list.clear()
+
+            for file in os.listdir(self.default_cover_dir):
+                if file.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                    file_path = os.path.join(self.default_cover_dir, file)
+                    self.selected_images.append(file_path)
+                    self.images_list.addItem(file)
+
+            self.log(f"加载默认插图 {len(self.selected_images)} 张")
+        except Exception as e:
+            self.log(f"加载默认插图失败: {str(e)}")
+
+    def clear_images(self):
+        """清空插图列表"""
+        self.selected_images = []
+        self.images_list.clear()
+
+    def log(self, message):
+        """添加日志信息"""
+        timestamp = datetime.now().strftime('%H:%M:%S')
+        self.log_text.append(f"[{timestamp}] {message}")
+        # 滚动到底部
+        self.log_text.moveCursor(self.log_text.textCursor().End)
+
+    def save_config(self):
+        """保存配置"""
+        try:
+            # 获取目录路径
+            self.default_cover_dir = self.cover_dir_edit.toPlainText().strip()
+            self.default_output_dir = self.output_dir_edit.toPlainText().strip()
+
+            # 确保目录存在
+            if self.default_cover_dir:
+                os.makedirs(self.default_cover_dir, exist_ok=True)
+            if self.default_output_dir:
+                os.makedirs(self.default_output_dir, exist_ok=True)
+
+            config = {
+                "sort_method": "create_time" if self.sort_method.currentIndex() == 0 else "name",
+                "max_images": self.max_images.value(),
+                "cover_width": self.cover_width.value(),
+                "cover_height": self.cover_height.value(),
+                "remove_chapter_marks": self.remove_chapter_marks.isChecked(),
+                "default_cover_dir": self.default_cover_dir,
+                "default_output_dir": self.default_output_dir,
+                "last_used": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+
+            with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+
+            self.log(f"配置已保存到 {CONFIG_PATH}")
+            QMessageBox.information(self, "成功", "配置已保存")
+        except Exception as e:
+            self.log(f"保存配置失败: {str(e)}")
+            QMessageBox.warning(self, "失败", f"保存配置失败: {str(e)}")
+
+    def load_config(self):
+        """加载配置"""
+        try:
+            if os.path.exists(CONFIG_PATH):
+                with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+
+                # 更新UI
+                self.sort_method.setCurrentIndex(0 if config.get("sort_method", "create_time") == "create_time" else 1)
+                self.max_images.setValue(config.get("max_images", 300))
+                self.cover_width.setValue(config.get("cover_width", 800))
+                self.cover_height.setValue(config.get("cover_height", 1200))
+                self.remove_chapter_marks.setChecked(config.get("remove_chapter_marks", False))
+
+                # 更新目录路径
+                self.default_cover_dir = config.get("default_cover_dir", r"D:\book\封面")
+                self.default_output_dir = config.get("default_output_dir", r"D:\book\epub-py")
+                self.cover_dir_edit.setText(self.default_cover_dir)
+                self.output_dir_edit.setText(self.default_output_dir)
+
+                self.log(f"已加载配置 {CONFIG_PATH}")
+                return config
+        except Exception as e:
+            self.log(f"加载配置失败: {str(e)}")
+
+        # 默认配置
+        return {
+            "sort_method": "create_time",
+            "max_images": 300,
+            "cover_width": 800,
+            "cover_height": 1200,
+            "remove_chapter_marks": False,
+            "default_cover_dir": r"D:\book\封面",
+            "default_output_dir": r"D:\book\epub-py"
+        }
 
     def start_conversion(self):
-        # collect parameters and run in a thread
-        self.cfg.update({
-            "txt_dir": self.entry_txt_dir.get().strip(),
-            "recursive": self.recursive_var.get(),
-            "cover_dir": self.entry_cover_dir.get().strip(),
-            "fallback_dir": self.entry_fallback.get().strip(),
-            "output_dir": self.out_entry.get().strip(),
-            "max_images": int(self.max_images_var.get()),
-            "cover_min_size": [int(self.cover_w_var.get()), int(self.cover_h_var.get())],
-            "image_min_size": [int(self.img_w_var.get()), int(self.img_h_var.get())],
-            "insert_mode": self.insert_mode_var.get(),
-            "replace_json": self.replace_path_var.get(),
-            "ignore_case_replace": self.ignore_case_var.get(),
-            "sort_by": self.sort_by_var.get(),
-            "images_source_shuffle": True
-        })
-        save_config(self.cfg)
-        t = threading.Thread(target=self.run_conversion, daemon=True)
-        t.start()
+        """开始转换过程"""
+        if not self.txt_files:
+            QMessageBox.warning(self, "警告", "请先选择TXT文件")
+            return
 
-    def run_conversion(self):
-        try:
-            # prepare
-            txt_list = list(self.txt_files)
-            if not txt_list:
-                self.log("没有TXT文件，停止")
-                return
-            self.progress['value'] = 0
-            self.progress['maximum'] = len(txt_list) + 10
+        # 保存当前配置
+        self.save_config()
 
-            # load replace rules
-            pairs, ignore_case = load_replace_rules(self.cfg.get("replace_json", ""), self.cfg.get("ignore_case_replace", False))
-            if pairs:
-                self.log(f"已加载 {len(pairs)} 条替换规则")
-            else:
-                self.log("未加载替换规则或规则为空")
+        # 准备转换参数
+        current_config = {
+            "sort_method": "create_time" if self.sort_method.currentIndex() == 0 else "name",
+            "max_images": self.max_images.value(),
+            "cover_width": self.cover_width.value(),
+            "cover_height": self.cover_height.value(),
+            "remove_chapter_marks": self.remove_chapter_marks.isChecked()
+        }
 
-            # find images
-            cover_candidates, insert_candidates = find_images_from_dir(self.cfg.get("cover_dir", ""), self.cfg.get("fallback_dir", ""), self.cfg, log_func=self.log)
-            if not cover_candidates and not insert_candidates:
-                self.log("没有找到可用图片，继续生成EPUB但没有封面与插图")
-            # pick cover
-            cover_path = None
-            if cover_candidates:
-                cover_path = cover_candidates[0]
-                self.log(f"选用封面: {cover_path}")
-            elif insert_candidates:
-                cover_path = insert_candidates[0]
-                self.log(f"备用图片选用封面: {cover_path}")
+        # 禁用转换按钮
+        self.convert_btn.setEnabled(False)
 
-            images_to_use = insert_candidates[:self.cfg.get("max_images", 50)]
+        # 创建并启动转换线程
+        self.convert_thread = ConvertThread(
+            self.txt_files,
+            self.default_output_dir,
+            self.default_cover_dir,
+            self.selected_cover,
+            self.selected_images,
+            current_config
+        )
 
-            # convert texts to html
-            self.log("开始处理TXT文本为章节...")
-            chapters, total_replacements = txt_to_html_chapters(txt_list, self.cfg, pairs, ignore_case, log_func=self.log)
-            self.log(f"文本处理完成，生成 {len(chapters)} 章节, 替换总计 {total_replacements} 次")
-            self.progress['value'] += len(txt_list)
+        # 连接信号槽
+        self.convert_thread.progress_updated.connect(self.update_progress)
+        self.convert_thread.log_updated.connect(self.log)
+        self.convert_thread.finished.connect(self.conversion_finished)
 
-            # distribute images among chapters
-            if images_to_use:
-                # compute per-chapter counts
-                ch_count = len(chapters)
-                if ch_count == 0:
-                    self.log("没有章节，停止")
-                    return
-                if self.cfg.get("insert_mode") == "even":
-                    per_ch = max(1, len(images_to_use) // ch_count)
-                    alloc = [per_ch] * ch_count
-                else:
-                    # proportional by text length (# chars)
-                    lengths = [len(BeautifulSoup(html, parser="lxml", features="xml").get_text()) for (_, html) in chapters]
-                    total_len = sum(lengths) or 1
-                    alloc = [max(1, int(len(images_to_use) * (l / total_len))) for l in lengths]
-                # adjust to not exceed available images
-                s = sum(alloc)
-                if s > len(images_to_use):
-                    # trim by reducing from largest allocations
-                    while s > len(images_to_use):
-                        idx_max = alloc.index(max(alloc))
-                        alloc[idx_max] -= 1
-                        s -= 1
-                # assign images slices
-                idx_img = 0
-                new_chapters = []
-                for i, (title, html) in enumerate(chapters):
-                    cnt = alloc[i]
-                    imgs = images_to_use[idx_img: idx_img + cnt]
-                    idx_img += cnt
-                    # insert imgs randomly into html avoiding first/last 3 paragraphs
-                    soup = BeautifulSoup(html, parser="lxml", features="xml")
-                    paragraphs = soup.find_all("p")
-                    if paragraphs:
-                        safe_positions = list(range(3, max(3, len(paragraphs)-3)))
-                        if not safe_positions:
-                            safe_positions = list(range(len(paragraphs)))
-                        # pick positions evenly
-                        positions = []
-                        if cnt >= len(safe_positions):
-                            positions = safe_positions
-                        else:
-                            step = max(1, len(safe_positions) // cnt)
-                            for k in range(cnt):
-                                pos = safe_positions[min(k*step, len(safe_positions)-1)]
-                                positions.append(pos)
-                        for j, imgp in enumerate(imgs):
-                            pos = positions[j % len(positions)]
-                            div = soup.new_tag("div")
-                            div['style'] = "text-align:center;margin:1em 0;"
-                            tag = soup.new_tag("img", src=f"./{os.path.basename(imgp)}", alt="插图", style="max-width:100%;height:auto;")
-                            div.append(tag)
-                            paragraphs[pos].insert_after(div)
-                            self.log(f"章节[{title}] 插入图片 {os.path.basename(imgp)} at para {pos}")
-                    new_chapters.append((title, str(soup)))
-                chapters = new_chapters
+        # 启动线程
+        self.convert_thread.start()
 
-            # create epub
-            book_title = os.path.basename(self.cfg.get("txt_dir", "book_dir"))
-            dt = datetime.now().strftime("%Y%m%d")
-            fname_base = f"{book_title}_{dt}"
-            outdir = self.out_entry.get().strip() or self.cfg.get("output_dir", "")
-            os.makedirs(outdir, exist_ok=True)
-            outpath = os.path.join(outdir, fname_base + ".epub")
-            # handle name collision
-            if os.path.exists(outpath) and self.overwrite_var.get() == "auto":
-                i = 1
-                while os.path.exists(os.path.join(outdir, f"{fname_base}_{i}.epub")):
-                    i += 1
-                outpath = os.path.join(outdir, f"{fname_base}_{i}.epub")
-            if os.path.exists(outpath) and self.overwrite_var.get() == "overwrite":
-                pass
+    def update_progress(self, value, status):
+        """更新进度条和状态"""
+        self.progress_bar.setValue(value)
+        self.status_label.setText(status)
 
-            # build book
-            self.log("开始构建 EPUB ...")
-            # progress callback for images embedding (dummy)
-            def prog_cb(cur, total):
-                self.progress['value'] = min(self.progress['maximum'], self.progress['value'] + 1)
-                self.root.update()
+    def conversion_finished(self, success, message):
+        """转换完成处理"""
+        self.convert_btn.setEnabled(True)
 
-            book = build_epub_book(book_title, "unknown", chapters, cover_path, images_to_use, self.cfg, log_func=self.log, progress_callback=prog_cb)
-            # write file
-            epub.write_epub(outpath, book)
-            self.log(f"EPUB 已保存：{outpath}")
-
-            # write log file
-            logpath = os.path.join(outdir, f"txt2epub_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
-            with open(logpath, "w", encoding="utf-8") as lf:
-                lf.write(self.log_text.get("1.0", tk.END))
-            self.log(f"日志已保存：{logpath}")
-
-            self.progress['value'] = self.progress['maximum']
-            messagebox.showinfo("完成", f"EPUB 生成完成：\n{outpath}\n日志：{logpath}")
-        except Exception as e:
-            traceback_str = traceback.format_exc()
-            self.log("错误: " + str(e))
-            self.log(traceback_str)
-            messagebox.showerror("错误", str(e))
-
-
-# -------------------------
-# 运行主程序
-# -------------------------
-def main():
-    load_config()
-    root = tk.Tk()
-    root.geometry("1200x800")
-    app = Txt2EpubGUI(root)
-    root.mainloop()
+        if success:
+            reply = QMessageBox.information(
+                self, "成功",
+                f"{message}\n是否打开输出目录？",
+                QMessageBox.Yes | QMessageBox.No
+            )
+            if reply == QMessageBox.Yes:
+                os.startfile(self.default_output_dir)
+        else:
+            QMessageBox.warning(self, "失败", message)
 
 
 if __name__ == "__main__":
-    main()
+    # 确保中文显示正常
+    import matplotlib
+    matplotlib.rcParams["font.family"] = ["SimHei", "WenQuanYi Micro Hei", "Heiti TC"]
+
+    app = QApplication(sys.argv)
+    window = EPubConverter()
+    window.show()
+    sys.exit(app.exec_())

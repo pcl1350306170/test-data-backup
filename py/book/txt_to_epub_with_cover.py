@@ -14,7 +14,7 @@ from pathlib import Path
 A_DIR = r"D:\book\HH"  # TXT文件目录
 COVER_DIR = r"D:\book\封面"  # 封面图片目录
 OUTPUT_DIR = r"D:\book\epub-py"  # EPUB输出目录
-JSON_PATH = r"C:\www\test\py\json\novelMapping.json"  # 替换规则JSON文件
+JSON_PATH = r"C:\www\test\py\book\json\novelMapping.json"  # 替换规则JSON文件
 
 # 创建输出目录
 os.makedirs(OUTPUT_DIR, exist_ok=True)

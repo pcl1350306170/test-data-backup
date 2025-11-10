@@ -1,0 +1,10 @@
+{
+  "sort_method": "create_time",
+  "max_images": 300,
+  "cover_width": 800,
+  "cover_height": 1200,
+  "remove_chapter_marks": false,
+  "default_cover_dir": "D:\\book\\封面",
+  "default_output_dir": "D:\\book\\epub-py",
+  "last_used": "2025-11-10 14:17:08"
+}
