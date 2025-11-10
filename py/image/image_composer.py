@@ -4,6 +4,14 @@ from tkinter import *
 from tkinter import filedialog, colorchooser, messagebox
 from PIL import Image, ImageTk, ImageEnhance
 
+# 确保json目录存在
+JSON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "json")
+os.makedirs(JSON_DIR, exist_ok=True)
+
+# 配置文件和历史记录文件路径
+CONFIG_FILE = os.path.join(JSON_DIR, "image_composer_config.json")
+
+
 class ImageOverlayApp:
     def __init__(self, root):
         self.root = root
@@ -19,7 +27,7 @@ class ImageOverlayApp:
         self.alpha = DoubleVar(value=100)
         self.pos_x = IntVar(value=0)
         self.pos_y = IntVar(value=0)
-        self.last_params_file = "./json/last_params.json"
+        self.last_params_file = CONFIG_FILE
 
         self.load_last_params()
 

@@ -511,8 +511,8 @@ class ConvertThread(QThread):
                     try:
                         # 获取文件扩展名
                         ext = os.path.splitext(cover_path)[1].lower()
-                        # 生成UUID作为文件名
-                        cover_filename = f"{uuid.uuid4()}{ext}"
+                        # 
+                        cover_filename = f"cover{ext}"
                         shutil.copy(cover_path, os.path.join(oebps_dir, cover_filename))
 
                         # 创建封面XHTML

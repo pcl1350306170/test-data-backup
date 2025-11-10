@@ -1,0 +1,80 @@
+2025-11-10 16:47:49,023 - INFO - 确保目录存在: C:\www\test\py\image\json
+2025-11-10 16:47:59,777 - INFO - 配置已保存到: C:\www\test\py\image\json\extract_exif_config.json
+2025-11-10 16:48:01,916 - INFO - ===== 开始提取EXIF数据 =====
+2025-11-10 16:48:01,926 - INFO - 确保目录存在: C:\www\test\py\image\json
+2025-11-10 16:48:01,953 - INFO - 开始扫描图片文件，目录: D:\book\封面, 递归: True
+2025-11-10 16:48:01,979 - INFO - 扫描完成，找到图片文件总数: 30
+2025-11-10 16:48:02,064 - INFO - 未找到EXIF数据: A-112 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,075 - INFO - 未找到EXIF数据: A-116 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,086 - INFO - 未找到EXIF数据: A-141 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,100 - INFO - 未找到EXIF数据: A-158 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,119 - INFO - 未找到EXIF数据: A-168【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,130 - INFO - 未找到EXIF数据: A-169【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,144 - INFO - 未找到EXIF数据: A-170【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,158 - INFO - 未找到EXIF数据: A-193 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,172 - INFO - 未找到EXIF数据: A-196【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,187 - INFO - 未找到EXIF数据: A-218【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,204 - INFO - 未找到EXIF数据: A-231 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,215 - INFO - 未找到EXIF数据: A-241 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,231 - INFO - 未找到EXIF数据: A-243【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,247 - INFO - 未找到EXIF数据: A-254 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,263 - INFO - 未找到EXIF数据: A-269【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,275 - INFO - 未找到EXIF数据: A-270【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,291 - INFO - 未找到EXIF数据: A-275【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,302 - INFO - 未找到EXIF数据: A-280【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,314 - INFO - 未找到EXIF数据: A-281【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,325 - INFO - 未找到EXIF数据: A-284【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,338 - INFO - 未找到EXIF数据: A-286【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,349 - INFO - 未找到EXIF数据: A-323【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,361 - INFO - 未找到EXIF数据: A-325【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,376 - INFO - 未找到EXIF数据: A-47【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,423 - INFO - 未找到EXIF数据: A-58 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,435 - INFO - 未找到EXIF数据: A-69【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,448 - INFO - 未找到EXIF数据: A-78 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,470 - INFO - 未找到EXIF数据: A-86 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,481 - INFO - 未找到EXIF数据: A-89 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:02,492 - INFO - 未找到EXIF数据: A-92 (2)【公众号：小谧蜂】.jpg
+2025-11-10 16:48:03,458 - INFO - ✅ 完成！共处理 30 个文件，成功提取 0 个EXIF数据
+2025-11-10 16:49:48,406 - INFO - 确保目录存在: C:\www\test\py\image\json
+2025-11-10 16:49:48,434 - INFO - 已加载配置: C:\www\test\py\image\json\extract_exif_config.json
+2025-11-10 16:50:01,749 - INFO - 配置已保存到: C:\www\test\py\image\json\extract_exif_config.json
+2025-11-10 16:50:03,008 - INFO - ===== 开始提取EXIF数据 =====
+2025-11-10 16:50:03,011 - INFO - 确保目录存在: C:\www\test\py\image\json
+2025-11-10 16:50:03,041 - INFO - 开始扫描图片文件，目录: D:\book\封面, 递归: True
+2025-11-10 16:50:03,064 - INFO - 扫描完成，找到图片文件总数: 10
+2025-11-10 16:50:03,124 - INFO - 成功提取EXIF数据: IMG_20250222_120039.jpg
+2025-11-10 16:50:03,136 - INFO - 成功提取EXIF数据: IMG_20250306_184329.jpg
+2025-11-10 16:50:03,147 - INFO - 成功提取EXIF数据: IMG_20250311_062052.jpg
+2025-11-10 16:50:03,164 - INFO - 成功提取EXIF数据: IMG_20250426_110036_1.jpg
+2025-11-10 16:50:03,179 - INFO - 成功提取EXIF数据: IMG_20250504_110724.jpg
+2025-11-10 16:50:03,191 - INFO - 成功提取EXIF数据: IMG_20250515_201857.jpg
+2025-11-10 16:50:03,200 - INFO - 成功提取EXIF数据: IMG_20250515_201943.jpg
+2025-11-10 16:50:03,210 - INFO - 成功提取EXIF数据: IMG_20250601_153442.jpg
+2025-11-10 16:50:03,220 - INFO - 成功提取EXIF数据: IMG_20250729_201139.jpg
+2025-11-10 16:50:03,241 - INFO - 成功提取EXIF数据: IMG_20250803_093332.jpg
+2025-11-10 16:50:03,277 - ERROR - 提取过程出错: Object of type IFDRational is not JSON serializable
+Traceback (most recent call last):
+  File "C:\www\test\py\image\extract_exif.py", line 334, in start_extraction
+    json.dump(exif_data_list, f, ensure_ascii=False, indent=4)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\tools\python\Lib\json\__init__.py", line 179, in dump
+    for chunk in iterable:
+                 ^^^^^^^^
+  File "D:\tools\python\Lib\json\encoder.py", line 431, in _iterencode
+    yield from _iterencode_list(o, _current_indent_level)
+  File "D:\tools\python\Lib\json\encoder.py", line 326, in _iterencode_list
+    yield from chunks
+  File "D:\tools\python\Lib\json\encoder.py", line 407, in _iterencode_dict
+    yield from chunks
+  File "D:\tools\python\Lib\json\encoder.py", line 407, in _iterencode_dict
+    yield from chunks
+  File "D:\tools\python\Lib\json\encoder.py", line 407, in _iterencode_dict
+    yield from chunks
+  File "D:\tools\python\Lib\json\encoder.py", line 326, in _iterencode_list
+    yield from chunks
+  File "D:\tools\python\Lib\json\encoder.py", line 440, in _iterencode
+    o = _default(o)
+  File "D:\tools\python\Lib\json\encoder.py", line 180, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+                    f'is not JSON serializable')
+TypeError: Object of type IFDRational is not JSON serializable

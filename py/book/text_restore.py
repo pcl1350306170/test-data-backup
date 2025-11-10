@@ -8,7 +8,7 @@ INPUT_DIR = r"D:\download\txt\乱世佳人"
 # 输出文件夹
 OUTPUT_DIR = r"D:\book\txt\乱世佳人"
 # 关键词映射表文件
-MAPPING_FILE = r"C:\www\test\py\json\novelMapping.json"
+MAPPING_FILE = r"C:\www\test\py\book\json\novelMapping.json"
 # =============================
 
 def load_mapping():
