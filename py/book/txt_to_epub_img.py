@@ -709,7 +709,7 @@ class Txt2EpubGUI:
                     alloc = [per_ch] * ch_count
                 else:
                     # proportional by text length (# chars)
-                    lengths = [len(BeautifulSoup(html, "lxml", features="xml").get_text()) for (_, html) in chapters]
+                    lengths = [len(BeautifulSoup(html, parser="lxml", features="xml").get_text()) for (_, html) in chapters]
                     total_len = sum(lengths) or 1
                     alloc = [max(1, int(len(images_to_use) * (l / total_len))) for l in lengths]
                 # adjust to not exceed available images
@@ -728,7 +728,7 @@ class Txt2EpubGUI:
                     imgs = images_to_use[idx_img: idx_img + cnt]
                     idx_img += cnt
                     # insert imgs randomly into html avoiding first/last 3 paragraphs
-                    soup = BeautifulSoup(html, "lxml", features="xml")
+                    soup = BeautifulSoup(html, parser="lxml", features="xml")
                     paragraphs = soup.find_all("p")
                     if paragraphs:
                         safe_positions = list(range(3, max(3, len(paragraphs)-3)))
