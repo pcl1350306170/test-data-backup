@@ -10,7 +10,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                             QLabel, QPushButton, QFileDialog, QListWidget, QCheckBox,
+                             QLabel, QPushButton, QFileDialog, QListWidget, QCheckBox, QLineEdit,
                              QProgressBar, QTextEdit, QMessageBox, QGroupBox, QRadioButton,
                              QSpinBox, QDoubleSpinBox, QFormLayout, QComboBox, QSplitter,
                              QTabWidget, QListWidgetItem)
@@ -30,8 +30,8 @@ os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
 class ConvertThread(QThread):
     """转换线程，用于后台处理文件转换，不阻塞UI"""
     progress_updated = pyqtSignal(int, str)  # 进度值，当前阶段
-    log_updated = pyqtSignal(str)            # 日志信息
-    finished = pyqtSignal(bool, str)         # 完成状态，消息
+    log_updated = pyqtSignal(str)  # 日志信息
+    finished = pyqtSignal(bool, str)  # 完成状态，消息
 
     def __init__(self, txt_files, output_dir, cover_dir, cover_path, image_paths, config):
         super().__init__()
@@ -50,7 +50,6 @@ class ConvertThread(QThread):
         try:
             # 初始化日志
             self.init_logger()
-
             # 确保输出目录存在
             os.makedirs(self.output_dir, exist_ok=True)
 
@@ -82,7 +81,7 @@ class ConvertThread(QThread):
                     self.log_updated.emit(f"读取文件失败 {os.path.basename(file_path)}: {str(e)}")
 
                 progress = 10 + int(20 * (i + 1) / total_files)
-                self.progress_updated.emit(progress, f"读取文件... ({i+1}/{total_files})")
+                self.progress_updated.emit(progress, f"读取文件... ({i + 1}/{total_files})")
 
             # 3. 处理文本
             self.progress_updated.emit(30, "处理文本...")
@@ -101,7 +100,7 @@ class ConvertThread(QThread):
                     processed_content = self.process_line_breaks(processed_content)
 
                     # 生成章节标题
-                    base_title = f"第{i+1}章 {os.path.splitext(os.path.basename(chapter['path']))[0]}"
+                    base_title = f"第{i + 1}章 {os.path.splitext(os.path.basename(chapter['path']))[0]}"
 
                     processed_chapters.append({
                         "base_title": base_title,  # 基础标题，用于切割后的子章节
@@ -115,7 +114,7 @@ class ConvertThread(QThread):
                     self.log_updated.emit(f"处理文本失败 {chapter['path']}: {str(e)}")
 
                 progress = 30 + int(20 * (i + 1) / total_files)
-                self.progress_updated.emit(progress, f"处理文本... ({i+1}/{total_files})")
+                self.progress_updated.emit(progress, f"处理文本... ({i + 1}/{total_files})")
 
             # 4. 准备图片
             self.progress_updated.emit(50, "准备图片...")
@@ -157,7 +156,7 @@ class ConvertThread(QThread):
                 self.cover_path,
                 valid_images,
                 image_allocation,
-                book_title
+                epub_filename.replace(".epub","")
             )
 
             if success:
@@ -283,10 +282,10 @@ class ConvertThread(QThread):
         # 常见章节标识模式
         patterns = [
             r'^第[零一二三四五六七八九十百千万]+章.*$',  # 第X章
-            r'^[0-9]+\..*$',                              # 1. ...
-            r'^[一二三四五六七八九十]+、.*$',            # 一、...
-            r'^\【.*\】$',                                # 【章节名】
-            r'^章节.*$'                                   # 章节...
+            r'^[0-9]+\..*$',  # 1. ...
+            r'^[一二三四五六七八九十]+、.*$',  # 一、...
+            r'^\【.*\】$',  # 【章节名】
+            r'^章节.*$'  # 章节...
         ]
 
         lines = content.split('\n')
@@ -386,19 +385,30 @@ class ConvertThread(QThread):
         return allocation
 
     def generate_epub_filename(self, book_title):
-        """生成EPUB文件名"""
-        timestamp = datetime.now().strftime('%Y%m%d')
-        base_name = f"{book_title}_{timestamp}.epub"
-        file_path = os.path.join(self.output_dir, base_name)
+        # 检查是否使用自定义文件名
+        if self.config.get("use_custom_filename", False) and self.config.get("custom_filename"):
+            template = self.config["custom_filename"]
+            # 替换占位符
+            timestamp = datetime.now().strftime('%Y%m%d')
+            filename = template.replace("{title}", book_title).replace("{timestamp}", timestamp)
+            # 确保扩展名正确
+            if not filename.endswith(".epub"):
+                filename += ".epub"
+        else:
+            # 原文件名生成逻辑
+            timestamp = datetime.now().strftime('%Y%m%d')
+            filename = f"{book_title}_{timestamp}.epub"
 
-        # 避免覆盖
+        # 避免文件名重复的逻辑保持不变
+        file_path = os.path.join(self.output_dir, filename)
         counter = 1
         while os.path.exists(file_path):
-            base_name = f"{book_title}_{timestamp}_{counter}.epub"
-            file_path = os.path.join(self.output_dir, base_name)
+            base, ext = os.path.splitext(filename)
+            filename = f"{base}_{counter}{ext}"
+            file_path = os.path.join(self.output_dir, filename)
             counter += 1
 
-        return base_name
+        return filename
 
     def create_epub(self, chapters, output_path, cover_path, images, image_allocation, book_title):
         """创建EPUB文件"""
@@ -435,7 +445,7 @@ class ConvertThread(QThread):
 
                 for i, chapter in enumerate(chapters):
                     # 生成XHTML内容
-                    chapter_filename = f"chapter_{i+1}.xhtml"
+                    chapter_filename = f"chapter_{i + 1}.xhtml"
                     chapter_path = os.path.join(oebps_dir, chapter_filename)
 
                     # 创建基本XHTML结构
@@ -484,7 +494,8 @@ class ConvertThread(QThread):
                                     img["style"] = "max-width:100%;height:auto;"
                                     img_tag.append(img)
                                     p_tags[idx].insert_after(img_tag)
-                                    self.log_updated.emit(f"在 {chapter['title']} 插入图片: {os.path.basename(img_path)}")
+                                    self.log_updated.emit(
+                                        f"在 {chapter['title']} 插入图片: {os.path.basename(img_path)}")
 
                     # 保存章节文件
                     with open(chapter_path, 'w', encoding='utf-8') as f:
@@ -492,7 +503,7 @@ class ConvertThread(QThread):
 
                     # 记录实际文件大小
                     file_size = os.path.getsize(chapter_path)
-                    self.log_updated.emit(f"生成章节: {chapter['title']} ({file_size/1024:.1f}KB)")
+                    self.log_updated.emit(f"生成章节: {chapter['title']} ({file_size / 1024:.1f}KB)")
 
                     chapter_files.append({
                         "title": chapter['title'],
@@ -501,7 +512,7 @@ class ConvertThread(QThread):
 
                     # 更新进度
                     progress = 60 + int(30 * (i + 1) / total_chapters)
-                    self.progress_updated.emit(progress, f"生成章节... ({i+1}/{total_chapters})")
+                    self.progress_updated.emit(progress, f"生成章节... ({i + 1}/{total_chapters})")
 
                 # 生成目录文件 book-toc.xhtml
                 self.create_book_toc(oebps_dir, chapter_files)
@@ -617,9 +628,11 @@ Table Of Contents
 
     def create_toc(self, ncx_path, chapters, book_title):
         """创建目录文件"""
-        ncx_content = f"""<?xml version="1.0" encoding="UTF-8"?>
+        ncx_content = f"""<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+        <!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">
 <ncx version="2005-1" xml:lang="zh-CN" xmlns="http://www.daisy.org/z3986/2005/ncx/">
     <head>
+        <meta name="cover" content="cover" />
         <meta name="dtb:uid" content="{uuid.uuid4()}"/>
         <meta name="dtb:depth" content="1"/>
         <meta name="dtb:totalPageCount" content="0"/>
@@ -628,9 +641,24 @@ Table Of Contents
     <docTitle>
         <text>{book_title}</text>
     </docTitle>
+    <docAuthor>
+        <text>评重楼</text>
+    </docAuthor>
     <navMap>
+      <navPoint id="cover" playOrder="0">
+            <navLabel>
+                <text>封面</text>
+            </navLabel>
+            <content src="cover.html" />
+        </navPoint>
+        <navPoint id="htmltoc" playOrder="1">
+            <navLabel>
+                <text>目录</text>
+            </navLabel>
+            <content src="book-toc.xhtml" />
+        </navPoint>
 """
-        for i, chapter in enumerate(chapters, 1):
+        for i, chapter in enumerate(chapters, 2):
             ncx_content += f"""        <navPoint id="chapter{i}" playOrder="{i}">
             <navLabel>
                 <text>{chapter['title']}</text>
@@ -665,18 +693,19 @@ Table Of Contents
             manifest_items.append(f'<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>')
             manifest_items.append(f'<item id="cover-img" href="{cover_filename}" media-type="{cover_media_type}"/>')
 
-            spine_items.append('<itemref idref="cover" linear="yes"/>')
+            spine_items.append('<itemref idref="cover" linear="no"/>')
 
         # 添加自定义目录文件
         manifest_items.append('<item id="book-toc" href="book-toc.xhtml" media-type="application/xhtml+xml"/>')
-        spine_items.append('<itemref idref="book-toc" linear="yes"/>')
+        spine_items.append('<itemref idref="book-toc" linear="no"/>')
 
         # 添加目录
-        manifest_items.append('<item id="toc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>')
+        manifest_items.append('<item id="ncxtoc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>')
 
         # 添加章节文件
         for i, chapter in enumerate(chapters, 1):
-            manifest_items.append(f'<item id="chapter{i}" href="{chapter["filename"]}" media-type="application/xhtml+xml"/>')
+            manifest_items.append(
+                f'<item id="chapter{i}" href="{chapter["filename"]}" media-type="application/xhtml+xml"/>')
             spine_items.append(f'<itemref idref="chapter{i}" linear="yes"/>')
 
         # 添加插图 - 使用UUID文件名
@@ -702,7 +731,7 @@ Table Of Contents
     <manifest>
         {"\n        ".join(manifest_items)}
     </manifest>
-    <spine>
+    <spine  toc="ncxtoc">
         {"\n        ".join(spine_items)}
     </spine>
 </package>"""
@@ -712,6 +741,7 @@ Table Of Contents
 
 class EPubConverter(QMainWindow):
     """TXT转EPUB可视化工具主窗口"""
+
     def __init__(self):
         super().__init__()
         self.txt_files = []
@@ -861,6 +891,14 @@ class EPubConverter(QMainWindow):
         self.output_dir_edit = QTextEdit()
         self.output_dir_edit.setMaximumHeight(50)
         config_form.addRow("默认输出目录:", self.output_dir_edit)
+
+        # 在init_ui方法的config_form部分添加
+        self.use_custom_filename = QCheckBox()
+        config_form.addRow("使用自定义文件名:", self.use_custom_filename)
+
+        self.custom_filename = QLineEdit()
+        self.custom_filename.setPlaceholderText("支持{title}和{timestamp}占位符")
+        config_form.addRow("自定义文件名模板:", self.custom_filename)
 
         # 配置按钮
         config_buttons = QHBoxLayout()
@@ -1044,6 +1082,8 @@ class EPubConverter(QMainWindow):
                 "remove_chapter_marks": self.remove_chapter_marks.isChecked(),
                 "default_cover_dir": self.default_cover_dir,
                 "default_output_dir": self.default_output_dir,
+                "custom_filename": self.custom_filename.text(),
+                "use_custom_filename": self.use_custom_filename.isChecked(),
                 "last_used": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
 
@@ -1070,6 +1110,8 @@ class EPubConverter(QMainWindow):
                 self.cover_width.setValue(config.get("cover_width", 800))
                 self.cover_height.setValue(config.get("cover_height", 1200))
                 self.remove_chapter_marks.setChecked(config.get("remove_chapter_marks", False))
+                self.use_custom_filename.setChecked(config.get("use_custom_filename", False))
+                self.custom_filename.setText(config.get("custom_filename", r"新文件"))
 
                 # 更新目录路径
                 self.default_cover_dir = config.get("default_cover_dir", r"D:\book\封面")
@@ -1091,7 +1133,9 @@ class EPubConverter(QMainWindow):
             "cover_height": 1200,
             "remove_chapter_marks": False,
             "default_cover_dir": r"D:\book\封面",
-            "default_output_dir": r"D:\book\epub-py"
+            "default_output_dir": r"D:\book\epub-py",
+            "custom_filename": "",  # 新增：自定义文件名模板
+            "use_custom_filename": False  # 新增：是否使用自定义文件名
         }
 
     def start_conversion(self):
@@ -1110,7 +1154,9 @@ class EPubConverter(QMainWindow):
             "max_chapter_size": self.max_chapter_size.value(),  # 传递章节大小配置
             "cover_width": self.cover_width.value(),
             "cover_height": self.cover_height.value(),
-            "remove_chapter_marks": self.remove_chapter_marks.isChecked()
+            "remove_chapter_marks": self.remove_chapter_marks.isChecked(),
+            "use_custom_filename": self.use_custom_filename.isChecked(),
+            "custom_filename": self.custom_filename.text()
         }
 
         # 禁用转换按钮
@@ -1158,6 +1204,7 @@ class EPubConverter(QMainWindow):
 if __name__ == "__main__":
     # 确保中文显示正常
     import matplotlib
+
     matplotlib.rcParams["font.family"] = ["SimHei", "WenQuanYi Micro Hei", "Heiti TC"]
 
     app = QApplication(sys.argv)
