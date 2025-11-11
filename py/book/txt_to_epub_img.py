@@ -43,6 +43,8 @@ class ConvertThread(QThread):
         self.config = config
         self.log_file = None
         self.logger = None
+        # 保存原始文件名用于生成目录
+        self.original_filenames = [os.path.splitext(os.path.basename(f))[0] for f in txt_files]
 
     def run(self):
         try:
@@ -300,7 +302,7 @@ class ConvertThread(QThread):
         return '\n'.join(cleaned_lines)
 
     def process_line_breaks(self, content):
-        """处理换行和空行"""
+        """处理换行和空行，不添加<br>标签"""
         lines = [line.rstrip() for line in content.split('\n')]
         processed = []
         current_line = ""
@@ -444,24 +446,20 @@ class ConvertThread(QThread):
     <title>{chapter['title']}</title>
 </head>
 <body>
-    <h2>{chapter['title']}</h2>
+    <h2  id="title" class="titlel2std">{chapter['title']}</h2>
 </body>
 </html>"""
 
                     soup = BeautifulSoup(xhtml, "lxml-xml")
                     body = soup.find("body")
 
-                    # 添加段落
+                    # 添加段落 - 不使用<br>标签
                     paragraphs = chapter['content'].split('\n')
                     for para in paragraphs:
                         if para.strip():
                             p_tag = soup.new_tag("p")
                             p_tag.string = para.strip()
                             body.append(p_tag)
-                        else:
-                            # 添加空行
-                            br_tag = soup.new_tag("br")
-                            body.append(br_tag)
 
                     # 插入图片 - 使用UUID文件名
                     chapter_images = image_allocation.get(i, [])
@@ -505,13 +503,16 @@ class ConvertThread(QThread):
                     progress = 60 + int(30 * (i + 1) / total_chapters)
                     self.progress_updated.emit(progress, f"生成章节... ({i+1}/{total_chapters})")
 
+                # 生成目录文件 book-toc.xhtml
+                self.create_book_toc(oebps_dir, chapter_files)
+
                 # 处理封面 - 使用UUID重命名
                 cover_filename = None
                 if cover_path and os.path.exists(cover_path):
                     try:
                         # 获取文件扩展名
                         ext = os.path.splitext(cover_path)[1].lower()
-                        # 
+                        #
                         cover_filename = f"cover{ext}"
                         shutil.copy(cover_path, os.path.join(oebps_dir, cover_filename))
 
@@ -578,6 +579,42 @@ class ConvertThread(QThread):
             self.log_updated.emit(f"创建EPUB失败: {str(e)}")
             return False
 
+    def create_book_toc(self, oebps_dir, chapters):
+        """创建book-toc.xhtml目录文件"""
+        toc_content = """<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+<meta name="generator" content="EasyPub v1.50" />
+<title>
+Table Of Contents
+</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+</head>
+<body>
+<h2 class="titletoc">
+目录
+</h2>
+<div class="toc">
+<dl>
+"""
+        # 添加目录项
+        for i, chapter in enumerate(chapters):
+            toc_content += f'<dt class="tocl2"><a href="{chapter["filename"]}">{chapter["title"]}</a></dt>\n'
+
+        toc_content += """</dl>
+</div>
+</body>
+</html>"""
+
+        # 保存目录文件
+        toc_path = os.path.join(oebps_dir, "book-toc.xhtml")
+        with open(toc_path, 'w', encoding='utf-8') as f:
+            f.write(toc_content)
+
+        self.log_updated.emit("生成目录文件: book-toc.xhtml")
+
     def create_toc(self, ncx_path, chapters, book_title):
         """创建目录文件"""
         ncx_content = f"""<?xml version="1.0" encoding="UTF-8"?>
@@ -629,6 +666,10 @@ class ConvertThread(QThread):
             manifest_items.append(f'<item id="cover-img" href="{cover_filename}" media-type="{cover_media_type}"/>')
 
             spine_items.append('<itemref idref="cover" linear="yes"/>')
+
+        # 添加自定义目录文件
+        manifest_items.append('<item id="book-toc" href="book-toc.xhtml" media-type="application/xhtml+xml"/>')
+        spine_items.append('<itemref idref="book-toc" linear="yes"/>')
 
         # 添加目录
         manifest_items.append('<item id="toc" href="toc.ncx" media-type="application/x-dtbncx+xml"/>')

@@ -1,22 +1,6 @@
 Git clone GitHub 项目速度慢通常是由于网络环境限制导致的，可通过以下几种方法显著提升速度：
 
 
-### **方法1：使用 GitHub 镜像站克隆（推荐）**
-国内有一些 GitHub 镜像站点（如 `hub.fastgit.xyz`、`github.com.cnpmjs.org` 等），可直接替换原仓库地址中的 `github.com` 加速克隆：
-
-```bash
-# 原地址（慢）
-git clone https://github.com/用户名/仓库名.git
-
-# 替换为镜像地址（快）
-git clone https://hub.fastgit.xyz/用户名/仓库名.git
-# 或
-git clone https://github.com.cnpmjs.org/用户名/仓库名.git
-```
-
-**注意**：镜像站可能随时间变化，若某镜像不可用，可尝试其他镜像（如 `gitclone.com`、`ghproxy.com` 等）。
-
-
 ### **方法2：配置 Git 代理（适合有科学上网工具的情况）**
 如果本地有代理（如 Clash、V2Ray 等），可通过配置 Git 代理加速：
 
@@ -28,13 +12,22 @@ git clone https://github.com.cnpmjs.org/用户名/仓库名.git
    git config --global https.proxy socks5://127.0.0.1:7897
 
    # 若使用 http 代理
+   
+   
+   ```
+   ```bash
    git config --global http.proxy http://127.0.0.1:7897
+   ```
+   
+   ```bash
    git config --global https.proxy https://127.0.0.1:7897
    ```
 3. **克隆完成后可取消代理**（可选）：
    ```bash
    git config --global --unset http.proxy
-   git config --global --unset https.proxy
+   ```
+   ```bash
+      git config --global --unset https.proxy
    ```
 
 
