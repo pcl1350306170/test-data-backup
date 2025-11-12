@@ -633,3 +633,8 @@ jd3ISTmebrKk8nfLuwzYcMR9t76oxvUDWXqNZEsJpVPlaG0i4Ah1FByO25QHCgnQXgpbd4PVlYnWy5za
 npm install -g pnpm
 pnpm install
 pnpm run build
+
+D:\tools\python\python.exe C:\www\test\py\script_launcher.py 
+
+#0f0e09
+

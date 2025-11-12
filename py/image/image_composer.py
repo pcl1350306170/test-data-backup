@@ -29,6 +29,12 @@ class ImageOverlayApp:
         self.pos_y = IntVar(value=0)
         self.last_params_file = CONFIG_FILE
 
+        # 拖拽相关变量
+        self.dragging = False
+        self.drag_start_x = 0
+        self.drag_start_y = 0
+        self.preview_scale = 1.0  # 预览图缩放比例
+
         self.load_last_params()
 
         # ======= 控件区域 =======
@@ -54,9 +60,12 @@ class ImageOverlayApp:
         Button(frame, text="居中", command=self.center_image).pack(fill=X)
         Button(frame, text="导出图片", command=self.export_result).pack(fill=X, pady=5)
 
-        # 预览区域
+        # 预览区域 - 添加鼠标事件绑定
         self.preview_label = Label(root, bg="#ddd")
         self.preview_label.pack(side=RIGHT, expand=True, fill=BOTH)
+        self.preview_label.bind("<Button-1>", self.on_drag_start)
+        self.preview_label.bind("<B1-Motion>", self.on_drag_motion)
+        self.preview_label.bind("<ButtonRelease-1>", self.on_drag_end)
 
         self.update_preview()
 
@@ -118,14 +127,68 @@ class ImageOverlayApp:
             img = self.image_a.resize((scaled_w, scaled_h), Image.LANCZOS)
             alpha_val = self.alpha.get() / 100.0
             if alpha_val < 1:
-                img = ImageEnhance.Brightness(img).enhance(alpha_val)
+                # 创建透明度掩码
+                alpha_mask = img.split()[3].point(lambda p: p * alpha_val)
+                img = img.copy()
+                img.putalpha(alpha_mask)
             bg.paste(img, (self.pos_x.get(), self.pos_y.get()), img)
 
+        # 计算预览缩放比例
+        orig_width, orig_height = bg.size
+        max_preview_size = (800, 600)
+        self.preview_scale = min(max_preview_size[0]/orig_width, max_preview_size[1]/orig_height, 1.0)
+
+        # 生成预览图
         preview = bg.copy()
-        preview.thumbnail((800, 600))
+        preview_width = int(orig_width * self.preview_scale)
+        preview_height = int(orig_height * self.preview_scale)
+        preview = preview.resize((preview_width, preview_height), Image.LANCZOS)
+
         tk_img = ImageTk.PhotoImage(preview)
         self.preview_label.configure(image=tk_img)
         self.preview_label.image = tk_img
+        # 存储原始尺寸用于拖拽计算
+        self.preview_original_size = (orig_width, orig_height)
+
+    def on_drag_start(self, event):
+        """开始拖拽"""
+        if not self.image_a:
+            return
+
+        # 检查点击位置是否在图片A上
+        bg_w, bg_h = self.get_bg_size()
+        scaled_w, scaled_h = self.get_scaled_size()
+        x, y = self.pos_x.get(), self.pos_y.get()
+
+        # 将预览窗口坐标转换为原始图像坐标
+        orig_x = event.x / self.preview_scale
+        orig_y = event.y / self.preview_scale
+
+        # 判断是否点击在图片A区域内
+        if (x <= orig_x <= x + scaled_w) and (y <= orig_y <= y + scaled_h):
+            self.dragging = True
+            self.drag_start_x = orig_x - x
+            self.drag_start_y = orig_y - y
+
+    def on_drag_motion(self, event):
+        """拖拽过程中更新位置"""
+        if self.dragging and self.image_a:
+            # 将预览窗口坐标转换为原始图像坐标
+            orig_x = event.x / self.preview_scale
+            orig_y = event.y / self.preview_scale
+
+            # 计算新位置
+            new_x = int(orig_x - self.drag_start_x)
+            new_y = int(orig_y - self.drag_start_y)
+
+            # 更新坐标
+            self.pos_x.set(new_x)
+            self.pos_y.set(new_y)
+            self.update_preview()
+
+    def on_drag_end(self, event):
+        """结束拖拽"""
+        self.dragging = False
 
     def export_result(self):
         if not self.image_a:
@@ -145,6 +208,12 @@ class ImageOverlayApp:
 
         scaled_w, scaled_h = self.get_scaled_size()
         img = self.image_a.resize((scaled_w, scaled_h), Image.LANCZOS)
+        # 处理透明度
+        alpha_val = self.alpha.get() / 100.0
+        if alpha_val < 1:
+            alpha_mask = img.split()[3].point(lambda p: p * alpha_val)
+            img = img.copy()
+            img.putalpha(alpha_mask)
         bg.paste(img, (self.pos_x.get(), self.pos_y.get()), img)
 
         ext = os.path.splitext(save_path)[1].lower()
