@@ -1,0 +1,9 @@
+{
+  "input_dir": "H:/IMAGE/V33/AI-3",
+  "traverse_subdirs": true,
+  "replace_original": true,
+  "output_dir": "G:\\图片\\v33\\裁剪处理",
+  "thread_count": 15,
+  "vertical_ratio": 0.12,
+  "horizontal_ratio": 0.09
+}
