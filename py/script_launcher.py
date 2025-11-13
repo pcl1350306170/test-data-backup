@@ -147,7 +147,7 @@ class ScriptLauncher:
         self.load_scripts()
 
     def load_scripts(self):
-        """加载脚本目录中的所有Python脚本"""
+        """加载脚本目录中的所有Python脚本（过滤包含【废弃】的描述）"""
         # 清空现有列表
         for item in self.script_tree.get_children():
             self.script_tree.delete(item)
@@ -167,6 +167,10 @@ class ScriptLauncher:
 
                         # 获取描述，如果没有则使用文件名
                         description = script_descriptions.get(relative_path, os.path.splitext(file)[0])
+
+                        # 过滤包含【废弃】的描述
+                        if "【废弃】" in description:
+                            continue
 
                         self.script_tree.insert("", tk.END, values=(description, relative_path))
         except Exception as e:

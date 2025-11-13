@@ -27,3 +27,4 @@ public/version.md
 .env.prod.copy
 vue.config.js
 完工报告.md
+/py/other/json/md_translator_config.json
