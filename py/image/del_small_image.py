@@ -6,6 +6,12 @@ import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 from pathlib import Path
 
+# ==============================
+# 🧩 配置与常量
+# ==============================
+# 获取当前脚本所在目录的绝对路径
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+
 # 配置日志记录
 def setup_logger():
     logger = logging.getLogger('image_cleaner')
@@ -22,7 +28,8 @@ def setup_logger():
 logger = setup_logger()
 
 # 配置文件处理
-CONFIG_PATH = Path('./json/config_delete_small_img.json')
+CONFIG_PATH = SCRIPT_DIR / "json" / "config_delete_small_img.json"
+PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / "process_log_crop_logo_advanced.txt"
 
 def load_config():
     """加载配置文件"""

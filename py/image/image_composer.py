@@ -3,14 +3,13 @@ import json
 from tkinter import *
 from tkinter import filedialog, colorchooser, messagebox
 from PIL import Image, ImageTk, ImageEnhance
+from pathlib import Path
 
-# 确保json目录存在
-JSON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "json")
-os.makedirs(JSON_DIR, exist_ok=True)
-
-# 配置文件和历史记录文件路径
-CONFIG_FILE = os.path.join(JSON_DIR, "image_composer_config.json")
-
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "image_composer"
+CONFIG_DIR = SCRIPT_DIR / "json"
+CONFIG_FILE = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
+CONFIG_DIR.mkdir(exist_ok=True)
 
 class ImageOverlayApp:
     def __init__(self, root):

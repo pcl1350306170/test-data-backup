@@ -12,6 +12,13 @@ import io
 import keyboard
 import ctypes
 from ctypes import wintypes
+from pathlib import Path
+
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "screen_cut_gif"
+CONFIG_DIR = SCRIPT_DIR / "json"
+CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
+CONFIG_DIR.mkdir(exist_ok=True)
 
 # 引入Windows剪贴板API
 user32 = ctypes.windll.user32
@@ -44,7 +51,7 @@ class ScreenRecorder:
         # 配置相关
         self.script_name = os.path.splitext(os.path.basename(__file__))[0]
         self.config_dir = "json"
-        self.config_file = os.path.join(self.config_dir, f"{self.script_name}_config.json")
+        self.config_file = CONFIG_PATH
         self.default_config = {
             "save_dir": os.getcwd(),
             "hotkey": "ctrl+shift+alt+j",

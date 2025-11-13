@@ -10,17 +10,22 @@ import hashlib
 from queue import Queue
 import requests
 import timeout_decorator
+from pathlib import Path
 
 
 # 配置与常量
-CONFIG_FILE = "./json/md_translator_config.json"
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "md_translator"
+CONFIG_DIR = SCRIPT_DIR / "json"
+CONFIG_PATH = CONFIG_DIR / f"{SCRIPT_NAME}_config.json"
+
 TRANSLATION_MARKER = "<!-- 中文对照已添加 -->"
 DEFAULT_IGNORES = [".git", "node_modules", "venv", "__pycache__", ".translation_logs"]
 SUPPORTED_API = ["baidu", "google"]
 LOG_DIR = ".translation_logs"
 
 # 确保配置目录存在
-os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
+CONFIG_DIR.mkdir(exist_ok=True)
 
 # 全局变量（使用线程安全的队列传递状态更新）
 task_queue = Queue()
@@ -260,7 +265,7 @@ class TranslationApp:
             # 保存忽略设置
             self.save_ignore_settings()
 
-            with open(CONFIG_FILE, "w", encoding="utf-8") as f:
+            with open(CONFIG_PATH, "w", encoding="utf-8") as f:
                 json.dump(config, f, ensure_ascii=False, indent=2)
 
             self.add_ui_update(("log", "配置已保存"))
@@ -275,9 +280,9 @@ class TranslationApp:
 
     def load_config(self):
         global config
-        if os.path.exists(CONFIG_FILE):
+        if os.path.exists(CONFIG_PATH):
             try:
-                with open(CONFIG_FILE, "r", encoding="utf-8") as f:
+                with open(CONFIG_PATH, "r", encoding="utf-8") as f:
                     loaded = json.load(f)
                     config.update(loaded)
             except Exception as e:

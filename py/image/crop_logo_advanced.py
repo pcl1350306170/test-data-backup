@@ -7,16 +7,21 @@ import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 from PIL import Image
 from queue import Queue
+from pathlib import Path
 
 # ==============================
 # 🧩 配置与常量
 # ==============================
-CONFIG_FILE = "./json/config_crop_logo_advanced.json"
-PROGRESS_FILE = "./json/logs/progress_crop_logo_advanced.json"
-PROCESS_LOG_FILE = "./json/logs/process_log_crop_logo_advanced.txt"
+# 获取当前脚本所在目录的绝对路径
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+
+# 绝对路径配置
+CONFIG_FILE = SCRIPT_DIR / "json" / "config_crop_logo_advanced.json"
+PROGRESS_FILE = SCRIPT_DIR / "json" / "logs" / "progress_crop_logo_advanced.log"
+PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / "process_log_crop_logo_advanced.log"
 SUPPORTED_EXTS = [".jpg", ".jpeg", ".png", ".bmp", ".webp"]
 
-# 确保目录存在
+# 确保目录存在（基于绝对路径创建）
 os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
 os.makedirs(os.path.dirname(PROCESS_LOG_FILE), exist_ok=True)
 

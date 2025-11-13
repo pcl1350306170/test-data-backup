@@ -7,10 +7,15 @@ from tkinter import ttk, messagebox, filedialog
 import requests
 from pathlib import Path
 
-# 配置与常量
+# 获取当前脚本所在目录的绝对路径
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+# 脚本名称（不含.py后缀）
 SCRIPT_NAME = "chinese_translator"
-CONFIG_DIR = Path("json")
+# 配置目录（脚本所在目录下的json文件夹，绝对路径）
+CONFIG_DIR = SCRIPT_DIR / "json"
+# 配置文件路径（绝对路径）
 CONFIG_PATH = CONFIG_DIR / f"{SCRIPT_NAME}_config.json"
+
 SUPPORTED_FORMATS = {
     "驼峰格式": "camelCase",
     "直译格式": "literal",
@@ -19,7 +24,7 @@ SUPPORTED_FORMATS = {
     "下划线间隔": "snake_case"
 }
 
-# 确保配置目录存在
+# 确保配置目录存在（以绝对路径创建）
 CONFIG_DIR.mkdir(exist_ok=True)
 
 class ChineseTranslatorApp:

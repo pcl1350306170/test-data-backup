@@ -11,15 +11,15 @@ from PIL import Image, ImageTk
 import re
 from pathlib import Path
 
-# 路径配置
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_DIR = os.path.join(SCRIPT_DIR, "json")
-NOVEL_MAPPING_PATH = os.path.join(JSON_DIR, "novelMapping.json")
-DB_CONFIG_PATH = os.path.join(os.path.dirname(SCRIPT_DIR), "json", "DB_CONFIG.json")
-CONFIG_PATH = os.path.join(JSON_DIR, "epub_replacer_config.json")
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "epub_replace_txt_cover"
+CONFIG_DIR = SCRIPT_DIR / "json"
+CONFIG_PATH = CONFIG_DIR / f"{SCRIPT_NAME}_config.json"
+NOVEL_MAPPING_PATH = CONFIG_DIR / "novelMapping.json"
+DB_CONFIG_PATH = CONFIG_DIR / "DB_CONFIG.json"
 
 # 确保目录存在
-os.makedirs(JSON_DIR, exist_ok=True)
+CONFIG_DIR.mkdir(exist_ok=True)
 
 class EpubReplacerApp:
     def __init__(self, root):

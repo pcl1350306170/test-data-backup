@@ -20,12 +20,11 @@ from bs4 import BeautifulSoup
 import chardet
 import re
 
-# 默认配置路径
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "json", "txt_epub_config.json")
-
-# 确保配置目录存在
-os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "txt_to_epub_img"
+CONFIG_DIR = SCRIPT_DIR / "json"
+CONFIG_PATH = CONFIG_DIR / f"{SCRIPT_NAME}_config.json"
+CONFIG_DIR.mkdir(exist_ok=True)
 
 class ConvertThread(QThread):
     """转换线程，用于后台处理文件转换，不阻塞UI"""

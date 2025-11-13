@@ -6,14 +6,16 @@ from PIL import Image
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 import sys
+from pathlib import Path
 
-# 确保json目录存在
-JSON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "json")
-os.makedirs(JSON_DIR, exist_ok=True)
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "random_copy_vertical_images"
+CONFIG_DIR = SCRIPT_DIR / "json"
 
-# 配置文件和历史记录文件路径
-CONFIG_FILE = os.path.join(JSON_DIR, "config_random_copy_vertical_images.json")
-HISTORY_FILE = os.path.join(JSON_DIR, "copy_history.json")
+CONFIG_FILE = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
+HISTORY_FILE = CONFIG_DIR / "logs" / "copy_history.log"
+CONFIG_DIR.mkdir(exist_ok=True)
+
 
 class ImageCopyApp:
     def __init__(self, root):
@@ -254,6 +256,7 @@ class ImageCopyApp:
         except Exception as e:
             self.log(f"复制过程出错: {str(e)}")
             messagebox.showerror("错误", f"复制过程出错: {str(e)}")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
