@@ -634,8 +634,10 @@ npm install -g pnpm
 pnpm install
 pnpm run build
 
-D:\tools\python\python.exe C:\www\test\py\script_launcher.py 
+cd C:\www\test\py\
+D:\tools\python\python.exe script_launcher.py 
 
-#0f0e09
 
 
+cloud1-8gg6ijrz075f0ecf-1258959671.tcloudbaseapp.com
+cloud1-8gg6ijrz075f0ecf-1258959671.tcloudbaseapp.com/blog/num/index.html

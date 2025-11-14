@@ -1,10 +1,10 @@
 {
-  "input_dir": "D:/img/AA1",
+  "input_dir": "H:/IMAGE/V33/AI-1",
   "traverse_subdirs": true,
   "replace_original": true,
   "output_dir": "G:\\图片\\v33\\裁剪处理",
-  "thread_count": 10,
-  "vertical_ratio": 0.121,
+  "thread_count": 20,
+  "vertical_ratio": 0.12,
   "horizontal_ratio": 0.09,
-  "logo_position": "上"
+  "logo_position": "下"
 }

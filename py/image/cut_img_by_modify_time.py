@@ -6,7 +6,7 @@ import sys
 # 配置参数
 SOURCE_DIR = r"H:\IMAGE\V33\AI-3"  # 源目录
 TARGET_DIR = r"H:\IMAGE\V33\AI"    # 目标目录
-TARGET_DATE = datetime(2025, 11, 12)  # 目标修改日期（2025年11月12日）
+TARGET_DATE = datetime(2025, 11, 13)  # 目标修改日期（2025年11月12日）
 SUPPORTED_IMG_EXTS = ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp']  # 支持的图片格式
 
 # 统计变量
