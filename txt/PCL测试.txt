@@ -635,7 +635,9 @@ pnpm install
 pnpm run build
 
 cd C:\www\test\py\
-D:\tools\python\python.exe script_launcher.py 
+D:\tools\python\python.exe C:\www\test\py\script_launcher.py 
+
+cd D:\tools\python\Scripts
 
 
 
