@@ -16,7 +16,7 @@ SCRIPT_NAME = "epub_replace_txt_cover"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"{SCRIPT_NAME}_config.json"
 NOVEL_MAPPING_PATH = CONFIG_DIR / "novelMapping.json"
-DB_CONFIG_PATH = CONFIG_DIR / "DB_CONFIG.json"
+DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
 
 # 确保目录存在
 CONFIG_DIR.mkdir(exist_ok=True)

@@ -1,0 +1,5 @@
+{
+  "SAVE_DIR": "G:/爬取",
+  "THREAD_COUNT": 10,
+  "RETRY_COUNT": 3
+}
