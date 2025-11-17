@@ -1,6 +1,6 @@
 {
-  "image_dir": "D:/img/AA1",
+  "image_dir": "G:/图片/v33",
   "process_subdirs": true,
-  "min_width": 800,
-  "min_height": 800
+  "min_width": 300,
+  "min_height": 300
 }

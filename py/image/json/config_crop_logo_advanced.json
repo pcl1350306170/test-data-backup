@@ -1,5 +1,5 @@
 {
-  "input_dir": "H:/IMAGE/V33/AI-1",
+  "input_dir": "D:/img/qrcode2",
   "traverse_subdirs": true,
   "replace_original": true,
   "output_dir": "G:\\图片\\v33\\裁剪处理",

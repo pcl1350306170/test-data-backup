@@ -853,8 +853,8 @@ class EPubConverter(QMainWindow):
 
         # 最大插图数量
         self.max_images = QSpinBox()
-        self.max_images.setRange(1, 500)
-        self.max_images.setValue(300)
+        self.max_images.setRange(1, 1000)
+        self.max_images.setValue(800)
         config_form.addRow("最大插图数量:", self.max_images)
 
         # 章节大小限制

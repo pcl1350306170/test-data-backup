@@ -25,7 +25,7 @@ class EpubReplacerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("EPUB内容替换工具")
-        self.root.geometry("800x600")
+        self.root.geometry("800x800")
 
         # 初始化配置
         self.config = {
