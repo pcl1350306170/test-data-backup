@@ -5,6 +5,7 @@ import pymysql
 import requests
 import threading
 import logging
+from logging.handlers import RotatingFileHandler  # 新增导入
 from queue import Queue
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -41,38 +42,16 @@ SMALL_IMG_JSON = CONFIG_DIR / "imgSmallMapping.json"
 STOP_FLAG = False
 STOP_LOCK = threading.Lock()
 
-# 配置默认值
+# 新增：日志文件大小限制(1MB)
+MAX_LOG_SIZE = 1 * 1024 * 1024  # 1MB
+
+# 配置默认值 - 新增"保存日志文件"配置
 DEFAULT_CONFIG = {
     "SAVE_DIR": str(SCRIPT_DIR / "IMAGE" / "V33" / "已处理"),
     "THREAD_COUNT": 5,
-    "RETRY_COUNT": 3
+    "RETRY_COUNT": 3,
+    "SAVE_LOG_FILE": True  # 新增：是否保存日志文件
 }
-
-# -------------------
-# 日志配置
-# -------------------
-def setup_logger():
-    """配置日志系统"""
-    logger = logging.getLogger(SCRIPT_NAME)
-    logger.setLevel(logging.INFO)
-
-    # 格式器
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-
-    # 文件处理器
-    file_handler = logging.FileHandler(PROCESS_LOG_FILE, encoding='utf-8')
-    file_handler.setFormatter(formatter)
-
-    # 控制台处理器
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-
-    return logger
-
-logger = setup_logger()
 
 # -------------------
 # 配置文件操作
@@ -103,11 +82,48 @@ def save_config(config):
     except Exception as e:
         logger.error(f"保存配置文件失败: {e}")
 
+
+# -------------------
+# 日志配置
+# -------------------
+def setup_logger():
+    """配置日志系统 - 增加文件大小限制和开关控制"""
+    logger = logging.getLogger(SCRIPT_NAME)
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()  # 清除已存在的处理器，避免重复输出
+
+    # 格式器
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+    # 新增：根据配置决定是否添加文件处理器
+    config = load_config()
+    if config["SAVE_LOG_FILE"]:
+        # 使用RotatingFileHandler实现日志文件大小限制
+        file_handler = RotatingFileHandler(
+            PROCESS_LOG_FILE,
+            mode='a',
+            maxBytes=MAX_LOG_SIZE,
+            backupCount=3,  # 最多保留3个备份日志
+            encoding='utf-8'
+        )
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
+    # 控制台处理器始终保留
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
+    return logger
+
+logger = setup_logger()
+
 # 加载配置
 config = load_config()
 SAVE_DIR = config["SAVE_DIR"]
 THREAD_COUNT = config["THREAD_COUNT"]
 RETRY_COUNT = config["RETRY_COUNT"]
+SAVE_LOG_FILE = config["SAVE_LOG_FILE"]  # 新增：日志保存开关
 
 # -------------------
 # 初始化
@@ -143,7 +159,7 @@ def get_db_connection():
     if not db_config:
         return None
     try:
-        return pymysql.connect(**db_config)
+        return pymysql.connect(** db_config)
     except Exception as e:
         logger.error(f"数据库连接失败: {e}")
         messagebox.showerror("错误", f"数据库连接失败: {e}")
@@ -443,7 +459,7 @@ class ImageCrawlerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("图片爬取工具")
-        self.root.geometry("600x400")
+        self.root.geometry("600x450")  # 增加高度以容纳新选项
         self.root.resizable(True, True)
 
         self.task_queue = None
@@ -481,15 +497,20 @@ class ImageCrawlerApp:
         self.retry_count_var = tk.IntVar(value=self.config["RETRY_COUNT"])
         ttk.Spinbox(main_frame, from_=1, to=10, textvariable=self.retry_count_var, width=10).grid(row=2, column=1, sticky=tk.W, pady=5)
 
+        # 新增：日志文件保存设置
+        ttk.Label(main_frame, text="保存日志文件:").grid(row=3, column=0, sticky=tk.W, pady=5)
+        self.save_log_var = tk.BooleanVar(value=self.config["SAVE_LOG_FILE"])
+        ttk.Checkbutton(main_frame, variable=self.save_log_var).grid(row=3, column=1, sticky=tk.W, pady=5)
+
         # 状态显示
-        ttk.Label(main_frame, text="状态:").grid(row=3, column=0, sticky=tk.W, pady=5)
+        ttk.Label(main_frame, text="状态:").grid(row=4, column=0, sticky=tk.W, pady=5)
         self.status_var = tk.StringVar(value="就绪")
-        ttk.Label(main_frame, textvariable=self.status_var).grid(row=3, column=1, sticky=tk.W, pady=5)
+        ttk.Label(main_frame, textvariable=self.status_var).grid(row=4, column=1, sticky=tk.W, pady=5)
 
         # 日志区域
-        ttk.Label(main_frame, text="操作日志:").grid(row=4, column=0, sticky=tk.NW, pady=5)
+        ttk.Label(main_frame, text="操作日志:").grid(row=5, column=0, sticky=tk.NW, pady=5)
         log_frame = ttk.Frame(main_frame)
-        log_frame.grid(row=4, column=1, columnspan=2, sticky=tk.NSEW, pady=5)
+        log_frame.grid(row=5, column=1, columnspan=2, sticky=tk.NSEW, pady=5)
 
         scrollbar = ttk.Scrollbar(log_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -517,7 +538,7 @@ class ImageCrawlerApp:
 
         # 按钮区域
         btn_frame = ttk.Frame(main_frame)
-        btn_frame.grid(row=5, column=0, columnspan=3, pady=10)
+        btn_frame.grid(row=6, column=0, columnspan=3, pady=10)
 
         self.start_btn = ttk.Button(btn_frame, text="开始爬取", command=self.start_crawling)
         self.start_btn.pack(side=tk.LEFT, padx=5)
@@ -533,7 +554,7 @@ class ImageCrawlerApp:
 
         # 配置网格权重
         main_frame.columnconfigure(1, weight=1)
-        main_frame.rowconfigure(4, weight=1)
+        main_frame.rowconfigure(5, weight=1)
 
     def browse_save_dir(self):
         directory = filedialog.askdirectory(title="选择保存目录")
@@ -544,15 +565,21 @@ class ImageCrawlerApp:
         new_config = {
             "SAVE_DIR": self.save_dir_var.get(),
             "THREAD_COUNT": self.thread_count_var.get(),
-            "RETRY_COUNT": self.retry_count_var.get()
+            "RETRY_COUNT": self.retry_count_var.get(),
+            "SAVE_LOG_FILE": self.save_log_var.get()  # 新增：保存日志配置
         }
         save_config(new_config)
 
         # 更新全局配置
-        global SAVE_DIR, THREAD_COUNT, RETRY_COUNT
+        global SAVE_DIR, THREAD_COUNT, RETRY_COUNT, SAVE_LOG_FILE
         SAVE_DIR = new_config["SAVE_DIR"]
         THREAD_COUNT = new_config["THREAD_COUNT"]
         RETRY_COUNT = new_config["RETRY_COUNT"]
+        SAVE_LOG_FILE = new_config["SAVE_LOG_FILE"]
+
+        # 重新配置日志系统
+        global logger
+        logger = setup_logger()
 
         messagebox.showinfo("成功", "配置已保存")
 

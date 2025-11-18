@@ -1,5 +1,6 @@
 {
-  "SAVE_DIR": "G:/爬取",
-  "THREAD_COUNT": 10,
-  "RETRY_COUNT": 3
+  "SAVE_DIR": "G:/图片/v33/直接爬取",
+  "THREAD_COUNT": 5,
+  "RETRY_COUNT": 3,
+  "SAVE_LOG_FILE": true
 }
