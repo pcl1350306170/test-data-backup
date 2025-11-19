@@ -5,6 +5,7 @@ from tkinter import filedialog, messagebox, ttk
 import pymysql
 import re
 from pathlib import Path
+import chardet  # 用于检测文件编码
 
 # 配置路径设置（与epub_replace_txt_cover.py保持一致）
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
@@ -339,6 +340,29 @@ class TxtReplacerApp:
             self.log(f"保存配置失败: {str(e)}")
             messagebox.showerror("错误", f"保存配置失败: {str(e)}")
 
+    def detect_encoding(self, file_path):
+        """检测文件编码格式"""
+        try:
+            # 读取文件前10KB用于编码检测
+            with open(file_path, 'rb') as f:
+                raw_data = f.read(10240)
+
+            # 检测编码
+            result = chardet.detect(raw_data)
+            encoding = result['encoding']
+
+            # 常见的可能错误检测结果修正
+            if encoding is None:
+                encoding = 'utf-8'
+            elif encoding.lower() in ['gb2312', 'gbk', 'gb18030']:
+                encoding = 'gb18030'  # 更全面的中文编码
+
+            self.log(f"文件 {os.path.basename(file_path)} 编码检测为: {encoding}")
+            return encoding
+        except Exception as e:
+            self.log(f"检测 {os.path.basename(file_path)} 编码失败: {str(e)}，将尝试使用utf-8")
+            return 'utf-8'
+
     def replace_text_content(self, content):
         """替换文本内容（合并JSON和数据库规则）"""
         replacements = {}
@@ -366,16 +390,28 @@ class TxtReplacerApp:
         return new_content, count
 
     def process_single_file(self, input_path, output_path):
-        """处理单个TXT文件"""
+        """处理单个TXT文件，支持自动检测编码"""
         try:
-            # 读取文件内容
-            with open(input_path, 'r', encoding='utf-8', errors='replace') as f:
-                content = f.read()
+            # 检测文件编码
+            encoding = self.detect_encoding(input_path)
+
+            # 读取文件内容，尝试多种编码容错
+            try:
+                with open(input_path, 'r', encoding=encoding, errors='replace') as f:
+                    content = f.read()
+            except UnicodeDecodeError:
+                self.log(f"使用 {encoding} 解码失败，尝试使用gb18030")
+                with open(input_path, 'r', encoding='gb18030', errors='replace') as f:
+                    content = f.read()
+            except Exception as e:
+                self.log(f"读取文件时发生错误: {str(e)}，尝试使用utf-8忽略错误")
+                with open(input_path, 'r', encoding='utf-8', errors='ignore') as f:
+                    content = f.read()
 
             # 替换内容
             new_content, count = self.replace_text_content(content)
 
-            # 写入新文件
+            # 写入新文件（始终使用UTF-8编码）
             with open(output_path, 'w', encoding='utf-8') as f:
                 f.write(new_content)
 
@@ -467,6 +503,12 @@ if __name__ == "__main__":
         import pymysql
     except ImportError:
         print("请先安装pymysql: pip install pymysql")
+        exit(1)
+
+    try:
+        import chardet
+    except ImportError:
+        print("请先安装chardet: pip install chardet")
         exit(1)
 
     root = tk.Tk()
