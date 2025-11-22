@@ -1,0 +1,5 @@
+{
+    "adb_dir": "D:\\tools\\QtScrcpy-win-x86-v3.3.1",
+    "scrcpy_exe": "D:\\tools\\QtScrcpy-win-x86-v3.3.1\\QtScrcpy.exe",
+    "device_ip": "192.168.18.144"
+}
