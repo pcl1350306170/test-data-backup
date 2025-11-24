@@ -1,0 +1,23 @@
+{
+  "save_dir": "G:\\下载\\Reddit\\GodPussy",
+  "subreddit": "r/GodPussy",
+  "use_praw": false,
+  "praw": {
+    "client_id": "",
+    "client_secret": "",
+    "user_agent": "reddit_scraper"
+  },
+  "download_types": {
+    "images": true,
+    "videos": true,
+    "gifs": true,
+    "documents": true
+  },
+  "start_date": "2025-10-23",
+  "end_date": "2025-11-24",
+  "batch_size": 50,
+  "threads": 5,
+  "write_to_db": false,
+  "db_config_path": "C:\\www\\test\\py\\json\\DB_CONFIG.json",
+  "last_run": "2025-11-24T16:29:54.748400"
+}
