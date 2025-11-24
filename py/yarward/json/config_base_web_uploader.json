@@ -1,0 +1,11 @@
+{
+    "local_web_dir": "G:\\CODE\\GIT\\pcl1350306170.github.io",
+    "server_host": "192.168.18.218",
+    "server_username": "root",
+    "server_password": "Yahua3585668",
+    "remote_upload_dir": "/home/ym_clinic/ym801s/upload/baseweb",
+    "exclude_patterns": [
+        ".git",
+        ".idea"
+    ]
+}

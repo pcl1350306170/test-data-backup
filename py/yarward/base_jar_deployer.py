@@ -11,7 +11,7 @@ import threading
 
 # ================== 配置与常量 ==================
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
-SCRIPT_NAME = "jar_deployer"
+SCRIPT_NAME = "base_jar_deployer"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
