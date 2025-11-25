@@ -29,7 +29,7 @@ C:\tools\python\python.exe crop_logo_recursive.py  // 裁剪图片
 C:\tools\python\python.exe crop_logo_recursive_replace.py // 裁剪替换图片
 
 自贡测试数据：
-http://192.168.31.77:28019/menzh/data-test/waitingColOptionZiGong
+http://192.168.18.218:28019/menzh/data-test/waitingColOptionZiGong
 
 ×
 
@@ -646,4 +646,8 @@ cloud1-8gg6ijrz075f0ecf-1258959671.tcloudbaseapp.com/blog/num/index.html
 
 
 C:\www\test\py\craw\downloadv33img.py
+
+robocopy "G:\图片\v33\直接爬取\V33-IMG-鸥媚" "H:\IMAGE\v33" /E /ZB /R:1 /W:1 /LOG:C:\copy_log.txt /TEE
+
+
 
