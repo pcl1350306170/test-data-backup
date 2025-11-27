@@ -26,7 +26,7 @@ DB_CONFIG = {
 }
 
 # 保存目录
-SAVE_DIR = "H:/IMAGE/v33"
+SAVE_DIR = "G:/图片/v33/直接爬取"
 
 # 多线程配置，默认5线程
 THREAD_COUNT = 1
