@@ -1,97 +1,3 @@
-## 需求
-写一个python【获取reddit某个子版块所有信息】的脚本
-* 具体需求如下
-* 可视化操作，选择保存的目录，默认G:\下载\Reddit\java，没有目录就创建，写入配置。
-* 选择或者输入需要爬取的子版块名称，例如“r/java”，写入配置。
-  * 子版块所有数据在脚本同级目录的json文件夹里面reddit_chi.json里，是一个数组，可以下拉选择“java”，也可以手动输入一个新的子版本名称，如果合法，就更新\json\reddit_chi.json
-* 可以选择爬取哪些信息，比如视频、gif、图片、文档等，写入配置，如果需要写入数据库，则使用数据库配置"DB_CONFIG_PATH"，如果要写入数据库，你就给我提供建表语句。
-
-* 4、可以选择爬取时间段内的帖子，写入配置，比如 2025-11-20 至 2025-11-25。
-* 分批保存，比如每 50 条写入一次，写入配置。
-* 多线程爬取，默认5，写入配置
-* 可以使用游客身份爬取，给我做适当处理
-* 也可以记住用户名client_id、client_secret爬取
-* 5、配置文件引入方式如下：
-   * 绝对路径引入配置文件的代码，确保无论脚本在何处执行，都能准确定位到配置文件
-   *  配置在“CONFIG_PATH”的json里面
-   * 通用数据库配置：DB_CONFIG_PATH，都是在运行脚本的父级目录的json文件夹，里面的DB_CONFIG.json【脚本用不到本地数据库就不用引入了】
-* 7、可视化操作给我加上合适的操作按钮
-* 8、记录操作日志“PROCESS_LOG_FILE”
-
-### reddit_chi.json数据格式是
-   ```json
-   [
-      {
-      "name": "r/java",
-      "description": "A place for java."
-      }
-   ]
-```
-
-### 配置实例
-```python
-# 配置与常量
-import os
-from pathlib import Path
-
-SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
-SCRIPT_NAME = "XXXX_XXXX" #脚本名称
-CONFIG_DIR = SCRIPT_DIR / "json"
-CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
-CONFIG_DIR.mkdir(exist_ok=True)
-DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
-PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / f"log_{SCRIPT_NAME}.log"
-```
-DB_CONFIG_PATH数据如下：
-```
-{
-  "host": "localhost",
-  "port": 3306,
-  "user": "root",
-  "password": "123456",
-  "database": "test",
-  "charset": "utf8mb4"
-}
-```
-
----
-
-下面给出一个较完整的 Python 脚本（基于 `tkinter` 可视化界面 + 多线程 + 配置文件 + 日志 + 可选数据库写入 + 支持 PRAW 或匿名抓取两种方式）。脚本实现了你提出的大部分需求，并在代码中注明了需要用户提供/补充的内容（例如 Reddit API 凭证 或 DB_CONFIG.json）。你只需把下面代码保存为一个 `.py` 文件并运行即可（需要安装部分第三方库，详情见脚本顶部注释）。
-
-> 说明（简短）
->
-> * 默认配置文件放在脚本所在目录的 `json` 子目录（与示例一致），并使用绝对路径定位配置文件，保证无论从何处执行脚本都能定位到配置。
-> * GUI 能选择保存目录（默认 `G:\下载\Reddit\java`），填写子版块（例如 `r/java` 或 `java`），选择下载类型、时间段、批次大小、线程数，并保存为配置。
-> * 下载时会每 `batch_size` 条将元数据持久化到磁盘（JSON），如启用数据库会写入 DB（使用 `pymysql`）。
-> * 支持两种抓取后端：`praw`（需要在配置里填 `client_id`, `client_secret`, `user_agent`）或匿名通过 reddit `.json` 页面抓取（限制较多，速度和稳定性不如 PRAW）。
-> * 记录操作日志到 `PROCESS_LOG_FILE`。
-
----
-
-### 依赖（请先安装）
-
-```bash
-pip install praw requests tqdm python-dateutil pymysql
-```
-
-（如果不使用数据库或不使用 PRAW，可不安装对应包；脚本会尽量回退到匿名抓取）
-
----
-
-### 完整脚本（直接运行）
-
-```python
-# reddit_scraper_gui.py
-"""
-Reddit 子版块抓取器（tkinter GUI）
-功能：
- - GUI 可选择保存目录、填写子版块、选择文件类型、时间段、批次、线程数
- - 将配置写入脚本目录的 json/config_<SCRIPT_NAME>.json（绝对路径）
- - 支持 PRAW（OAuth）或匿名抓取（从 reddit JSON 页面）
- - 多线程下载媒体并批量持久化元数据
- - 可选写入数据库（使用 DB_CONFIG.json，在脚本父目录的 json 文件夹内）
- - 日志写入 PROCESS_LOG_FILE
-"""
 import os
 import json
 import threading
@@ -100,11 +6,13 @@ import queue
 from pathlib import Path
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from tkinter import Tk, Label, Entry, Button, StringVar, IntVar, BooleanVar, Checkbutton, filedialog, ttk, messagebox, Frame
+from tkinter import Tk, Label, Entry, Button, StringVar, IntVar, BooleanVar, Checkbutton, filedialog, ttk, messagebox, Frame, OptionMenu
 import requests
 from urllib.parse import urlparse
 from dateutil import parser as date_parser
 from tqdm import tqdm
+import re
+import time
 
 # 尝试导入可选库
 try:
@@ -119,18 +27,19 @@ try:
 except Exception:
     HAS_PYMYSQL = False
 
-# -------------------- 配置与常量（按你给出的示例） --------------------
+# -------------------- 配置与常量 --------------------
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
-SCRIPT_NAME = "reddit_scraper"  # 脚本名称，可以修改
+SCRIPT_NAME = "reddit_scraper_gui"  # 脚本名称，可以修改
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
 PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / f"log_{SCRIPT_NAME}.log"
 PROCESS_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+REDDIT_CHI_PATH = CONFIG_DIR / "reddit_chi.json"
 
-# 默认保存目录（可以被 GUI 修改）
-DEFAULT_SAVE_DIR = Path(r"G:\下载\Reddit\java")
+# 默认保存目录
+DEFAULT_SAVE_DIR = Path(r"D:\img\reddit")
 
 # 日志配置
 logging.basicConfig(
@@ -176,6 +85,16 @@ def save_config(cfg: dict):
 def ensure_dir(path: Path):
     path.mkdir(parents=True, exist_ok=True)
 
+def safe_filename(name):
+    """清理文件名中的非法字符并限制长度"""
+    # 移除或替换非法字符
+    name = re.sub(r'[<>:"/\\|?*]', '_', name)
+    # 限制长度，保留扩展名
+    max_length = 100
+    if len(name) > max_length:
+        name = name[:max_length]
+    return name
+
 def safe_filename_from_url(url: str):
     parsed = urlparse(url)
     name = Path(parsed.path).name
@@ -183,6 +102,7 @@ def safe_filename_from_url(url: str):
         name = parsed.netloc
     # 防止重复或非法字符
     name = name.split("?")[0]
+    name = safe_filename(name)
     return name
 
 def url_is_media(url: str, allow_images=True, allow_videos=True, allow_gifs=True, allow_docs=True):
@@ -207,6 +127,46 @@ def url_is_media(url: str, allow_images=True, allow_videos=True, allow_gifs=True
     if (allow_videos or allow_gifs) and ("gfycat.com" in url or "v.redd.it" in url):
         return True
     return False
+
+def load_reddit_chi():
+    """加载reddit_chi.json数据"""
+    if REDDIT_CHI_PATH.exists():
+        try:
+            with open(REDDIT_CHI_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            logger.info(f"加载reddit_chi.json：{REDDIT_CHI_PATH}")
+            return data
+        except Exception as e:
+            logger.exception("读取reddit_chi.json失败")
+    # 默认数据
+    default_data = [
+        {
+            "name": "r/java",
+            "description": "A place for java.",
+            "iscraw": False,
+            "lastCrawTime": ""
+        }
+    ]
+    save_reddit_chi(default_data)
+    return default_data
+
+def save_reddit_chi(data):
+    """保存reddit_chi.json数据"""
+    with open(REDDIT_CHI_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    logger.info(f"已保存reddit_chi.json到 {REDDIT_CHI_PATH}")
+
+def validate_subreddit(subreddit_name):
+    """验证子版块名称是否合法"""
+    if not subreddit_name or not subreddit_name.startswith("r/"):
+        return False
+    sub_name = subreddit_name[2:]  # 去掉 "r/"
+    if not sub_name or len(sub_name) == 0:
+        return False
+    # 检查是否包含非法字符
+    if not re.match(r'^[a-zA-Z0-9_-]+$', sub_name):
+        return False
+    return True
 
 # -------------------- Reddit 抓取实现 --------------------
 class RedditFetcher:
@@ -297,7 +257,7 @@ class RedditFetcher:
                     resp = self.session.get(url, params=params, timeout=30)
                     if resp.status_code == 429:
                         logger.warning("被 Reddit 限速 429，暂停 10s")
-                        import time; time.sleep(10)
+                        time.sleep(10)
                         continue
                     resp.raise_for_status()
                     data = resp.json()
@@ -414,20 +374,14 @@ class Downloader:
                 if r.status_code == 200:
                     fname = safe_filename_from_url(murl)
                     # 加个前缀：postid_title
-                    safe_title = "".join(ch for ch in post.get("title", "") if ch.isalnum() or ch in (" ", "_", "-"))[:50].strip()
+                    safe_title = safe_filename("".join(ch for ch in post.get("title", "") if ch.isalnum() or ch in (" ", "_", "-"))[:50].strip())
                     prefix = f"{post.get('id')}_{safe_title}" if safe_title else post.get("id")
                     save_name = f"{prefix}_{fname}"
                     out_path = self.save_dir / save_name
-                    # 若已存在则跳过或改名
+                    # 若已存在则跳过（只保留一个）
                     if out_path.exists():
-                        # 添加数字后缀
-                        i = 1
-                        while True:
-                            alt = out_path.with_name(f"{out_path.stem}_{i}{out_path.suffix}")
-                            if not alt.exists():
-                                out_path = alt
-                                break
-                            i += 1
+                        logger.info(f"文件已存在，跳过：{out_path}")
+                        continue
                     with open(out_path, "wb") as wf:
                         for chunk in r.iter_content(chunk_size=8192):
                             if chunk:
@@ -486,8 +440,9 @@ class Downloader:
 class App:
     def __init__(self, root):
         self.root = root
-        self.root.title("Reddit 子版块抓取器")
+        self.root.title("Reddit 子版块批量抓取器")
         self.cfg = load_config()
+        self.reddits = load_reddit_chi()
 
         # TK variables
         self.save_dir_var = StringVar(value=self.cfg.get("save_dir"))
@@ -512,6 +467,7 @@ class App:
         # runtime control
         self._stop_event = threading.Event()
         self._worker_thread = None
+        self._batch_worker_thread = None
 
     def _build(self):
         row = 0
@@ -520,8 +476,14 @@ class App:
         Button(self.root, text="选择...", command=self.choose_dir).grid(row=row, column=2, padx=6)
         row += 1
 
-        Label(self.root, text="子版块 (例如 r/java 或 java):").grid(row=row, column=0, sticky="w", padx=6, pady=6)
-        Entry(self.root, textvariable=self.subreddit_var, width=30).grid(row=row, column=1, sticky="w")
+        Label(self.root, text="子版块:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
+        # 创建下拉菜单
+        self.subreddit_options = [item["name"] for item in self.reddits]
+        self.subreddit_var.set(self.cfg.get("subreddit", "r/java"))
+        self.subreddit_menu = OptionMenu(self.root, self.subreddit_var, *self.subreddit_options)
+        self.subreddit_menu.grid(row=row, column=1, sticky="w", padx=6)
+        # 手动输入框
+        Entry(self.root, textvariable=self.subreddit_var, width=30).grid(row=row, column=1, sticky="e", padx=6)
         row += 1
 
         Label(self.root, text="抓取时间段 (YYYY-MM-DD):").grid(row=row, column=0, sticky="w", padx=6, pady=6)
@@ -553,6 +515,7 @@ class App:
         # Buttons
         Button(self.root, text="保存配置", command=self.on_save_config).grid(row=row, column=0, padx=6, pady=10)
         Button(self.root, text="开始抓取", command=self.on_start).grid(row=row, column=1, padx=6)
+        Button(self.root, text="批量抓取", command=self.on_batch_start).grid(row=row, column=1, sticky="e", padx=6)
         Button(self.root, text="停止", command=self.on_stop).grid(row=row, column=2, padx=6)
         row += 1
 
@@ -601,15 +564,176 @@ class App:
         if self._worker_thread and self._worker_thread.is_alive():
             messagebox.showwarning("进行中", "已有抓取任务正在运行")
             return
-        # update cfg
+        # 更新子版块到配置和reddit_chi.json
+        subreddit_name = self.subreddit_var.get()
+        if validate_subreddit(subreddit_name):
+            # 检查是否已存在
+            exists = False
+            for item in self.reddits:
+                if item["name"] == subreddit_name:
+                    exists = True
+                    break
+            if not exists:
+                # 添加到reddit_chi.json
+                new_item = {
+                    "name": subreddit_name,
+                    "description": f"Subreddit {subreddit_name}",
+                    "iscraw": False,
+                    "lastCrawTime": ""
+                }
+                self.reddits.append(new_item)
+                save_reddit_chi(self.reddits)
+                # 更新下拉菜单
+                self.subreddit_options.append(subreddit_name)
+                self.subreddit_menu['menu'].delete(0, 'end')
+                for option in self.subreddit_options:
+                    self.subreddit_menu['menu'].add_command(label=option, command=lambda value=option: self.subreddit_var.set(value))
+
+        # 保存配置
         self.on_save_config()
         self._stop_event.clear()
         self._worker_thread = threading.Thread(target=self.worker_main, daemon=True)
         self._worker_thread.start()
 
+    def on_batch_start(self):
+        if (self._worker_thread and self._worker_thread.is_alive()) or (self._batch_worker_thread and self._batch_worker_thread.is_alive()):
+            messagebox.showwarning("进行中", "已有抓取任务正在运行")
+            return
+        self._stop_event.clear()
+        self._batch_worker_thread = threading.Thread(target=self.batch_worker_main, daemon=True)
+        self._batch_worker_thread.start()
+
     def on_stop(self):
         self._stop_event.set()
         self.status_var.set("停止中...")
+
+    def batch_worker_main(self):
+        """批量处理所有子版块"""
+        cfg = load_config()
+        # 更新最后运行时间
+        cfg["last_run"] = datetime.now().isoformat()
+        save_config(cfg)
+
+        save_dir = Path(cfg.get("save_dir") or DEFAULT_SAVE_DIR)
+        ensure_dir(save_dir)
+
+        # 读取最新的reddit_chi.json
+        reddit_data = load_reddit_chi()
+        total_subreddits = len(reddit_data)
+
+        self.status_var.set(f"开始批量抓取，共 {total_subreddits} 个子版块")
+        self.progress.config(maximum=total_subreddits, value=0)
+        self.progress.config(mode="determinate")
+
+        processed_count = 0
+        for item in reddit_data:
+            if self._stop_event.is_set():
+                logger.info("检测到停止信号，退出批量抓取")
+                break
+
+            subreddit_name = item["name"]
+            # 创建子目录
+            sub_dir = save_dir / subreddit_name[2:]  # 去掉 "r/" 前缀
+            ensure_dir(sub_dir)
+
+            self.status_var.set(f"正在处理子版块: {subreddit_name}")
+
+            # 更新配置中的子版块
+            cfg["subreddit"] = subreddit_name
+
+            # DB config
+            db_cfg = None
+            if cfg.get("write_to_db"):
+                # 读取 DB_CONFIG_PATH
+                dbp = Path(cfg.get("db_config_path") or DB_CONFIG_PATH)
+                if dbp.exists():
+                    try:
+                        with open(dbp, "r", encoding="utf-8") as f:
+                            db_cfg = json.load(f)
+                            logger.info(f"读取数据库配置：{dbp}")
+                    except Exception:
+                        logger.exception("读取 DB 配置失败")
+                else:
+                    logger.warning(f"未找到 DB_CONFIG.json：{dbp}. 将以离线模式运行。")
+
+            fetcher = RedditFetcher(cfg)
+            downloader = Downloader(cfg, sub_dir, db_cfg)
+
+            sub = cfg.get("subreddit", "r/java")
+            start = cfg.get("start_date", "")
+            end = cfg.get("end_date", "")
+            threads = int(cfg.get("threads", 5))
+            batch_size = int(cfg.get("batch_size", 50))
+            total_processed = 0
+
+            # 抓取帖子
+            post_generator = fetcher.fetch_posts(sub, start, end, limit=None)
+
+            # 收集帖子
+            posts = []
+            try:
+                for p in post_generator:
+                    posts.append(p)
+                    if self._stop_event.is_set():
+                        logger.info("检测到停止信号，退出抓取循环")
+                        break
+            except Exception:
+                logger.exception("抓取期间发生异常")
+
+            if not posts:
+                self.status_var.set(f"子版块 {subreddit_name} 未抓取到任何帖子")
+                downloader.close()
+                # 更新reddit_chi.json中的抓取时间
+                for r_item in reddit_data:
+                    if r_item["name"] == subreddit_name:
+                        r_item["iscraw"] = True
+                        r_item["lastCrawTime"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        break
+                save_reddit_chi(reddit_data)
+                processed_count += 1
+                self.progress.step(1)
+                continue
+
+            # 多线程下载媒体
+            self.status_var.set(f"子版块 {subreddit_name} 开始下载媒体，共 {len(posts)} 帖子，使用 {threads} 线程")
+            futures = []
+            with ThreadPoolExecutor(max_workers=threads) as executor:
+                for post in posts:
+                    if self._stop_event.is_set():
+                        break
+                    futures.append(executor.submit(self._process_post, downloader, post))
+                # 遍历完成
+                for fut in as_completed(futures):
+                    if self._stop_event.is_set():
+                        break
+                    try:
+                        rec = fut.result()
+                        total_processed += 1
+                        self.status_var.set(f"子版块 {subreddit_name}: 已处理 {total_processed}/{len(posts)}")
+                    except Exception:
+                        logger.exception("任务执行异常")
+            # 最后 flush 剩余 batch
+            if downloader.batch:
+                try:
+                    downloader.persist_batch(downloader.batch)
+                except Exception:
+                    logger.exception("最后批次持久化失败")
+            downloader.close()
+
+            # 更新reddit_chi.json中的抓取时间
+            for r_item in reddit_data:
+                if r_item["name"] == subreddit_name:
+                    r_item["iscraw"] = True
+                    r_item["lastCrawTime"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    break
+            save_reddit_chi(reddit_data)
+
+            processed_count += 1
+            self.progress.step(1)
+            self.status_var.set(f"批量抓取进度: {processed_count}/{total_subreddits}")
+
+        self.status_var.set(f"批量抓取完成，共处理 {processed_count} 个子版块")
+        logger.info("批量任务完成")
 
     def worker_main(self):
         cfg = load_config()
@@ -619,6 +743,11 @@ class App:
 
         save_dir = Path(cfg.get("save_dir") or DEFAULT_SAVE_DIR)
         ensure_dir(save_dir)
+
+        # 为当前子版块创建子目录
+        subreddit_name = cfg.get("subreddit", "r/java")
+        sub_dir = save_dir / subreddit_name[2:]  # 去掉 "r/" 前缀
+        ensure_dir(sub_dir)
 
         # DB config
         db_cfg = None
@@ -636,7 +765,7 @@ class App:
                 logger.warning(f"未找到 DB_CONFIG.json：{dbp}. 将以离线模式运行。")
 
         fetcher = RedditFetcher(cfg)
-        downloader = Downloader(cfg, save_dir, db_cfg)
+        downloader = Downloader(cfg, sub_dir, db_cfg)
 
         sub = cfg.get("subreddit", "r/java")
         start = cfg.get("start_date", "")
@@ -724,49 +853,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-```
-
----
-
-### 说明与注意事项（你需要提供或确认的内容）
-
-1. **如果希望使用 PRAW（推荐、稳定）**：
-
-    * 请在配置里填写 `praw.client_id`、`praw.client_secret`、`praw.user_agent`。你可以把这些写入已经生成的 `json/config_reddit_scraper.json` 的 `praw` 字段，或运行后在 GUI 勾选 “使用 PRAW” 并直接编辑配置文件。
-    * 获取方法：在 Reddit 创建一个应用（脚本类型），会得到 `client_id` 和 `client_secret`。`user_agent` 自定义描述即可。
-
-2. **如果希望写入数据库**：
-
-    * 在脚本父目录下的 `json/DB_CONFIG.json` 提供 DB 信息（你在问题里已给出示例格式），并在 GUI 勾选“写入数据库”。脚本会尝试用 `pymysql` 连接并写入一张假设表 `reddit_posts`（你需要根据实际数据库准备对应表或修改插入语句）。
-    * 如果不写数据库，无须准备 DB_CONFIG.json。
-
-3. **关于抓取量、速率限制、防 ban**：
-
-    * 匿名抓取（直接访问 `https://www.reddit.com/r/.../new.json`）会有较严格的速率限制，有可能被暂时封禁（HTTP 429）。生产级建议使用 PRAW + 合理速率控制。
-    * 请在大量抓取时尊重 Reddit 的 API 使用政策与机器人行为准则，并设置合适的 `user_agent`。
-
-4. **文件类型识别**：脚本通过 URL 后缀和 preview/media 字段做基本识别，可覆盖常见场景但不能百分百覆盖所有托管站（如复杂的 imgur/gallery、gfycat API 需要单独处理），如需支持更多站点可进一步扩展。
-
-5. **默认保存目录**：脚本会按你要求默认到 `G:\下载\Reddit\java`（如果系统无该盘会自动尝试创建并抛出异常，请调整）。
-
-6. **日志**：操作日志写在 `json/logs/log_reddit_scraper.log`，方便排查。
-
----
-
-### 回答你最后的问题：“还需要我提供什么内容吗？”
-
-简短回答：
-
-* 若**使用 PRAW**：请提供 `client_id`、`client_secret`、`user_agent`（放到配置 `praw` 段里或直接提供我可以把示例写入脚本）。
-* 若**需要写 DB**：请提供 `json/DB_CONFIG.json`（即你问题里给的 DB 配置示例），并确认目标数据库中是否已创建用于存放记录的表（脚本示例中写入表名 `reddit_posts` — 你可以告诉我你希望的表结构或让我帮你生成 SQL 建表语句）。
-* 若**需要更高级的媒体解析**（比如解析 imgur 相册、gfycat API、reddit galleries、reddit-hosted videos 更高质量合并音视频等），请说明优先级，我会把这些支持扩展到脚本里（这会涉及更多 API 逻辑）。
-
----
-
-如果你愿意，我可以：
-
-* 帮你把 `praw` 的 `client_id`/`client_secret` 写入配置示例（你只需把值粘贴给我），或
-* 根据你的数据库表结构，生成对应的建表 SQL 并把插入语句调整为安全的参数化版本，或
-* 扩展脚本支持 imgur/gfycat/gallery/v.redd.it 的更完整解析与合并（比如下载 video + audio 并合并），这会复杂一些但我可以直接写好。
-
-要我现在继续做哪项扩展，请直接告诉我（例如：把 PRAW 凭证写进配置 / 为你生成 SQL 表结构 / 支持 imgur 相册）。

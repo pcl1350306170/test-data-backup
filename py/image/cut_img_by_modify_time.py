@@ -4,8 +4,8 @@ from datetime import datetime
 import sys
 
 # 配置参数
-SOURCE_DIR = r"D:\img\qrcode2"  # 源目录
-TARGET_DIR = r"H:\IMAGE\V33\AI"    # 目标目录
+SOURCE_DIR = r"D:\img\reddit\OnOff0823-1126"  # 源目录
+TARGET_DIR = r"D:\img\reddit\gonewild"    # 目标目录
 TARGET_DATE = datetime(2025, 11, 17)  # 目标修改日期（2025年11月12日）
 SUPPORTED_IMG_EXTS = ['.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp']  # 支持的图片格式
 

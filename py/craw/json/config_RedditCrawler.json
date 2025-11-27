@@ -1,0 +1,21 @@
+{
+    "save_root": "D:/img/reddit/nsfw",
+    "subreddit": "nsfw",
+    "use_oauth": false,
+    "client_id": "",
+    "client_secret": "",
+    "user_agent": "RedditCrawler/1.0 by u/yourname",
+    "download_types": {
+        "image": true,
+        "video": true,
+        "gif": true,
+        "gallery": true,
+        "document": true,
+        "selftext": true
+    },
+    "start_date": "2025-10-01",
+    "end_date": "2025-11-26",
+    "batch_size": 50,
+    "threads": 5,
+    "save_to_db": true
+}
