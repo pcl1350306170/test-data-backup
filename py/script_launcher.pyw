@@ -1,3 +1,5 @@
+# script_launcher.pyw
+
 import os
 import subprocess
 import tkinter as tk
@@ -99,11 +101,13 @@ class ScriptLauncher:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         # 脚本列表
-        self.script_tree = ttk.Treeview(list_frame, yscrollcommand=scrollbar.set, columns=("name", "path"), show="headings")
+        self.script_tree = ttk.Treeview(list_frame, yscrollcommand=scrollbar.set, columns=("name", "path", "type"), show="headings")
         self.script_tree.heading("name", text="脚本名称")
         self.script_tree.heading("path", text="脚本路径")
+        self.script_tree.heading("type", text="类型")
         self.script_tree.column("name", width=300)
-        self.script_tree.column("path", width=400)
+        self.script_tree.column("path", width=350)
+        self.script_tree.column("type", width=80)
         self.script_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         scrollbar.config(command=self.script_tree.yview)
@@ -147,7 +151,7 @@ class ScriptLauncher:
         self.load_scripts()
 
     def load_scripts(self):
-        """加载脚本目录中的所有Python脚本（过滤包含【废弃】的描述）"""
+        """加载脚本目录中的所有Python脚本（.py 和 .pyw），过滤包含【废弃】的描述）"""
         # 清空现有列表
         for item in self.script_tree.get_children():
             self.script_tree.delete(item)
@@ -161,7 +165,7 @@ class ScriptLauncher:
         try:
             for root, _, files in os.walk(self.script_dir):
                 for file in files:
-                    if file.endswith(".py"):
+                    if file.endswith((".py", ".pyw")):  # 支持 .py 和 .pyw
                         script_path = os.path.join(root, file)
                         relative_path = os.path.relpath(script_path, self.script_dir)
 
@@ -172,7 +176,10 @@ class ScriptLauncher:
                         if "【废弃】" in description:
                             continue
 
-                        self.script_tree.insert("", tk.END, values=(description, relative_path))
+                        # 获取文件类型
+                        file_type = "PYW" if file.endswith(".pyw") else "PY"
+
+                        self.script_tree.insert("", tk.END, values=(description, relative_path, file_type))
         except Exception as e:
             messagebox.showerror("错误", f"加载脚本失败: {str(e)}")
 
@@ -186,6 +193,7 @@ class ScriptLauncher:
         selected_item = selected_items[0]
         script_name = self.script_tree.item(selected_item, "values")[0]
         script_relative_path = self.script_tree.item(selected_item, "values")[1]
+        script_type = self.script_tree.item(selected_item, "values")[2]
         script_path = os.path.join(self.script_dir, script_relative_path)
 
         if not os.path.exists(script_path):
@@ -193,47 +201,53 @@ class ScriptLauncher:
             return
 
         try:
-            # 打开新窗口显示脚本输出
-            output_window = tk.Toplevel(self.root)
-            output_window.title(f"执行: {script_name}")
-            output_window.geometry("800x600")
+            # 根据脚本类型决定是否显示输出窗口
+            if script_type == "PYW":
+                # .pyw 文件不显示控制台，直接执行
+                subprocess.Popen([self.python_path, script_path])
+                messagebox.showinfo("执行", f"已启动 .pyw 脚本: {script_name}")
+            else:
+                # .py 文件显示输出窗口
+                output_window = tk.Toplevel(self.root)
+                output_window.title(f"执行: {script_name}")
+                output_window.geometry("800x600")
 
-            # 输出文本框
-            output_text = tk.Text(output_window, wrap=tk.WORD)
-            output_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+                # 输出文本框
+                output_text = tk.Text(output_window, wrap=tk.WORD)
+                output_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-            # 滚动条
-            scrollbar = ttk.Scrollbar(output_text, command=output_text.yview)
-            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            output_text.config(yscrollcommand=scrollbar.set)
+                # 滚动条
+                scrollbar = ttk.Scrollbar(output_text, command=output_text.yview)
+                scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+                output_text.config(yscrollcommand=scrollbar.set)
 
-            # 执行脚本
-            output_text.insert(tk.END, f"正在执行脚本: {script_name}\n")
-            output_text.insert(tk.END, f"脚本路径: {script_path}\n\n")
-            output_text.update()
+                # 执行脚本
+                output_text.insert(tk.END, f"正在执行脚本: {script_name}\n")
+                output_text.insert(tk.END, f"脚本路径: {script_path}\n\n")
+                output_text.update()
 
-            process = subprocess.Popen(
-                [self.python_path, script_path],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                encoding="utf-8",
-                bufsize=1
-            )
+                process = subprocess.Popen(
+                    [self.python_path, script_path],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    encoding="utf-8",
+                    bufsize=1
+                )
 
-            # 实时显示输出
-            def update_output():
-                if process.poll() is None:
-                    line = process.stdout.readline()
-                    if line:
-                        output_text.insert(tk.END, line)
+                # 实时显示输出
+                def update_output():
+                    if process.poll() is None:
+                        line = process.stdout.readline()
+                        if line:
+                            output_text.insert(tk.END, line)
+                            output_text.see(tk.END)
+                        output_window.after(100, update_output)
+                    else:
+                        output_text.insert(tk.END, f"\n脚本执行完成，退出代码: {process.returncode}")
                         output_text.see(tk.END)
-                    output_window.after(100, update_output)
-                else:
-                    output_text.insert(tk.END, f"\n脚本执行完成，退出代码: {process.returncode}")
-                    output_text.see(tk.END)
 
-            update_output()
+                update_output()
 
         except Exception as e:
             messagebox.showerror("错误", f"执行脚本失败: {str(e)}")
@@ -270,7 +284,9 @@ class ScriptLauncher:
                     self.config.add_section("Descriptions")
                 self.config.set("Descriptions", script_relative_path, description)
                 self.save_config()
-                self.script_tree.item(selected_item, values=(description, script_relative_path))
+                # 更新显示的描述（保留类型信息）
+                script_type = self.script_tree.item(selected_item, "values")[2]
+                self.script_tree.item(selected_item, values=(description, script_relative_path, script_type))
                 dialog.destroy()
 
         ttk.Button(dialog, text="保存", command=save_description).pack(pady=10)
