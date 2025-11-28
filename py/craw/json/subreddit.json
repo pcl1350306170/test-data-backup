@@ -442,66 +442,125 @@
     }
 ]
 ,
-[
-    {
-        "name": "r/AsianNSFW",
-        "description": "亚洲女优+网红色图/短视频集中营，日系占比90%，每日更新超高活跃"
-    },
-    {
-        "name": "r/JAV",
-        "description": "最纯粹的日本AV女优讨论区，按番号+女优名整理，资源帖最全"
-    },
-    {
-        "name": "r/JapanesePornstars",
-        "description": "日本女优档案馆，每人一个专属帖子，三围、出道年份、代表作全收录"
-    },
-    {
-        "name": "r/KoreanNSFW",
-        "description": "韩国女主播/BJ/网红/女优专区，韩系审美天堂"
-    },
-    {
-        "name": "r/ChineseBeauty",
-        "description": "国产/华裔女优+网红图集，抖音推特搬运较多"
-    },
-    {
-        "name": "r/PornstarHQ",
-        "description": "欧美+日韩女优高清图合集，按名字分类超清晰"
-    },
-    {
-        "name": "r/EroticAI",
-        "description": "AI生成的成人色图最大版块，真人向+二次元都有，基本无码"
-    },
-    {
-        "name": "r/AI_NSFW",
-        "description": "另一大AI色图社区，更偏写实风格，日更量爆炸"
-    },
-    {
-        "name": "r/AIWaifu",
-        "description": "AI二次元老婆生成专区，大量LoRA分享"
-    },
-    {
-        "name": "r/YuaMikami_MasterThread",
-        "description": "三上悠亚完整生涯合集（2015-2024退役）300+部番号+无码流出"
-    },
-    {
-        "name": "r/KiraraAsuka_Legend",
-        "description": "明日花キララ17年生涯总结+胸围变化史+整容对比"
-    },
-    {
-        "name": "r/YuiHatano_15thAnniversary",
-        "description": "波多野结衣15周年半退役全作品Excel表"
-    },
-    {
-        "name": "r/SoraAoi_Pioneer",
-        "description": "苍井空2002-2011考古级帖子+早期无码晶盘流出"
-    },
-    {
-        "name": "r/ErikaMomotani_Legend",
-        "description": "桃谷绘里香只有18部却封神，短命神颜代表"
-    },
-    {
-        "name": "r/RaraAnzai_Retirement",
-        "description": "安斋らら（J杯时代）2024-2025隐退纪念神贴"
-    }
-]
+
+    [
+        {
+            "name": "r/AsianNSFW",
+            "description": "亚洲女优+网红色图/短视频集中营，日系占比90%，每日更新超高活跃"
+        },
+        {
+            "name": "r/JAV",
+            "description": "最纯粹的日本AV女优讨论区，按番号+女优名整理，资源帖最全"
+        },
+        {
+            "name": "r/JapanesePornstars",
+            "description": "日本女优档案馆，每人一个专属帖子，三围、出道年份、代表作全收录"
+        },
+        {
+            "name": "r/KoreanNSFW",
+            "description": "韩国女主播/BJ/网红/女优专区，韩系审美天堂"
+        },
+        {
+            "name": "r/ChineseBeauty",
+            "description": "国产/华裔女优+网红图集，抖音推特搬运较多"
+        },
+        {
+            "name": "r/PornstarHQ",
+            "description": "欧美+日韩女优高清图合集，按名字分类超清晰"
+        },
+        {
+            "name": "r/EroticAI",
+            "description": "AI生成的成人色图最大版块，真人向+二次元都有，基本无码"
+        },
+        {
+            "name": "r/AI_NSFW",
+            "description": "另一大AI色图社区，更偏写实风格，日更量爆炸"
+        },
+        {
+            "name": "r/AIWaifu",
+            "description": "AI二次元老婆生成专区，大量LoRA分享"
+        },
+        {
+            "name": "r/YuaMikami_MasterThread",
+            "description": "三上悠亚完整生涯合集（2015-2024退役）300+部番号+无码流出"
+        },
+        {
+            "name": "r/KiraraAsuka_Legend",
+            "description": "明日花キララ17年生涯总结+胸围变化史+整容对比"
+        },
+        {
+            "name": "r/YuiHatano_15thAnniversary",
+            "description": "波多野结衣15周年半退役全作品Excel表"
+        },
+        {
+            "name": "r/SoraAoi_Pioneer",
+            "description": "苍井空2002-2011考古级帖子+早期无码晶盘流出"
+        },
+        {
+            "name": "r/ErikaMomotani_Legend",
+            "description": "桃谷绘里香只有18部却封神，短命神颜代表"
+        },
+        {
+            "name": "r/RaraAnzai_Retirement",
+            "description": "安斋らら（J杯时代）2024-2025隐退纪念神贴"
+        }
+    ],
+    [
+        {
+            "name": "r/Wallpaper",
+            "description": "Reddit 官方壁纸总站，手机竖版+电脑横版都有，每天超多 4K-8K 新图"
+        },
+        {
+            "name": "r/Wallpapers",
+            "description": "比上面更活跃，专门有人打包手机壁纸合集（iPhone/Android 都齐）"
+        },
+        {
+            "name": "r/MobileWallpaper",
+            "description": "纯手机壁纸区，基本全是 19.5:9 / 20:9 竖版，完美适配刘海/挖孔屏"
+        },
+        {
+            "name": "r/UltraWideWallpapers",
+            "description": "超宽屏/带鱼屏专用（21:9、32:9），女明星横版大图超多"
+        },
+        {
+            "name": "r/Celebs",
+            "description": "欧美/日韩/国内女明星高清写真区，红毯、杂志封面、剧照 4K 级"
+        },
+        {
+            "name": "r/GentlemanBoners",
+            "description": "经典老牌“绅士福利”，女明星优雅性感照（穿得不少但绝美），壁纸神源"
+        },
+        {
+            "name": "r/EmmaWatson",
+            "description": "艾玛·沃森本尊级壁纸宝库，4K 写真+电影截图全收集"
+        },
+        {
+            "name": "r/MargotRobbie",
+            "description": "玛格特·罗比高清图合集，常年霸榜最美壁纸之一"
+        },
+        {
+            "name": "r/SydneySweeney",
+            "description": "2024-2025 最火欧美新星，壁纸级脸+身材，每天都在刷屏"
+        },
+        {
+            "name": "r/KPopWallpaper",
+            "description": "韩团女爱豆官方图+打歌舞台 4K 截图（NewJeans、IVE、aespa、BLACKPINK）"
+        },
+        {
+            "name": "r/Twice",
+            "description": "TWICE 官方壁纸浓度最高的分区，所有成员个人高光图都有"
+        },
+        {
+            "name": "r/BLACKPINK",
+            "description": "四位姐姐的 8K 级写真+演唱会截图，常年高赞"
+        },
+        {
+            "name": "r/AsianLadyboners",
+            "description": "亚洲女明星/模特版 GentlemanBoners，柳岩、迪丽热巴、古力娜扎、韩素希等超多"
+        },
+        {
+            "name": "r/Chinesebeauty",
+            "description": "国内女星+网红 4K 写真（杨幂、刘诗诗、赵露思、鞠婧祎等）"
+        }
+    ]
 ]
