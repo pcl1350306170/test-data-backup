@@ -1,4 +1,4 @@
-# adb_device_manager.py
+# adb_device_manager.pyw
 
 import os
 import json

@@ -1,5 +1,5 @@
 {
-  "save_dir": "D:\\img\\reddit",
+  "save_dir": "G:\\图片\\v33\\Reddit",
   "subreddit": "r/RealGirls",
   "use_praw": false,
   "praw": {
@@ -11,13 +11,13 @@
     "images": true,
     "videos": true,
     "gifs": true,
-    "documents": true
+    "documents": false
   },
   "start_date": "2025-01-01",
   "end_date": "2025-11-27",
   "batch_size": 50,
-  "threads": 5,
+  "threads": 1,
   "write_to_db": false,
   "db_config_path": "C:\\www\\test\\py\\json\\DB_CONFIG.json",
-  "last_run": "2025-11-27T17:19:17.762508"
+  "last_run": "2025-11-28T11:01:02.697951"
 }
