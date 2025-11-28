@@ -300,15 +300,44 @@ class ZipBasedPackagerApp:
                 # 解析订单信息
                 order_match = re.match(r'(\d+)-(.+)', order_info)
                 if not order_match:
-                    self._log("❌ 订单信息格式错误", logging.ERROR)
-                    return
+                    self._log(f"❌ 订单信息格式错误: '{order_info}'，应为 '数字-文本' 格式", logging.ERROR)
+                    # 使用默认名称
+                    new_zip_name = f"{order_info}.zip"
+                    new_zip_path = output_dir / new_zip_name
+                    self._log(f"⚠️ 使用默认名称: {new_zip_name}")
+                else:
+                    full_order_id = order_info  # ← 修改：使用原始订单信息
+                    hospital_name = order_match.group(2)  # 例如 "1987南昌市立医院新院区"
+
+                    # 提取年份后两位和订单编号
+                    order_parts = full_order_id.split('-')
+                    if len(order_parts) != 2:
+                        self._log(f"❌ 订单ID格式错误: '{full_order_id}'，应为 '年份-编号' 格式", logging.ERROR)
+                        # 使用默认名称
+                        new_zip_name = f"{order_info}.zip"
+                        new_zip_path = output_dir / new_zip_name
+                        self._log(f"⚠️ 使用默认名称: {new_zip_name}")
+                    else:
+                        year_part = order_parts[0][-2:]  # "25"
+                        order_num = order_parts[1]       # "1987"
+
+                        # 提取医院名称拼音首字母
+                        pinyin_initials = self._get_pinyin_initials(hospital_name)
+
+                        new_zip_name = f"YM-801S-TLSS-V{version}.{year_part}{order_num}.01001-{pinyin_initials}-FE.zip"
+                        new_zip_path = output_dir / new_zip_name
 
                 full_order_id = order_match.group(1)  # 例如 "2025-1987"
                 hospital_name = order_match.group(2)  # 例如 "南昌市立医院新院区"
 
                 # 提取年份后两位和订单编号
-                year_part = full_order_id.split('-')[0][-2:]  # "25"
-                order_num = full_order_id.split('-')[1]       # "1987"
+                order_parts = full_order_id.split('-')
+                if len(order_parts) != 2:
+                    self._log(f"❌ 订单ID格式错误: '{full_order_id}'，应为 '年份-编号' 格式", logging.ERROR)
+                    return
+
+                year_part = order_parts[0][-2:]  # "25"
+                order_num = order_parts[1]       # "1987"
 
                 # 提取医院名称拼音首字母
                 pinyin_initials = self._get_pinyin_initials(hospital_name)
