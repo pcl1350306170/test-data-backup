@@ -39,15 +39,16 @@ DEFAULT_CONFIG = {
     "output_dir": r"D:\yarward\svn\2025-1987南昌市立医院新院区\前端",
     "order_info": "2025-1987南昌市立医院新院区",
     "project_version": "1.5.1",
-    "base_zip_path": r"C:\www\test\门诊\801S-订单\前端\1.5.1.zip"
+    "base_zip_path": r"C:\www\test\门诊\801S-订单\前端\1.5.1.zip",
+    "custom_zip_name": ""  # ← 新增：自定义ZIP名称
 }
 
 class ZipBasedPackagerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("📦 基于压缩包的打包工具")
-        self.root.geometry("900x700")
-        self.root.minsize(800, 600)
+        self.root.geometry("900x750")  # 增高以容纳新控件
+        self.root.minsize(800, 650)
 
         # 初始化变量
         self.project_dir = tk.StringVar()
@@ -55,6 +56,7 @@ class ZipBasedPackagerApp:
         self.order_info = tk.StringVar()
         self.project_version = tk.StringVar()
         self.base_zip_path = tk.StringVar()
+        self.custom_zip_name = tk.StringVar()  # ← 新增：自定义ZIP名称
         self.is_packaging = False
 
         # 创建UI
@@ -296,53 +298,37 @@ class ZipBasedPackagerApp:
                 # 5.3 生成新压缩包名
                 order_info = self.order_info.get()
                 version = self.project_version.get()
+                custom_name = self.custom_zip_name.get().strip()
 
-                # 解析订单信息
-                order_match = re.match(r'(\d+)-(.+)', order_info)
-                if not order_match:
-                    self._log(f"❌ 订单信息格式错误: '{order_info}'，应为 '数字-文本' 格式", logging.ERROR)
-                    # 使用默认名称
-                    new_zip_name = f"{order_info}.zip"
-                    new_zip_path = output_dir / new_zip_name
-                    self._log(f"⚠️ 使用默认名称: {new_zip_name}")
+                # 使用自定义名称（如果提供）
+                if custom_name:
+                    new_zip_name = custom_name
+                    if not new_zip_name.lower().endswith('.zip'):
+                        new_zip_name += '.zip'
                 else:
-                    full_order_id = order_info  # ← 修改：使用原始订单信息
-                    hospital_name = order_match.group(2)  # 例如 "1987南昌市立医院新院区"
+                    # 解析订单信息（前9个字符为订单号，其余为医院名）
+                    if len(order_info) >= 9:
+                        order_id = order_info[:9]  # 前9个字符
+                        hospital_name = order_info[9:]  # 剩余字符
+                        self._log(f"解析订单号: {order_id}, 医院名: {hospital_name}")
 
-                    # 提取年份后两位和订单编号
-                    order_parts = full_order_id.split('-')
-                    if len(order_parts) != 2:
-                        self._log(f"❌ 订单ID格式错误: '{full_order_id}'，应为 '年份-编号' 格式", logging.ERROR)
-                        # 使用默认名称
-                        new_zip_name = f"{order_info}.zip"
-                        new_zip_path = output_dir / new_zip_name
-                        self._log(f"⚠️ 使用默认名称: {new_zip_name}")
+                        # 提取年份后两位和订单编号（假设前9位是 2025-1987 格式）
+                        order_parts = order_id.split('-')
+                        if len(order_parts) == 2:
+                            year_part = order_parts[0][-2:]  # "25"
+                            order_num = order_parts[1]       # "1987"
+                            # 提取医院名称拼音首字母
+                            pinyin_initials = self._get_pinyin_initials(hospital_name)
+                            new_zip_name = f"YM-801S-TLSS-V{version}.{year_part}{order_num}.01001-{pinyin_initials}-FE.zip"
+                        else:
+                            # 如果格式不是 2025-1987，使用默认名称
+                            self._log(f"⚠️ 订单号格式不匹配: '{order_id}'，使用默认名称", logging.WARNING)
+                            new_zip_name = f"{version}.zip"
                     else:
-                        year_part = order_parts[0][-2:]  # "25"
-                        order_num = order_parts[1]       # "1987"
+                        # 如果长度不足9，使用默认名称
+                        self._log(f"⚠️ 订单信息长度不足9位: '{order_info}'，使用默认名称", logging.WARNING)
+                        new_zip_name = f"{version}.zip"
 
-                        # 提取医院名称拼音首字母
-                        pinyin_initials = self._get_pinyin_initials(hospital_name)
-
-                        new_zip_name = f"YM-801S-TLSS-V{version}.{year_part}{order_num}.01001-{pinyin_initials}-FE.zip"
-                        new_zip_path = output_dir / new_zip_name
-
-                full_order_id = order_match.group(1)  # 例如 "2025-1987"
-                hospital_name = order_match.group(2)  # 例如 "南昌市立医院新院区"
-
-                # 提取年份后两位和订单编号
-                order_parts = full_order_id.split('-')
-                if len(order_parts) != 2:
-                    self._log(f"❌ 订单ID格式错误: '{full_order_id}'，应为 '年份-编号' 格式", logging.ERROR)
-                    return
-
-                year_part = order_parts[0][-2:]  # "25"
-                order_num = order_parts[1]       # "1987"
-
-                # 提取医院名称拼音首字母
-                pinyin_initials = self._get_pinyin_initials(hospital_name)
-
-                new_zip_name = f"YM-801S-TLSS-V{version}.{year_part}{order_num}.01001-{pinyin_initials}-FE.zip"
                 new_zip_path = output_dir / new_zip_name
 
                 # 5.4 重新打包
@@ -405,9 +391,6 @@ class ZipBasedPackagerApp:
         if not self.base_zip_path.get():
             messagebox.showerror("错误", "请先选择基础压缩包")
             return
-        if not self.order_info.get():
-            messagebox.showerror("错误", "请输入订单信息")
-            return
         if not self.project_version.get():
             messagebox.showerror("错误", "请选择或输入项目版本")
             return
@@ -441,7 +424,8 @@ class ZipBasedPackagerApp:
             "output_dir": self.output_dir.get(),
             "order_info": self.order_info.get(),
             "project_version": self.project_version.get(),
-            "base_zip_path": self.base_zip_path.get()
+            "base_zip_path": self.base_zip_path.get(),
+            "custom_zip_name": self.custom_zip_name.get()  # ← 保存自定义名称
         }
 
         try:
@@ -463,6 +447,7 @@ class ZipBasedPackagerApp:
                 self.order_info.set(config.get("order_info", DEFAULT_CONFIG["order_info"]))
                 self.project_version.set(config.get("project_version", DEFAULT_CONFIG["project_version"]))
                 self.base_zip_path.set(config.get("base_zip_path", DEFAULT_CONFIG["base_zip_path"]))
+                self.custom_zip_name.set(config.get("custom_zip_name", DEFAULT_CONFIG["custom_zip_name"]))  # ← 加载自定义名称
 
                 self._log("配置已加载")
             else:
@@ -495,7 +480,7 @@ class ZipBasedPackagerApp:
         # 订单信息
         order_frame = ttk.LabelFrame(main_frame, text="📋 订单信息", padding="5")
         order_frame.pack(fill=tk.X, pady=5)
-        ttk.Label(order_frame, text="格式: 2025-1987南昌市立医院新院区").pack(anchor=tk.W)
+        ttk.Label(order_frame, text="格式: 前9个字符为订单号，其余为医院名").pack(anchor=tk.W)
         ttk.Entry(order_frame, textvariable=self.order_info, width=70).pack(fill=tk.X, pady=5)
 
         # 项目版本
@@ -517,6 +502,12 @@ class ZipBasedPackagerApp:
         self.manual_version_entry = ttk.Entry(version_frame, textvariable=self.manual_version_var, width=10)
         self.manual_version_entry.grid(row=0, column=1, padx=5, pady=5)
         self.manual_version_entry.grid_remove()  # 初始隐藏
+
+        # 自定义ZIP名称（新增）
+        custom_frame = ttk.LabelFrame(main_frame, text="🏷️ 自定义ZIP名称", padding="5")
+        custom_frame.pack(fill=tk.X, pady=5)
+        ttk.Label(custom_frame, text="（留空则自动生成或使用默认名称）").pack(anchor=tk.W)
+        ttk.Entry(custom_frame, textvariable=self.custom_zip_name, width=70).pack(fill=tk.X, pady=5)
 
         # 基础压缩包
         zip_frame = ttk.LabelFrame(main_frame, text="📦 基础压缩包", padding="5")
