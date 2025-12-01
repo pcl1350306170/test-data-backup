@@ -14,10 +14,10 @@
     "documents": false
   },
   "start_date": "2025-01-01",
-  "end_date": "2025-11-27",
+  "end_date": "2025-12-01",
   "batch_size": 50,
   "threads": 1,
   "write_to_db": false,
   "db_config_path": "C:\\www\\test\\py\\json\\DB_CONFIG.json",
-  "last_run": "2025-11-28T16:56:08.964594"
+  "last_run": "2025-12-01T13:01:49.675557"
 }

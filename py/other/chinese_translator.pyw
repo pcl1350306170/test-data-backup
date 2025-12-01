@@ -1,3 +1,5 @@
+# chinese_translator.pyw
+
 import os
 import json
 import hashlib
