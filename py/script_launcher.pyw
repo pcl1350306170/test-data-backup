@@ -205,7 +205,7 @@ class ScriptLauncher:
             if script_type == "PYW":
                 # .pyw 文件不显示控制台，直接执行
                 subprocess.Popen([self.python_path, script_path])
-                messagebox.showinfo("执行", f"已启动 .pyw 脚本: {script_name}")
+                # messagebox.showinfo("执行", f"已启动 .pyw 脚本: {script_name}")
             else:
                 # .py 文件显示输出窗口
                 output_window = tk.Toplevel(self.root)

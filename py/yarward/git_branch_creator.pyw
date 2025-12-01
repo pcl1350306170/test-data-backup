@@ -1,5 +1,6 @@
+# git_branch_creator.pyw
+
 import os
-import sys
 import subprocess
 import json
 import re

@@ -6,7 +6,7 @@ import queue
 from pathlib import Path
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from tkinter import Tk, Label, Entry, Button, StringVar, IntVar, BooleanVar, Checkbutton, filedialog, ttk, messagebox, Frame, OptionMenu
+from tkinter import Tk, Label, Entry, Button, StringVar, IntVar, BooleanVar, Checkbutton, filedialog, ttk, messagebox, Frame, OptionMenu, scrolledtext
 import requests
 from urllib.parse import urlparse
 from dateutil import parser as date_parser
@@ -50,7 +50,6 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s: %(message)s"
 )
 logger = logging.getLogger("reddit_scraper")
-logger.addHandler(logging.StreamHandler())  # 终端也打印
 
 # -------------------- 帮助函数 --------------------
 def load_config():
@@ -484,11 +483,30 @@ class Downloader:
                 except Exception:
                     logger.exception("批次持久化出错")
 
+# 自定义日志处理器，将日志输出到GUI
+class GUIHandler(logging.Handler):
+    def __init__(self, text_widget):
+        super().__init__()
+        self.text_widget = text_widget
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.text_widget.config(state="normal")
+        self.text_widget.insert("end", msg + "\n")
+        self.text_widget.see("end")
+        self.text_widget.config(state="disabled")
+
 # -------------------- GUI 与 主流程 --------------------
 class App:
     def __init__(self, root):
         self.root = root
         self.root.title("Reddit 子版块批量抓取器")
+        self.root.geometry("900x700")
+
+        # 添加日志处理器
+        self.log_text = None
+        self.gui_handler = None
+
         self.cfg = load_config()
         self.reddits = load_reddit_chi()
 
@@ -496,7 +514,7 @@ class App:
         self.save_dir_var = StringVar(value=self.cfg.get("save_dir"))
         self.subreddit_var = StringVar(value=self.cfg.get("subreddit"))
         self.batch_var = IntVar(value=self.cfg.get("batch_size", 50))
-        self.threads_var = IntVar(value=self.cfg.get("threads", 3))  # 默认线程数
+        self.threads_var = IntVar(value=self.cfg.get("threads", 3))
         self.use_praw_var = BooleanVar(value=self.cfg.get("use_praw", False))
         self.write_db_var = BooleanVar(value=self.cfg.get("write_to_db", False))
         self.start_date_var = StringVar(value=self.cfg.get("start_date", ""))
@@ -517,31 +535,40 @@ class App:
         self._worker_thread = None
         self._batch_worker_thread = None
 
+        # 添加GUI日志处理器
+        self.gui_handler = GUIHandler(self.log_text)
+        self.gui_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
+        logger.addHandler(self.gui_handler)
+
     def _build(self):
+        # 创建主框架
+        main_frame = Frame(self.root)
+        main_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
         row = 0
-        Label(self.root, text="保存目录:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
-        Entry(self.root, textvariable=self.save_dir_var, width=50).grid(row=row, column=1, sticky="w")
-        Button(self.root, text="选择...", command=self.choose_dir).grid(row=row, column=2, padx=6)
+        Label(main_frame, text="保存目录:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
+        Entry(main_frame, textvariable=self.save_dir_var, width=50).grid(row=row, column=1, sticky="w")
+        Button(main_frame, text="选择...", command=self.choose_dir).grid(row=row, column=2, padx=6)
         row += 1
 
-        Label(self.root, text="子版块:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
+        Label(main_frame, text="子版块:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
         # 创建下拉菜单
         self.subreddit_options = [item["name"] for item in self.reddits]
         self.subreddit_var.set(self.cfg.get("subreddit", "r/java"))
-        self.subreddit_menu = OptionMenu(self.root, self.subreddit_var, *self.subreddit_options)
+        self.subreddit_menu = OptionMenu(main_frame, self.subreddit_var, *self.subreddit_options)
         self.subreddit_menu.grid(row=row, column=1, sticky="w", padx=6)
         # 手动输入框
-        Entry(self.root, textvariable=self.subreddit_var, width=30).grid(row=row, column=1, sticky="e", padx=6)
+        Entry(main_frame, textvariable=self.subreddit_var, width=30).grid(row=row, column=1, sticky="e", padx=6)
         row += 1
 
-        Label(self.root, text="抓取时间段 (YYYY-MM-DD):").grid(row=row, column=0, sticky="w", padx=6, pady=6)
-        Entry(self.root, textvariable=self.start_date_var, width=12).grid(row=row, column=1, sticky="w")
-        Entry(self.root, textvariable=self.end_date_var, width=12).grid(row=row, column=1, sticky="e")
+        Label(main_frame, text="抓取时间段 (YYYY-MM-DD):").grid(row=row, column=0, sticky="w", padx=6, pady=6)
+        Entry(main_frame, textvariable=self.start_date_var, width=12).grid(row=row, column=1, sticky="w")
+        Entry(main_frame, textvariable=self.end_date_var, width=12).grid(row=row, column=1, sticky="e")
         row += 1
 
         # 下载类型
-        Label(self.root, text="下载类型:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
-        FrameBox = Frame(self.root)
+        Label(main_frame, text="下载类型:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
+        FrameBox = Frame(main_frame)
         FrameBox.grid(row=row, column=1, sticky="w")
         Checkbutton(FrameBox, text="图片", variable=self.images_var).pack(side="left")
         Checkbutton(FrameBox, text="视频", variable=self.videos_var).pack(side="left")
@@ -549,32 +576,43 @@ class App:
         Checkbutton(FrameBox, text="文档", variable=self.docs_var).pack(side="left")
         row += 1
 
-        Label(self.root, text="每批保存条数:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
-        Entry(self.root, textvariable=self.batch_var, width=8).grid(row=row, column=1, sticky="w")
-        Label(self.root, text="多线程数量:").grid(row=row, column=1, sticky="e")
-        Entry(self.root, textvariable=self.threads_var, width=6).grid(row=row, column=2, sticky="w")
+        Label(main_frame, text="每批保存条数:").grid(row=row, column=0, sticky="w", padx=6, pady=6)
+        Entry(main_frame, textvariable=self.batch_var, width=8).grid(row=row, column=1, sticky="w")
+        Label(main_frame, text="多线程数量:").grid(row=row, column=1, sticky="e")
+        Entry(main_frame, textvariable=self.threads_var, width=6).grid(row=row, column=2, sticky="w")
         row += 1
 
-        Checkbutton(self.root, text="使用 PRAW（需在配置中填写 client_id 等）", variable=self.use_praw_var).grid(row=row, column=0, columnspan=3, sticky="w", padx=6)
+        Checkbutton(main_frame, text="使用 PRAW（需在配置中填写 client_id 等）", variable=self.use_praw_var).grid(row=row, column=0, columnspan=3, sticky="w", padx=6)
         row += 1
-        Checkbutton(self.root, text="写入数据库（需在脚本父目录/json/DB_CONFIG.json 提供 DB 配置）", variable=self.write_db_var).grid(row=row, column=0, columnspan=3, sticky="w", padx=6)
+        Checkbutton(main_frame, text="写入数据库（需在脚本父目录/json/DB_CONFIG.json 提供 DB 配置）", variable=self.write_db_var).grid(row=row, column=0, columnspan=3, sticky="w", padx=6)
         row += 1
 
         # Buttons
-        Button(self.root, text="保存配置", command=self.on_save_config).grid(row=row, column=0, padx=6, pady=10)
-        Button(self.root, text="开始抓取", command=self.on_start).grid(row=row, column=1, padx=6)
-        Button(self.root, text="批量抓取", command=self.on_batch_start).grid(row=row, column=1, sticky="e", padx=6)
-        Button(self.root, text="停止", command=self.on_stop).grid(row=row, column=2, padx=6)
+        Button(main_frame, text="保存配置", command=self.on_save_config).grid(row=row, column=0, padx=6, pady=10)
+        Button(main_frame, text="开始抓取", command=self.on_start).grid(row=row, column=1, padx=6)
+        Button(main_frame, text="批量抓取", command=self.on_batch_start).grid(row=row, column=1, sticky="e", padx=6)
+        Button(main_frame, text="停止", command=self.on_stop).grid(row=row, column=2, padx=6)
         row += 1
 
         # progress
-        self.progress = ttk.Progressbar(self.root, mode="determinate", length=500)
+        self.progress = ttk.Progressbar(main_frame, mode="determinate", length=500)
         self.progress.grid(row=row, column=0, columnspan=3, padx=6, pady=6)
         row += 1
 
         # status label
         self.status_var = StringVar(value="Ready")
-        Label(self.root, textvariable=self.status_var).grid(row=row, column=0, columnspan=3, sticky="w", padx=6)
+        Label(main_frame, textvariable=self.status_var).grid(row=row, column=0, columnspan=3, sticky="w", padx=6)
+        row += 1
+
+        # 日志区域
+        log_frame = Frame(main_frame)
+        log_frame.grid(row=row, column=0, columnspan=3, sticky="nsew", padx=6, pady=6)
+        main_frame.rowconfigure(row, weight=1)
+        log_frame.rowconfigure(0, weight=1)
+        log_frame.columnconfigure(0, weight=1)
+
+        self.log_text = scrolledtext.ScrolledText(log_frame, state="disabled", wrap="word")
+        self.log_text.grid(row=0, column=0, sticky="nsew")
 
     def choose_dir(self):
         d = filedialog.askdirectory(initialdir=self.save_dir_var.get() or os.getcwd())
@@ -710,7 +748,7 @@ class App:
             sub = cfg.get("subreddit", "r/java")
             start = cfg.get("start_date", "")
             end = cfg.get("end_date", "")
-            threads = int(cfg.get("threads", 3))  # 默认线程数
+            threads = int(cfg.get("threads", 3))
             batch_size = int(cfg.get("batch_size", 50))
             total_processed = 0
 
@@ -820,7 +858,7 @@ class App:
         sub = cfg.get("subreddit", "r/java")
         start = cfg.get("start_date", "")
         end = cfg.get("end_date", "")
-        threads = int(cfg.get("threads", 3))  # 默认线程数
+        threads = int(cfg.get("threads", 3))
         batch_size = int(cfg.get("batch_size", 50))
         total_processed = 0
 
