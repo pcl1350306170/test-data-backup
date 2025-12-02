@@ -23,7 +23,8 @@ SUPPORTED_FORMATS = {
     "直译格式": "literal",
     "全部大写": "uppercase",
     "全部小写": "lowercase",
-    "下划线间隔": "snake_case"
+    "下划线间隔": "snake_case",
+    "横线间隔": "snake_case_h"
 }
 
 # 确保配置目录存在（以绝对路径创建）
@@ -101,6 +102,8 @@ class ChineseTranslatorApp:
 
         self.input_text = tk.Text(input_frame, height=6, wrap=tk.WORD)
         self.input_text.pack(fill=tk.BOTH, expand=True)
+        # 新增：绑定 Enter 键到翻译函数（在输入框内）
+        self.input_text.bind("<Return>", self._on_enter_key)
         ttk.Button(input_frame, text="翻译", command=self.translate_text).pack(pady=10)
 
         # 3. 结果区域
@@ -122,6 +125,15 @@ class ChineseTranslatorApp:
         self.result_tree.column("action", width=100, anchor=tk.CENTER)
 
         self.result_tree.pack(fill=tk.BOTH, expand=True)
+
+    def _on_enter_key(self, event):
+        """处理输入框内的 Enter 键事件"""
+        # 阻止 Enter 键在文本框中插入换行符
+        event.widget.insert(tk.INSERT, '')  # 不插入任何内容
+        # 调用翻译函数
+        self.translate_text()
+        # 阻止事件继续传递
+        return "break"
 
     def bind_shortcuts(self):
         """绑定快捷键（修复关键处）"""
@@ -192,6 +204,7 @@ class ChineseTranslatorApp:
 
         # 4. 下划线间隔
         formatted["snake_case"] = '_'.join(words)
+        formatted["snake_case_h"] = '-'.join(words)
 
         # 5. 驼峰格式
         if len(words) == 1:
