@@ -362,7 +362,7 @@ class AnkiBuilderGUI:
             subprocess.run(['explorer', str(apkg_dir)], check=True)
         except Exception as e:
             logger.warning(f"Failed to open directory: {e}")
-        messagebox.showinfo("成功", f"APKG 已生成：\n{apkg_path}\n\n目录已自动打开。")
+        # messagebox.showinfo("成功", f"APKG 已生成：\n{apkg_path}\n\n目录已自动打开。")
 
     def on_error(self, error_msg):
         self.btn_generate.config(state='normal')
