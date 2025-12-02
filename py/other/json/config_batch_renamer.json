@@ -1,0 +1,19 @@
+{
+  "target_dir": "H:/NOVEL/合集/old/翠微居/HH",
+  "replace_rules": [
+    "《",
+    "》",
+    "章节",
+    "已完结",
+    "_",
+    "-",
+    "（章）",
+    "（全本）",
+    "全本",
+    "全文",
+    "（",
+    "）"
+  ],
+  "remove_parentheses": true,
+  "remove_numbers": true
+}

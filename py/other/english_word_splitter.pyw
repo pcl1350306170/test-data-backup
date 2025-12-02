@@ -152,21 +152,23 @@ class WordSplitterApp:
             self.word_file_path.set(file_path)
             self.log(f"选择词库文件: {file_path}")
 
-            # 读取文件中的所有单词并添加到过滤词中
+            # 读取文件中的所有单词并添加到过滤词中（保留原有配置）
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
                     word_list = json.load(f)
 
-                existing_words = set(word.lower() for word in self.config.get("exclude_words", []))
-                new_words = set()
+                # 获取当前配置中的过滤词（保留原有）
+                current_exclude_words = set(self.config.get("exclude_words", []))
 
+                # 从文件中提取新单词
+                new_words = set()
                 for item in word_list:
                     word = item.get("Word", "").strip().lower()
                     if word:
                         new_words.add(word)
 
-                # 合并现有和新单词
-                all_words = existing_words.union(new_words)
+                # 合并：保留原有 + 添加新单词
+                all_words = current_exclude_words.union(new_words)
 
                 # 更新配置
                 self.config["exclude_words"] = list(all_words)
@@ -176,7 +178,7 @@ class WordSplitterApp:
                 self.exclude_text.delete("1.0", tk.END)
                 self.exclude_text.insert("1.0", exclude_str)
 
-                self.log(f"从文件中读取到 {len(new_words)} 个单词，已添加到过滤词中")
+                self.log(f"从文件中读取到 {len(new_words)} 个新单词，已合并到过滤词中（总计: {len(all_words)} 个）")
 
             except Exception as e:
                 error_msg = f"读取文件中的单词失败: {e}"

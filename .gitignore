@@ -29,6 +29,7 @@ public/version.md
 .env.prod.copy
 vue.config.js
 完工报告.md
-/py/other/json/*
+/py/other/json/chinese_translator_config.json
+/py/other/json/md_translator_config.json
 /py/yarward/build/*
 /py/yarward/dist/*
