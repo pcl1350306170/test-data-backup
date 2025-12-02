@@ -3,5 +3,5 @@
   "hotkey": "ctrl+shift+alt+j",
   "gif_loop": 0,
   "quality": 0.5,
-  "auto_open_dir": false
+  "auto_open_dir": true
 }
