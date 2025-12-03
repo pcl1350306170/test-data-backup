@@ -1,3 +1,5 @@
+# file_mover.pyw
+
 import os
 import shutil
 import json
@@ -37,7 +39,8 @@ class FileMoverApp:
         # 初始化变量
         self.source_dir = tk.StringVar()
         self.target_dir = tk.StringVar()
-        self.project_dir = tk.StringVar()  # 项目目录变量
+        self.keyword = tk.StringVar()  # 新增：移动关键字
+        self.project_dir = tk.StringVar()
         self.is_moving = False
 
         # 创建UI
@@ -66,6 +69,10 @@ class FileMoverApp:
         ttk.Entry(dir_frame, textvariable=self.target_dir, width=50).grid(row=1, column=1, padx=5, pady=10, sticky=tk.EW)
         ttk.Button(dir_frame, text="浏览...", command=self._select_target_dir).grid(row=1, column=2, padx=5, pady=10)
 
+        # 移动关键字（新增）
+        ttk.Label(dir_frame, text="移动关键字:").grid(row=2, column=0, padx=5, pady=10, sticky=tk.W)
+        ttk.Entry(dir_frame, textvariable=self.keyword, width=50).grid(row=2, column=1, padx=5, pady=10, sticky=tk.EW)
+        ttk.Label(dir_frame, text="(留空则移动所有文件)", font=("微软雅黑", 8)).grid(row=2, column=2, padx=5, pady=10, sticky=tk.W)
 
         dir_frame.columnconfigure(1, weight=1)
 
@@ -100,17 +107,11 @@ class FileMoverApp:
             self.target_dir.set(dir_path)
             self._log(f"已选择目标目录: {dir_path}")
 
-    def _select_project_dir(self):
-        """选择项目目录"""
-        dir_path = filedialog.askdirectory(title="选择需要打包的项目目录")
-        if dir_path:
-            self.project_dir.set(dir_path)
-            self._log(f"已选择项目目录: {dir_path}")
-
     def _start_move(self):
         """开始移动文件（在新线程中执行，避免UI卡顿）"""
         source = self.source_dir.get().strip()
         target = self.target_dir.get().strip()
+        keyword = self.keyword.get().strip()  # 获取关键字
 
         # 验证目录
         if not source:
@@ -124,18 +125,25 @@ class FileMoverApp:
             return
 
         # 确认移动
-        if not messagebox.askyesno("确认", f"确定要将\n{source}\n中的所有内容移动到\n{target}\n吗？"):
+        confirm_msg = f"确定要将\n{source}\n中的"
+        if keyword:
+            confirm_msg += f"包含关键字 '{keyword}' 的"
+        else:
+            confirm_msg += "所有"
+        confirm_msg += f"文件移动到\n{target}\n吗？"
+
+        if not messagebox.askyesno("确认", confirm_msg):
             return
 
         # 开始移动
         self.is_moving = True
         self.move_btn.config(state=tk.DISABLED)
-        self._log("开始移动文件...")
+        self._log(f"开始移动文件... (关键字: '{keyword}' 为空则移动全部)")
 
         # 在新线程中执行移动操作
-        threading.Thread(target=self._move_files, args=(source, target), daemon=True).start()
+        threading.Thread(target=self._move_files, args=(source, target, keyword), daemon=True).start()
 
-    def _move_files(self, source, target):
+    def _move_files(self, source, target, keyword):
         """执行文件移动（保留目录结构）"""
         try:
             # 确保目标目录存在
@@ -144,7 +152,9 @@ class FileMoverApp:
             # 统计文件总数
             total_files = 0
             for root, _, files in os.walk(source):
-                total_files += len(files)
+                for file in files:
+                    if not keyword or keyword in file:  # 检查关键字
+                        total_files += 1
 
             moved_files = 0
             error_files = 0
@@ -158,6 +168,10 @@ class FileMoverApp:
 
                 # 移动文件
                 for file in files:
+                    # 检查是否匹配关键字（如果关键字为空则移动所有文件）
+                    if keyword and keyword not in file:
+                        continue
+
                     source_file = os.path.join(root, file)
                     target_file = os.path.join(target_subdir, file)
 
@@ -168,7 +182,7 @@ class FileMoverApp:
                         continue
 
                     try:
-                        shutil.move(source_file, target_file)
+                        shutil.move(source_file, target_file)  # shutil.move 自动处理跨磁盘移动
                         moved_files += 1
                         self._log(f"已移动: {source_file} → {target_file}")
                     except Exception as e:
@@ -224,6 +238,7 @@ class FileMoverApp:
         config = {
             "source_dir": self.source_dir.get(),
             "target_dir": self.target_dir.get(),
+            "keyword": self.keyword.get(),  # 保存关键字
             "project_dir": self.project_dir.get()
         }
 
@@ -247,6 +262,8 @@ class FileMoverApp:
                     self.source_dir.set(config["source_dir"])
                 if "target_dir" in config:
                     self.target_dir.set(config["target_dir"])
+                if "keyword" in config:  # 加载关键字
+                    self.keyword.set(config["keyword"])
                 if "project_dir" in config:
                     self.project_dir.set(config["project_dir"])
 

@@ -1,8 +1,11 @@
+# group_files_by_num.pyw
+
 import os
 import shutil
 from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
+from tkinter import filedialog  # ← 修复：导入 filedialog
 import time
 
 class FileGrouperApp:
@@ -66,7 +69,7 @@ class FileGrouperApp:
 
     def browse_dir(self):
         """浏览选择根目录"""
-        dir_path = tk.filedialog.askdirectory(title="选择根目录")
+        dir_path = filedialog.askdirectory(title="选择根目录")  # ← 修复：直接使用 filedialog
         if dir_path:
             self.dir_var.set(dir_path)
 
