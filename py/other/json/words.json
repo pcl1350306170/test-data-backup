@@ -1,370 +1,289 @@
 [
   {
-    "Word": "Extends",
-    "Phonetic": "英 [ɪkˈstendz]，美 [ɪkˈstendz]",
-    "Meaning": "v. 扩展；延伸；扩大（extend 的第三人称单数）；继承（用于 Java 等编程语言中，表示类的继承关系）",
-    "Example": "A subclass extends its superclass to inherit and add new features.",
-    "ExampleTranslator": "子类通过继承父类来获取并添加新的功能。",
+    "Word": "write",
+    "Phonetic": "英 [raɪt]，美 [raɪt]",
+    "Meaning": "v. 编写；书写；写作；记录；撰写（代码、文档等）",
+    "Example": "Developers need to write clean and readable code for better maintainability.",
+    "ExampleTranslator": "开发者需要编写清晰易读的代码以提高可维护性。",
     "Audio": "",
     "ExampleAudio": ""
   },
   {
-    "Word": "programming",
-    "Phonetic": "英 [ˈprəʊɡræmɪŋ]，美 [ˈproʊɡræmɪŋ]",
-    "Meaning": "n. 编程；程序设计；v. 编写程序（program 的现在分词）",
-    "Example": "She is learning programming to develop her own mobile applications.",
-    "ExampleTranslator": "她正在学习编程，以便开发自己的移动应用程序。",
+    "Word": "unit",
+    "Phonetic": "英 [ˈjuːnɪt]，美 [ˈjuːnɪt]",
+    "Meaning": "n. 单元；单位；组件；（代码中的）单元模块",
+    "Example": "A unit test focuses on verifying the functionality of a single code unit.",
+    "ExampleTranslator": "单元测试专注于验证单个代码单元的功能。",
     "Audio": "",
     "ExampleAudio": ""
   },
   {
-    "Word": "model",
-    "Phonetic": "英 [ˈmɒdl]，美 [ˈmɑːdl]",
-    "Meaning": "n. 模型；模式；样式；v. 做模型；模仿；adj. 模范的；作模型用的（在编程中常指数据模型、设计模型等）",
-    "Example": "The data model defines how information is structured in the database.",
-    "ExampleTranslator": "数据模型定义了信息在数据库中的结构化方式。",
+    "Word": "test",
+    "Phonetic": "英 [test]，美 [test]",
+    "Meaning": "n. 测试；试验；检验 v. 测试；检验；考验（代码、系统等）",
+    "Example": "Running automated tests regularly can help detect bugs early in the development cycle.",
+    "ExampleTranslator": "定期运行自动化测试有助于在开发周期早期发现漏洞。",
     "Audio": "",
     "ExampleAudio": ""
   },
   {
-    "Word": "support",
-    "Phonetic": "英 [səˈpɔːt]，美 [səˈpɔːrt]",
-    "Meaning": "v. 支持；支撑；资助；n. 支持；支撑；支持物（在技术领域指对某种功能、协议等的兼容支持）",
-    "Example": "This software supports multiple operating systems, including Windows and macOS.",
-    "ExampleTranslator": "这款软件支持多种操作系统，包括 Windows 和 macOS。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "well",
-    "Phonetic": "英 [wel]，美 [wel]",
-    "Meaning": "adv. 很好地；充分地；满意地；n. 井；源泉；adj. 健康的；良好的",
-    "Example": "The code is well - structured and easy to understand.",
-    "ExampleTranslator": "这段代码结构良好，易于理解。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "known",
-    "Phonetic": "英 [nəʊn]，美 [noʊn]",
-    "Meaning": "adj. 已知的；知名的；大家知道的；v. 知道（know 的过去分词）",
-    "Example": "This is a well - known algorithm used in data compression.",
-    "ExampleTranslator": "这是一种在数据压缩中使用的知名算法。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "Enterprise",
-    "Phonetic": "英 [ˈentəpraɪz]，美 [ˈentərpraɪz]",
-    "Meaning": "n. 企业；事业；进取心；事业心（常指大型企业或企业级的）",
-    "Example": "Enterprise software is designed to meet the needs of large organizations.",
-    "ExampleTranslator": "企业级软件旨在满足大型组织的需求。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "Integration",
-    "Phonetic": "英 [ˌɪntɪˈɡreɪʃn]，美 [ˌɪntɪˈɡreɪʃn]",
-    "Meaning": "n. 集成；综合；融合（在计算机领域指不同系统、组件等的整合）",
-    "Example": "The integration of these two systems will improve work efficiency.",
-    "ExampleTranslator": "这两个系统的集成将提高工作效率。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "Patterns",
-    "Phonetic": "英 [ˈpætnz]，美 [ˈpætərnz]",
-    "Meaning": "n. 模式；图案；样式（pattern 的复数）；v. 模仿；以图案装饰（pattern 的第三人称单数）（在编程中常指设计模式）",
-    "Example": "Design patterns provide solutions to common software design problems.",
-    "ExampleTranslator": "设计模式为常见的软件设计问题提供了解决方案。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "enables",
-    "Phonetic": "英 [ɪˈneɪblz]，美 [ɪˈneɪblz]",
-    "Meaning": "v. 使能够；使可能；授权（enable 的第三人称单数）",
-    "Example": "This new technology enables faster data transmission.",
-    "ExampleTranslator": "这项新技术使更快的数据传输成为可能。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "lightweight",
-    "Phonetic": "英 [ˈlaɪtweɪt]，美 [ˈlaɪtweɪt]",
-    "Meaning": "adj. 轻量的；轻型的；不重要的；n. 轻量级选手；无足轻重的人或物（在软件领域指轻量级的框架、工具等）",
-    "Example": "This lightweight framework is easy to deploy and use.",
-    "ExampleTranslator": "这个轻量级框架易于部署和使用。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "messaging",
-    "Phonetic": "英 [ˈmesɪdʒɪŋ]，美 [ˈmesɪdʒɪŋ]",
-    "Meaning": "n. 消息传递；信息发送；v. 发送消息（message 的现在分词）",
-    "Example": "Instant messaging allows real - time communication between users.",
-    "ExampleTranslator": "即时消息传递允许用户之间进行实时通信。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "within",
-    "Phonetic": "英 [wɪˈðɪn]，美 [wɪˈðɪn]",
-    "Meaning": "prep. 在……之内；在……里面；adv. 在内部；在里面",
-    "Example": "All operations must be completed within the specified time limit.",
-    "ExampleTranslator": "所有操作必须在规定的时间限制内完成。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "supports",
-    "Phonetic": "英 [səˈpɔːts]，美 [səˈpɔːrts]",
-    "Meaning": "v. 支持；支撑；维持（support 的第三人称单数）；n. 支持；支撑物（support 的复数）",
-    "Example": "The new version of the software supports more file formats.",
-    "ExampleTranslator": "这个软件的新版本支持更多的文件格式。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "external",
-    "Phonetic": "英 [ɪkˈstɜːnl]，美 [ɪkˈstɜːrnl]",
-    "Meaning": "adj. 外部的；外面的；外在的；n. 外部；外观；外部情况",
-    "Example": "The system needs to interact with external data sources.",
-    "ExampleTranslator": "该系统需要与外部数据源进行交互。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "systems",
-    "Phonetic": "英 [ˈsɪstəmz]，美 [ˈsɪstəmz]",
-    "Meaning": "n. 系统；体系；制度（system 的复数）",
-    "Example": "Computer systems have revolutionized the way we work.",
-    "ExampleTranslator": "计算机系统彻底改变了我们的工作方式。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "via",
-    "Phonetic": "英 [ˈvaɪə]，美 [ˈvaɪə]",
-    "Meaning": "prep. 经由；通过；凭借",
-    "Example": "Data is transmitted from the server to the client via the network.",
-    "ExampleTranslator": "数据通过网络从服务器传输到客户端。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "declarative",
-    "Phonetic": "英 [dɪˈklærətɪv]，美 [dɪˈklærətɪv]",
-    "Meaning": "adj. 说明的；陈述的（在编程中指声明式编程，关注做什么而不是怎么做）",
-    "Example": "SQL is a declarative language used for managing databases.",
-    "ExampleTranslator": "SQL 是一种用于管理数据库的声明式语言。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "adapters",
-    "Phonetic": "英 [əˈdæptəz]，美 [əˈdæptərz]",
-    "Meaning": "n. 适配器；改编者（adapter 的复数）（在技术领域指用于连接不同设备或系统的适配器）",
-    "Example": "These adapters allow different types of connectors to work together.",
-    "ExampleTranslator": "这些适配器使不同类型的连接器能够一起工作。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "Those",
-    "Phonetic": "英 [ðəʊz]，美 [ðoʊz]",
-    "Meaning": "pron. 那些（that 的复数）；adj. 那些的",
-    "Example": "Those functions are essential for the program to run correctly.",
-    "ExampleTranslator": "那些函数对于程序的正确运行是必不可少的。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "provide",
-    "Phonetic": "英 [prəˈvaɪd]，美 [prəˈvaɪd]",
-    "Meaning": "v. 提供；供应；给予；规定",
-    "Example": "The library can provide various tools for data processing.",
-    "ExampleTranslator": "这个库可以提供各种数据处理工具。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "higher",
-    "Phonetic": "英 [ˈhaɪə(r)]，美 [ˈhaɪər]",
-    "Meaning": "adj. 更高的；较高的（high 的比较级）；adv. 更高地；在更高处",
-    "Example": "Higher - level programming languages are easier to learn than machine language.",
-    "ExampleTranslator": "高级编程语言比机器语言更容易学习。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "level",
-    "Phonetic": "英 [ˈlevl]，美 [ˈlevl]",
-    "Meaning": "n. 水平；级别；层次；v. 使平坦；使同等；adj. 水平的；平坦的；同高度的",
-    "Example": "This algorithm operates at a lower level of abstraction.",
-    "ExampleTranslator": "这种算法在较低的抽象级别上运行。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "abstraction",
-    "Phonetic": "英 [æbˈstrækʃn]，美 [æbˈstrækʃn]",
-    "Meaning": "n. 抽象；抽象概念；提取；抽象化（在编程中指对复杂事物的简化表示）",
-    "Example": "Object - oriented programming uses abstraction to model real - world entities.",
-    "ExampleTranslator": "面向对象编程使用抽象来建模现实世界的实体。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "over",
-    "Phonetic": "英 [ˈəʊvə(r)]，美 [ˈoʊvər]",
-    "Meaning": "prep. 在……上方；越过；关于；adv. 结束；越过；翻转；adj. 结束的；上面的",
-    "Example": "The function provides a layer of security over the data.",
-    "ExampleTranslator": "该函数为数据提供了一层安全保障。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "remoting",
-    "Phonetic": "英 [rɪˈməʊtɪŋ]，美 [rɪˈmoʊtɪŋ]",
-    "Meaning": "n. 远程处理；远程操作（指通过网络对远程计算机或资源进行操作）",
-    "Example": "Remoting allows users to access files on a distant server.",
-    "ExampleTranslator": "远程处理允许用户访问远程服务器上的文件。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "scheduling",
-    "Phonetic": "英 [ˈʃedjuːlɪŋ]，美 [ˈskedjuːlɪŋ]",
-    "Meaning": "n. 调度；排程；安排；v. 安排；为……制定时间表（schedule 的现在分词）",
-    "Example": "Task scheduling ensures that processes run in an orderly manner.",
-    "ExampleTranslator": "任务调度确保进程有序运行。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "primary",
-    "Phonetic": "英 [ˈpraɪməri]，美 [ˈpraɪmeri]",
-    "Meaning": "adj. 主要的；初级的；基本的；n. 原色；最主要者",
-    "Example": "The primary goal of this project is to improve performance.",
-    "ExampleTranslator": "这个项目的主要目标是提高性能。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "goal",
-    "Phonetic": "英 [ɡəʊl]，美 [ɡoʊl]",
-    "Meaning": "n. 目标；球门；终点；v. 攻门；射门得分",
-    "Example": "Writing clean code is an important goal for every programmer.",
-    "ExampleTranslator": "编写整洁的代码是每个程序员的重要目标。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "simple",
-    "Phonetic": "英 [ˈsɪmpl]，美 [ˈsɪmpl]",
-    "Meaning": "adj. 简单的；单纯的；天真的；n. 笨蛋；愚蠢的行为",
-    "Example": "A simple solution is often better than a complex one.",
-    "ExampleTranslator": "简单的解决方案往往比复杂的更好。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "building",
-    "Phonetic": "英 [ˈbɪldɪŋ]，美 [ˈbɪldɪŋ]",
-    "Meaning": "n. 建筑；建筑物；v. 建造；建立；发展（build 的现在分词）（在编程中指构建软件、系统等）",
-    "Example": "Building scalable applications requires careful planning.",
-    "ExampleTranslator": "构建可扩展的应用程序需要周密的计划。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "solutions",
-    "Phonetic": "英 [səˈluːʃnz]，美 [səˈluːʃnz]",
-    "Meaning": "n. 解决方案；解答；解决办法（solution 的复数）",
-    "Example": "The company offers various software solutions for business needs.",
-    "ExampleTranslator": "该公司为商业需求提供各种软件解决方案。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "while",
-    "Phonetic": "英 [waɪl]，美 [waɪl]",
-    "Meaning": "conj. 当……的时候；虽然；然而；n. 一段时间；v. 消磨",
-    "Example": "The loop runs while the condition is true.",
-    "ExampleTranslator": "当条件为真时，循环运行。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "maintaining",
-    "Phonetic": "英 [meɪnˈteɪnɪŋ]，美 [meɪnˈteɪnɪŋ]",
-    "Meaning": "v. 维持；保持；维修；主张（maintain 的现在分词）",
-    "Example": "Maintaining code quality is crucial for long - term projects.",
-    "ExampleTranslator": "对于长期项目来说，保持代码质量至关重要。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "separation",
-    "Phonetic": "英 [ˌsepəˈreɪʃn]，美 [ˌsepəˈreɪʃn]",
-    "Meaning": "n. 分离；分开；间隔；分隔物（在编程中常指关注点分离等原则）",
-    "Example": "Separation of concerns makes the code easier to maintain.",
-    "ExampleTranslator": "关注点分离使代码更易于维护。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "concerns",
-    "Phonetic": "英 [kənˈsɜːnz]，美 [kənˈsɜːrnz]",
-    "Meaning": "n. 关注点；关心的事；忧虑（concern 的复数）；v. 涉及；使担忧；关心（concern 的第三人称单数）",
-    "Example": "In software design, different modules handle different concerns.",
-    "ExampleTranslator": "在软件设计中，不同的模块处理不同的关注点。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "essential",
-    "Phonetic": "英 [ɪˈsenʃl]，美 [ɪˈsenʃl]",
-    "Meaning": "adj. 基本的；必要的；本质的；精华的；n. 本质；要素；要点",
-    "Example": "Understanding data structures is essential for programming.",
-    "ExampleTranslator": "理解数据结构对于编程来说是必不可少的。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "producing",
-    "Phonetic": "英 [prəˈdjuːsɪŋ]，美 [prəˈduːsɪŋ]",
-    "Meaning": "v. 生产；产生；制作；创作（produce 的现在分词）",
-    "Example": "The compiler is responsible for producing executable code from source code.",
-    "ExampleTranslator": "编译器负责从源代码生成可执行代码。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "maintainable",
-    "Phonetic": "英 [meɪnˈteɪnəbl]，美 [meɪnˈteɪnəbl]",
-    "Meaning": "adj. 可维持的；可维护的；可保养的（在编程中指代码易于维护）",
-    "Example": "Writing comments can make code more maintainable.",
-    "ExampleTranslator": "编写注释可以使代码更易于维护。",
-    "Audio": "",
-    "ExampleAudio": ""
-  },
-  {
-    "Word": "testable",
-    "Phonetic": "英 [ˈtestəbl]，美 [ˈtestəbl]",
-    "Meaning": "adj. 可测试的；能验证的（指软件、代码等可以通过测试来检验其正确性）",
-    "Example": "Modular design makes the code more testable.",
-    "ExampleTranslator": "模块化设计使代码更具可测试性。",
+    "Word": "before",
+    "Phonetic": "英 [bɪˈfɔː(r)]，美 [bɪˈfɔːr]",
+    "Meaning": "prep. 在……之前；先于 adv. 以前；先前 conj. 在……之前",
+    "Example": "You should compile the code before executing it to check for syntax errors.",
+    "ExampleTranslator": "在执行代码之前，你应该先编译它以检查语法错误。",
     "Audio": "",
     "ExampleAudio": ""
   },
   {
     "Word": "code",
     "Phonetic": "英 [kəʊd]，美 [koʊd]",
-    "Meaning": "n. 代码；密码；编码；法典；v. 编码；译成密码",
-    "Example": "He spent hours writing and debugging the code.",
-    "ExampleTranslator": "他花了几个小时编写和调试代码。",
+    "Meaning": "n. 代码；编码；程序代码 v. 编码；编写代码",
+    "Example": "Writing efficient code is essential for improving software performance.",
+    "ExampleTranslator": "编写高效的代码对于提升软件性能至关重要。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "crucial",
+    "Phonetic": "英 [ˈkruːʃl]，美 [ˈkruːʃl]",
+    "Meaning": "adj. 至关重要的；决定性的；关键的（用于描述技术环节、步骤等）",
+    "Example": "Data validation is a crucial step in preventing invalid inputs from crashing the system.",
+    "ExampleTranslator": "数据验证是防止无效输入导致系统崩溃的关键步骤。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "behavior",
+    "Phonetic": "英 [bɪˈheɪvjə(r)]，美 [bɪˈheɪvjər]",
+    "Meaning": "n. 行为；举止；（软件、系统的）运行行为；特性",
+    "Example": "Writing unit tests before coding is a crucial behavior for ensuring code quality.",
+    "ExampleTranslator": "（编码前写单元测试是保障代码质量的关键行为。）\n记忆点：谐音“必行为”，联想“技术开发中，规范的行为（Behavior）必能提升效率”。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "ensure",
+    "Phonetic": "英 [ɪnˈʃʊə(r)]，美 [ɪnˈʃʊr]",
+    "Meaning": "v. 确保；保证；担保（使系统、流程等达到预期效果）",
+    "Example": "Proper error handling ensures the application can recover from unexpected failures.",
+    "ExampleTranslator": "适当的错误处理确保应用程序能够从意外故障中恢复。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "quality",
+    "Phonetic": "英 [ˈkwɒləti]，美 [ˈkwɑːləti]",
+    "Meaning": "n. 质量；品质；（软件的）质量；性能",
+    "Example": "Code reviews play a vital role in maintaining high software quality standards.",
+    "ExampleTranslator": "代码审查在维持高软件质量标准方面起着至关重要的作用。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "motivation",
+    "Phonetic": "英 [ˌməʊtɪˈveɪʃn]，美 [ˌmoʊtɪˈveɪʃn]",
+    "Meaning": "n. 动机；动力；诱因（推动技术优化、创新的因素）",
+    "Example": "The motivation to optimize the algorithm comes from the need to reduce system response time.",
+    "ExampleTranslator": "（优化算法的动机源于降低系统响应时间的需求。）\n记忆点：词根“mot-”表“移动”，联想“有了动机（Motivation），才会主动推动（move）技术优化”。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "optimize",
+    "Phonetic": "英 [ˈɒptɪmaɪz]，美 [ˈɑːptɪmaɪz]",
+    "Meaning": "v. 使最优化；优化（算法、系统、代码等）；充分利用资源",
+    "Example": "Developers often optimize database queries to reduce execution time.",
+    "ExampleTranslator": "开发者经常优化数据库查询以减少执行时间。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "algorithm",
+    "Phonetic": "英 [ˈælɡərɪðəm]，美 [ˈælɡərɪðəm]",
+    "Meaning": "n. 算法；计算程序；解决问题的步骤流程",
+    "Example": "The sorting algorithm significantly affects the efficiency of data processing.",
+    "ExampleTranslator": "排序算法对数据处理的效率有显著影响。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "come",
+    "Phonetic": "英 [kʌm]，美 [kʌm]",
+    "Meaning": "v. 来；来到；出现；产生（结果、效果等）",
+    "Example": "Most software vulnerabilities come from improper input validation.",
+    "ExampleTranslator": "大多数软件漏洞源于不恰当的输入验证。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "reduce",
+    "Phonetic": "英 [rɪˈdjuːs]，美 [rɪˈduːs]",
+    "Meaning": "v. 减少；降低；缩小（成本、时间、复杂度等）",
+    "Example": "Caching frequently accessed data can reduce the load on the database server.",
+    "ExampleTranslator": "缓存频繁访问的数据可以减轻数据库服务器的负载。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "system",
+    "Phonetic": "英 [ˈsɪstəm]，美 [ˈsɪstəm]",
+    "Meaning": "n. 系统；体系；（计算机、软件）系统；制度",
+    "Example": "A distributed system consists of multiple interconnected computers working together.",
+    "ExampleTranslator": "分布式系统由多台相互连接的计算机协同工作组成。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "response",
+    "Phonetic": "英 [rɪˈspɒns]，美 [rɪˈspɑːns]",
+    "Meaning": "n. 反应；响应；（系统、程序的）响应；回答",
+    "Example": "The API's response time must be within 500 milliseconds for a smooth user experience.",
+    "ExampleTranslator": "为了流畅的用户体验，API 的响应时间必须在 500 毫秒以内。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "time",
+    "Phonetic": "英 [taɪm]，美 [taɪm]",
+    "Meaning": "n. 时间；时刻；（程序、操作的）时间；次数 v. 计时；定时",
+    "Example": "Measuring execution time helps identify performance bottlenecks in the code.",
+    "ExampleTranslator": "测量执行时间有助于识别代码中的性能瓶颈。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "proficiency",
+    "Phonetic": "英 [prəˈfɪʃnsi]，美 [prəˈfɪʃnsi]",
+    "Meaning": "n. 熟练；精通；娴熟（对技术、工具的掌握程度）",
+    "Example": "Proficiency in version control systems like Git is essential for collaborative development.",
+    "ExampleTranslator": "精通像 Git 这样的版本控制系统对于协作开发至关重要。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "cloud",
+    "Phonetic": "英 [klaʊd]，美 [klaʊd]",
+    "Meaning": "n. 云；云朵；（计算机）云（指云服务、云计算） v. 使模糊；笼罩",
+    "Example": "Cloud computing allows users to access resources and services over the internet.",
+    "ExampleTranslator": "云计算允许用户通过互联网访问资源和服务。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "compute",
+    "Phonetic": "英 [kəmˈpjuːt]，美 [kəmˈpjuːt]",
+    "Meaning": "v. 计算；估算；运算 n. 计算；估计",
+    "Example": "Modern GPUs are designed to compute complex mathematical operations efficiently.",
+    "ExampleTranslator": "现代 GPU 旨在高效地计算复杂的数学运算。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "tool",
+    "Phonetic": "英 [tuːl]，美 [tuːl]",
+    "Meaning": "n. 工具；用具；（开发、设计用的）工具软件 v. 使用工具；用工具加工",
+    "Example": "Debugging tools help developers identify and fix errors in their code.",
+    "ExampleTranslator": "调试工具帮助开发者识别并修复代码中的错误。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "improve",
+    "Phonetic": "英 [ɪmˈpruːv]，美 [ɪmˈpruːv]",
+    "Meaning": "v. 改善；提高；改进（性能、效率、质量等）",
+    "Example": "Refactoring code regularly can improve its readability and maintainability.",
+    "ExampleTranslator": "定期重构代码可以提高其可读性和可维护性。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "your",
+    "Phonetic": "英 [jɔː(r)]，美 [jʊr]",
+    "Meaning": "pron. 你的；你们的（用于指代开发者、用户等的所属关系）",
+    "Example": "Your choice of programming language depends on the project's specific requirements.",
+    "ExampleTranslator": "你对编程语言的选择取决于项目的具体需求。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "ability",
+    "Phonetic": "英 [əˈbɪləti]，美 [əˈbɪləti]",
+    "Meaning": "n. 能力；才能；（系统、工具的）功能；性能",
+    "Example": "Proficiency in cloud computing tools improves your ability to deploy applications quickly.",
+    "ExampleTranslator": "（熟练使用云计算工具能提升你快速部署应用的能力。）\n记忆点：谐音“爱比利”，联想“开发者都爱（爱）提升自己的技术能力（Ability），比（比）别人更优秀”。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "deploy",
+    "Phonetic": "英 [dɪˈplɔɪ]，美 [dɪˈplɔɪ]",
+    "Meaning": "v. 部署；调度；配置（软件、应用、服务等）",
+    "Example": "DevOps teams use CI/CD pipelines to deploy applications automatically to production.",
+    "ExampleTranslator": "DevOps 团队使用 CI/CD 流水线将应用程序自动部署到生产环境。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "quickly",
+    "Phonetic": "英 [ˈkwɪkli]，美 [ˈkwɪkli]",
+    "Meaning": "adv. 迅速地；快速地；立即（描述操作、响应的速度）",
+    "Example": "The application must process user requests quickly to maintain a good user experience.",
+    "ExampleTranslator": "应用程序必须快速处理用户请求以保持良好的用户体验。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "IDE",
+    "Phonetic": "英 [ˌaɪ diː ˈiː]，美 [ˌaɪ diː ˈiː]",
+    "Meaning": "abbr. 集成开发环境（Integrated Development Environment），用于编写、调试和运行代码的软件",
+    "Example": "A good IDE provides features like code completion and syntax highlighting to boost productivity.",
+    "ExampleTranslator": "优秀的集成开发环境提供代码补全和语法高亮等功能，以提高开发效率。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "will",
+    "Phonetic": "英 [wɪl]，美 [wɪl]",
+    "Meaning": "modal v. 将；会；愿意（用于描述程序、系统的未来动作） n. 意志；决心",
+    "Example": "The compiler will generate an error message if there are syntax issues in the code.",
+    "ExampleTranslator": "如果代码中存在语法问题，编译器将会生成错误消息。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "prompt",
+    "Phonetic": "英 [prɒmpt]，美 [prɑːmpt]",
+    "Meaning": "v. 促使；提示；鼓励（系统、程序的提示行为） adj. 迅速的 n. 提示；提示符",
+    "Example": "The IDE will prompt you to save the file before closing the project.",
+    "ExampleTranslator": "（关闭项目前，集成开发环境会提示你保存文件。）\n记忆点：谐音“普朗特”，联想“开发时，系统的提示（Prompt）能帮你避免忘记关键操作，就像贴心的助手”。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "save",
+    "Phonetic": "英 [seɪv]，美 [seɪv]",
+    "Meaning": "v. 保存；存储；节省；挽救（数据、文件、状态等）",
+    "Example": "Always save your work regularly to prevent data loss in case of a system crash.",
+    "ExampleTranslator": "务必定期保存工作内容，以防止系统崩溃时的数据丢失。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "file",
+    "Phonetic": "英 [faɪl]，美 [faɪl]",
+    "Meaning": "n. 文件；档案；文件夹；（计算机中的）文件 v. 归档；保存；锉",
+    "Example": "A configuration file stores settings that control the behavior of an application.",
+    "ExampleTranslator": "配置文件存储控制应用程序行为的设置。",
+    "Audio": "",
+    "ExampleAudio": ""
+  },
+  {
+    "Word": "close",
+    "Phonetic": "英 [kləʊz]，美 [kloʊz]",
+    "Meaning": "v. 关闭；结束；合上；停止运行（程序、文件、项目等） adj. 接近的 adv. 紧密地",
+    "Example": "Make sure to close all database connections after completing the transaction.",
+    "ExampleTranslator": "完成事务后，确保关闭所有数据库连接。",
     "Audio": "",
     "ExampleAudio": ""
   }

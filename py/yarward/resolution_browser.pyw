@@ -1,4 +1,4 @@
-# resolution_browser.py
+# resolution_browser.pyw
 
 import sys
 import json
@@ -31,7 +31,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(PROCESS_LOG_FILE, encoding='utf-8'),
-        logging.StreamHandler(sys.stdout)
+        logging.StreamHandler(sys.stdout)  # 保留控制台输出（运行时可见）
     ]
 )
 logger = logging.getLogger(__name__)
@@ -69,11 +69,15 @@ def load_config():
 
 def save_config(config):
     try:
-        with open(CONFIG_PATH, 'w', encoding=' utf-8') as f:
+        with open(CONFIG_PATH, 'w', encoding='utf-8') as f:  # 修复：移除多余空格
             json.dump(config, f, indent=2, ensure_ascii=False)
         logger.info("配置已保存")
     except Exception as e:
         logger.error(f"配置保存失败: {e}")
+        # 在 .pyw 中，弹窗是唯一可见的错误提示
+        app = QApplication.instance()
+        if app is None:
+            app = QApplication(sys.argv)
         QMessageBox.critical(None, "错误", f"无法保存配置：{e}")
 
 # ========================
