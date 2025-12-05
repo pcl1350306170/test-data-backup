@@ -250,8 +250,10 @@ class WordSplitterApp:
                     "Meaning": "",
                     "Example": "",
                     "ExampleTranslator": "",
+                    "AIHelp": "",
                     "Audio": "",
-                    "ExampleAudio": ""
+                    "ExampleAudio": "",
+                    "imgExample": ""
                 }
                 word_list.append(new_entry)
                 existing_words.add(lower_word)

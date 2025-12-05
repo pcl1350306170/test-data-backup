@@ -1,0 +1,1853 @@
+[
+  {
+    "Word": "excitement",
+    "Phonetic": "英 [ɪkˈsaɪtmənt]，美 [ɪkˈsaɪtmənt]",
+    "Meaning": "n. 兴奋；激动；刺激",
+    "Example": "The programmer felt great excitement when the long-awaited code finally compiled successfully.",
+    "ExampleTranslator": "当期待已久的代码终于成功编译时，程序员感到非常兴奋。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：ex-（出）+ cite（引用；激发）+ -ment（名词后缀）→ 被激发出来的情绪 → 兴奋。</p><p><strong>场景记忆</strong>：想象调试了一天的bug终于解决，那种兴奋（excitement）的感觉。</p>"
+  },
+  {
+    "Word": "pencil",
+    "Phonetic": "英 [ˈpensl]，美 [ˈpensl]",
+    "Meaning": "n. 铅笔；v. 用铅笔写（或画）",
+    "Example": "Before writing actual code, many programmers sketch algorithms with a pencil on paper.",
+    "ExampleTranslator": "在编写实际代码之前，许多程序员会用铅笔在纸上勾勒算法。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“喷手”→ 铅笔（pencil）用久了需要削，削的时候会有木屑喷到手上。</p><p><strong>场景记忆</strong>：程序员在白板上用铅笔（pencil）临时记录代码思路。</p>"
+  },
+  {
+    "Word": "skirt",
+    "Phonetic": "英 [skɜːt]，美 [skɜːrt]",
+    "Meaning": "n. 裙子；v. 绕过；回避",
+    "Example": "The developer tried to skirt around the complex logic by using a third-party library.",
+    "ExampleTranslator": "开发者试图通过使用第三方库来绕过复杂的逻辑。",
+    "AIHelp": "<p><strong>对比近义词</strong>：skirt（回避）与avoid（避免），skirt更侧重于巧妙地绕过，如程序员 skirt 复杂代码逻辑。</p><p><strong>造句强化</strong>：When facing tricky bugs, some programmers tend to skirt them temporarily.（遇到棘手的bug时，有些程序员倾向于暂时回避它们。）</p>"
+  },
+  {
+    "Word": "pick",
+    "Phonetic": "英 [pɪk]，美 [pɪk]",
+    "Meaning": "v. 挑选；采摘；n. 选择；精华",
+    "Example": "Developers need to pick the right framework for their project to ensure efficiency.",
+    "ExampleTranslator": "开发者需要为他们的项目挑选合适的框架以确保效率。",
+    "AIHelp": "<p><strong>说明</strong>：picked 是 pick 的过去式和过去分词。</p><p><strong>词根联想</strong>：pick 本身有“挑选”之意，可联想在众多编程语言中 pick 出最适合的一种。</p><p><strong>场景记忆</strong>：在IDE中 pick 一个代码模板快速开始编程。</p>"
+  },
+  {
+    "Word": "stalk",
+    "Phonetic": "英 [stɔːk]，美 [stɔːk]",
+    "Meaning": "n. 茎；秆；v. 偷偷接近；追踪",
+    "Example": "The hacker tried to stalk the user's online activities through the vulnerable system.",
+    "ExampleTranslator": "黑客试图通过有漏洞的系统追踪用户的在线活动。",
+    "AIHelp": "<p><strong>说明</strong>：stalks 是 stalk 的第三人称单数形式。</p><p><strong>谐音记忆</strong>：“死套壳”→ 像 stalk（追踪）一样死套着某个系统漏洞。</p><p><strong>对比近义词</strong>：stalk（追踪）与track（跟踪），stalk 带有偷偷摸摸的意味，如黑客 stalk 系统漏洞。</p>"
+  },
+  {
+    "Word": "far",
+    "Phonetic": "英 [fɑː(r)]，美 [fɑːr]",
+    "Meaning": "adv. 远；久远地；adj. 远的；遥远的",
+    "Example": "The performance of this algorithm is far better than the previous one in large data processing.",
+    "ExampleTranslator": "在大数据处理中，这种算法的性能远比上一种好。",
+    "AIHelp": "<p><strong>造句强化</strong>：The distance between the local server and the cloud is far, but data transmission is still fast.（本地服务器和云端距离很远，但数据传输仍然很快。）</p><p><strong>对比反义词</strong>：far（远的）与near（近的），如 far server 和 near server。</p>"
+  },
+  {
+    "Word": "put",
+    "Phonetic": "英 [pʊt]，美 [pʊt]",
+    "Meaning": "v. 放；安置；表达；写下",
+    "Example": "Remember to put a semicolon at the end of each statement in Java.",
+    "ExampleTranslator": "记住在Java中每个语句的末尾放一个分号。",
+    "AIHelp": "<p><strong>说明</strong>：putting 是 put 的现在分词形式。</p><p><strong>场景记忆</strong>：程序员在代码中 put 一个断点进行调试。</p><p><strong>词根联想</strong>：put 有“放置”之意，可联想在内存中 put 一个变量。</p>"
+  },
+  {
+    "Word": "seam",
+    "Phonetic": "英 [siːm]，美 [siːm]",
+    "Meaning": "n. 缝；接缝；v. 缝合；接合",
+    "Example": "The seamless integration of the two modules makes the software run more smoothly.",
+    "ExampleTranslator": "两个模块的无缝接合使软件运行得更顺畅。",
+    "AIHelp": "<p><strong>说明</strong>：seams 是 seam 的复数形式。</p><p><strong>词根联想</strong>：seam（接缝）可联想代码模块之间的“接缝”，即接口。</p><p><strong>场景记忆</strong>：优秀的代码架构中，模块之间的 seam 处理得很好，几乎无缝。</p>"
+  },
+  {
+    "Word": "ride",
+    "Phonetic": "英 [raɪd]，美 [raɪd]",
+    "Meaning": "v. 骑；乘；n. 骑；乘坐",
+    "Example": "Developers can ride the wave of new technologies to improve their coding skills.",
+    "ExampleTranslator": "开发者可以乘着新技术的浪潮来提高他们的编码技能。",
+    "AIHelp": "<p><strong>说明</strong>：ridden 是 ride 的过去分词形式。</p><p><strong>谐音记忆</strong>：“瑞德”→ 瑞德（ride）骑着马，可联想 ride 有“骑”的意思。</p><p><strong>造句强化</strong>：We can ride the cloud computing trend to develop more efficient applications.（我们可以乘着云计算的趋势开发更高效的应用程序。）</p>"
+  },
+  {
+    "Word": "crack",
+    "Phonetic": "英 [kræk]，美 [kræk]",
+    "Meaning": "v. 破裂；破解；n. 裂缝；裂痕",
+    "Example": "It took the security expert several hours to crack the encryption algorithm.",
+    "ExampleTranslator": "安全专家花了几个小时才破解这个加密算法。",
+    "AIHelp": "<p><strong>场景记忆</strong>：黑客试图 crack（破解）系统的密码。</p><p><strong>对比近义词</strong>：crack（破解）与break（打破；破解），crack 更侧重于破解密码、算法等，如 crack password。</p>"
+  },
+  {
+    "Word": "actually",
+    "Phonetic": "英 [ˈæktʃuəli]，美 [ˈæktʃuəli]",
+    "Meaning": "adv. 实际上；事实上",
+    "Example": "This function actually returns a boolean value instead of an integer as we thought.",
+    "ExampleTranslator": "这个函数实际上返回的是布尔值，而不是我们所想的整数。",
+    "AIHelp": "<p><strong>词根联想</strong>：actual（实际的）+ -ly（副词后缀）→ actually（实际上）。</p><p><strong>造句强化</strong>：Actually, this bug is caused by a wrong parameter passed to the function.（实际上，这个bug是由于传给函数的参数错误导致的。）</p>"
+  },
+  {
+    "Word": "bite",
+    "Phonetic": "英 [baɪt]，美 [baɪt]",
+    "Meaning": "v. 咬；叮咬；n. 咬；一口",
+    "Example": "The new programming language's syntax is easy to learn and won't bite even for beginners.",
+    "ExampleTranslator": "这种新编程语言的语法很容易学习，即使对初学者来说也不会“咬人”（即不难掌握）。",
+    "AIHelp": "<p><strong>说明</strong>：biting 是 bite 的现在分词形式。</p><p><strong>谐音记忆</strong>：“败特”→ 被虫子 bite（咬）了，感觉很败特（难受）。</p><p><strong>场景记忆</strong>：不要被复杂的代码吓倒，它们不会真的 bite（咬人）。</p>"
+  },
+  {
+    "Word": "lower",
+    "Phonetic": "英 [ˈləʊə(r)]，美 [ˈloʊər]",
+    "Meaning": "v. 降低；减少；adj. 较低的；下面的",
+    "Example": "We need to lower the memory usage of the application to run it on low-end devices.",
+    "ExampleTranslator": "我们需要降低应用程序的内存使用率，以便在低端设备上运行它。",
+    "AIHelp": "<p><strong>对比反义词</strong>：lower（降低）与raise（提高），如 lower CPU usage 和 raise CPU usage。</p><p><strong>造句强化</strong>：Developers try to lower the response time of the API to improve user experience.（开发者试图降低API的响应时间以提升用户体验。）</p>"
+  },
+  {
+    "Word": "shimmy",
+    "Phonetic": "英 [ˈʃɪmi]，美 [ˈʃɪmi]",
+    "Meaning": "v. 摇动；震颤；n. 摇动；西迷舞",
+    "Example": "The old server shimmies slightly when processing large amounts of data concurrently.",
+    "ExampleTranslator": "这台旧服务器在并发处理大量数据时会轻微震颤。",
+    "AIHelp": "<p><strong>说明</strong>：shimmying 是 shimmy 的现在分词形式。</p><p><strong>谐音记忆</strong>：“西米”→ 西米（shimmy）在碗里摇动，可联想 shimmy 有“摇动”之意。</p><p><strong>场景记忆</strong>：服务器负载过高时可能会 shimmy（震颤），像在抗议。</p>"
+  },
+  {
+    "Word": "ask",
+    "Phonetic": "英 [ɑːsk]，美 [æsk]",
+    "Meaning": "v. 问；询问；要求；请求",
+    "Example": "When stuck in coding, it's good to ask colleagues for help or check Stack Overflow.",
+    "ExampleTranslator": "当陷入编码困境时，向同事求助或查看Stack Overflow是个好办法。",
+    "AIHelp": "<p><strong>造句强化</strong>：New developers should not be afraid to ask questions about the project's architecture.（新开发者不应该害怕询问关于项目架构的问题。）</p><p><strong>场景记忆</strong>：在代码评审时，对不懂的地方要大胆 ask（询问）。</p>"
+  },
+  {
+    "Word": "run",
+    "Phonetic": "英 [rʌn]，美 [rʌn]",
+    "Meaning": "v. 跑；运行；经营；n. 奔跑；运行",
+    "Example": "Click the 'Run' button to execute the code and see the output in the console.",
+    "ExampleTranslator": "点击“运行”按钮来执行代码，并在控制台查看输出。",
+    "AIHelp": "<p><strong>说明</strong>：running 是 run 的现在分词形式。</p><p><strong>场景记忆</strong>：程序员每天都要 run（运行）代码来测试功能。</p><p><strong>词根联想</strong>：run 有“运行”之意，可联想程序的 run time（运行时）。</p>"
+  },
+  {
+    "Word": "hand",
+    "Phonetic": "英 [hænd]，美 [hænd]",
+    "Meaning": "n. 手；指针；v. 传递；交给",
+    "Example": "The developer handed over the completed code to the testing team for verification.",
+    "ExampleTranslator": "开发者将完成的代码交给测试团队进行验证。",
+    "AIHelp": "<p><strong>说明</strong>：hands 是 hand 的复数形式。</p><p><strong>场景记忆</strong>：程序员用 hands（手）敲击键盘编写代码。</p><p><strong>造句强化</strong>：We need to hand in the project code before the deadline.（我们需要在截止日期前提交项目代码。）</p>"
+  },
+  {
+    "Word": "kind",
+    "Phonetic": "英 [kaɪnd]，美 [kaɪnd]",
+    "Meaning": "n. 种类；adj. 和蔼的；宽容的",
+    "Example": "There are many kind of data structures in programming, such as arrays and linked lists.",
+    "ExampleTranslator": "编程中有许多种数据结构，如数组和链表。",
+    "AIHelp": "<p><strong>对比近义词</strong>：kind（种类）与type（类型），在编程中，data kind 和 data type 意思相近，如 different kinds of algorithms。</p><p><strong>造句强化</strong>：This kind of programming language is suitable for web development.（这种编程语言适合网页开发。）</p>"
+  },
+  {
+    "Word": "choke",
+    "Phonetic": "英 [tʃəʊk]，美 [tʃoʊk]",
+    "Meaning": "v. 窒息；阻塞；n. 窒息；阻塞",
+    "Example": "A memory leak can cause the application to choke and crash eventually.",
+    "ExampleTranslator": "内存泄漏会导致应用程序阻塞并最终崩溃。",
+    "AIHelp": "<p><strong>说明</strong>：choking 是 choke 的现在分词形式。</p><p><strong>谐音记忆</strong>：“抽克”→ 管道被阻塞（choke），抽（水）的时候很克（困难）。</p><p><strong>场景记忆</strong>：当服务器带宽被占满时，网络会 choke（阻塞）。</p>"
+  },
+  {
+    "Word": "noise",
+    "Phonetic": "英 [nɔɪz]，美 [nɔɪz]",
+    "Meaning": "n. 噪音；杂音；v. 发出噪音",
+    "Example": "The faulty hardware produces electrical noise that interferes with data transmission.",
+    "ExampleTranslator": "有故障的硬件产生的电子噪音会干扰数据传输。",
+    "AIHelp": "<p><strong>场景记忆</strong>：在代码中，无用的日志输出就像 noise（噪音），影响调试。</p><p><strong>对比近义词</strong>：noise（噪音）与interference（干扰），如 electrical noise 和 signal interference。</p>"
+  },
+  {
+    "Word": "turn",
+    "Phonetic": "英 [tɜːn]，美 [tɜːrn]",
+    "Meaning": "v. 转动；转变；n. 转动；轮流",
+    "Example": "It's your turn to review the code and find potential bugs.",
+    "ExampleTranslator": "轮到你审查代码并找出潜在的bug了。",
+    "AIHelp": "<p><strong>造句强化</strong>：We need to turn the old code into a more efficient version.（我们需要把旧代码改写成更高效的版本。）</p><p><strong>词根联想</strong>：turn 有“转变”之意，可联想代码从错误到正确的 turn（转变）。</p>"
+  },
+  {
+    "Word": "darling",
+    "Phonetic": "英 [ˈdɑːlɪŋ]，美 [ˈdɑːrlɪŋ]",
+    "Meaning": "n. 亲爱的；宠儿；adj. 可爱的；亲爱的",
+    "Example": "This new IDE has become the darling of many developers due to its powerful features.",
+    "ExampleTranslator": "这款新的集成开发环境因其强大的功能成为了许多开发者的宠儿。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“达令”→ 这是“darling”的音译，程序员可能会把好用的工具称为“darling”。</p><p><strong>场景记忆</strong>：当一个框架非常顺手时，开发者会亲切地称它为 darling。</p>"
+  },
+  {
+    "Word": "reach",
+    "Phonetic": "英 [riːtʃ]，美 [riːtʃ]",
+    "Meaning": "v. 到达；达到；伸出；n. 范围；延伸",
+    "Example": "The API can reach a response time of less than 100 milliseconds under normal load.",
+    "ExampleTranslator": "在正常负载下，这个API的响应时间可以达到小于100毫秒。",
+    "AIHelp": "<p><strong>说明</strong>：reaching 是 reach 的现在分词形式。</p><p><strong>造句强化</strong>：Our goal is to reach 100% code coverage in unit testing.（我们的目标是在单元测试中达到100%的代码覆盖率。）</p><p><strong>场景记忆</strong>：努力让项目性能 reach（达到）预期指标。</p>"
+  },
+  {
+    "Word": "stroke",
+    "Phonetic": "英 [strəʊk]，美 [stroʊk]",
+    "Meaning": "n. 中风；一击；笔画；v. 抚摸；划动",
+    "Example": "With a single stroke of the keyboard, the programmer deleted the redundant code.",
+    "ExampleTranslator": "程序员在键盘上一击，就删除了冗余代码。",
+    "AIHelp": "<p><strong>场景记忆</strong>：程序员用手指 stroke（敲击）键盘，一行行代码就出现了。</p><p><strong>对比近义词</strong>：stroke（一击）与hit（敲击），如 a stroke of the enter key 和 hit the enter key。</p>"
+  },
+  {
+    "Word": "cheek",
+    "Phonetic": "英 [tʃiːk]，美 [tʃiːk]",
+    "Meaning": "n. 脸颊；面颊",
+    "Example": "The programmer's cheek twitched slightly when he saw the messy indentation in the code.",
+    "ExampleTranslator": "当程序员看到代码中混乱的缩进时，他的脸颊微微抽搐了一下。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“契克”→ 契克（cheek）的脸颊红红的。</p><p><strong>场景记忆</strong>：看到别人写的糟糕代码，可能会气得 cheek（脸颊）发烫。</p>"
+  },
+  {
+    "Word": "feel",
+    "Phonetic": "英 [fiːl]，美 [fiːl]",
+    "Meaning": "v. 感觉；觉得；触摸；n. 感觉；手感",
+    "Example": "Experienced developers can feel whether the code has potential performance issues.",
+    "ExampleTranslator": "有经验的开发者能感觉到代码是否存在潜在的性能问题。",
+    "AIHelp": "<p><strong>造句强化</strong>：I feel that this approach to solving the problem is more efficient.（我觉得这种解决问题的方法更高效。）</p><p><strong>场景记忆</strong>：对代码要有良好的 feel（感觉），能快速判断优劣。</p>"
+  },
+  {
+    "Word": "manage",
+    "Phonetic": "英 [ˈmænɪdʒ]，美 [ˈmænɪdʒ]",
+    "Meaning": "v. 管理；经营；设法做到",
+    "Example": "The team leader needs to manage the development process to ensure the project is delivered on time.",
+    "ExampleTranslator": "团队 leader 需要管理开发过程以确保项目按时交付。",
+    "AIHelp": "<p><strong>说明</strong>：manages 是 manage 的第三人称单数形式。</p><p><strong>词根联想</strong>：man（手）+ age（行为）→ 用手去做→ 管理，设法做到。</p><p><strong>场景记忆</strong>：项目经理需要 manage（管理）好团队的开发进度。</p>"
+  },
+  {
+    "Word": "raise",
+    "Phonetic": "英 [reɪz]，美 [reɪz]",
+    "Meaning": "v. 提高；筹集；养育；n. 加薪",
+    "Example": "We need to raise the security level of the system to prevent unauthorized access.",
+    "ExampleTranslator": "我们需要提高系统的安全级别以防止未授权访问。",
+    "AIHelp": "<p><strong>对比反义词</strong>：raise（提高）与lower（降低），如 raise the log level 和 lower the log level。</p><p><strong>造句强化</strong>：The company plans to raise the budget for research and development of new technologies.（公司计划增加新技术研发的预算。）</p>"
+  },
+  {
+    "Word": "eyebrow",
+    "Phonetic": "英 [ˈaɪbraʊ]，美 [ˈaɪbraʊ]",
+    "Meaning": "n. 眉毛",
+    "Example": "The senior developer raised an eyebrow when he saw the unconventional coding style.",
+    "ExampleTranslator": "资深开发者看到这种非常规的编码风格时皱起了眉毛。",
+    "AIHelp": "<p><strong>词根拆分</strong>：eye（眼睛）+ brow（额头；眉）→ eyebrow（眉毛）。</p><p><strong>场景记忆</strong>：看到别人写的奇怪代码，可能会不自觉地扬起 eyebrow（眉毛）。</p>"
+  },
+  {
+    "Word": "lovely",
+    "Phonetic": "英 [ˈlʌvli]，美 [ˈlʌvli]",
+    "Meaning": "adj. 可爱的；令人愉快的；n. 美女",
+    "Example": "This lovely piece of code is concise, efficient and easy to understand.",
+    "ExampleTranslator": "这段可爱的代码简洁、高效且易于理解。",
+    "AIHelp": "<p><strong>词根联想</strong>：love（爱）+ -ly（形容词后缀）→ 让人喜爱的→ lovely（可爱的）。</p><p><strong>场景记忆</strong>：写出一段 lovely（漂亮）的代码会让程序员很有成就感。</p>"
+  },
+  {
+    "Word": "clothes",
+    "Phonetic": "英 [kləʊðz]，美 [kloʊðz]",
+    "Meaning": "n. 衣服；服装",
+    "Example": "Many programmers prefer comfortable clothes when working from home to stay focused.",
+    "ExampleTranslator": "许多程序员在家工作时更喜欢穿舒适的衣服以保持专注。",
+    "AIHelp": "<p><strong>场景记忆</strong>：程序员的 clothes（衣服）可能印着编程语言的logo，如Python、Java等。</p><p><strong>对比近义词</strong>：clothes（衣服，泛指）与clothing（服装，总称），如 casual clothes 和 winter clothing。</p>"
+  },
+  {
+    "Word": "Bye",
+    "Phonetic": "英 [baɪ]，美 [baɪ]",
+    "Meaning": "int. 再见；n. 轮空（体育比赛中）",
+    "Example": "After pushing the final commit, the developer said 'Bye' to the project temporarily.",
+    "ExampleTranslator": "提交最后一次代码后，开发者暂时和这个项目说“再见”。",
+    "AIHelp": "<p><strong>场景记忆</strong>：下班前，开发者对电脑说声 Bye，结束一天的编码工作。</p><p><strong>造句强化</strong>：Bye for now, I need to test this new feature before leaving.（先再见了，我需要在离开前测试这个新功能。）</p>"
+  },
+  {
+    "Word": "say",
+    "Phonetic": "英 [seɪ]，美 [seɪ]",
+    "Meaning": "v. 说；讲；表明；n. 发言权",
+    "Example": "The error message says that there's a syntax error in line 25 of the code.",
+    "ExampleTranslator": "错误信息表明代码的第25行有语法错误。",
+    "AIHelp": "<p><strong>造句强化</strong>：The documentation says how to configure the environment variables.（文档说明了如何配置环境变量。）</p><p><strong>场景记忆</strong>：代码中的注释会 say（说明）这段代码的功能。</p>"
+  },
+  {
+    "Word": "retreat",
+    "Phonetic": "英 [rɪˈtriːt]，美 [rɪˈtriːt]",
+    "Meaning": "v. 撤退；退缩；n. 撤退；隐居处",
+    "Example": "When facing a difficult bug, don't retreat; try different debugging methods instead.",
+    "ExampleTranslator": "遇到难搞的bug时，不要退缩，而是尝试不同的调试方法。",
+    "AIHelp": "<p><strong>说明</strong>：retreating 是 retreat 的现在分词形式。</p><p><strong>词根联想</strong>：re-（向后）+ treat（处理；对待）→ 向后处理→ 撤退，退缩。</p><p><strong>场景记忆</strong>：面对复杂的需求，程序员不能 retreat（退缩），要迎难而上。</p>"
+  },
+  {
+    "Word": "hear",
+    "Phonetic": "英 [hɪə(r)]，美 [hɪr]",
+    "Meaning": "v. 听见；听说；得知",
+    "Example": "Developers often hear about new programming frameworks at tech conferences.",
+    "ExampleTranslator": "开发者经常在技术会议上听说新的编程框架。",
+    "AIHelp": "<p><strong>对比近义词</strong>：hear（听说）与learn（得知），如 hear about a new tool 和 learn about a new tool。</p><p><strong>场景记忆</strong>：时刻 hear（关注）行业动态，了解新技术。</p>"
+  },
+  {
+    "Word": "faintly",
+    "Phonetic": "英 [ˈfeɪntli]，美 [ˈfeɪntli]",
+    "Meaning": "adv. 微弱地；模糊地",
+    "Example": "The server's fan can be faintly heard running in the quiet office.",
+    "ExampleTranslator": "在安静的办公室里，可以微弱地听到服务器风扇运转的声音。",
+    "AIHelp": "<p><strong>词根联想</strong>：faint（微弱的）+ -ly（副词后缀）→ faintly（微弱地）。</p><p><strong>场景记忆</strong>：远程连接服务器时，信号可能 faintly（微弱地）波动。</p>"
+  },
+  {
+    "Word": "episode",
+    "Phonetic": "英 [ˈepɪsəʊd]，美 [ˈepɪsoʊd]",
+    "Meaning": "n. 插曲；片段；一集（电视/广播剧）",
+    "Example": "The data breach was a serious episode in the company's cybersecurity history.",
+    "ExampleTranslator": "这次数据泄露是公司网络安全史上的一个严重事件。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“爱泼嗖的”→ 爱泼（发生）嗖的（突然）一下的事情→ 插曲，片段。</p><p><strong>场景记忆</strong>：项目开发中遇到的紧急bug可以看作一个小 episode（插曲）。</p>"
+  },
+  {
+    "Word": "make",
+    "Phonetic": "英 [meɪk]，美 [meɪk]",
+    "Meaning": "v. 做；制造；使得；n. 品牌；型号",
+    "Example": "This function is designed to make data processing more efficient for large datasets.",
+    "ExampleTranslator": "这个函数旨在使大数据集的数据处理更高效。",
+    "AIHelp": "<p><strong>说明</strong>：made 是 make 的过去式和过去分词形式。</p><p><strong>场景记忆</strong>：程序员用代码 make（制作）出各种应用程序。</p><p><strong>造句强化</strong>：We need to make sure the code is compatible with different operating systems.（我们需要确保代码与不同的操作系统兼容。）</p>"
+  },
+  {
+    "Word": "freshen",
+    "Phonetic": "英 [ˈfreʃn]，美 [ˈfreʃn]",
+    "Meaning": "v. 使清新；使新鲜；更新",
+    "Example": "It's a good practice to freshen the cache regularly to ensure users get the latest data.",
+    "ExampleTranslator": "定期更新缓存是个好习惯，以确保用户获取到最新数据。",
+    "AIHelp": "<p><strong>词根联想</strong>：fresh（新鲜的）+ -en（使…）→ 使新鲜→ 更新，使清新。</p><p><strong>场景记忆</strong>：网站后台需要定时 freshen（更新）数据，保持信息时效性。</p>"
+  },
+  {
+    "Word": "clean",
+    "Phonetic": "英 [kliːn]，美 [kliːn]",
+    "Meaning": "adj. 干净的；整洁的；v. 打扫；清理",
+    "Example": "Writing clean code with proper indentation and comments is essential for maintainability.",
+    "ExampleTranslator": "编写带有适当缩进和注释的整洁代码对可维护性至关重要。",
+    "AIHelp": "<p><strong>场景记忆</strong>：优秀的程序员会写 clean（整洁的）代码，方便他人阅读和修改。</p><p><strong>对比反义词</strong>：clean（整洁的）与messy（混乱的），如 clean code 和 messy code。</p>"
+  },
+  {
+    "Word": "pair",
+    "Phonetic": "英 [peə(r)]，美 [per]",
+    "Meaning": "n. 一对；一双；v. 配对；成对",
+    "Example": "Pair programming can help two developers solve problems more efficiently through collaboration.",
+    "ExampleTranslator": "结对编程可以帮助两名开发者通过协作更高效地解决问题。",
+    "AIHelp": "<p><strong>场景记忆</strong>：在团队开发中，经常会进行 pair（结对）编程，互相学习。</p><p><strong>造句强化</strong>：We often pair to debug complex issues in the project.（我们经常结对调试项目中的复杂问题。）</p>"
+  },
+  {
+    "Word": "thing",
+    "Phonetic": "英 [θɪŋ]，美 [θɪŋ]",
+    "Meaning": "n. 事情；东西；事物",
+    "Example": "One important thing in programming is to handle edge cases properly.",
+    "ExampleTranslator": "编程中一件重要的事情是正确处理边界情况。",
+    "AIHelp": "<p><strong>说明</strong>：things 是 thing 的复数形式。</p><p><strong>场景记忆</strong>：程序员每天要处理很多 things（事情），如写代码、改bug等。</p><p><strong>造句强化</strong>：There are many things to consider when designing a database schema.（设计数据库模式时有很多事情要考虑。）</p>"
+  },
+  {
+    "Word": "sexually",
+    "Phonetic": "英 [ˈsekʃuəli]，美 [ˈsekʃuəli]",
+    "Meaning": "adv. 性别上地；性方面地",
+    "Example": "The company has a strict policy against any sexually discriminatory behavior in the workplace, including among developers.",
+    "ExampleTranslator": "公司有严格的政策禁止工作场所的任何性别歧视行为，包括开发者之间。",
+    "AIHelp": "<p><strong>词根联想</strong>：sexual（性的；性别）+ -ly（副词后缀）→ sexually（性别上地；性方面地）。</p><p><strong>场景记忆</strong>：职场中，包括程序员团队，都应杜绝 sexually（性别上）的歧视。</p>"
+  },
+  {
+    "Word": "exciting",
+    "Phonetic": "英 [ɪkˈsaɪtɪŋ]，美 [ɪkˈsaɪtɪŋ]",
+    "Meaning": "adj. 令人兴奋的；使人激动的",
+    "Example": "Participating in the development of a cutting-edge AI project is really exciting for programmers.",
+    "ExampleTranslator": "参与尖端人工智能项目的开发对程序员来说确实令人兴奋。",
+    "AIHelp": "<p><strong>词根联想</strong>：excite（使兴奋）+ -ing（形容词后缀，令人…的）→ exciting（令人兴奋的）。</p><p><strong>场景记忆</strong>：接触到 exciting（令人兴奋的）新技术时，程序员会充满热情。</p>"
+  },
+  {
+    "Word": "ever",
+    "Phonetic": "英 [ˈevə(r)]，美 [ˈevər]",
+    "Meaning": "adv. 曾经；在任何时候；究竟",
+    "Example": "Has this programming language ever been used in large-scale commercial projects?",
+    "ExampleTranslator": "这种编程语言曾经在大型商业项目中使用过吗？",
+    "AIHelp": "<p><strong>造句强化</strong>：This is the most challenging bug I have ever encountered.（这是我遇到过的最具挑战性的bug。）</p><p><strong>场景记忆</strong>：程序员会经常问自己，这个问题我 ever（曾经）遇到过吗？</p>"
+  },
+  {
+    "Word": "experience",
+    "Phonetic": "英 [ɪkˈspɪəriəns]，美 [ɪkˈspɪriəns]",
+    "Meaning": "n. 经验；经历；v. 经历；体验",
+    "Example": "Years of coding experience help developers quickly identify the root cause of problems.",
+    "ExampleTranslator": "多年的编码经验帮助开发者快速识别问题的根源。",
+    "AIHelp": "<p><strong>说明</strong>：experienced 是 experience 的过去分词形式，也可作形容词，意为“有经验的”。</p><p><strong>词根联想</strong>：ex-（出）+ peri（尝试）+ -ence（名词后缀）→ 尝试出来的东西→ 经验。</p><p><strong>场景记忆</strong>：experienced（有经验的）程序员能更快解决复杂问题。</p>"
+  },
+  {
+    "Word": "tell",
+    "Phonetic": "英 [tel]，美 [tel]",
+    "Meaning": "v. 告诉；讲述；辨别；吩咐",
+    "Example": "The error log can tell us where the problem occurred in the code execution process.",
+    "ExampleTranslator": "错误日志能告诉我们在代码执行过程中哪里出现了问题。",
+    "AIHelp": "<p><strong>场景记忆</strong>：代码的运行结果会 tell（告诉）我们是否达到了预期。</p><p><strong>造句强化</strong>：Can you tell the difference between these two sorting algorithms?（你能分辨出这两种排序算法的区别吗？）</p>"
+  },
+  {
+    "Word": "love",
+    "Phonetic": "英 [lʌv]，美 [lʌv]",
+    "Meaning": "v. 爱；喜欢；n. 爱；爱情；喜爱",
+    "Example": "Many developers love Python because of its simple and readable syntax.",
+    "ExampleTranslator": "许多开发者喜欢Python，因为它的语法简单且易读。",
+    "AIHelp": "<p><strong>说明</strong>：loves 是 love 的第三人称单数形式。</p><p><strong>场景记忆</strong>：程序员会 love（喜爱）那些能提高开发效率的工具。</p><p><strong>造句强化</strong>：I love coding because it allows me to create amazing applications.（我喜欢编程，因为它能让我创造出很棒的应用程序。）</p>"
+  },
+  {
+    "Word": "push",
+    "Phonetic": "英 [pʊʃ]，美 [pʊʃ]",
+    "Meaning": "v. 推；推动；促使；n. 推；推力",
+    "Example": "Don't forget to push your code changes to the remote repository after finishing the task.",
+    "ExampleTranslator": "完成任务后别忘了把你的代码更改推送到远程仓库。",
+    "AIHelp": "<p><strong>说明</strong>：pushing 是 push 的现在分词形式。</p><p><strong>场景记忆</strong>：程序员写完代码后，需要 push（推送）到代码仓库，如Git。</p><p><strong>造句强化</strong>：We need to push the new features to the production environment tonight.（我们今晚需要把新功能推送到生产环境。）</p>"
+  },
+  {
+    "Word": "limit",
+    "Phonetic": "英 [ˈlɪmɪt]，美 [ˈlɪmɪt]",
+    "Meaning": "n. 限制；界限；v. 限制；限定",
+    "Example": "The system has a limit on the number of concurrent users it can handle.",
+    "ExampleTranslator": "这个系统对其能处理的并发用户数量有限制。",
+    "AIHelp": "<p><strong>说明</strong>：limits 是 limit 的复数形式（作名词）或第三人称单数形式（作动词）。</p><p><strong>词根联想</strong>：lim（界限）+ -it（名词后缀）→ 界限→ 限制。</p><p><strong>场景记忆</strong>：API接口通常会设置调用 limits（限制），防止滥用。</p>"
+  },
+  {
+    "Word": "relationship",
+    "Phonetic": "英 [rɪˈleɪʃnʃɪp]，美 [rɪˈleɪʃnʃɪp]",
+    "Meaning": "n. 关系；联系；关联",
+    "Example": "Understanding the relationship between classes is crucial in object-oriented programming.",
+    "ExampleTranslator": "在面向对象编程中，理解类之间的关系至关重要。",
+    "AIHelp": "<p><strong>词根拆分</strong>：relation（关系）+ -ship（表示状态、关系）→ relationship（关系；联系）。</p><p><strong>场景记忆</strong>：数据库中表与表之间的 relationship（关系）需要正确设计。</p>"
+  },
+  {
+    "Word": "both",
+    "Phonetic": "英 [bəʊθ]，美 [boʊθ]",
+    "Meaning": "det./pron. 两者都；adj. 两者的",
+    "Example": "Both front-end and back-end developers need to collaborate closely on this project.",
+    "ExampleTranslator": "前端和后端开发者都需要在这个项目上密切合作。",
+    "AIHelp": "<p><strong>造句强化</strong>：Both Java and Python are popular programming languages in the industry.（Java和Python都是行业内流行的编程语言。）</p><p><strong>场景记忆</strong>：在全栈开发中，both（两者）前端和后端知识都需要掌握。</p>"
+  },
+  {
+    "Word": "enjoy",
+    "Phonetic": "英 [ɪnˈdʒɔɪ]，美 [ɪnˈdʒɔɪ]",
+    "Meaning": "v. 享受；喜爱；欣赏",
+    "Example": "Developers enjoy the process of solving complex problems through coding.",
+    "ExampleTranslator": "开发者享受通过编程解决复杂问题的过程。",
+    "AIHelp": "<p><strong>说明</strong>：enjoying 是 enjoy 的现在分词形式。</p><p><strong>词根联想</strong>：en-（使）+ joy（快乐）→ 使快乐→ 享受，喜爱。</p><p><strong>场景记忆</strong>：当代码成功运行时，开发者会 enjoying（享受）这份成就感。</p>"
+  },
+  {
+    "Word": "harm",
+    "Phonetic": "英 [hɑːm]，美 [hɑːrm]",
+    "Meaning": "n. 伤害；损害；v. 伤害；损害",
+    "Example": "Using untrusted third-party libraries may cause potential harm to the system's security.",
+    "ExampleTranslator": "使用不可信的第三方库可能会对系统的安全性造成潜在伤害。",
+    "AIHelp": "<p><strong>对比反义词</strong>：harm（伤害）与benefit（益处），如 do harm to the system 和 do benefit to the system。</p><p><strong>场景记忆</strong>：恶意代码会对计算机系统造成 harm（伤害）。</p>"
+  },
+  {
+    "Word": "day",
+    "Phonetic": "英 [deɪ]，美 [deɪ]",
+    "Meaning": "n. 一天；白天；时期",
+    "Example": "A typical workday for a developer includes writing code, debugging and attending meetings.",
+    "ExampleTranslator": "开发者典型的工作日包括写代码、调试和参加会议。",
+    "AIHelp": "<p><strong>场景记忆</strong>：程序员的 day（一天）通常在与代码打交道中度过。</p><p><strong>造句强化</strong>：We need to finish this module within three days.（我们需要在三天内完成这个模块。）</p>"
+  },
+  {
+    "Word": "work",
+    "Phonetic": "英 [wɜːk]，美 [wɜːrk]",
+    "Meaning": "v. 工作；运转；起作用；n. 工作；职业；作品",
+    "Example": "The new algorithm works efficiently even with a large amount of input data.",
+    "ExampleTranslator": "即使有大量输入数据，这个新算法也能高效地工作。",
+    "AIHelp": "<p><strong>场景记忆</strong>：程序员的主要 work（工作）是开发和维护软件。</p><p><strong>造句强化</strong>：This function doesn't work as expected; we need to fix it.（这个函数没有按预期工作，我们需要修复它。）</p>"
+  },
+  {
+    "Word": "way",
+    "Phonetic": "英 [weɪ]，美 [weɪ]",
+    "Meaning": "n. 方式；方法；道路；adv. 远远地",
+    "Example": "There are many ways to optimize the performance of a database query.",
+    "ExampleTranslator": "有很多方法可以优化数据库查询的性能。",
+    "AIHelp": "<p><strong>说明</strong>：ways 是 way 的复数形式。</p><p><strong>场景记忆</strong>：解决同一个问题，程序员可能有不同的 ways（方法）。</p><p><strong>造句强化</strong>：This is the best way to implement the login function.（这是实现登录功能的最佳方式。）</p>"
+  },
+  {
+    "Word": "display",
+    "Phonetic": "英 [dɪˈspleɪ]，美 [dɪˈspleɪ]",
+    "Meaning": "v. 显示；展示；n. 显示；展示；显示器",
+    "Example": "The dashboard can display real-time data of server performance metrics.",
+    "ExampleTranslator": "这个仪表盘可以显示服务器性能指标的实时数据。",
+    "AIHelp": "<p><strong>场景记忆</strong>：前端页面需要 display（显示）后端传递过来的数据。</p><p><strong>对比近义词</strong>：display（显示）与show（展示），如 display data 和 show results。</p>"
+  },
+  {
+    "Word": "change",
+    "Phonetic": "英 [tʃeɪndʒ]，美 [tʃeɪndʒ]",
+    "Meaning": "v. 改变；变化；更换；n. 变化；改变",
+    "Example": "The requirements changed several times during the development process, which delayed the project.",
+    "ExampleTranslator": "在开发过程中，需求变更了好几次，这延误了项目。",
+    "AIHelp": "<p><strong>说明</strong>：changed 是 change 的过去式和过去分词形式。</p><p><strong>场景记忆</strong>：项目开发中，需求 change（变更）是常有的事，程序员需要灵活应对。</p><p><strong>造句强化</strong>：We need to change the configuration file to connect to the new database.（我们需要修改配置文件以连接到新数据库。）</p>"
+  },
+  {
+    "Word": "mad",
+    "Phonetic": "英 [mæd]，美 [mæd]",
+    "Meaning": "adj. 疯狂的；生气的；着迷的",
+    "Example": "The developer was mad when he found that his code was overwritten by a teammate without notice.",
+    "ExampleTranslator": "当开发者发现他的代码被队友在未通知的情况下覆盖时，他很生气。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“麦德”→ 麦德（mad）因为代码被改而生气。</p><p><strong>场景记忆</strong>：调试了很久的bug还没解决，可能会让人有点 mad（抓狂）。</p>"
+  },
+  {
+    "Word": "ish",
+    "Phonetic": "英 [ɪʃ]，美 [ɪʃ]",
+    "Meaning": "suffix. （加在形容词后）略…的；稍…的；（加在名词后）像…的",
+    "Example": "The code is working, but it's a bit buggish and needs further optimization.",
+    "ExampleTranslator": "这段代码能运行，但有点小问题，需要进一步优化。",
+    "AIHelp": "<p><strong>场景记忆</strong>：形容代码有点问题时，可以说 codeish（有点像代码但不够完善）。</p><p><strong>造句强化</strong>：This function is slowish, but it's acceptable for small datasets.（这个函数有点慢，但对于小数据集来说可以接受。）</p>"
+  },
+  {
+    "Word": "line",
+    "Phonetic": "英 [laɪn]，美 [laɪn]",
+    "Meaning": "n. 线；行；线条；v. 排队；沿…排列",
+    "Example": "Each line of code should have a clear purpose to improve readability.",
+    "ExampleTranslator": "每一行代码都应该有明确的目的，以提高可读性。",
+    "AIHelp": "<p><strong>场景记忆</strong>：程序员在编写代码时，要注意 line（行）的缩进和格式。</p><p><strong>造句强化</strong>：There's a syntax error in line 56 of the source code.（源代码的第56行有一个语法错误。）</p>"
+  },
+  {
+    "Word": "material",
+    "Phonetic": "英 [məˈtɪəriəl]，美 [məˈtɪriəl]",
+    "Meaning": "n. 材料；素材；adj. 物质的；重要的",
+    "Example": "Open-source materials provide valuable references for developers to learn new technologies.",
+    "ExampleTranslator": "开源素材为开发者学习新技术提供了有价值的参考。",
+    "AIHelp": "<p><strong>场景记忆</strong>：程序员学习的教程、文档等都是重要的 learning materials（学习材料）。</p><p><strong>词根联想</strong>：mater（母亲；根源）+ -ial（形容词/名词后缀）→ 根源性的东西→ 材料，素材。</p>"
+  },
+  {
+    "Word": "bare",
+    "Phonetic": "英 [beə(r)]，美 [ber]",
+    "Meaning": "adj. 赤裸的；光秃的；仅有的；v. 露出；暴露",
+    "Example": "The bare minimum code required to run this program includes the main function and a print statement.",
+    "ExampleTranslator": "运行这个程序所需的最基本代码包括主函数和一个打印语句。",
+    "AIHelp": "<p><strong>对比近义词</strong>：bare（仅有的）与minimum（最小的），如 bare essentials 和 minimum requirements。</p><p><strong>场景记忆</strong>：写 demo 时，通常只保留 bare（最基本的）代码。</p>"
+  },
+  {
+    "Word": "bottom",
+    "Phonetic": "英 [ˈbɒtəm]，美 [ˈbɑːtəm]",
+    "Meaning": "n. 底部；末端；adj. 底部的；v. 到达底部",
+    "Example": "The error message is usually at the bottom of the console output when the program crashes.",
+    "ExampleTranslator": "程序崩溃时，错误信息通常在控制台输出的底部。",
+    "AIHelp": "<p><strong>对比反义词</strong>：bottom（底部）与top（顶部），如 scroll to the bottom 和 scroll to the top of the code file。</p><p><strong>场景记忆</strong>：查看长日志时，经常需要滚动到 bottom（底部）找最新信息。</p>"
+  },
+  {
+    "Word": "fresh",
+    "Phonetic": "英 [freʃ]，美 [freʃ]",
+    "Meaning": "adj. 新鲜的；新的；清新的；adv. 刚刚；才",
+    "Example": "The team released a fresh version of the app with new features and bug fixes.",
+    "ExampleTranslator": "团队发布了带有新功能和bug修复的新版本应用。",
+    "AIHelp": "<p><strong>场景记忆</strong>：每次迭代后，都会有 fresh（新的）版本上线。</p><p><strong>对比近义词</strong>：fresh（新的）与new（新的），如 fresh update 和 new release。</p>"
+  },
+  {
+    "Word": "air",
+    "Phonetic": "英 [eə(r)]，美 [er]",
+    "Meaning": "n. 空气；天空；v. 晾干；通风",
+    "Example": "The data is transmitted through the air via wireless networks in this IoT project.",
+    "ExampleTranslator": "在这个物联网项目中，数据通过无线网络在空中传输。",
+    "AIHelp": "<p><strong>场景记忆</strong>：air（空中）传输数据的无线网络在编程中经常涉及，如WiFi、蓝牙。</p><p><strong>造句强化</strong>：The device can send sensor data through the air to the cloud platform.（这个设备可以通过空中将传感器数据发送到云平台。）</p>"
+  },
+  {
+    "Word": "fabulous",
+    "Phonetic": "英 [ˈfæbjələs]，美 [ˈfæbjələs]",
+    "Meaning": "adj. 极好的；绝妙的；神话般的",
+    "Example": "The new framework has fabulous performance in handling concurrent requests.",
+    "ExampleTranslator": "这个新框架在处理并发请求方面有极好的性能。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“发不了死”→ 性能 fabulous（极好的），根本发不了（出现）死锁。</p><p><strong>场景记忆</strong>：遇到一个 fabulous（绝妙的）解决方案时，程序员会很兴奋。</p>"
+  },
+  {
+    "Word": "wonderfully",
+    "Phonetic": "英 [ˈwʌndəfəli]，美 [ˈwʌndərfəli]",
+    "Meaning": "adv. 极好地；精彩地；惊人地",
+    "Example": "The algorithm works wonderfully in reducing the time complexity from O(n²) to O(n log n).",
+    "ExampleTranslator": "这个算法在将时间复杂度从O(n²)降低到O(n log n)方面表现得极好。",
+    "AIHelp": "<p><strong>词根联想</strong>：wonderful（极好的）+ -ly（副词后缀）→ wonderfully（极好地）。</p><p><strong>场景记忆</strong>：优化后的代码运行得 wonderfully（极好地），效率大幅提升。</p>"
+  },
+  {
+    "Word": "wicked",
+    "Phonetic": "英 [ˈwɪkɪd]，美 [ˈwɪkɪd]",
+    "Meaning": "adj. 邪恶的；恶劣的；很棒的（俚语）",
+    "Example": "That wicked bug took me three days to fix, but now the system runs smoothly.",
+    "ExampleTranslator": "那个棘手的bug花了我三天时间才修复，但现在系统运行顺畅了。",
+    "AIHelp": "<p><strong>俚语用法记忆</strong>：在俚语中，wicked 可表示“很棒的”，如 wicked code（很棒的代码）。</p><p><strong>场景记忆</strong>：遇到 wicked（棘手的）bug 时，需要耐心调试。</p>"
+  },
+  {
+    "Word": "prepare",
+    "Phonetic": "英 [prɪˈpeə(r)]，美 [prɪˈper]",
+    "Meaning": "v. 准备；预备；筹备",
+    "Example": "Developers are preparing the test cases before releasing the new software version.",
+    "ExampleTranslator": "开发者在发布新软件版本前正在准备测试用例。",
+    "AIHelp": "<p><strong>说明</strong>：preparing 是 prepare 的现在分词形式。</p><p><strong>词根联想</strong>：pre-（预先）+ pare（准备）→ 预先准备→ prepare（准备）。</p><p><strong>场景记忆</strong>：上线前，需要 preparing（准备）好各种应急预案。</p>"
+  },
+  {
+    "Word": "supper",
+    "Phonetic": "英 [ˈsʌpə(r)]，美 [ˈsʌpər]",
+    "Meaning": "n. 晚餐；晚饭",
+    "Example": "The team had supper while discussing the solution to the technical problem.",
+    "ExampleTranslator": "团队在讨论技术问题的解决方案时吃了晚饭。",
+    "AIHelp": "<p><strong>对比近义词</strong>：supper（晚餐，较正式）与dinner（晚餐，泛指），如 have supper 和 have dinner。</p><p><strong>场景记忆</strong>：程序员加班时，可能会边吃 supper（晚餐）边改代码。</p>"
+  },
+  {
+    "Word": "together",
+    "Phonetic": "英 [təˈɡeðə(r)]，美 [təˈɡeðər]",
+    "Meaning": "adv. 一起；共同；同时；adj. 自信而妥实的",
+    "Example": "Developers and testers work together to ensure the quality of the software product.",
+    "ExampleTranslator": "开发者和测试人员一起工作以确保软件产品的质量。",
+    "AIHelp": "<p><strong>词根拆分</strong>：to + gether（get的比较级，更…）→ 更能聚集到一起→ together（一起）。</p><p><strong>场景记忆</strong>：团队成员 together（一起）协作，才能高效完成项目。</p>"
+  },
+  {
+    "Word": "accidentally",
+    "Phonetic": "英 [ˌæksɪˈdentəli]，美 [ˌæksɪˈdentəli]",
+    "Meaning": "adv. 意外地；偶然地",
+    "Example": "The developer accidentally deleted an important configuration file, causing the system to crash.",
+    "ExampleTranslator": "开发者意外地删除了一个重要的配置文件，导致系统崩溃。",
+    "AIHelp": "<p><strong>词根联想</strong>：accident（意外）+ -al（形容词后缀）+ -ly（副词后缀）→ accidentally（意外地）。</p><p><strong>场景记忆</strong>：编程时要小心，避免 accidentally（意外地）修改重要代码。</p>"
+  },
+  {
+    "Word": "knife",
+    "Phonetic": "英 [naɪf]，美 [naɪf]",
+    "Meaning": "n. 刀；v. 用刀切割",
+    "Example": "In some programming analogies, a sharp algorithm is like a knife that efficiently cuts through complex data.",
+    "ExampleTranslator": "在一些编程类比中，一个敏锐的算法就像一把刀，能高效地处理复杂数据。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“奈夫”→ 奈夫（knife）用刀切割东西。</p><p><strong>场景记忆</strong>：可以把高效处理数据的算法比作 knife（刀），精准且快速。</p>"
+  },
+  {
+    "Word": "pick",
+    "Phonetic": "英 [pɪk]，美 [pɪk]",
+    "Meaning": "v. 挑选；采摘；n. 选择；精华",
+    "Example": "Developers should pick appropriate design patterns based on the project's specific requirements.",
+    "ExampleTranslator": "开发者应根据项目的具体需求挑选合适的设计模式。",
+    "AIHelp": "<p><strong>场景记忆</strong>：在众多库和框架中 pick（挑选）最适合项目的那个。</p><p><strong>造句强化</strong>：It's important to pick the right database for storing user information.（为存储用户信息挑选合适的数据库很重要。）</p>"
+  },
+  {
+    "Word": "able",
+    "Phonetic": "英 [ˈeɪbl]，美 [ˈeɪbl]",
+    "Meaning": "adj. 能够；有能力的；能干的",
+    "Example": "A well-designed API should be able to handle various types of input parameters.",
+    "ExampleTranslator": "一个设计良好的API应该能够处理各种类型的输入参数。",
+    "AIHelp": "<p><strong>词根联想</strong>：able 本身表示“能够的”，常见搭配 be able to do sth.（能够做某事）。</p><p><strong>场景记忆</strong>：优秀的程序员 able（能够）快速适应新技术。</p>"
+  },
+  {
+    "Word": "Why",
+    "Phonetic": "英 [waɪ]，美 [waɪ]",
+    "Meaning": "adv. 为什么；int. 哎呀；n. 原因；理由",
+    "Example": "Why does this function return null when the input is an empty string? We need to investigate.",
+    "ExampleTranslator": "为什么当输入是空字符串时这个函数返回null？我们需要调查一下。",
+    "AIHelp": "<p><strong>场景记忆</strong>：调试时，程序员经常会问 Why（为什么）出现这样的结果。</p><p><strong>造句强化</strong>：Why is the database connection failing? Let's check the configuration.（为什么数据库连接失败？我们检查一下配置。）</p>"
+  },
+  {
+    "Word": "are not",
+    "Phonetic": "英 [ɑː(r) nɒt]，美 [ɑːr nɑːt]",
+    "Meaning": "不是；没有",
+    "Example": "These code comments are not clear enough, making it hard for others to understand the logic.",
+    "ExampleTranslator": "这些代码注释不够清晰，使其他人难以理解逻辑。",
+    "AIHelp": "<p><strong>说明</strong>：aren 是 are not 的缩写形式 aren't 的误写，正确缩写为 aren't。</p><p><strong>场景记忆</strong>：在代码评审时，会指出哪些地方 are not（不是）符合规范的。</p>"
+  },
+  {
+    "Word": "wear",
+    "Phonetic": "英 [weə(r)]，美 [wer]",
+    "Meaning": "v. 穿；戴；磨损；n. 穿着；磨损",
+    "Example": "Some developers wear headphones while coding to block out distractions in the office.",
+    "ExampleTranslator": "一些开发者在编码时戴耳机以阻挡办公室的干扰。",
+    "AIHelp": "<p><strong>说明</strong>：wearing 是 wear 的现在分词形式。</p><p><strong>场景记忆</strong>：程序员可能会 wearing（穿着）印有代码图案的T恤。</p><p><strong>造句强化</strong>：I prefer to wear comfortable clothes when working on long coding sessions.（在长时间编码时，我更喜欢穿舒适的衣服。）</p>"
+  },
+  {
+    "Word": "ask",
+    "Phonetic": "英 [ɑːsk]，美 [æsk]",
+    "Meaning": "v. 问；询问；要求；请求",
+    "Example": "When in doubt about the API usage, ask the documentation or the developer who designed it.",
+    "ExampleTranslator": "当对API用法有疑问时，查阅文档或询问设计它的开发者。",
+    "AIHelp": "<p><strong>说明</strong>：asks 是 ask 的第三人称单数形式。</p><p><strong>场景记忆</strong>：新手开发者要多 asks（询问），才能快速成长。</p><p><strong>造句强化</strong>：The system asks for user authentication before accessing sensitive data.（系统在访问敏感数据前要求用户进行身份验证。）</p>"
+  },
+  {
+    "Word": "astonished",
+    "Phonetic": "英 [əˈstɒnɪʃt]，美 [əˈstɑːnɪʃt]",
+    "Meaning": "adj. 惊讶的；吃惊的",
+    "Example": "The team was astonished by how much the new optimization improved the system's performance.",
+    "ExampleTranslator": "团队对新优化带来的系统性能提升感到惊讶。",
+    "AIHelp": "<p><strong>词根联想</strong>：astonish（使惊讶）+ -ed（形容词后缀，感到…的）→ astonished（惊讶的）。</p><p><strong>场景记忆</strong>：看到一段低效代码被优化后性能提升巨大，会感到 astonished（惊讶的）。</p>"
+  },
+  {
+    "Word": "often",
+    "Phonetic": "英 [ˈɒfn]，美 [ˈɔːfn]",
+    "Meaning": "adv. 经常；常常",
+    "Example": "Good programmers often refactor their code to improve readability and maintainability.",
+    "ExampleTranslator": "优秀的程序员经常重构他们的代码以提高可读性和可维护性。",
+    "AIHelp": "<p><strong>场景记忆</strong>：程序员 often（经常）需要查阅官方文档来解决问题。</p><p><strong>造句强化</strong>：We often use version control systems to manage code changes.（我们经常使用版本控制系统来管理代码变更。）</p>"
+  },
+  {
+    "Word": "home",
+    "Phonetic": "英 [həʊm]，美 [hoʊm]",
+    "Meaning": "n. 家；住宅；adj. 家庭的；国内的；adv. 在家；回家",
+    "Example": "With the popularity of remote work, more developers can code from home efficiently.",
+    "ExampleTranslator": "随着远程工作的普及，更多开发者可以在家高效地编码。",
+    "AIHelp": "<p><strong>场景记忆</strong>：home（家）办公已成为许多程序员的工作方式之一。</p><p><strong>相关词汇</strong>：home directory（主目录）是编程中常见的术语，指用户的主文件夹。</p>"
+  },
+  {
+    "Word": "explain",
+    "Phonetic": "英 [ɪkˈspleɪn]，美 [ɪkˈspleɪn]",
+    "Meaning": "v. 解释；说明；阐明",
+    "Example": "The technical documentation should clearly explain how to integrate the SDK into the project.",
+    "ExampleTranslator": "技术文档应清楚地说明如何将SDK集成到项目中。",
+    "AIHelp": "<p><strong>词根联想</strong>：ex-（出）+ plain（明白的）→ 使明白地出来→ 解释，说明。</p><p><strong>场景记忆</strong>：代码注释需要 explain（解释）代码的功能和实现思路。</p>"
+  },
+  {
+    "Word": "normal",
+    "Phonetic": "英 [ˈnɔːml]，美 [ˈnɔːrml]",
+    "Meaning": "adj. 正常的；普通的；n. 常态；标准",
+    "Example": "It's normal for a new project to have some bugs in the initial testing phase.",
+    "ExampleTranslator": "新项目在初始测试阶段有一些bug是正常的。",
+    "AIHelp": "<p><strong>对比反义词</strong>：normal（正常的）与abnormal（异常的），如 normal operation 和 abnormal behavior。</p><p><strong>场景记忆</strong>：系统正常运行时，日志会显示 normal（正常的）状态。</p>"
+  },
+  {
+    "Word": "feel",
+    "Phonetic": "英 [fiːl]，美 [fiːl]",
+    "Meaning": "v. 感觉；觉得；触摸；n. 感觉；手感",
+    "Example": "Experienced developers feel that code readability is more important than writing clever one-liners.",
+    "ExampleTranslator": "有经验的开发者认为代码可读性比写巧妙的单行代码更重要。",
+    "AIHelp": "<p><strong>说明</strong>：feels 是 feel 的第三人称单数形式。</p><p><strong>场景记忆</strong>：对代码的好坏，有经验的程序员会有敏锐的 feel（感觉）。</p><p><strong>造句强化</strong>：The system feels more responsive after the performance optimization.（性能优化后，系统感觉响应更快了。）</p>"
+  },
+  {
+    "Word": "stop",
+    "Phonetic": "英 [stɒp]，美 [stɑːp]",
+    "Meaning": "v. 停止；中断；阻止；n. 停止；车站",
+    "Example": "The program will stop executing if it encounters an unhandled exception.",
+    "ExampleTranslator": "如果程序遇到未处理的异常，将会停止执行。",
+    "AIHelp": "<p><strong>说明</strong>：stops 是 stop 的第三人称单数形式。</p><p><strong>场景记忆</strong>：调试时，会在关键位置设置断点让程序 stops（停止）。</p><p><strong>造句强化</strong>：We need to stop the server before deploying the new code.（部署新代码前，我们需要停止服务器。）</p>"
+  },
+  {
+    "Word": "bit",
+    "Phonetic": "英 [bɪt]，美 [bɪt]",
+    "Meaning": "n. 一点；少量；比特（计算机存储单位）；v. 咬（bite的过去式）",
+    "Example": "Adding a bit of error handling code can make the program more robust.",
+    "ExampleTranslator": "添加一点错误处理代码可以使程序更健壮。",
+    "AIHelp": "<p><strong>计算机术语</strong>：bit（比特）是计算机中最小的信息单位，8 bits = 1 byte。</p><p><strong>场景记忆</strong>：即使是 a bit（一点点）的代码优化，也可能带来性能提升。</p>"
+  },
+  {
+    "Word": "steamy",
+    "Phonetic": "英 [ˈstiːmi]，美 [ˈstiːmi]",
+    "Meaning": "adj. 蒸汽的；充满蒸汽的；色情的",
+    "Example": "The server room became steamy after the air conditioning failed, affecting equipment performance.",
+    "ExampleTranslator": "空调故障后，服务器机房变得充满蒸汽，影响了设备性能。",
+    "AIHelp": "<p><strong>词根联想</strong>：steam（蒸汽）+ -y（形容词后缀）→ steamy（蒸汽的；充满蒸汽的）。</p><p><strong>场景记忆</strong>：服务器过热时，机房可能会变得 steamy（闷热的）。</p>"
+  },
+  {
+    "Word": "mean",
+    "Phonetic": "英 [miːn]，美 [miːn]",
+    "Meaning": "v. 意思是；意味着；打算；adj. 吝啬的；刻薄的；n. 平均值",
+    "Example": "In programming, 'null' means that a variable has no assigned value.",
+    "ExampleTranslator": "在编程中，“null”意味着变量没有被赋值。",
+    "AIHelp": "<p><strong>多义记忆</strong>：mean 作动词时表示“意味着”，在编程中常用，如 This error message means...（这个错误信息意味着…）。</p><p><strong>场景记忆</strong>：理解代码中关键字的 mean（含义）是编程的基础。</p>"
+  },
+  {
+    "Word": "blush",
+    "Phonetic": "英 [blʌʃ]，美 [blʌʃ]",
+    "Meaning": "v. 脸红；羞愧；n. 脸红；羞愧",
+    "Example": "The junior developer blushed when his simple mistake in the code was pointed out in the meeting.",
+    "ExampleTranslator": "当会议上指出他代码中的简单错误时，这位初级开发者脸红了。",
+    "AIHelp": "<p><strong>说明</strong>：blushes 是 blush 的第三人称单数形式。</p><p><strong>谐音记忆</strong>：“布拉什”→ 布拉什（blush）因为犯错而脸红。</p><p><strong>场景记忆</strong>：新手程序员在代码评审中被指出错误时可能会 blush（脸红）。</p>"
+  },
+  {
+    "Word": "wonderful",
+    "Phonetic": "英 [ˈwʌndəfl]，美 [ˈwʌndərfl]",
+    "Meaning": "adj. 极好的；精彩的；绝妙的",
+    "Example": "The wonderful user interface design of this app has won many positive reviews.",
+    "ExampleTranslator": "这款应用绝妙的用户界面设计赢得了许多好评。",
+    "AIHelp": "<p><strong>词根联想</strong>：wonder（惊奇；奇迹）+ -ful（形容词后缀，充满…的）→ 充满奇迹的→ 极好的。</p><p><strong>场景记忆</strong>：使用 wonderful（极好的）开发工具能提高编程效率。</p>"
+  },
+  {
+    "Word": "shade",
+    "Phonetic": "英 [ʃeɪd]，美 [ʃeɪd]",
+    "Meaning": "n. 阴影；阴凉处；v. 遮蔽；使阴暗",
+    "Example": "The monitor's brightness and shade settings can be adjusted to reduce eye strain during long coding sessions.",
+    "ExampleTranslator": "显示器的亮度和阴影设置可以调整，以减少长时间编码时的眼睛疲劳。",
+    "AIHelp": "<p><strong>场景记忆</strong>：编程时，合适的屏幕 shade（阴影）设置有助于保护视力。</p><p><strong>对比近义词</strong>：shade（阴影）与shadow（影子），如 screen shade 和 tree shadow。</p>"
+  },
+  {
+    "Word": "Sometimes",
+    "Phonetic": "英 [ˈsʌmtaɪmz]，美 [ˈsʌmtaɪmz]",
+    "Meaning": "adv. 有时；间或",
+    "Example": "Sometimes, taking a short break can help solve a coding problem that's been frustrating you.",
+    "ExampleTranslator": "有时，短暂休息一下能帮助解决一个让你困扰的编码问题。",
+    "AIHelp": "<p><strong>场景记忆</strong>：Sometimes（有时），换一种思路就能解决卡了很久的bug。</p><p><strong>造句强化</strong>：Sometimes we need to rewrite a module from scratch to improve its performance.（有时我们需要从头重写一个模块以提高其性能。）</p>"
+  },
+  {
+    "Word": "confess",
+    "Phonetic": "英 [kənˈfes]，美 [kənˈfes]",
+    "Meaning": "v. 承认；坦白；忏悔",
+    "Example": "The developer had to confess that he forgot to test the code before committing it.",
+    "ExampleTranslator": "这位开发者不得不承认他在提交代码前忘记测试了。",
+    "AIHelp": "<p><strong>说明</strong>：confesses 是 confess 的第三人称单数形式。</p><p><strong>词根联想</strong>：con-（完全）+ fess（说）→ 完全说出来→ 承认，坦白。</p><p><strong>场景记忆</strong>：代码出问题时，要勇于 confess（承认）错误并及时改正。</p>"
+  },
+  {
+    "Word": "should",
+    "Phonetic": "英 [ʃʊd , ʃəd]，美 [ʃʊd , ʃəd]",
+    "Meaning": "modal verb. 应该；应当；可能",
+    "Example": "Developers should follow coding standards to ensure consistency across the project.",
+    "ExampleTranslator": "开发者应该遵循编码标准以确保项目的一致性。",
+    "AIHelp": "<p><strong>场景记忆</strong>：在编程中，should（应该）做的事情包括写注释、进行单元测试等。</p><p><strong>造句强化</strong>：We should backup the database before performing any major updates.（在进行任何重大更新前，我们应该备份数据库。）</p>"
+  },
+  {
+    "Word": "encourage",
+    "Phonetic": "英 [ɪnˈkʌrɪdʒ]，美 [ɪnˈkɜːrɪdʒ]",
+    "Meaning": "v. 鼓励；促进；支持",
+    "Example": "Team leaders should encourage knowledge sharing among developers to improve overall skills.",
+    "ExampleTranslator": "团队领导应该鼓励开发者之间的知识共享，以提高整体技能。",
+    "AIHelp": "<p><strong>词根联想</strong>：en-（使）+ courage（勇气）→ 使有勇气→ 鼓励。</p><p><strong>场景记忆</strong>：在团队中，encourage（鼓励）成员尝试新技术能推动项目创新。</p>"
+  },
+  {
+    "Word": "look",
+    "Phonetic": "英 [lʊk]，美 [lʊk]",
+    "Meaning": "v. 看；看起来；n. 看；样子；脸色",
+    "Example": "Developers need to look for potential security vulnerabilities in the code during reviews.",
+    "ExampleTranslator": "开发者在评审时需要查找代码中潜在的安全漏洞。",
+    "AIHelp": "<p><strong>说明</strong>：looks 是 look 的第三人称单数形式。</p><p><strong>场景记忆</strong>：调试时，要仔细 look（查看）日志信息找线索。</p><p><strong>造句强化</strong>：This function looks correct, but we need to test it with various inputs.（这个函数看起来是正确的，但我们需要用各种输入来测试它。）</p>"
+  },
+  {
+    "Word": "uncertain",
+    "Phonetic": "英 [ʌnˈsɜːtn]，美 [ʌnˈsɜːrtn]",
+    "Meaning": "adj. 不确定的；犹豫的；多变的",
+    "Example": "The outcome of this new algorithm in large-scale applications is still uncertain and needs more testing.",
+    "ExampleTranslator": "这种新算法在大规模应用中的结果仍不确定，需要更多测试。",
+    "AIHelp": "<p><strong>词根联想</strong>：un-（否定）+ certain（确定的）→ uncertain（不确定的）。</p><p><strong>场景记忆</strong>：面对 uncertain（不确定的）需求时，程序员要做好灵活调整的准备。</p>"
+  },
+    {
+      "Word": "evening",
+      "Phonetic": "英 [ˈiːvnɪŋ]，美 [ˈiːvnɪŋ]",
+      "Meaning": "n. 晚上；傍晚；晚会",
+      "Example": "We had a team meeting in the evening to discuss the progress of the project.",
+      "ExampleTranslator": "我们晚上开了个团队会议，讨论项目的进展。",
+      "AIHelp": "<div><strong>词根联想记忆法</strong>：even（平坦的；偶数的）+ ing → 白天过去，迎来平坦过渡的时段→傍晚、晚上</div><div><strong>场景记忆</strong>：程序员常说“evening commit”（晚间提交代码），傍晚提交完当天的代码，结束一天的工作。</div>"
+    },
+    {
+      "Word": "ready",
+      "Phonetic": "英 [ˈredi]，美 [ˈredi]",
+      "Meaning": "adj. 准备好的；现成的；愿意的",
+      "Example": "The deployment script is ready, and we can release the new version now.",
+      "ExampleTranslator": "部署脚本已经准备好了，我们现在可以发布新版本了。",
+      "AIHelp": "<div><strong>谐音记忆</strong>：“ready”发音类似“瑞迪”，可以联想“瑞雪兆丰年，一切准备（ready）就绪”。</div><div><strong>程序员场景造句</strong>：When the CI/CD pipeline is ready, automated tests will run automatically.（当CI/CD流水线准备好后，自动化测试会自动运行。）</div>"
+    },
+    {
+      "Word": "bath",
+      "Phonetic": "英 [bɑːθ]，美 [bæθ]",
+      "Meaning": "n. 沐浴；浴室；浴盆 v. 洗澡",
+      "Example": "After debugging for 5 hours, he decided to take a bath to relax his mind.",
+      "ExampleTranslator": "调试了5个小时后，他决定洗个澡放松一下大脑。",
+      "AIHelp": "<div><strong>对比记忆</strong>：与“bathe”（v. 洗澡，较正式）对比，“bath”作名词更常用，如“take a bath”（洗澡）。</div><div><strong>场景联想</strong>：程序员改完一个棘手的bug后，泡个澡（bath）是不错的放松方式。</div>"
+    },
+    {
+      "Word": "pubic",
+      "Phonetic": "英 [ˈpjuːbɪk]，美 [ˈpjuːbɪk]",
+      "Meaning": "adj. 耻骨的；阴部的",
+      "Example": "The term is not commonly used in programming contexts.",
+      "ExampleTranslator": "该术语在编程语境中不常用。",
+      "AIHelp": "<div><strong>词根记忆</strong>：pub（公共的）+ ic（形容词后缀）→ 注意该词特指人体部位，与“public”（公共的）词形相近，注意区分。</div>"
+    },
+    {
+      "Word": "trim",
+      "Phonetic": "英 [trɪm]，美 [trɪm]",
+      "Meaning": "v. 修剪；整理；削减 adj. 整齐的 n. 修剪",
+      "Example": "We need to trim the unnecessary log statements in the code to improve performance.",
+      "ExampleTranslator": "我们需要删减代码中不必要的日志语句以提高性能。",
+      "AIHelp": "<div><strong>场景记忆</strong>：程序员整理代码时“trim whitespace”（去除空白字符），就像修剪（trim）多余的枝叶一样。</div><div><strong>近义词对比</strong>：与“cut”相比，“trim”更强调“修剪到整齐状态”，如trim the code（精简代码）。</div>"
+    },
+    {
+      "Word": "remember",
+      "Phonetic": "英 [rɪˈmembə(r)]，美 [rɪˈmembər]",
+      "Meaning": "v. 记得；牢记；纪念",
+      "Example": "Remember to add comments to the complex functions for future maintenance.",
+      "ExampleTranslator": "记得给复杂函数添加注释，以便日后维护。",
+      "AIHelp": "<div><strong>词根分解</strong>：re（再）+ member（成员）→ 再次成为“成员”，即留在记忆中→记得</div><div><strong>程序员场景</strong>：开发时要“remember to commit code regularly”（记得定期提交代码），避免工作丢失。</div>",
+      "Note": "原单词“remembering”是“remember”的现在分词形式"
+    },
+    {
+      "Word": "cute",
+      "Phonetic": "英 [kjuːt]，美 [kjuːt]",
+      "Meaning": "adj. 可爱的；聪明的；伶俐的",
+      "Example": "The new UI design of the app is really cute and user - friendly.",
+      "ExampleTranslator": "这款应用的新UI设计非常可爱且用户友好。",
+      "AIHelp": "<div><strong>谐音记忆</strong>：“cute”发音类似“Q弹”，可以联想“Q弹可爱的界面设计”。</div><div><strong>场景造句</strong>：The error message with a cute icon makes users less frustrated.（带有可爱图标的错误提示让用户没那么沮丧。）</div>"
+    },
+    {
+      "Word": "look",
+      "Phonetic": "英 [lʊk]，美 [lʊk]",
+      "Meaning": "v. 看；看起来；注视 n. 看；样子；脸色",
+      "Example": "Let's look at the stack trace to find the root cause of the exception.",
+      "ExampleTranslator": "让我们看看堆栈跟踪，找出异常的根本原因。",
+      "AIHelp": "<div><strong>短语记忆</strong>：常用短语“look up”（查阅，如look up API documentation查阅API文档）、“look through”（浏览，如look through code浏览代码）。</div>",
+      "Note": "原单词“looked”是“look”的过去式和过去分词形式"
+    },
+    {
+      "Word": "puffy",
+      "Phonetic": "英 [ˈpʌfi]，美 [ˈpʌfi]",
+      "Meaning": "adj. 肿胀的；松软的；浮夸的",
+      "Example": "After staying up all night debugging, his eyes were puffy.",
+      "ExampleTranslator": "通宵调试后，他的眼睛肿了。",
+      "AIHelp": "<div><strong>词根联想</strong>：puff（v. 膨胀；吹气）+ y（形容词后缀）→ 膨胀的→肿胀的</div><div><strong>场景记忆</strong>：程序员连续加班后，常出现puffy eyes（肿眼泡），要注意休息哦。</div>"
+    },
+    {
+      "Word": "mound",
+      "Phonetic": "英 [maʊnd]，美 [maʊnd]",
+      "Meaning": "n. 堆；土墩；小山 v. 堆起",
+      "Example": "There is a mound of unprocessed log files waiting to be analyzed.",
+      "ExampleTranslator": "有一堆未处理的日志文件等待分析。",
+      "AIHelp": "<div><strong>场景联想</strong>：可以联想服务器上堆积如山的日志文件（a mound of log files），需要定期清理。</div>",
+      "Note": "原单词“mounds”是“mound”的复数形式"
+    },
+    {
+      "Word": "bald",
+      "Phonetic": "英 [bɔːld]，美 [bɔːld]",
+      "Meaning": "adj. 秃顶的；光秃的；明显的",
+      "Example": "The senior developer with a bald head has rich experience in system architecture.",
+      "ExampleTranslator": "那个秃顶的资深开发在系统架构方面有丰富的经验。",
+      "AIHelp": "<div><strong>谐音记忆</strong>：“bald”发音类似“鲍德”，可以联想“鲍德大叔秃顶（bald）了”。</div><div><strong>近义词对比</strong>：与“bare”（光秃的，强调无覆盖物）相比，“bald”更常指人秃顶。</div>"
+    },
+    {
+      "Word": "may",
+      "Phonetic": "英 [meɪ]，美 [meɪ]",
+      "Meaning": "aux. 可能；可以；也许 n. 五月",
+      "Example": "The database connection may fail if the network is unstable.",
+      "ExampleTranslator": "如果网络不稳定，数据库连接可能会失败。",
+      "AIHelp": "<div><strong>用法记忆</strong>：在编程中常用来表示可能性，如“The function may return null in some cases.（该函数在某些情况下可能返回null。）”</div><div><strong>对比记忆</strong>：与“might”相比，“may”表示的可能性稍大。</div>"
+    },
+    {
+      "Word": "Nair",
+      "Phonetic": "英 [neə(r)]，美 [ner]",
+      "Meaning": "n. 奈尔（人名）；一种脱毛膏品牌",
+      "Example": "Nair is not a term commonly used in programming.",
+      "ExampleTranslator": "Nair不是编程中常用的术语。",
+      "AIHelp": "<div><strong>注意</strong>：该词在编程语境中极少出现，主要作为专有名词使用，记忆时直接关联其特定含义即可。</div>"
+    },
+    {
+      "Word": "cupboard",
+      "Phonetic": "英 [ˈkʌbəd]，美 [ˈkʌbərd]",
+      "Meaning": "n. 橱柜；壁橱",
+      "Example": "The server room has a cupboard where we store backup hard drives.",
+      "ExampleTranslator": "服务器机房有一个橱柜，我们在那里存放备份硬盘。",
+      "AIHelp": "<div><strong>词根组合</strong>：cup（杯子）+ board（木板）→ 放杯子的木板柜→橱柜</div><div><strong>场景联想</strong>：可以联想机房里放着备份设备的橱柜（cupboard）。</div>"
+    },
+    {
+      "Word": "resist",
+      "Phonetic": "英 [rɪˈzɪst]，美 [rɪˈzɪst]",
+      "Meaning": "v. 抵抗；抵制；忍住",
+      "Example": "It's hard to resist the temptation to write hacky code to fix the bug quickly.",
+      "ExampleTranslator": "很难抵制为了快速修复bug而写蹩脚代码的诱惑。",
+      "AIHelp": "<div><strong>词根记忆</strong>：re（反对）+ sist（站立）→ 反着站立→抵抗、抵制</div><div><strong>程序员场景</strong>：要“resist the urge to skip unit tests”（抵制跳过单元测试的冲动），保证代码质量。</div>"
+    },
+    {
+      "Word": "half",
+      "Phonetic": "英 [hɑːf]，美 [hæf]",
+      "Meaning": "n. 一半；半场；半学年 adj. 一半的；不完全的 adv. 一半地",
+      "Example": "Half of the development time was spent on optimizing the algorithm.",
+      "ExampleTranslator": "一半的开发时间都花在了算法优化上。",
+      "AIHelp": "<div><strong>短语记忆</strong>：常用短语“half - way”（中途，如We're half - way through the project.我们的项目进行到一半了。）</div>",
+      "Note": "原单词“Half”首字母大写，此处修正为小写“half”，表示“一半”时无需大写"
+    },
+    {
+      "Word": "hour",
+      "Phonetic": "英 [ˈaʊə(r)]，美 [ˈaʊər]",
+      "Meaning": "n. 小时；钟头；课时",
+      "Example": "The build process takes about an hour to complete on the local machine.",
+      "ExampleTranslator": "在本地机器上，构建过程大约需要一个小时完成。",
+      "AIHelp": "<div><strong>谐音记忆</strong>：“hour”发音类似“奥尔”，可以联想“奥尔用了一个小时（hour）写完了代码”。</div><div><strong>注意</strong>：与“our”（我们的）发音相同，注意词形和含义区别。</div>"
+    },
+    {
+      "Word": "late",
+      "Phonetic": "英 [leɪt]，美 [leɪt]",
+      "Meaning": "adj. 晚的；迟的；最近的 adv. 晚；迟；最近",
+      "Example": "The code review was delayed, so the merge was later than expected.",
+      "ExampleTranslator": "代码审查被推迟了，所以合并比预期晚。",
+      "AIHelp": "<div><strong>词性变化</strong>：“later”是“late”的比较级形式，意为“更晚；后来”。</div><div><strong>场景造句</strong>：We can discuss the details later in the meeting.（我们可以在会议后期讨论细节。）</div>",
+      "Note": "原单词“later”是“late”的比较级形式"
+    },
+    {
+      "Word": "urge",
+      "Phonetic": "英 [ɜːdʒ]，美 [ɜːrdʒ]",
+      "Meaning": "v. 催促；力劝；强烈要求 n. 强烈的欲望；冲动",
+      "Example": "The project manager urged the team to finish the sprint goal on time.",
+      "ExampleTranslator": "项目经理催促团队按时完成冲刺目标。",
+      "AIHelp": "<div><strong>场景记忆</strong>：上线前，产品经理常会“urge developers to fix all bugs”（催促开发人员修复所有bug）。</div><div><strong>近义词</strong>：与“push”相比，“urge”更强调“强烈的劝说或催促”。</div>"
+    },
+    {
+      "Word": "same",
+      "Phonetic": "英 [seɪm]，美 [seɪm]",
+      "Meaning": "adj. 相同的；同一的 pron. 同样的人或事物",
+      "Example": "The two functions have the same logic but different parameter names.",
+      "ExampleTranslator": "这两个函数有相同的逻辑，但参数名不同。",
+      "AIHelp": "<div><strong>短语记忆</strong>：常用短语“the same as”（与……相同，如This result is the same as expected.这个结果和预期的一样。）</div><div><strong>程序员场景</strong>：判断两个对象是否“same”时，要注意是值相等还是引用相等。</div>"
+    },
+    {
+      "Word": "serve",
+      "Phonetic": "英 [sɜːv]，美 [sɜːrv]",
+      "Meaning": "v. 服务；招待；供应；服役 n. 发球",
+      "Example": "This API serves data to multiple client applications.",
+      "ExampleTranslator": "这个API为多个客户端应用程序提供数据服务。",
+      "AIHelp": "<div><strong>词根联想</strong>：serv（服务）+ e → 服务，如“server”（服务器）就是提供服务的设备。</div>",
+      "Note": "原单词“served”是“serve”的过去式和过去分词形式"
+    },
+    {
+      "Word": "tie",
+      "Phonetic": "英 [taɪ]，美 [taɪ]",
+      "Meaning": "v. 系；绑；连接；打结 n. 领带；联系；束缚",
+      "Example": "We need to tie the frontend and backend together with a stable interface.",
+      "ExampleTranslator": "我们需要用一个稳定的接口把前端和后端连接起来。",
+      "AIHelp": "<div><strong>场景记忆</strong>：可以联想“tie the code modules”（将代码模块连接起来），就像系（tie）绳子一样把它们绑在一起。</div>",
+      "Note": "原单词“tying”是“tie”的现在分词形式"
+    },
+    {
+      "Word": "sash",
+      "Phonetic": "英 [sæʃ]，美 [sæʃ]",
+      "Meaning": "n. 腰带；肩带；窗框 v. 系腰带",
+      "Example": "The sash of the server rack is used to organize the network cables.",
+      "ExampleTranslator": "服务器机架的束带用来整理网络线缆。",
+      "AIHelp": "<div><strong>场景联想</strong>：可以联想服务器机架上用来固定线缆的束带（sash），和腰带的功能类似。</div>"
+    },
+    {
+      "Word": "loose",
+      "Phonetic": "英 [luːs]，美 [luːs]",
+      "Meaning": "adj. 松的；宽松的；不牢固的 adv. 松散地",
+      "Example": "Loosely coupled modules are easier to maintain and reuse.",
+      "ExampleTranslator": "松耦合的模块更易于维护和重用。",
+      "AIHelp": "<div><strong>词性变化</strong>：“loosely”是“loose”的副词形式，意为“松散地”。</div><div><strong>程序员术语</strong>：“loosely coupled”（松耦合）是软件设计中的重要概念。</div>",
+      "Note": "原单词“loosely”是“loose”的副词形式"
+    },
+    {
+      "Word": "dare",
+      "Phonetic": "英 [deə(r)]，美 [der]",
+      "Meaning": "v. 敢；胆敢；敢于面对 aux. 敢 n. 挑战；胆量",
+      "Example": "Dare you refactor this legacy code without breaking any functionality?",
+      "ExampleTranslator": "你敢重构这段遗留代码而不破坏任何功能吗？",
+      "AIHelp": "<div><strong>用法记忆</strong>：常用于否定句和疑问句，如“I daren't modify the core algorithm.（我不敢修改核心算法。）”</div><div><strong>场景联想</strong>：面对复杂的遗留系统，很多程序员“dare not refactor easily”（不敢轻易重构）。</div>"
+    },
+    {
+      "Word": "night",
+      "Phonetic": "英 [naɪt]，美 [naɪt]",
+      "Meaning": "n. 夜晚；晚上；黑暗",
+      "Example": "He spent the whole night fixing the production incident.",
+      "ExampleTranslator": "他花了一整夜修复生产事故。",
+      "AIHelp": "<div><strong>拼写对比</strong>：“Nite”是“night”的非正式拼写，在编程和正式文档中建议使用“night”。</div><div><strong>场景短语</strong>：“all night long”（整夜，如coding all night long通宵编码）。</div>",
+      "Note": "原单词“Nite”是非正式拼写，修正为标准拼写“night”"
+    },
+    {
+      "Word": "kiss",
+      "Phonetic": "英 [kɪs]，美 [kɪs]",
+      "Meaning": "v. 吻；轻触 n. 吻；轻触",
+      "Example": "The cursor kissed the button, and the form was submitted immediately.",
+      "ExampleTranslator": "光标轻轻点触按钮，表单立即提交了。",
+      "AIHelp": "<div><strong>场景比喻</strong>：可以联想鼠标光标“kiss”（轻触）按钮触发事件，形象记忆该词。</div>"
+    },
+    {
+      "Word": "goodnight",
+      "Phonetic": "英 [ˌɡʊdˈnaɪt]，美 [ˌɡʊdˈnaɪt]",
+      "Meaning": "int. 晚安 n. 晚安",
+      "Example": "After pushing the final commit, he said goodnight to his colleagues and left the office.",
+      "ExampleTranslator": "提交完最后的代码后，他跟同事道了晚安，然后离开了办公室。",
+      "AIHelp": "<div><strong>组合记忆</strong>：good（好的）+ night（夜晚）→ 晚安，程序员下班时常说“goodnight”，结束一天的工作。</div>"
+    },
+    {
+      "Word": "Mommy",
+      "Phonetic": "英 [ˈmɒmi]，美 [ˈmɑːmi]",
+      "Meaning": "n. 妈咪（儿语）",
+      "Example": "The programmer called his mommy to tell her he would work overtime tonight.",
+      "ExampleTranslator": "那个程序员打电话给妈妈，告诉她今晚要加班。",
+      "AIHelp": "<div><strong>注意</strong>：较口语化，对应正式的“mother”，记忆时结合儿语场景。</div>"
+    },
+    {
+      "Word": "haven",
+      "Phonetic": "英 [ˈheɪvn]，美 [ˈheɪvn]",
+      "Meaning": "n. 港口；避难所；安全的地方 v. 避难；安息",
+      "Example": "The quiet meeting room became a haven for him to focus on coding.",
+      "ExampleTranslator": "那个安静的会议室成了他专注编码的避风港。",
+      "AIHelp": "<div><strong>词根联想</strong>：have（有）+ n → 有安全保障的地方→避难所</div><div><strong>场景记忆</strong>：对程序员来说，不受打扰的工位就是一个工作的haven（避风港）。</div>"
+    },
+    {
+      "Word": "get",
+      "Phonetic": "英 [ɡet]，美 [ɡet]",
+      "Meaning": "v. 得到；获得；变得；到达",
+      "Example": "We need to get the latest version of the library to fix this bug.",
+      "ExampleTranslator": "我们需要获取这个库的最新版本来修复这个bug。",
+      "AIHelp": "<div><strong>短语众多</strong>：在编程中常用“get data”（获取数据）、“get started”（开始，如Get started with the tutorial.从教程开始。）等短语。</div>",
+      "Note": "原单词“got”是“get”的过去式和过去分词形式"
+    },
+    {
+      "Word": "anymore",
+      "Phonetic": "英 [ˌeniˈmɔː(r)]，美 [ˌeniˈmɔːr]",
+      "Meaning": "adv. 不再；再也不",
+      "Example": "This deprecated API doesn't work anymore in the new framework.",
+      "ExampleTranslator": "这个已废弃的API在新框架中不再起作用了。",
+      "AIHelp": "<div><strong>用法记忆</strong>：常用于否定句，如“We don't use this method anymore.（我们不再使用这个方法了。）”</div><div><strong>对比</strong>：与“no longer”意思相近，位置不同，如“He no longer works here. = He doesn't work here anymore.”</div>"
+    },
+    {
+      "Word": "open",
+      "Phonetic": "英 [ˈəʊpən]，美 [ˈoʊpən]",
+      "Meaning": "v. 打开；开启；公开 adj. 开放的；公开的；敞开的 n. 公开；空旷",
+      "Example": "Opening a file in read - only mode prevents accidental modifications.",
+      "ExampleTranslator": "以只读模式打开文件可以防止意外修改。",
+      "AIHelp": "<div><strong>词性变化</strong>：“opening”是“open”的现在分词形式，可作名词“开口；开始”或形容词“开始的”。</div><div><strong>程序员操作</strong>：“opening a terminal”（打开终端）是程序员的日常操作。</div>",
+      "Note": "原单词“opening”是“open”的现在分词形式"
+    },
+    {
+      "Word": "weak",
+      "Phonetic": "英 [wiːk]，美 [wiːk]",
+      "Meaning": "adj. 虚弱的；无力的；薄弱的",
+      "Example": "A weak password is easy to be cracked by hackers.",
+      "ExampleTranslator": "弱密码很容易被黑客破解。",
+      "AIHelp": "<div><strong>对比记忆</strong>：与“strong”（强壮的；强的）是反义词，如“weak password”（弱密码）和“strong password”（强密码）。</div><div><strong>场景</strong>：系统设计中要避免“weak points”（薄弱环节）。</div>"
+    },
+    {
+      "Word": "embarrass",
+      "Phonetic": "英 [ɪmˈbærəs]，美 [ɪmˈbærəs]",
+      "Meaning": "v. 使窘迫；使局促不安；使为难",
+      "Example": "It's embarrassing to have a typo in the commit message.",
+      "ExampleTranslator": "提交信息里有拼写错误会很尴尬。",
+      "AIHelp": "<div><strong>词性变化</strong>：“embarrassing”是“embarrass”的现在分词形式，作形容词“令人尴尬的”。</div><div><strong>场景</strong>：程序员在代码评审时被指出低级错误会很embarrassing（尴尬）。</div>",
+      "Note": "原单词“embarrassing”是“embarrass”的现在分词形式"
+    },
+    {
+      "Word": "confess",
+      "Phonetic": "英 [kənˈfes]，美 [kənˈfes]",
+      "Meaning": "v. 承认；坦白；忏悔",
+      "Example": "He had to confess that he made a mistake in the logic of the loop.",
+      "ExampleTranslator": "他不得不承认自己在循环逻辑上犯了一个错误。",
+      "AIHelp": "<div><strong>词根记忆</strong>：con（完全）+ fess（说）→ 完全说出来→承认、坦白</div><div><strong>场景</strong>：代码出问题时，及时confess（承认）错误并修复很重要。</div>"
+    },
+    {
+      "Word": "blush",
+      "Phonetic": "英 [blʌʃ]，美 [blʌʃ]",
+      "Meaning": "v. 脸红；羞愧 n. 脸红；羞愧",
+      "Example": "He blushed when his code with a silly mistake was shown in the meeting.",
+      "ExampleTranslator": "当他带有愚蠢错误的代码在会议上被展示时，他脸红了。",
+      "AIHelp": "<div><strong>词性变化</strong>：“blushing”是“blush”的现在分词形式。</div><div><strong>场景联想</strong>：程序员在众人面前被指出明显错误时，可能会blush（脸红）。</div>",
+      "Note": "原单词“blushing”是“blush”的现在分词形式"
+    },
+    {
+      "Word": "see",
+      "Phonetic": "英 [siː]，美 [siː]",
+      "Meaning": "v. 看见；理解；领会；看望",
+      "Example": "I can see the error in the console log.",
+      "ExampleTranslator": "我能在控制台日志中看到这个错误。",
+      "AIHelp": "<div><strong>多义记忆</strong>：在编程语境中常表示“查看、理解”，如“see the problem”（看出问题所在）。</div>",
+      "Note": "原单词“saw”是“see”的过去式"
+    },
+    {
+      "Word": "want",
+      "Phonetic": "英 [wɒnt]，美 [wɑːnt]",
+      "Meaning": "v. 想要；希望；需要；缺少 n. 需要；缺乏；欲望",
+      "Example": "The client wants us to add a new feature to the application.",
+      "ExampleTranslator": "客户希望我们给这个应用添加一个新功能。",
+      "AIHelp": "<div><strong>场景用法</strong>：需求沟通中常用“want”，如“What do you want this function to do?（你希望这个函数做什么？）”</div>",
+      "Note": "原单词“wanted”是“want”的过去式和过去分词形式"
+    },
+    {
+      "Word": "depilatory",
+      "Phonetic": "英 [dɪˈpɪlətri]，美 [dɪˈpɪlətɔːri]",
+      "Meaning": "adj. 脱毛的 n. 脱毛剂",
+      "Example": "Depilatory is not a term related to programming.",
+      "ExampleTranslator": "脱毛剂不是与编程相关的术语。",
+      "AIHelp": "<div><strong>词根记忆</strong>：de（去除）+ pil（毛发）+ atory（形容词/名词后缀）→ 脱毛的；脱毛剂</div><div><strong>注意</strong>：该词在编程领域不常用，了解其基本含义即可。</div>"
+    },
+    {
+      "Word": "cream",
+      "Phonetic": "英 [kriːm]，美 [kriːm]",
+      "Meaning": "n. 奶油；乳霜；精华 v. 提取精华；成奶油状",
+      "Example": "The cream of the team is working on the core module of the project.",
+      "ExampleTranslator": "团队的精英正在开发项目的核心模块。",
+      "AIHelp": "<div><strong>引申义记忆</strong>：除了“奶油”，还可表示“精华”，如“the cream of developers”（开发精英）。</div>"
+    },
+    {
+      "Word": "like",
+      "Phonetic": "英 [laɪk]，美 [laɪk]",
+      "Meaning": "v. 喜欢；喜爱；愿意 prep. 像；如同 conj. 好像 n. 爱好",
+      "Example": "Most developers like using IDEs with powerful debugging tools.",
+      "ExampleTranslator": "大多数开发人员喜欢使用带有强大调试工具的IDE。",
+      "AIHelp": "<div><strong>用法对比</strong>：作动词“喜欢”和介词“像”时用法不同，如“I like Python.（我喜欢Python。）”和“It's like a bug.（它像个bug。）”</div>",
+      "Note": "原单词“liked”是“like”的过去式和过去分词形式"
+    },
+    {
+      "Word": "heart",
+      "Phonetic": "英 [hɑːt]，美 [hɑːrt]",
+      "Meaning": "n. 心；心脏；中心；核心 v. 鼓励；铭记",
+      "Example": "The heart of the system is the database that stores all user information.",
+      "ExampleTranslator": "这个系统的核心是存储所有用户信息的数据库。",
+      "AIHelp": "<div><strong>比喻记忆</strong>：常用来比喻“核心”，如“the heart of the algorithm”（算法的核心）。</div><div><strong>短语</strong>：“at heart”（本质上，如He is a good developer at heart.他本质上是个好开发。）</div>"
+    },
+    {
+      "Word": "skip",
+      "Phonetic": "英 [skɪp]，美 [skɪp]",
+      "Meaning": "v. 跳过；略过；蹦跳 n. 跳跃；跳过",
+      "Example": "Don't skip the unit tests when submitting code changes.",
+      "ExampleTranslator": "提交代码变更时不要跳过单元测试。",
+      "AIHelp": "<div><strong>场景用法</strong>：在循环中“skip a iteration”（跳过一次迭代）是常见操作。</div>",
+      "Note": "原单词“skips”是“skip”的第三人称单数形式"
+    },
+    {
+      "Word": "beat",
+      "Phonetic": "英 [biːt]，美 [biːt]",
+      "Meaning": "v. 打；打败；拍打；跳动 n. 节拍；跳动；敲击",
+      "Example": "The new algorithm beats the old one in terms of execution speed.",
+      "ExampleTranslator": "新算法在执行速度上打败了旧算法。",
+      "AIHelp": "<div><strong>多义记忆</strong>：在编程中可表示“超越、打败”，如“beat the performance record”（打破性能记录）。</div>",
+      "Note": "原单词“beats”是“beat”的第三人称单数形式"
+    },
+    {
+      "Word": "very",
+      "Phonetic": "英 [ˈveri]，美 [ˈveri]",
+      "Meaning": "adv. 非常；很；完全 adj. 恰好的；十足的；特有的",
+      "Example": "This function is very efficient in handling large datasets.",
+      "ExampleTranslator": "这个函数在处理大型数据集时非常高效。",
+      "AIHelp": "<div><strong>用法注意</strong>：在正式文档中，可使用“extremely”等词替代“very”以增强专业性，如“extremely complex logic”（极其复杂的逻辑）。</div>"
+    },
+    {
+      "Word": "soft",
+      "Phonetic": "英 [sɒft]，美 [sɔːft]",
+      "Meaning": "adj. 软的；柔软的；温和的；软件的 adv. 柔软地；温和地",
+      "Example": "The soft keyboard on the terminal makes input more convenient for touch - screen devices.",
+      "ExampleTranslator": "终端上的软键盘使触摸屏设备的输入更方便。",
+      "AIHelp": "<div><strong>术语联想</strong>：与“software”（软件）相关，“soft”有“软件的”含义，如“soft engineering”（软件工程）。</div><div><strong>对比</strong>：与“hard”（硬的；硬件的）相对，如“soft skills”（软技能）和“hard skills”（硬技能）。</div>"
+    },
+    {
+      "Word": "continue",
+      "Phonetic": "英 [kənˈtɪnjuː]，美 [kənˈtɪnjuː]",
+      "Meaning": "v. 继续；持续；延伸",
+      "Example": "The loop will continue executing until the condition is met.",
+      "ExampleTranslator": "这个循环会继续执行，直到条件满足为止。",
+      "AIHelp": "<div><strong>编程用法</strong>：在循环中“continue statement”（continue语句）用于跳过本次循环剩余部分，继续下一次循环。</div><div><strong>词根记忆</strong>：con（一起）+ tinue（连接）→ 连接在一起→继续</div>"
+    },
+    {
+      "Word": "think",
+      "Phonetic": "英 [θɪŋk]，美 [θɪŋk]",
+      "Meaning": "v. 想；认为；思考；思索 n. 想；想法",
+      "Example": "We need to think of a better way to optimize the database query.",
+      "ExampleTranslator": "我们需要想一个更好的方法来优化数据库查询。",
+      "AIHelp": "<div><strong>场景用法</strong>：程序员常说“Let me think.（让我想想。）”来思考解决方案。</div>",
+      "Note": "原单词“thought”是“think”的过去式和过去分词形式"
+    },
+    {
+      "Word": "somehow",
+      "Phonetic": "英 [ˈsʌmhaʊ]，美 [ˈsʌmhaʊ]",
+      "Meaning": "adv. 以某种方式；不知怎么地；莫名其妙地",
+      "Example": "Somehow, the bug disappeared after restarting the application.",
+      "ExampleTranslator": "不知怎么地，重启应用后这个bug就消失了。",
+      "AIHelp": "<div><strong>场景记忆</strong>：在调试中，常会遇到“somehow the code works”（不知怎么地代码能运行了）的情况，要深究原因哦。</div>"
+    },
+    {
+      "Word": "come",
+      "Phonetic": "英 [kʌm]，美 [kʌm]",
+      "Meaning": "v. 来；来到；到达；出现；成为",
+      "Example": "The new features will come with the next version update.",
+      "ExampleTranslator": "新功能将随着下一个版本更新而来。",
+      "AIHelp": "<div><strong>短语记忆</strong>：常用“come up with”（想出，如come up with a solution想出一个解决方案）、“come from”（来自，如This error comes from the network.这个错误来自网络。）</div>",
+      "Note": "原单词“came”是“come”的过去式"
+    },
+    {
+      "Word": "straight",
+      "Phonetic": "英 [streɪt]，美 [streɪt]",
+      "Meaning": "adj. 直的；笔直的；连续的；直率的 adv. 直地；直接地；立即",
+      "Example": "The code should follow a straight logic to make it easy to understand.",
+      "ExampleTranslator": "代码应该遵循直接的逻辑，以便于理解。",
+      "AIHelp": "<div><strong>场景联想</strong>：“straight code”（简洁直接的代码）比复杂绕弯的代码更易维护。</div><div><strong>短语</strong>：“straight away”（立即，如Fix it straight away.立即修复它。）</div>"
+    },
+    {
+      "Word": "groin",
+      "Phonetic": "英 [ɡrɔɪn]，美 [ɡrɔɪn]",
+      "Meaning": "n. 腹股沟；交叉点 v. 使成腹股沟状",
+      "Example": "Groin is not a term used in programming.",
+      "ExampleTranslator": "腹股沟不是编程中使用的术语。",
+      "AIHelp": "<div><strong>注意</strong>：该词主要用于医学领域，编程中几乎不会用到，简单了解即可。</div>"
+    },
+    {
+      "Word": "seem",
+      "Phonetic": "英 [siːm]，美 [siːm]",
+      "Meaning": "v. 似乎；好像；看来",
+      "Example": "The code seems to work, but we need to test it thoroughly.",
+      "ExampleTranslator": "这段代码看起来能工作，但我们需要彻底测试它。",
+      "AIHelp": "<div><strong>用法记忆</strong>：常与“like”连用，如“It seems like a memory leak.（这似乎是个内存泄漏。）”</div>",
+      "Note": "原单词“seemingly”是“seem”的派生词，意为“表面上；似乎”"
+    },
+    {
+      "Word": "bypass",
+      "Phonetic": "英 [ˈbaɪpɑːs]，美 [ˈbaɪpæs]",
+      "Meaning": "v. 绕过；避开；忽视 n. 旁路；旁道",
+      "Example": "We can bypass the cache for this request to get the latest data.",
+      "ExampleTranslator": "我们可以绕过这个请求的缓存来获取最新数据。",
+      "AIHelp": "<div><strong>词根记忆</strong>：by（旁边）+ pass（通过）→ 从旁边通过→绕过</div><div><strong>编程术语</strong>：“bypass security checks”（绕过安全检查）是不安全的操作，应避免。</div>",
+      "Note": "原单词“bypassing”是“bypass”的现在分词形式"
+    },
+    {
+      "Word": "brain",
+      "Phonetic": "英 [breɪn]，美 [breɪn]",
+      "Meaning": "n. 脑；大脑；智力；智慧 v. 猛击…的头部",
+      "Example": "Writing clean code requires both technical skills and brain power.",
+      "ExampleTranslator": "编写整洁的代码既需要技术技能，也需要智力。",
+      "AIHelp": "<div><strong>比喻记忆</strong>：常将“brain”比作“CPU”，如“the brain of the system”（系统的大脑，即核心控制器）。</div>"
+    },
+    {
+      "Word": "force",
+      "Phonetic": "英 [fɔːs]，美 [fɔːrs]",
+      "Meaning": "v. 强迫；迫使；推动 n. 力量；武力；影响力",
+      "Example": "We had to force a restart of the service to resolve the deadlock.",
+      "ExampleTranslator": "我们不得不强制重启服务来解决死锁问题。",
+      "AIHelp": "<div><strong>编程用法</strong>：“force refresh”（强制刷新）、“force quit”（强制退出）是常见操作。</div><div><strong>词根联想</strong>：forc（力量）+ e → 力量；强迫</div>"
+    },
+    {
+      "Word": "rise",
+      "Phonetic": "英 [raɪz]，美 [raɪz]",
+      "Meaning": "v. 上升；升起；增加；提高 n. 上升；增加；兴起",
+      "Example": "The memory usage of the application rises rapidly when processing large files.",
+      "ExampleTranslator": "处理大文件时，应用程序的内存使用量迅速上升。",
+      "AIHelp": "<div><strong>对比记忆</strong>：与“raise”（举起；提高，及物动词）不同，“rise”是不及物动词，如“temperature rises”（温度上升）。</div>",
+      "Note": "原单词“rises”是“rise”的第三人称单数形式"
+    },
+    {
+      "Word": "single",
+      "Phonetic": "英 [ˈsɪŋɡl]，美 [ˈsɪŋɡl]",
+      "Meaning": "adj. 单一的；单个的；唯一的；单身的 n. 单曲；单程票 v. 挑选",
+      "Example": "A single line of code can cause a critical error in the system.",
+      "ExampleTranslator": "一行代码就可能在系统中引发严重错误。",
+      "AIHelp": "<div><strong>编程术语</strong>：“single - threaded”（单线程的）、“single instance”（单实例）是常见概念。</div><div><strong>对比</strong>：与“multiple”（多个的）相对。</div>"
+    },
+    {
+      "Word": "finger",
+      "Phonetic": "英 [ˈfɪŋɡə(r)]，美 [ˈfɪŋɡər]",
+      "Meaning": "n. 手指；指状物 v. 用手指触摸；指出",
+      "Example": "He tapped the keyboard with his fingers to write the code quickly.",
+      "ExampleTranslator": "他用手指快速敲击键盘编写代码。",
+      "AIHelp": "<div><strong>场景联想</strong>：程序员的手指（fingers）在键盘上飞舞，敲写出一行行代码。</div><div><strong>短语</strong>：“finger on the pulse”（了解最新动态，如Keep your finger on the pulse of new technologies.随时了解新技术动态。）</div>"
+    },
+    {
+      "Word": "fingertip",
+      "Phonetic": "英 [ˈfɪŋɡətɪp]，美 [ˈfɪŋɡərtɪp]",
+      "Meaning": "n. 指尖；指套",
+      "Example": "With years of practice, he can type code without looking at the keyboard, using only his fingertips.",
+      "ExampleTranslator": "经过多年的练习，他可以不看键盘，只用指尖敲击代码。",
+      "AIHelp": "<div><strong>组合记忆</strong>：finger（手指）+ tip（尖端）→ 指尖，联想程序员指尖在键盘上的操作。</div>"
+    },
+    {
+      "Word": "brush",
+      "Phonetic": "英 [brʌʃ]，美 [brʌʃ]",
+      "Meaning": "v. 刷；擦过；掠过 n. 刷子；画笔；刷",
+      "Example": "The cursor brushes the menu item, and a tooltip appears.",
+      "ExampleTranslator": "光标掠过菜单项，一个提示框出现了。",
+      "AIHelp": "<div><strong>场景比喻</strong>：光标在屏幕上的“brush”（掠过）动作，就像刷子轻刷过表面。</div>",
+      "Note": "原单词“brushes”是“brush”的第三人称单数形式"
+    },
+    {
+      "Word": "vulva",
+      "Phonetic": "英 [ˈvʌlvə]，美 [ˈvʌlvə]",
+      "Meaning": "n. 外阴（女性生殖器官的外部部分）",
+      "Example": "Vulva is a medical term and not used in programming.",
+      "ExampleTranslator": "外阴是一个医学术语，不在编程中使用。",
+      "AIHelp": "<div><strong>注意</strong>：该词属于医学领域术语，与编程无关，了解其基本范畴即可。</div>"
+    },
+    {
+      "Word": "enough",
+      "Phonetic": "英 [ɪˈnʌf]，美 [ɪˈnʌf]",
+      "Meaning": "adj. 足够的；充分的 adv. 足够地；充分地 n. 足够；充分",
+      "Example": "Having enough test cases is crucial for ensuring code quality.",
+      "ExampleTranslator": "有足够的测试用例对确保代码质量至关重要。",
+      "AIHelp": "<div><strong>用法位置</strong>：作副词时常放在形容词或副词后，如“fast enough”（足够快）、“good enough”（足够好）。</div><div><strong>场景</strong>：“Is 1GB of memory enough?（1GB内存够吗？）”是配置时常见的问题。</div>"
+    },
+    {
+      "Word": "quake",
+      "Phonetic": "英 [kweɪk]，美 [kweɪk]",
+      "Meaning": "v. 颤抖；震动 n. 地震；颤抖",
+      "Example": "The server room quaked slightly during the maintenance, but no equipment was damaged.",
+      "ExampleTranslator": "维护期间服务器机房轻微震动，但没有设备受损。",
+      "AIHelp": "<div><strong>联想记忆</strong>：可以联想“server quake”（服务器震动），虽然少见，但可形象记忆该词。</div><div><strong>近义词</strong>：与“shake”（摇晃）意思相近，但“quake”更强调较强烈的震动。</div>"
+    },
+    {
+      "Word": "voice",
+      "Phonetic": "英 [vɔɪs]，美 [vɔɪs]",
+      "Meaning": "n. 声音；嗓音；发言权；意见 v. 表达；吐露",
+      "Example": "Developers should have a voice in the decision - making process of technical architecture.",
+      "ExampleTranslator": "开发人员在技术架构的决策过程中应该有发言权。",
+      "AIHelp": "<div><strong>场景用法</strong>：“voice an opinion”（发表意见），如“Voice your ideas in the meeting.（在会议上发表你的想法。）”</div>"
+    },
+    {
+      "Word": "wonder",
+      "Phonetic": "英 [ˈwʌndə(r)]，美 [ˈwʌndər]",
+      "Meaning": "v. 想知道；好奇；怀疑 n. 惊奇；奇迹；奇观",
+      "Example": "I wonder how this optimization can improve the system's performance.",
+      "ExampleTranslator": "我想知道这个优化如何能提高系统的性能。",
+      "AIHelp": "<div><strong>用法记忆</strong>：后常接宾语从句，如“I wonder if this code is efficient.（我想知道这段代码是否高效。）”</div>"
+    },
+    {
+      "Word": "begin",
+      "Phonetic": "英 [bɪˈɡɪn]，美 [bɪˈɡɪn]",
+      "Meaning": "v. 开始；着手；启动",
+      "Example": "We will begin the development of the new module next week.",
+      "ExampleTranslator": "我们下周将开始新模块的开发。",
+      "AIHelp": "<div><strong>短语</strong>：“begin with”（以……开始，如The process begins with requirement analysis.这个过程从需求分析开始。）</div>",
+      "Note": "原单词“begins”是“begin”的第三人称单数形式"
+    },
+    {
+      "Word": "caress",
+      "Phonetic": "英 [kəˈres]，美 [kəˈres]",
+      "Meaning": "v. 爱抚；抚摸；亲吻 n. 爱抚；抚摸",
+      "Example": "The designer caressed the screen, adjusting the UI elements carefully.",
+      "ExampleTranslator": "设计师轻抚着屏幕，仔细调整UI元素。",
+      "AIHelp": "<div><strong>场景比喻</strong>：可以比喻设计师对UI界面的精心调整，像“caress”（轻抚）一样细致。</div>"
+    },
+    {
+      "Word": "fingertip",
+      "Phonetic": "英 [ˈfɪŋɡətɪp]，美 [ˈfɪŋɡərtɪp]",
+      "Meaning": "n. 指尖；指套",
+      "Example": "His fingertips danced across the keyboard as he wrote the code.",
+      "ExampleTranslator": "他写代码时，指尖在键盘上飞舞。",
+      "AIHelp": "<div><strong>重复记忆</strong>：与前面的“fingertip”相同，联想程序员指尖操作键盘的场景加深记忆。</div>",
+      "Note": "原单词“fingertips”是“fingertip”的复数形式"
+    },
+    {
+      "Word": "graze",
+      "Phonetic": "英 [ɡreɪz]，美 [ɡreɪz]",
+      "Meaning": "v. 擦伤；擦过；放牧 n. 擦伤；放牧",
+      "Example": "The mouse pointer grazed the close button, but didn't click it.",
+      "ExampleTranslator": "鼠标指针擦过关闭按钮，但没有点击它。",
+      "AIHelp": "<div><strong>场景联想</strong>：鼠标指针在界面元素上的“graze”（擦过）动作，就像 grazing 牲畜擦过草地。</div>",
+      "Note": "原单词“grazing”是“graze”的现在分词形式"
+    },
+    {
+      "Word": "dance",
+      "Phonetic": "英 [dɑːns]，美 [dæns]",
+      "Meaning": "v. 跳舞；跳动；雀跃 n. 舞蹈；舞会；舞曲",
+      "Example": "The progress bar danced across the screen as the file was being downloaded.",
+      "ExampleTranslator": "文件下载时，进度条在屏幕上跳动。",
+      "AIHelp": "<div><strong>比喻记忆</strong>：将进度条的移动比作“dance”（跳舞），形象生动，便于记忆。</div>",
+      "Note": "原单词“dancing”是“dance”的现在分词形式"
+    },
+    {
+      "Word": "drive",
+      "Phonetic": "英 [draɪv]，美 [draɪv]",
+      "Meaning": "v. 驱动；驾驶；推动；驱使 n. 驱动器；驱车旅行；动力",
+      "Example": "The new engine drives the application to run much faster than before.",
+      "ExampleTranslator": "新的引擎驱动应用程序比以前运行快得多。",
+      "AIHelp": "<div><strong>编程术语</strong>：“drive”有“驱动”之意，如“hard drive”（硬盘驱动器）、“driver”（驱动程序）。</div>",
+      "Note": "原单词“driving”是“drive”的现在分词形式"
+    },
+    {
+      "Word": "wild",
+      "Phonetic": "英 [waɪld]，美 [waɪld]",
+      "Meaning": "adj. 野生的；野蛮的；疯狂的；失控的 n. 荒野；野外",
+      "Example": "The wild growth of dependencies can make the project difficult to maintain.",
+      "ExampleTranslator": "依赖的疯狂增长会使项目难以维护。",
+      "AIHelp": "<div><strong>短语</strong>：“wild card”（通配符，在编程中常用，如“*”是一个wild card）。</div><div><strong>场景</strong>：“wild code”（混乱的代码）需要重构。</div>"
+    },
+    {
+      "Word": "interrupt",
+      "Phonetic": "英 [ˌɪntəˈrʌpt]，美 [ˌɪntəˈrʌpt]",
+      "Meaning": "v. 打断；中断；妨碍 n. 中断；中断信号",
+      "Example": "A sudden power failure can interrupt the database transaction.",
+      "ExampleTranslator": "突然断电会中断数据库事务。",
+      "AIHelp": "<div><strong>编程术语</strong>：“interrupt”是计算机术语，指“中断”，如“hardware interrupt”（硬件中断）。</div><div><strong>词根记忆</strong>：inter（在……之间）+ rupt（打破）→ 在中间打破→打断、中断</div>"
+    },
+    {
+      "Word": "fact",
+      "Phonetic": "英 [fækt]，美 [fækt]",
+      "Meaning": "n. 事实；实际；真相",
+      "Example": "The fact is that this algorithm has a time complexity of O(n²).",
+      "ExampleTranslator": "事实是这个算法的时间复杂度是O(n²)。",
+      "AIHelp": "<div><strong>短语</strong>：“in fact”（事实上，如In fact, this bug is easy to fix.事实上，这个bug很容易修复。）</div><div><strong>场景</strong>：在技术讨论中，要基于fact（事实）说话。</div>"
+    },
+    {
+      "Word": "lie",
+      "Phonetic": "英 [laɪ]，美 [laɪ]",
+      "Meaning": "v. 躺；位于；说谎；在于 n. 谎言；谎言",
+      "Example": "The root cause of the problem lies in the incorrect configuration of the network.",
+      "ExampleTranslator": "问题的根源在于网络的错误配置。",
+      "AIHelp": "<div><strong>多义区分</strong>：表示“躺；位于”时，过去式是“lay”，过去分词是“lain”；表示“说谎”时，过去式和过去分词是“lied”。</div><div><strong>场景用法</strong>：“The error lies in line 5.（错误在第5行。）”</div>"
+    },
+    {
+      "Word": "doll",
+      "Phonetic": "英 [dɒl]，美 [dɑːl]",
+      "Meaning": "n. 洋娃娃；玩偶；美丽但无头脑的女人 v. 把……打扮得花枝招展",
+      "Example": "The children's programming education app uses a cute doll as the guide character.",
+      "ExampleTranslator": "这款儿童编程教育应用用一个可爱的玩偶作为引导角色。",
+      "AIHelp": "<div><strong>联想记忆</strong>：可以联想编程教育中用于吸引儿童的卡通玩偶（doll）形象。</div>"
+    },
+    {
+      "Word": "exactly",
+      "Phonetic": "英 [ɪɡˈzæktli]，美 [ɪɡˈzæktli]",
+      "Meaning": "adv. 精确地；确切地；正好；完全",
+      "Example": "This is exactly what we need to solve the compatibility issue.",
+      "ExampleTranslator": "这正是我们解决兼容性问题所需要的。",
+      "AIHelp": "<div><strong>词根变化</strong>：“Exactly”由“exact”（精确的）加“ly”构成副词。</div><div><strong>场景用法</strong>：程序员认同观点时会说“Exactly!（完全正确！）”</div>",
+      "Note": "原单词“Exactly”首字母大写，此处修正为小写“exactly”，句首除外"
+    },
+    {
+      "Word": "dolly",
+      "Phonetic": "英 [ˈdɒli]，美 [ˈdɑːli]",
+      "Meaning": "n. 洋娃娃；小推车；摄影机移动车 v. 用移动车移动",
+      "Example": "The robot dolly in the warehouse is controlled by a simple programming script.",
+      "ExampleTranslator": "仓库里的机器人小推车由一个简单的编程脚本控制。",
+      "AIHelp": "<div><strong>联想记忆</strong>：与“doll”相关，“dolly”可指小推车，联想仓库中可编程控制的小推车。</div>"
+    },
+    {
+      "Word": "long",
+      "Phonetic": "英 [lɒŋ]，美 [lɔːŋ]",
+      "Meaning": "adj. 长的；长久的；冗长的 adv. 长久地；长期地 v. 渴望",
+      "Example": "The longest execution time of this function should not exceed 1 second.",
+      "ExampleTranslator": "这个函数的最长执行时间不应超过1秒。",
+      "AIHelp": "<div><strong>词性变化</strong>：“longest”是“long”的最高级形式。</div><div><strong>场景</strong>：“long time execution”（长时间执行）会影响用户体验。</div>",
+      "Note": "原单词“longest”是“long”的最高级形式"
+    },
+    {
+      "Word": "thrill",
+      "Phonetic": "英 [θrɪl]，美 [θrɪl]",
+      "Meaning": "v. 使激动；使兴奋；使震颤 n. 激动；兴奋；震颤",
+      "Example": "Finishing a complex project on time gives programmers a great thrill.",
+      "ExampleTranslator": "按时完成一个复杂的项目给程序员带来极大的兴奋。",
+      "AIHelp": "<div><strong>词性变化</strong>：“thrilling”是“thrill”的现在分词形式，作形容词“令人兴奋的”。</div><div><strong>场景</strong>：解决一个棘手的bug后，程序员会感到thrilling（兴奋）。</div>",
+      "Note": "原单词“thrilling”是“thrill”的现在分词形式"
+    },
+    {
+      "Word": "run",
+      "Phonetic": "英 [rʌn]，美 [rʌn]",
+      "Meaning": "v. 跑；运行；经营；流动 n. 奔跑；运行；系列",
+      "Example": "The application runs smoothly on both Windows and Linux systems.",
+      "ExampleTranslator": "这个应用程序在Windows和Linux系统上都能顺畅运行。",
+      "AIHelp": "<div><strong>编程核心含义</strong>：“run”在编程中常表示“运行”，如“run the code”（运行代码）、“run a test”（运行测试）。</div>",
+      "Note": "原单词“runs”是“run”的第三人称单数形式"
+    },
+    {
+      "Word": "steady",
+      "Phonetic": "英 [ˈstedi]，美 [ˈstedi]",
+      "Meaning": "adj. 稳定的；稳固的；持续的 adv. 稳定地；稳固地 v. 使稳定；使稳固",
+      "Example": "The server has maintained a steady performance under high load.",
+      "ExampleTranslator": "服务器在高负载下保持了稳定的性能。",
+      "AIHelp": "<div><strong>词性变化</strong>：“steadily”是“steady”的副词形式。</div><div><strong>场景术语</strong>：“steady state”（稳定状态）在系统设计中很重要。</div>",
+      "Note": "原单词“steadily”是“steady”的副词形式"
+    },
+    {
+      "Word": "wet",
+      "Phonetic": "英 [wet]，美 [wet]",
+      "Meaning": "adj. 湿的；潮湿的；多雨的 v. 弄湿；变湿 n. 雨天；湿气",
+      "Example": "The wet floor in the server room may cause a short circuit of the equipment.",
+      "ExampleTranslator": "服务器机房潮湿的地面可能会导致设备短路。",
+      "AIHelp": "<div><strong>词性变化</strong>：“wetter”是“wet”的比较级形式。</div><div><strong>注意</strong>：服务器环境要避免wet（潮湿），以防损坏设备。</div>",
+      "Note": "原单词“wetter”是“wet”的比较级形式"
+    },
+    {
+      "Word": "along",
+      "Phonetic": "英 [əˈlɒŋ]，美 [əˈlɔːŋ]",
+      "Meaning": "prep. 沿着；顺着；随着 adv. 向前；一起；来到",
+      "Example": "We need to proceed along the planned development roadmap.",
+      "ExampleTranslator": "我们需要沿着计划的开发路线图前进。",
+      "AIHelp": "<div><strong>短语</strong>：“along with”（与……一起，如We'll deploy the frontend along with the backend.我们将同时部署前端和后端。）</div>"
+    },
+    {
+      "Word": "wish",
+      "Phonetic": "英 [wɪʃ]，美 [wɪʃ]",
+      "Meaning": "v. 希望；愿望；祝愿 n. 愿望；希望；祝福",
+      "Example": "I wish there was a tool to automatically refactor this legacy code.",
+      "ExampleTranslator": "我希望有一个工具能自动重构这段遗留代码。",
+      "AIHelp": "<div><strong>用法</strong>：后接宾语从句时，从句常用虚拟语气，表达难以实现的愿望，如“I wish I could fix this bug quickly.（我希望能快点修复这个bug。）”</div>"
+    },
+    {
+      "Word": "part",
+      "Phonetic": "英 [pɑːt]，美 [pɑːrt]",
+      "Meaning": "v. 分开；分离；分手；断裂 n. 部分；零件；角色 adj. 部分的",
+      "Example": "The system is parted into several independent modules for easier maintenance.",
+      "ExampleTranslator": "这个系统被分成几个独立的模块，以便于维护。",
+      "AIHelp": "<div><strong>词性变化</strong>：“parted”是“part”的过去式和过去分词形式。</div><div><strong>编程概念</strong>：“parted system”（模块化系统）是软件设计的常见方式。</div>",
+      "Note": "原单词“parted”是“part”的过去式和过去分词形式"
+    },
+    {
+      "Word": "instead",
+      "Phonetic": "英 [ɪnˈsted]，美 [ɪnˈsted]",
+      "Meaning": "adv. 代替；反而；相反",
+      "Example": "We decided to use a NoSQL database instead of a relational database for this project.",
+      "ExampleTranslator": "我们决定在这个项目中使用NoSQL数据库而不是关系型数据库。",
+      "AIHelp": "<div><strong>短语</strong>：“instead of”（代替；而不是，如Use functions instead of repeating code.用函数代替重复代码。）</div>"
+    },
+    {
+      "Word": "lie",
+      "Phonetic": "英 [laɪ]，美 [laɪ]",
+      "Meaning": "v. 躺；位于；说谎；在于 n. 谎言；谎言",
+      "Example": "The log files are lying in the /var/log directory of the server.",
+      "ExampleTranslator": "日志文件位于服务器的/var/log目录下。",
+      "AIHelp": "<div><strong>形式区分</strong>：“lying”是“lie”（躺；位于）的现在分词形式，注意与“laying”（“lay”的现在分词）区分。</div><div><strong>场景</strong>：“Files are lying in the folder.（文件在文件夹里。）”</div>",
+      "Note": "原单词“lying”是“lie”的现在分词形式"
+    },
+    {
+      "Word": "press",
+      "Phonetic": "英 [pres]，美 [pres]",
+      "Meaning": "v. 按；压；逼迫；出版 n. 新闻界；出版社；压；按",
+      "Example": "Press the commit button to save your code changes to the repository.",
+      "ExampleTranslator": "按提交按钮将你的代码变更保存到代码库。",
+      "AIHelp": "<div><strong>场景用法</strong>：“press the key”（按键）、“press enter”（按回车）是程序员的常见操作。</div>",
+      "Note": "原单词“pressed”是“press”的过去式和过去分词形式"
+    },
+    {
+      "Word": "arm",
+      "Phonetic": "英 [ɑːm]，美 [ɑːrm]",
+      "Meaning": "n. 手臂；胳膊；武器；扶手 v. 武装；装备",
+      "Example": "The robot's mechanical arms are controlled by a set of programming instructions.",
+      "ExampleTranslator": "机器人的机械臂由一组编程指令控制。",
+      "AIHelp": "<div><strong>术语联想</strong>：“ARM”也是一种处理器架构的名称，在嵌入式编程中常见。</div>",
+      "Note": "原单词“arms”是“arm”的复数形式"
+    },
+    {
+      "Word": "is",
+      "Phonetic": "英 [ɪz]，美 [ɪz]",
+      "Meaning": "v. 是（be动词的第三人称单数现在时形式）",
+      "Example": "This is a critical bug that needs to be fixed immediately.",
+      "ExampleTranslator": "这是一个需要立即修复的严重bug。",
+      "AIHelp": "<div><strong>用法</strong>：“isn't”是“is not”的缩写形式，原单词“isn”可能是“isn't”的拼写错误，此处修正为“is”。</div><div><strong>编程场景</strong>：判断语句中常用，如“This is correct.（这是正确的。）”</div>",
+      "Note": "原单词“isn”疑似拼写错误，修正为“is”，“isn't”是“is not”的缩写"
+    },
+    {
+      "Word": "happy",
+      "Phonetic": "英 [ˈhæpi]，美 [ˈhæpi]",
+      "Meaning": "adj. 快乐的；幸福的；满意的；乐意的",
+      "Example": "Developers are happy when their code passes all the tests at once.",
+      "ExampleTranslator": "当开发人员的代码一次性通过所有测试时，他们会很开心。",
+      "AIHelp": "<div><strong>词根记忆</strong>：hap（运气；机会）+ py（形容词后缀）→ 有好运的→快乐的</div><div><strong>场景</strong>：“happy path”（愉快路径）指程序正常执行的流程。</div>"
+    },
+    {
+      "Word": "either",
+      "Phonetic": "英 [ˈaɪðə(r)]，美 [ˈaɪðər]",
+      "Meaning": "adj. 两者之中任一的；两者之中每一的 pron. 任一 adv. 也（用于否定句或否定词组后）",
+      "Example": "You can either use Python or Java to implement this function.",
+      "ExampleTranslator": "你可以用Python或者Java来实现这个函数。",
+      "AIHelp": "<div><strong>用法区分</strong>：作“也”讲时，用于否定句末，如“He doesn't like it, and I don't either.（他不喜欢，我也不喜欢。）”；作“两者之一”讲时，常与“or”连用。</div>"
+    },
+    {
+      "Word": "slip",
+      "Phonetic": "英 [slɪp]，美 [slɪp]",
+      "Meaning": "v. 滑倒；滑动；溜走；犯错 n. 滑倒；滑动；失误；纸条",
+      "Example": "A small typo can slip into the code if you're not careful.",
+      "ExampleTranslator": "如果你不小心，代码中可能会混入一个小的拼写错误。",
+      "AIHelp": "<div><strong>场景用法</strong>：“slip a bug into the code”（代码中混入bug）是程序员需要避免的。</div>",
+      "Note": "原单词“slips”是“slip”的第三人称单数形式"
+    },
+    {
+      "Word": "under",
+      "Phonetic": "英 [ˈʌndə(r)]，美 [ˈʌndər]",
+      "Meaning": "prep. 在……下面；少于；在……情况下 adv. 在下面；少于；在水下 adj. 下面的；从属的",
+      "Example": "The database runs under the Linux operating system.",
+      "ExampleTranslator": "这个数据库在Linux操作系统下运行。",
+      "AIHelp": "<div><strong>短语</strong>：“under development”（在开发中，如The new feature is under development.新功能正在开发中。）</div><div><strong>场景</strong>：“under the hood”（在内部，指程序内部工作原理）。</div>"
+    },
+    {
+      "Word": "left",
+      "Phonetic": "英 [left]，美 [left]",
+      "Meaning": "adj. 左边的；左侧的 n. 左边；左侧；左派 v. 离开（leave的过去式和过去分词）",
+      "Example": "Click the button on the left to switch to the debug mode.",
+      "ExampleTranslator": "点击左边的按钮切换到调试模式。",
+      "AIHelp": "<div><strong>多义记忆</strong>：既表示“左边的”，也是“leave”的过去式和过去分词，意为“离开”，如“He left the office after committing the code.（他提交代码后离开了办公室。）”</div>"
+    },
+    {
+      "Word": "ankle",
+      "Phonetic": "英 [ˈæŋkl]，美 [ˈæŋkl]",
+      "Meaning": "n. 脚踝；踝关节",
+      "Example": "He sprained his ankle, so he worked from home coding on his laptop.",
+      "ExampleTranslator": "他扭伤了脚踝，所以在家用笔记本电脑编程。",
+      "AIHelp": "<div><strong>注意</strong>：该词与编程无关，主要指人体部位，简单记忆即可。</div>"
+    },
+    {
+      "Word": "lift",
+      "Phonetic": "英 [lɪft]，美 [lɪft]",
+      "Meaning": "v. 举起；抬起；提升；电梯 n. 电梯；举起；提升；搭车",
+      "Example": "We need to lift the memory limit to run this large - scale simulation.",
+      "ExampleTranslator": "我们需要提高内存限制来运行这个大规模的模拟程序。",
+      "AIHelp": "<div><strong>场景用法</strong>：“lift the restriction”（解除限制）在配置程序时可能用到。</div>",
+      "Note": "原单词“lifts”是“lift”的第三人称单数形式"
+    },
+    {
+      "Word": "leg",
+      "Phonetic": "英 [leɡ]，美 [leɡ]",
+      "Meaning": "n. 腿；腿部；支柱；一段行程 v. 走；跑",
+      "Example": "The second leg of the project involves integrating the third - party API.",
+      "ExampleTranslator": "项目的第二阶段包括集成第三方API。",
+      "AIHelp": "<div><strong>引申义</strong>：可表示“阶段、部分”，如“the first leg of development”（开发的第一阶段）。</div>"
+    },
+    {
+      "Word": "other",
+      "Phonetic": "英 [ˈʌðə(r)]，美 [ˈʌðər]",
+      "Meaning": "adj. 其他的；另外的；另一个的 pron. 其他(人或物)",
+      "Example": "This function can communicate with other modules via the message queue.",
+      "ExampleTranslator": "这个函数可以通过消息队列与其他模块通信。",
+      "AIHelp": "<div><strong>短语</strong>：“each other”（彼此，如Two threads communicate with each other.两个线程彼此通信。）、“on the other hand”（另一方面）。</div>"
+    },
+    {
+      "Word": "moist",
+      "Phonetic": "英 [mɔɪst]，美 [mɔɪst]",
+      "Meaning": "adj. 潮湿的；湿润的；多雨的",
+      "Example": "The moist environment in the data center is not suitable for storing hard drives.",
+      "ExampleTranslator": "数据中心潮湿的环境不适合存放硬盘。",
+      "AIHelp": "<div><strong>对比记忆</strong>：与“wet”相比，“moist”程度较轻，指“微湿的”，如“moist air”（湿润的空气）。</div>"
+    },
+    {
+      "Word": "suppress",
+      "Phonetic": "英 [səˈpres]，美 [səˈpres]",
+      "Meaning": "v. 抑制；镇压；压制；隐瞒",
+      "Example": "The log level is set to suppress unimportant debug messages.",
+      "ExampleTranslator": "日志级别被设置为抑制不重要的调试消息。",
+      "AIHelp": "<div><strong>词根记忆</strong>：sup（在……下面）+ press（压）→ 压在下面→抑制、压制</div><div><strong>编程用法</strong>：“suppress warnings”（抑制警告）在编译代码时可能用到。</div>"
+    },
+    {
+      "Word": "dolly",
+      "Phonetic": "英 [ˈdɒli]，美 [ˈdɑːli]",
+      "Meaning": "n. 洋娃娃；小推车；摄影机移动车 v. 用移动车移动",
+      "Example": "The factory uses automated dollies to transport code - burning equipment.",
+      "ExampleTranslator": "这家工厂使用自动小推车运输代码烧录设备。",
+      "AIHelp": "<div><strong>复数记忆</strong>：“dollies”是“dolly”的复数形式，联想多个自动小推车在工厂工作的场景。</div>",
+      "Note": "原单词“dollies”是“dolly”的复数形式"
+    },
+    {
+      "Word": "access",
+      "Phonetic": "英 [ˈækses]，美 [ˈækses]",
+      "Meaning": "v. 进入；使用；获取 n. 进入；使用权；通道；访问",
+      "Example": "Users can access the database only with a valid authentication token.",
+      "ExampleTranslator": "用户只有凭借有效的认证令牌才能访问数据库。",
+      "AIHelp": "<div><strong>编程核心术语</strong>：“access”在编程中常表示“访问”，如“access data”（访问数据）、“access control”（访问控制）。</div><div><strong>词根记忆</strong>：ac（加强）+ cess（走）→ 走进去→进入、访问</div>"
+    },
+    {
+      "Word": "use",
+      "Phonetic": "英 [juːz]，美 [juːz]",
+      "Meaning": "v. 使用；利用；运用；消耗 n. 使用；用途；使用权",
+      "Example": "We can use this library to simplify the implementation of the encryption function.",
+      "ExampleTranslator": "我们可以使用这个库来简化加密函数的实现。",
+      "AIHelp": "<div><strong>编程基础词汇</strong>：“use”是编程中最基础的词汇之一，如“use a loop”（使用循环）、“use a variable”（使用变量）。</div>",
+      "Note": "原单词“uses”是“use”的第三人称单数形式"
+    },
+    {
+      "Word": "especially",
+      "Phonetic": "英 [ɪˈspeʃəli]，美 [ɪˈspeʃəli]",
+      "Meaning": "adv. 尤其；特别；格外",
+      "Example": "This optimization is important, especially for large - scale data processing.",
+      "ExampleTranslator": "这种优化很重要，尤其是对于大规模数据处理。",
+      "AIHelp": "<div><strong>用法</strong>：用于强调某一情况，如“Libraries are helpful, especially for beginners.（库很有用，尤其是对初学者。）”</div>"
+    },
+    {
+      "Word": "agonizing",
+      "Phonetic": "英 [ˈæɡənaɪzɪŋ]，美 [ˈæɡənaɪzɪŋ]",
+      "Meaning": "adj. 令人极度痛苦的；折磨人的 v. 使极度痛苦；折磨（agonize的现在分词）",
+      "Example": "Debugging this intermittent bug is an agonizing process.",
+      "ExampleTranslator": "调试这个间歇性bug是一个折磨人的过程。",
+      "AIHelp": "<div><strong>词性变化</strong>：“agonizingly”是“agonizing”的副词形式，意为“令人痛苦地”。</div><div><strong>场景联想</strong>：程序员遇到难以复现的bug时，会感到agonizing（痛苦的）。</div>",
+      "Note": "原单词“agonizingly”是“agonizing”的副词形式"
+    },
+    {
+      "Word": "top",
+      "Phonetic": "英 [tɒp]，美 [tɑːp]",
+      "Meaning": "n. 顶部；顶端；上面；最高级别 adj. 顶部的；最高的；头等的 v. 居……之首；超过；加盖",
+      "Example": "The top priority is to fix the security vulnerability in the login module.",
+      "ExampleTranslator": "首要任务是修复登录模块中的安全漏洞。",
+      "AIHelp": "<div><strong>短语</strong>：“top level”（顶级，如top - level domain顶级域名）、“on top of”（除……之外，如On top of that, we need to optimize performance.除此之外，我们还需要优化性能。）</div>"
+    },
+    {
+      "Word": "each",
+      "Phonetic": "英 [iːtʃ]，美 [iːtʃ]",
+      "Meaning": "adj. 每个的；各自的 pron. 每个；各自 adv. 每个；各自",
+      "Example": "Each element in the array needs to be processed sequentially.",
+      "ExampleTranslator": "数组中的每个元素都需要按顺序处理。",
+      "AIHelp": "<div><strong>用法</strong>：常与“of”连用，如“each of the items”（每个项目），在循环中常用，如“for each item in the list”（对于列表中的每个项目）。</div>"
+    },
+    {
+      "Word": "delicious",
+      "Phonetic": "英 [dɪˈlɪʃəs]，美 [dɪˈlɪʃəs]",
+      "Meaning": "adj. 美味的；可口的；令人愉快的",
+      "Example": "Writing clean and efficient code is as delicious as tasting a good meal.",
+      "ExampleTranslator": "编写整洁高效的代码就像品尝美味的饭菜一样令人愉快。",
+      "AIHelp": "<div><strong>比喻记忆</strong>：将编写优秀代码比作品尝delicious（美味的）食物，增强记忆趣味性。</div>"
+    },
+    {
+      "Word": "such",
+      "Phonetic": "英 [sʌtʃ]，美 [sʌtʃ]",
+      "Meaning": "adj. 这样的；如此的；pron. 这样的人或事物",
+      "Example": "Such bugs in the code can cause the program to crash unexpectedly.",
+      "ExampleTranslator": "代码中这样的漏洞可能会导致程序意外崩溃。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>词根联想</strong>：无特定词根，可联想“such as”（例如）这个常用短语，程序员在列举数据类型时常用，如“Such as int, string, boolean are common data types in programming.”</li><li><strong>场景记忆</strong>：在调试时说“This is such a tricky error!”（这真是个棘手的错误！），结合场景加深印象。</li></ul>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "whisper",
+      "Phonetic": "英 [ˈwɪspə(r)]，美 [ˈwɪspər]",
+      "Meaning": "v. 低语；私下说；n. 低语；耳语",
+      "Example": "Developers often whisper about the new framework during coffee breaks.",
+      "ExampleTranslator": "程序员们常在喝咖啡休息时私下讨论新的框架。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>谐音记忆</strong>：“威士波”，想象小声说话时像波浪一样轻轻传递，比如团队成员在会议上小声讨论代码问题，“He whispered the solution to his teammate.”</li><li><strong>对比近义词</strong>：与“murmur”（嘟囔）相比，“whisper”更强调声音小且私密，适合描述程序员间分享秘密技巧的场景。</li></ul><p><em>注：原词“whispers”是whisper的第三人称单数形式</em></p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "speak",
+      "Phonetic": "英 [spiːk]，美 [spiːk]",
+      "Meaning": "v. 说；讲；发言；交谈",
+      "Example": "The tech lead will speak about the new project architecture in the meeting.",
+      "ExampleTranslator": "技术负责人将在会议上讲解新的项目架构。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>词根联想</strong>：与“speech”（演讲）同根，程序员在技术分享会上“speak”（发言），产出“speech”（演讲内容）。</li><li><strong>造句强化</strong>：“We need to speak clearly when explaining code logic to teammates.”（向队友解释代码逻辑时，我们需要清晰表达。）</li></ul>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "smile",
+      "Phonetic": "英 [smaɪl]，美 [smaɪl]",
+      "Meaning": "v. 微笑；n. 微笑",
+      "Example": "The developer smiled when the unit test finally passed after hours of debugging.",
+      "ExampleTranslator": "经过数小时调试，单元测试终于通过时，开发者笑了。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>场景记忆</strong>：想象修复一个困扰已久的bug后露出的微笑，“A smile appeared on his face when the code ran successfully.”</li><li><strong>谐音记忆</strong>：“死卖了”，夸张联想为“代码卖出去了”而微笑，加深印象。</li></ul><p><em>注：原词“smiles”是smile的第三人称单数和复数形式</em></p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "understand",
+      "Phonetic": "英 [ˌʌndəˈstænd]，美 [ˌʌndərˈstænd]",
+      "Meaning": "v. 理解；明白；懂得",
+      "Example": "It's important for developers to understand the requirements before writing code.",
+      "ExampleTranslator": "开发者在编写代码前理解需求是很重要的。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>词根联想</strong>：由“under”（在...之下）和“stand”（站立）组成，可理解为“站在下面看清楚”即“理解”，如“Understand the core logic before modifying the code.”</li><li><strong>对比近义词</strong>：与“comprehend”相比，“understand”更常用，程序员常说“I understand how this function works.”（我明白这个函数的工作原理。）</li></ul><p><em>注：原词“understands”是understand的第三人称单数形式</em></p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "game",
+      "Phonetic": "英 [ɡeɪm]，美 [ɡeɪm]",
+      "Meaning": "n. 游戏；比赛；v. 打赌；赌输赢",
+      "Example": "Many developers use game engines like Unity to create interactive applications.",
+      "ExampleTranslator": "许多开发者使用像Unity这样的游戏引擎来创建交互式应用程序。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>场景记忆</strong>：联想游戏开发场景，“Developing a game requires proficiency in C# and Unity.”（开发游戏需要精通C#和Unity。）</li><li><strong>造句强化</strong>：“The new game features advanced AI algorithms for enemy behavior.”（这款新游戏为敌人行为配备了先进的AI算法。）</li></ul>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "play",
+      "Phonetic": "英 [pleɪ]，美 [pleɪ]",
+      "Meaning": "v. 玩；播放；演奏；n. 游戏；比赛",
+      "Example": "Developers can play around with the API to test its functionality.",
+      "ExampleTranslator": "开发者可以尝试使用这个API来测试其功能。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>场景记忆</strong>：在调试时“play”（运行）程序查看效果，“Click the play button to run the simulation.”（点击运行按钮来启动模拟。）</li><li><strong>多义联想</strong>：除了“玩”，还有“运行”之意，如“play a video”（播放视频），在多媒体编程中常用。</li></ul><p><em>注：原词“playing”是play的现在分词形式</em></p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "skirt",
+      "Phonetic": "英 [skɜːt]，美 [skɜːrt]",
+      "Meaning": "n. 裙子；v. 绕过；回避",
+      "Example": "The code skirted around the complex edge case to ensure stability.",
+      "ExampleTranslator": "这段代码回避了复杂的边缘情况以确保稳定性。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>联想记忆</strong>：“skirt”作动词时表示“绕过”，像裙子围绕身体一样绕过障碍物，如“Skirt the deprecated methods when writing new code.”（编写新代码时避开已弃用的方法。）</li><li><strong>对比记忆</strong>：与“avoid”相比，“skirt”更强调“巧妙绕过”，适合描述代码中规避问题的处理方式。</li></ul><p><em>注：原词“Skirting”是skirt的现在分词形式，首字母已调整为小写规范形式</em></p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "trace",
+      "Phonetic": "英 [treɪs]，美 [treɪs]",
+      "Meaning": "v. 追踪；追溯；n. 痕迹；踪迹",
+      "Example": "Developers use log statements to trace the execution flow of the program.",
+      "ExampleTranslator": "开发者使用日志语句来追踪程序的执行流程。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>词根联想</strong>：与“track”（跟踪）意义相近，在调试中“trace”（追踪）变量变化，“We need to trace the data flow from input to output.”（我们需要追踪从输入到输出的数据流。）</li><li><strong>场景记忆</strong>：想象使用调试工具“trace”（跟踪）bug的位置，如“Trace the error back to its origin in the code.”</li></ul><p><em>注：原词“traces”是trace的第三人称单数和复数形式</em></p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "wind",
+      "Phonetic": "英 [waɪnd]，美 [waɪnd]（v. 缠绕）；英 [wɪnd]，美 [wɪnd]（n. 风）",
+      "Meaning": "v. 缠绕；蜿蜒；n. 风",
+      "Example": "The cable winds through the server rack to connect different components.",
+      "ExampleTranslator": "电缆蜿蜒穿过服务器机架连接不同的组件。",
+      "AIHelp": "<p>快速记忆：</p><ul><li><strong>多音多义</strong>：作动词“缠绕”时读[waɪnd]，联想服务器线缆“缠绕”的状态，“The wires wind around the motherboard neatly.”（电线整齐地缠绕在主板上。）</li><li><strong>对比记忆</strong>：与“twist”（扭曲）相比，“wind”更强调“蜿蜒缠绕”，适合描述线缆布局。</li></ul><p><em>注：原词“winding”是wind（v.）的现在分词形式</em></p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    }
+  ]
