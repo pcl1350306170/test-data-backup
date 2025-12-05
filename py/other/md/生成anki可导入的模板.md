@@ -40,7 +40,7 @@ DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
 PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / f"log_{SCRIPT_NAME}.log"
 ```
 ---
-完善words.json的要求：
+完善words.json的里面的单词和例子，要求：
 1. 完善这个json内容，如果json里面有些字段已经存在了【Example、ExampleTranslator】不用替换。
 2. 如果不存在，就给我生成一个例子和翻译，要贴近技术。
 3. 如果json里面的单词是xx的复数、现在或过去分词，给我替换为xx，并说明xx的复数是什么或者现在或过去分词是什么。
