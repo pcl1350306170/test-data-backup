@@ -49,6 +49,9 @@ class WordSplitterApp:
         # 应用配置
         self.apply_config()
 
+        # 启动时自动更新过滤词
+        self.auto_update_exclude_words()
+
     def load_config(self):
         """加载配置文件"""
         default_config = {
@@ -103,6 +106,49 @@ class WordSplitterApp:
         exclude_str = "\n".join(self.config.get("exclude_words", []))
         self.exclude_text.delete("1.0", tk.END)
         self.exclude_text.insert("1.0", exclude_str)
+
+    def auto_update_exclude_words(self):
+        """启动时自动更新过滤词"""
+        word_file_path_str = self.word_file_path.get()
+        if not word_file_path_str:
+            return  # 如果没有设置文件路径，则跳过
+
+        word_file_path = Path(word_file_path_str)
+        if not word_file_path.exists():
+            return  # 如果文件不存在，则跳过
+
+        try:
+            # 读取文件中的所有单词
+            with open(word_file_path, "r", encoding="utf-8") as f:
+                word_list = json.load(f)
+
+            # 获取当前配置中的过滤词
+            current_exclude_words = set(self.config.get("exclude_words", []))
+
+            # 从文件中提取新单词
+            new_words = set()
+            for item in word_list:
+                word = item.get("Word", "").strip().lower()
+                if word:
+                    new_words.add(word)
+
+            # 合并：保留原有 + 添加新单词
+            all_words = current_exclude_words.union(new_words)
+
+            # 更新配置
+            self.config["exclude_words"] = list(all_words)
+
+            # 更新界面显示
+            exclude_str = "\n".join(sorted(all_words))
+            self.exclude_text.delete("1.0", tk.END)
+            self.exclude_text.insert("1.0", exclude_str)
+
+            self.log(f"自动更新过滤词：从文件中读取到 {len(new_words)} 个单词，总计过滤词: {len(all_words)} 个")
+
+        except Exception as e:
+            error_msg = f"自动更新过滤词失败: {e}"
+            logging.error(error_msg)
+            self.log(error_msg)
 
     def create_widgets(self):
         """创建界面组件"""
@@ -264,6 +310,9 @@ class WordSplitterApp:
             with open(word_file_path, "w", encoding="utf-8") as f:
                 json.dump(word_list, f, ensure_ascii=False, indent=2)
 
+            # 更新配置中的 exclude_words（添加新添加的单词）
+            self.update_exclude_words_after_split(word_list)
+
             self.log(f"拆分完成！新增: {added_count}, 跳过: {skipped_count}")
             messagebox.showinfo("成功", f"拆分完成！\n新增单词: {added_count}\n跳过单词: {skipped_count}")
 
@@ -272,6 +321,37 @@ class WordSplitterApp:
             logging.error(error_msg)
             self.log(error_msg)
             messagebox.showerror("错误", error_msg)
+
+    def update_exclude_words_after_split(self, word_list):
+        """拆分完成后更新配置中的 exclude_words"""
+        try:
+            # 获取当前配置中的过滤词
+            current_exclude_words = set(self.config.get("exclude_words", []))
+
+            # 从词库中提取所有单词
+            all_words = set()
+            for item in word_list:
+                word = item.get("Word", "").strip().lower()
+                if word:
+                    all_words.add(word)
+
+            # 合并：保留原有 + 词库中的单词
+            updated_words = current_exclude_words.union(all_words)
+
+            # 更新配置
+            self.config["exclude_words"] = list(updated_words)
+
+            # 更新界面显示
+            exclude_str = "\n".join(sorted(updated_words))
+            self.exclude_text.delete("1.0", tk.END)
+            self.exclude_text.insert("1.0", exclude_str)
+
+            self.log(f"拆分后更新过滤词：总计过滤词: {len(updated_words)} 个")
+
+        except Exception as e:
+            error_msg = f"更新过滤词失败: {e}"
+            logging.error(error_msg)
+            self.log(error_msg)
 
     def split_sentence(self, sentence):
         """拆分句子为单词"""
