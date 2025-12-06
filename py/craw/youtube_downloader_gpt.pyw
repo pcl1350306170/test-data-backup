@@ -10,6 +10,7 @@ YouTube 下载器（可视化 .pyw）
  - 支持重试次数
  - 记录操作日志（PROCESS_LOG_FILE）
  - 最终生成的脚本可保存为 .pyw 双击运行（无控制台）
+ - 支持Cookie文件路径配置
 
 注意：
  - 依赖：yt-dlp, ffmpeg（系统安装），可选 psutil（用于更可靠的进程暂停/继续）
@@ -66,7 +67,8 @@ DEFAULT_CONFIG = {
     "quality": "best",
     "retry_count": 3,
     "urls": [],
-    "ffmpeg_path": ""  # 新增ffmpeg路径配置
+    "ffmpeg_path": "",  # 新增ffmpeg路径配置
+    "cookie_path": ""   # 新增cookie路径配置
 }
 
 # 日志
@@ -321,6 +323,14 @@ class App:
         ttk.Entry(ffmpegfrm, textvariable=self.var_ffmpeg, width=30).pack(side=tk.LEFT, padx=4)
         ttk.Button(ffmpegfrm, text="浏览", command=self._browse_ffmpeg).pack(side=tk.LEFT)
 
+        # Cookie 路径
+        cookiefrm = ttk.Frame(settings)
+        cookiefrm.pack(fill=tk.X, pady=2)
+        ttk.Label(cookiefrm, text="Cookie 文件路径:").pack(side=tk.LEFT)
+        self.var_cookie = tk.StringVar(value=self.cfg.get('cookie_path', ''))
+        ttk.Entry(cookiefrm, textvariable=self.var_cookie, width=30).pack(side=tk.LEFT, padx=4)
+        ttk.Button(cookiefrm, text="浏览", command=self._browse_cookie).pack(side=tk.LEFT)
+
         # Threads
         thfrm = ttk.Frame(settings)
         thfrm.pack(fill=tk.X, pady=2)
@@ -430,10 +440,20 @@ class App:
         if d:
             self.var_ffmpeg.set(d)
 
+    def _browse_cookie(self):
+        """手动选择Cookie文件路径"""
+        d = filedialog.askopenfilename(
+            title="选择Cookie文件",
+            filetypes=[("Cookie文件", "*.txt"), ("所有文件", "*.*")]
+        )
+        if d:
+            self.var_cookie.set(d)
+
     def _load_cfg(self):
         self.cfg = load_config()
         self.var_out.set(self.cfg.get('output_dir'))
         self.var_ffmpeg.set(self.cfg.get('ffmpeg_path', find_ffmpeg()))
+        self.var_cookie.set(self.cfg.get('cookie_path', ''))
         self.var_threads.set(self.cfg.get('threads'))
         self.var_type.set(self.cfg.get('download_type'))
         self.var_afmt.set(self.cfg.get('audio_format'))
@@ -449,6 +469,7 @@ class App:
         cfg = {
             'output_dir': self.var_out.get(),
             'ffmpeg_path': self.var_ffmpeg.get(),
+            'cookie_path': self.var_cookie.get(),
             'threads': int(self.var_threads.get()),
             'download_type': self.var_type.get(),
             'audio_format': self.var_afmt.get(),
@@ -471,6 +492,7 @@ class App:
         cfg = {
             'output_dir': outdir,
             'ffmpeg_path': self.var_ffmpeg.get(),
+            'cookie_path': self.var_cookie.get(),
             'threads': int(self.var_threads.get()),
             'download_type': self.var_type.get(),
             'audio_format': self.var_afmt.get(),
@@ -484,6 +506,11 @@ class App:
         ffmpeg_path = cfg['ffmpeg_path'] or find_ffmpeg()
         if not ffmpeg_path:
             messagebox.showerror('错误', '未找到FFmpeg，请手动设置路径')
+            return
+
+        # 检查Cookie文件是否存在（如果设置了）
+        if cfg['cookie_path'] and not os.path.exists(cfg['cookie_path']):
+            messagebox.showerror('错误', f'Cookie文件不存在: {cfg["cookie_path"]}')
             return
 
         # 清空表格 & 创建任务
@@ -501,6 +528,10 @@ class App:
             'ffmpeg_location': ffmpeg_path,
             # progress hook will be appended in DownloadTask
         }
+
+        # 如果设置了Cookie文件，则添加到选项中
+        if cfg['cookie_path']:
+            ydl_base_opts['cookiefile'] = cfg['cookie_path']
 
         # 根据选择设置 postprocessors
         if cfg['download_type'] == 'audio':

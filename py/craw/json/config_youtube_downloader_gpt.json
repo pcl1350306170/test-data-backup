@@ -1,12 +1,13 @@
 {
-    "output_dir": "C:\\www\\test\\py\\craw\\downloads",
+    "output_dir": "D:/附件/YouTube/VOA",
     "ffmpeg_path": "D:/tools/ffmpeg/bin/ffmpeg.exe",
+    "cookie_path": "C:/Users/pcl/文档/Downloads/aeef2c0b-0d27-4d5c-a727-f4a9eb5134cd.txt",
     "threads": 1,
     "download_type": "video",
     "audio_format": "mp3",
     "quality": "best",
     "retry_count": 3,
     "urls": [
-        "https://www.youtube.com/watch?v=DL_wfKddoLs&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=2"
+        "https://www.youtube.com/watch?v=63KXWNeRx9c&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=2&pp=iAQB"
     ]
 }
