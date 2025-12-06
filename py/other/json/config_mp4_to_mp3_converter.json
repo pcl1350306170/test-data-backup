@@ -1,0 +1,25 @@
+{
+  "ffmpeg_path": "D:/tools/ffmpeg/bin/ffmpeg.exe",
+  "output_dir": "D:/附件/YouTube/VOA-MP3",
+  "thread_count": 2,
+  "last_input_files": [
+    "D:/附件/YouTube/VOA/Bald Eagle, Blue Ghost, Knitting at Movies, Feedback - x6Pl02UZqMU.mp4",
+    "D:/附件/YouTube/VOA/Birds of prey, Einstein ring, Yellowstone, Superlatives - hgYzNEivsk0.mp4",
+    "D:/附件/YouTube/VOA/Brave woman spy, Winter gardening, Root words, Resolutions - 4O5g39iqf1A.mp4",
+    "D:/附件/YouTube/VOA/Coasts, Time change, Open Boat - XpAxGjcs5dU.mp4",
+    "D:/附件/YouTube/VOA/Dog show, English in Senegal, Protect phone data, Actor verbs - m2iWrmalZWU.mp4",
+    "D:/附件/YouTube/VOA/Edison, Mental health at work, Cancer medicines, Mt Everest - g5cu_IJ9crs.mp4",
+    "D:/附件/YouTube/VOA/Goddard’s rockets, Plasma research, Screen time, Partitives - JaTnpxNHuAs.mp4",
+    "D:/附件/YouTube/VOA/Golden Gate, Physical Therapy, Deep ocean, Help for spinal cord problems - oBM8y3A7AAg.mp4",
+    "D:/附件/YouTube/VOA/James Madison, Rescued rower, Imagery, Guilty pleasure - 63KXWNeRx9c.mp4",
+    "D:/附件/YouTube/VOA/Mardi Gras, Air quality, Robotics research, Disagreement - BT3PBeNqTqI.mp4",
+    "D:/附件/YouTube/VOA/Mary Kay, Building vocabulary, Zero emission plane, Small expressions - Ney6dPZhYe8.mp4",
+    "D:/附件/YouTube/VOA/Paradox museum,  Games in class, How to eat veggies, Getting nervous - rnCBVl9EUrM.mp4",
+    "D:/附件/YouTube/VOA/Pearl S  Buck, New fruits, Prefixes, Whose Who’'s - nrXXFSn53oQ.mp4",
+    "D:/附件/YouTube/VOA/Philo Farnsworth – TV inventor, Apple trees, Lower risk of dementia, Question intonation - adt5QZY7gFc.mp4",
+    "D:/附件/YouTube/VOA/Sew and Knit, Adverbs, Yellowstone, Open Boat 2 - DL_wfKddoLs.mp4",
+    "D:/附件/YouTube/VOA/Signature dish, Red Mars, Empire State Building, Unbelievable Ad - miQD4ZYOXUs.mp4",
+    "D:/附件/YouTube/VOA/Skyscrapers, ADHD, Ornamentals, Catch up - yfPivlhb3b4.mp4",
+    "D:/附件/YouTube/VOA/Statue of Liberty, Polar weather, Lead in Greece - KejRixkPtk8.mp4"
+  ]
+}

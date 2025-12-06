@@ -35,7 +35,6 @@
 
 ![开启开发者模式](screenshots/Snipaste_2025-12-06_12-52-42.png)
 
-![开启开发者模式](https://example.com/images/dev-mode-toggle.png)
 
 ---
 
