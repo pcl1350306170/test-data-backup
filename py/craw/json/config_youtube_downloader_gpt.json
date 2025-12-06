@@ -1,0 +1,12 @@
+{
+    "output_dir": "C:\\www\\test\\py\\craw\\downloads",
+    "ffmpeg_path": "D:/tools/ffmpeg/bin/ffmpeg.exe",
+    "threads": 1,
+    "download_type": "video",
+    "audio_format": "mp3",
+    "quality": "best",
+    "retry_count": 3,
+    "urls": [
+        "https://www.youtube.com/watch?v=DL_wfKddoLs&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=2"
+    ]
+}
