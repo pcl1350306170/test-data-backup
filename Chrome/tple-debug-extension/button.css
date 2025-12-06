@@ -1,0 +1,25 @@
+#tple-debug-button {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    z-index: 2147483647; /* 最大 z-index，确保在最上层 */
+    padding: 10px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+#tple-debug-button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+#tple-debug-button:active {
+    transform: translateY(0);
+}

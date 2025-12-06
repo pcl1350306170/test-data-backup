@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "门诊web调试页面加载",
+  "version": "1.1",
+  "description": "在 7000 端口项目页面添加调试入口按钮，并支持 iframeIndex2 自动跳转",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "css": ["button.css"]
+    }
+  ]
+}

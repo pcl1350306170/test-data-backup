@@ -6,8 +6,15 @@
     "download_type": "video",
     "audio_format": "mp3",
     "quality": "best",
-    "retry_count": 3,
+    "retry_count": 5,
     "urls": [
-        "https://www.youtube.com/watch?v=63KXWNeRx9c&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=2&pp=iAQB"
+        "https://www.youtube.com/watch?v=JaTnpxNHuAs&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=11&pp=iAQB",
+        "https://www.youtube.com/watch?v=KejRixkPtk8&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=12&pp=iAQB",
+        "https://www.youtube.com/watch?v=m2iWrmalZWU&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=13&pp=iAQB",
+        "https://www.youtube.com/watch?v=Ney6dPZhYe8&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=14&pp=iAQB",
+        "https://www.youtube.com/watch?v=g5cu_IJ9crs&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=15&pp=iAQB",
+        "https://www.youtube.com/watch?v=hgYzNEivsk0&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=16&pp=iAQB",
+        "https://www.youtube.com/watch?v=rnCBVl9EUrM&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=17&pp=iAQB",
+        "https://www.youtube.com/watch?v=adt5QZY7gFc&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=18&pp=iAQB"
     ]
 }
