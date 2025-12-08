@@ -81,15 +81,13 @@ APKG_MODEL = genanki.Model(
             'name': 'Card 1',
             'qfmt': '{{Word}}<br>{{Audio}}',
             'afmt': '''
-{{Word}}<br>
+{{Audio}}{{Word}}<br>
 {{Phonetic}}<br><br>
 {{Meaning}}<br><br>
-<i>{{Example}}</i><br>
+{{ExampleAudio}}<i>{{Example}}</i><br>
 {{ExampleTranslator}}<br><br>
 {{AIHelp}}<br><br>
 {{imgExample}}<br><br>
-{{Audio}}
-{{ExampleAudio}}
 ''',
         },
     ],
