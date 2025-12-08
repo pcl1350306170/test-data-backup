@@ -1,5 +1,5 @@
 {
-    "output_dir": "D:/附件/YouTube/VOA",
+    "output_dir": "D:/附件/YouTube/VOA/2025年12月8日",
     "ffmpeg_path": "D:/tools/ffmpeg/bin/ffmpeg.exe",
     "cookie_path": "C:/Users/pcl/文档/Downloads/aeef2c0b-0d27-4d5c-a727-f4a9eb5134cd.txt",
     "threads": 1,
@@ -8,6 +8,5 @@
     "quality": "best",
     "retry_count": 5,
     "urls": [
-
     ]
 }
