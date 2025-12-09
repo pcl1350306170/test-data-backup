@@ -10,11 +10,8 @@ from tkinter import *
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 
 # ================== 配置与常量 ==================
-import os
-from pathlib import Path
-
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
-SCRIPT_NAME = "file_renamer"  # 脚本名称
+SCRIPT_NAME = "file_renamer"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
@@ -40,28 +37,25 @@ class FileRenamerGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("文件批量重命名工具")
-        self.root.geometry("850x650")
-        self.root.minsize(750, 600)
+        self.root.geometry("900x700")
+        self.root.minsize(800, 650)
 
-        # 当前选中的文件列表
         self.selected_files = []
         self.selected_dir = ""
 
-        # 加载配置
         self.config = self.load_config()
-
-        # 创建界面
         self.create_widgets()
         self.apply_config()
 
     def load_config(self):
         default_config = {
-            "mode": "prefix",  # "prefix", "suffix", "split_dash"
+            "mode": "prefix",
             "content": "",
-            "input_type": "files",  # "files" or "directory"
+            "replace_from": "",
+            "replace_to": "",
+            "input_type": "files",
             "last_files": [],
             "last_directory": "",
-            "preview_enabled": True
         }
         if CONFIG_PATH.exists():
             try:
@@ -76,10 +70,11 @@ class FileRenamerGUI:
         cfg = {
             "mode": self.mode_var.get(),
             "content": self.content_var.get().strip(),
+            "replace_from": self.replace_from_var.get().strip(),
+            "replace_to": self.replace_to_var.get().strip(),
             "input_type": self.input_type_var.get(),
             "last_files": self.selected_files,
             "last_directory": self.selected_dir,
-            "preview_enabled": True
         }
         try:
             with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
@@ -91,13 +86,12 @@ class FileRenamerGUI:
     def apply_config(self):
         self.mode_var.set(self.config.get("mode", "prefix"))
         self.content_var.set(self.config.get("content", ""))
+        self.replace_from_var.set(self.config.get("replace_from", ""))
+        self.replace_to_var.set(self.config.get("replace_to", ""))
         self.input_type_var.set(self.config.get("input_type", "files"))
         self.selected_dir = self.config.get("last_directory", "")
         self.selected_files = self.config.get("last_files", [])
         self.update_file_list()
-
-        # 触发 UI 更新
-        self.on_input_type_change()
         self.on_mode_change()
 
     def create_widgets(self):
@@ -135,21 +129,32 @@ class FileRenamerGUI:
         modes = [
             ("添加前缀", "prefix"),
             ("添加后缀", "suffix"),
-            ("保留“-”前部分", "split_dash")
+            ("保留“-”前部分", "split_dash"),
+            ("关键字替换", "replace")
         ]
         for text, val in modes:
             Radiobutton(mode_row, text=text, variable=self.mode_var, value=val,
                         command=self.on_mode_change).pack(side=LEFT, padx=(10,0))
 
         # 内容输入（前缀/后缀用）
-        content_row = Frame(rule_frame)
-        content_row.pack(fill=X, pady=5)
-        Label(content_row, text="内容:").pack(side=LEFT)
+        self.content_frame = Frame(rule_frame)
+        self.content_frame.pack(fill=X, pady=5)
+        Label(self.content_frame, text="内容:").pack(side=LEFT)
         self.content_var = StringVar()
-        self.content_entry = Entry(content_row, textvariable=self.content_var, width=40)
+        self.content_entry = Entry(self.content_frame, textvariable=self.content_var, width=40)
         self.content_entry.pack(side=LEFT, padx=5, fill=X, expand=True)
-        self.content_hint = Label(content_row, text="", fg="gray")
+        self.content_hint = Label(self.content_frame, text="", fg="gray")
         self.content_hint.pack(side=LEFT, padx=(5,0))
+
+        # 关键字替换输入（仅 replace 模式显示）
+        self.replace_frame = Frame(rule_frame)
+        self.replace_frame.pack(fill=X, pady=5)
+        Label(self.replace_frame, text="原关键字:").pack(side=LEFT)
+        self.replace_from_var = StringVar()
+        Entry(self.replace_frame, textvariable=self.replace_from_var, width=20).pack(side=LEFT, padx=5)
+        Label(self.replace_frame, text="→ 替换为:").pack(side=LEFT)
+        self.replace_to_var = StringVar()
+        Entry(self.replace_frame, textvariable=self.replace_to_var, width=20).pack(side=LEFT, padx=5)
 
         # === 4. 文件列表预览 ===
         list_frame = LabelFrame(main_frame, text="待处理文件（最多显示20条）", padx=5, pady=5)
@@ -180,6 +185,8 @@ class FileRenamerGUI:
         self.input_type_var.trace_add("write", lambda *a: self.save_config())
         self.mode_var.trace_add("write", lambda *a: self.on_mode_change())
         self.content_var.trace_add("write", lambda *a: self.update_preview())
+        self.replace_from_var.trace_add("write", lambda *a: self.update_preview())
+        self.replace_to_var.trace_add("write", lambda *a: self.update_preview())
 
     def on_input_type_change(self):
         self.save_config()
@@ -190,15 +197,22 @@ class FileRenamerGUI:
 
     def on_mode_change(self):
         mode = self.mode_var.get()
-        if mode == "split_dash":
-            self.content_entry.config(state=DISABLED)
-            self.content_hint.config(text="自动移除“-”及之后内容")
+        # 隐藏/显示控件
+        self.content_frame.pack_forget()
+        self.replace_frame.pack_forget()
+
+        if mode == "replace":
+            self.replace_frame.pack(fill=X, pady=5)
+            self.content_hint.config(text="")
         else:
-            self.content_entry.config(state=NORMAL)
+            self.content_frame.pack(fill=X, pady=5)
             if mode == "prefix":
                 self.content_hint.config(text="将添加到文件名开头")
-            else:
+            elif mode == "suffix":
                 self.content_hint.config(text="将添加到文件名末尾（扩展名前）")
+            elif mode == "split_dash":
+                self.content_hint.config(text="自动移除“-”及之后内容")
+
         self.save_config()
         self.update_preview()
 
@@ -260,7 +274,14 @@ class FileRenamerGUI:
             new_stem = stem + self.content_var.get().strip()
         elif mode == "split_dash":
             parts = stem.split("-", 1)
-            new_stem = parts[0].rstrip()  # 保留第一部分，去除右侧空格
+            new_stem = parts[0].rstrip()
+        elif mode == "replace":
+            from_str = self.replace_from_var.get()
+            to_str = self.replace_to_var.get()
+            if from_str == "":
+                new_stem = stem  # 不替换
+            else:
+                new_stem = stem.replace(from_str, to_str)
         else:
             new_stem = stem
 
@@ -294,7 +315,11 @@ class FileRenamerGUI:
             messagebox.showwarning("警告", "没有可处理的文件！")
             return
 
-        # 确认
+        # 特别检查：replace 模式下是否填写了原关键字
+        if self.mode_var.get() == "replace" and not self.replace_from_var.get().strip():
+            messagebox.showwarning("警告", "“关键字替换”模式下，请输入“原关键字”！")
+            return
+
         if not messagebox.askyesno("确认", f"即将重命名 {len(files)} 个文件，是否继续？"):
             return
 
@@ -306,7 +331,7 @@ class FileRenamerGUI:
                 new_path = Path(new_path_str)
 
                 if old_path == new_path:
-                    continue  # 跳过无需更改的
+                    continue
 
                 if new_path.exists():
                     self.log(f"⚠️ 跳过（目标已存在）: {new_path.name}")
@@ -327,12 +352,11 @@ class FileRenamerGUI:
 
 # ================== 启动程序 ==================
 if __name__ == "__main__":
-    # 虽然不使用 DB_CONFIG，但按要求加载（可选）
+    # 加载 DB_CONFIG（虽不使用）
     if DB_CONFIG_PATH.exists():
         try:
             with open(DB_CONFIG_PATH, 'r', encoding='utf-8') as f:
-                db_cfg = json.load(f)
-                # 这里可以留作未来扩展，当前忽略
+                _ = json.load(f)  # 占位，满足需求
         except:
             pass
 

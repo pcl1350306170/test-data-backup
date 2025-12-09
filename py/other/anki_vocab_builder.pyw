@@ -1,5 +1,5 @@
 # anki_vocab_builder.pyw
-
+import asyncio
 import os
 import json
 import logging
@@ -120,20 +120,41 @@ def clean_filename(text):
 # TTS 引擎实现
 # ==============================
 async def synthesize_edge(text, lang, output_path):
-    """使用 Edge TTS（免费）"""
-    try:
-        voice_map = {
-            'en': 'en-US-JennyNeural',
-            'zh': 'zh-CN-XiaoxiaoNeural',
-        }
-        voice = voice_map.get(lang, 'en-US-JennyNeural')
-        communicate = edge_tts.Communicate(text, voice)
-        await communicate.save(output_path)
-        logger.info(f"Edge TTS success: {output_path}")
-        return True
-    except Exception as e:
-        logger.error(f"Edge TTS failed: {e}")
+    """使用 Edge TTS（免费），增加重试和延迟"""
+    if not edge_tts:
         return False
+
+    voice_map = {
+        'en': 'en-US-JennyNeural',
+        'zh': 'zh-CN-XiaoxiaoNeural',
+    }
+    voice = voice_map.get(lang, 'en-US-JennyNeural')
+
+    # 重试次数
+    max_retries = 3
+    delay = 0.5  # 基础延迟（秒）
+
+    for attempt in range(max_retries):
+        try:
+            communicate = edge_tts.Communicate(text, voice)
+            await communicate.save(output_path)
+
+            # 检查文件是否生成成功（大小是否 > 0）
+            if Path(output_path).exists() and Path(output_path).stat().st_size > 0:
+                logger.info(f"Edge TTS success: {output_path}")
+                await asyncio.sleep(delay)  # 请求后延迟
+                return True
+            else:
+                logger.warning(f"Edge TTS returned empty file: {output_path}")
+
+        except Exception as e:
+            logger.error(f"Edge TTS attempt {attempt+1} failed: {e}")
+            if attempt < max_retries - 1:
+                await asyncio.sleep(delay * (attempt + 1))  # 每次重试延迟递增
+            continue
+
+    logger.error(f"Edge TTS failed after {max_retries} attempts for: {text}")
+    return False
 
 def synthesize_google_cloud(text, lang, output_path, credentials_json=None):
     """使用 Google Cloud TTS（需凭据）"""
@@ -234,6 +255,7 @@ def generate_apkg(json_path, apkg_name, export_dir, tts_engine, tts_config, prog
             elif tts_engine == "edge" and edge_tts:
                 import asyncio
                 success = asyncio.run(synthesize_edge(word, 'en', str(audio_file)))
+                time.sleep(0.5)  # Edge TTS 后延迟
             elif tts_engine == "google_cloud":
                 cred_path = tts_config.get("google_cred_path")
                 success = synthesize_google_cloud(word, 'en', str(audio_file), cred_path)
@@ -250,6 +272,7 @@ def generate_apkg(json_path, apkg_name, export_dir, tts_engine, tts_config, prog
             elif tts_engine == "edge" and edge_tts:
                 import asyncio
                 success = asyncio.run(synthesize_edge(example, 'en', str(example_file)))
+                time.sleep(0.5)  # Edge TTS 后延迟
             elif tts_engine == "google_cloud":
                 cred_path = tts_config.get("google_cred_path")
                 success = synthesize_google_cloud(example, 'en', str(example_file), cred_path)

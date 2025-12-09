@@ -1,30 +1,9 @@
 {
-  "mode": "prefix",
+  "mode": "replace",
   "content": "VOA Learning English",
-  "input_type": "files",
-  "last_files": [
-    "D:/附件/YouTube/VOA/2025年12月8日/＂Remain＂ question for teacher, Sentence patterns, Blue Hotel.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Air plants, Poleana, Fall injuries, Pronoucing t.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Baby Mammoth, Kick off, Science of 2024.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Birdwatching in Alabama, Spread thin, ISS stay, Prediction.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Chorus Waves, Free salmon, High blood pressure, Food trucks.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Defining obesity, Winter gardening, Pink fire retardant, Talking about fun activities.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Dinosaur frog, Carter and Afghanistan, AI tools for learning disabilities.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Elephants in court, Missing school, Changing workplace for science, Hafta.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Escaped Monkeys, Politics, Bennu.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Gettysburg, Power couple, Moon’s grand canyon, Homophones.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Greenland, Mercury visit, AI from CES, Tons of.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Japan’s new satellite, More tigers in India, Sound barrier, US History game.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Nepal’s environment, Neuralink, Memory palace, Hard and soft skills.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Oldest person, Woman leaders in Vatican, Tik Tok ban.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Red dye ban, Celtic society, Meta fact check change, Objectivity.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Saving the Everglades, Microcredentials, Usual and unusual.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/South Atlantic iceberg, Invasive lizards, Write better emails, Reduced forms.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/South Korean impeachments, Kung Fu nuns, Weighted blankets.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Super Bowl history, Regardless, Fall of the House of Usher Part 2.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Trees in buildings, Avoiding viruses, Good news and Bad News.mp4",
-    "D:/附件/YouTube/VOA/2025年12月8日/Women on motorcycles, Iodine, Resolutions, People watching.mp4"
-  ],
-  "last_directory": "",
-  "preview_enabled": true
+  "replace_from": "×",
+  "replace_to": "-",
+  "input_type": "directory",
+  "last_files": [],
+  "last_directory": "C:/www/yh/门诊/template1.5.1/src/components/assets/images/design - 副本"
 }
