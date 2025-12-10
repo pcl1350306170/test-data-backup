@@ -1,0 +1,247 @@
+# adb_device_manager.pyw
+
+import os
+import sys
+import json
+import logging
+import subprocess
+import threading
+from pathlib import Path
+from tkinter import *
+from tkinter import filedialog, messagebox, ttk
+
+# ==============================
+# 配置与常量
+# ==============================
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+
+# 如果被打包为 exe，则资源在 _internal 下（PyInstaller 标准做法）
+if getattr(sys, 'frozen', False):
+    BASE_DIR = Path(sys._MEIPASS)
+else:
+    BASE_DIR = SCRIPT_DIR
+
+# 默认 scrcpy 路径（开发环境）
+DEFAULT_SCRCPY_DIR = r"D:\tools\scrcpy-win64-v3.3.3"
+
+# 运行时实际使用的 scrcpy 目录（优先用配置，其次默认，最后尝试打包内嵌）
+CONFIG_DIR = SCRIPT_DIR / "json"
+CONFIG_PATH = CONFIG_DIR / "config_adb_device_manager.json"
+LOGS_DIR = CONFIG_DIR / "logs"
+PROCESS_LOG_FILE = LOGS_DIR / "log_adb_device_manager.log"
+
+CONFIG_DIR.mkdir(exist_ok=True)
+LOGS_DIR.mkdir(exist_ok=True)
+
+# 日志配置
+logging.basicConfig(
+    filename=PROCESS_LOG_FILE,
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    encoding='utf-8'
+)
+
+# ==============================
+# 工具函数
+# ==============================
+def get_scrcpy_dir_from_config():
+    """从配置或默认值获取 scrcpy 目录"""
+    if CONFIG_PATH.exists():
+        try:
+            with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                path = config.get("scrcpy_dir", "").strip()
+                if path and Path(path).exists():
+                    return Path(path)
+        except Exception as e:
+            logging.error(f"配置加载失败: {e}")
+
+    # 尝试默认路径
+    if Path(DEFAULT_SCRCPY_DIR).exists():
+        return Path(DEFAULT_SCRCPY_DIR)
+
+    # 尝试打包内嵌路径（_internal/scrcpy/）
+    embedded = BASE_DIR / "_internal" / "scrcpy"
+    if embedded.exists():
+        return embedded
+
+    # 兜底
+    return Path(DEFAULT_SCRCPY_DIR)
+
+def save_config(scrcpy_dir: Path):
+    try:
+        with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+            json.dump({"scrcpy_dir": str(scrcpy_dir)}, f, ensure_ascii=False, indent=2)
+        logging.info(f"配置已保存: {scrcpy_dir}")
+    except Exception as e:
+        logging.error(f"保存配置失败: {e}")
+        messagebox.showerror("错误", f"无法保存配置：{e}")
+
+def run_adb_command(adb_path, args, timeout=30):
+    try:
+        cmd = [str(adb_path)] + args
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            encoding='utf-8',
+            timeout=timeout
+        )
+        return result.returncode, result.stdout, result.stderr
+    except subprocess.TimeoutExpired:
+        return -1, "", "命令超时"
+    except Exception as e:
+        return -1, "", str(e)
+
+# ==============================
+# GUI 主类
+# ==============================
+class ADBDeviceManager:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("📱 ADB 设备管理器 - Scrcpy 集成版")
+        self.root.geometry("650x400")
+        self.root.resizable(True, True)
+
+        # 初始化路径
+        self.scrcpy_dir = get_scrcpy_dir_from_config()
+        self.adb_exe = self.scrcpy_dir / "adb.exe"
+        self.scrcpy_exe = self.scrcpy_dir / "scrcpy.exe"
+
+        self.setup_ui()
+        self.update_display()
+
+    def setup_ui(self):
+        # Scrcpy 路径设置
+        frame_scrcpy = LabelFrame(self.root, text="🖥️ Scrcpy 路径（含 adb.exe）", padx=10, pady=10)
+        frame_scrcpy.pack(fill=X, padx=20, pady=10)
+
+        self.scrcpy_dir_var = StringVar(value=str(self.scrcpy_dir))
+        Entry(frame_scrcpy, textvariable=self.scrcpy_dir_var, width=60, font=("Consolas", 10)).pack(side=LEFT, padx=5)
+        Button(frame_scrcpy, text="📂 选择目录", command=self.select_scrcpy_dir).pack(side=LEFT, padx=5)
+
+        # 设备 IP 输入
+        frame_ip = LabelFrame(self.root, text="📡 设备 IP 地址（如 192.168.1.100）", padx=10, pady=10)
+        frame_ip.pack(fill=X, padx=20, pady=10)
+
+        self.device_ip_var = StringVar()
+        ip_entry = Entry(frame_ip, textvariable=self.device_ip_var, font=("Arial", 14), width=20)
+        ip_entry.pack(side=LEFT, padx=5)
+        ip_entry.bind("<Return>", lambda e: self.connect_device())
+
+        # 按钮区
+        btn_frame = Frame(self.root)
+        btn_frame.pack(pady=15)
+
+        Button(btn_frame, text="🔌 连接设备", command=self.connect_device, bg="#4CAF50", fg="white", width=12, height=2).grid(row=0, column=0, padx=10)
+        Button(btn_frame, text="📺 启动投屏", command=self.launch_scrcpy, bg="#2196F3", fg="white", width=12, height=2).grid(row=0, column=1, padx=10)
+        Button(btn_frame, text="🔄 刷新状态", command=self.check_adb_devices, bg="#FF9800", fg="white", width=12, height=2).grid(row=0, column=2, padx=10)
+
+        # 状态显示
+        self.status_label = Label(self.root, text="就绪", fg="green", font=("Arial", 12))
+        self.status_label.pack(pady=10)
+
+        # 日志输出
+        log_frame = LabelFrame(self.root, text="📝 操作日志", padx=10, pady=5)
+        log_frame.pack(fill=BOTH, expand=True, padx=20, pady=(0, 10))
+
+        self.log_text = Text(log_frame, height=6, state=DISABLED, wrap=WORD, font=("Consolas", 9))
+        scrollbar = Scrollbar(log_frame, orient=VERTICAL, command=self.log_text.yview)
+        self.log_text.configure(yscrollcommand=scrollbar.set)
+        self.log_text.pack(side=LEFT, fill=BOTH, expand=True)
+        scrollbar.pack(side=RIGHT, fill=Y)
+
+    def update_display(self):
+        self.scrcpy_dir_var.set(str(self.scrcpy_dir))
+        self.adb_exe = self.scrcpy_dir / "adb.exe"
+        self.scrcpy_exe = self.scrcpy_dir / "scrcpy.exe"
+
+    def select_scrcpy_dir(self):
+        folder = filedialog.askdirectory(initialdir=str(self.scrcpy_dir))
+        if folder:
+            new_dir = Path(folder)
+            adb_path = new_dir / "adb.exe"
+            scrcpy_path = new_dir / "scrcpy.exe"
+            if not adb_path.exists():
+                messagebox.showerror("错误", "所选目录中未找到 adb.exe！")
+                return
+            if not scrcpy_path.exists():
+                messagebox.showwarning("警告", "未找到 scrcpy.exe，仅支持 ADB 功能。")
+
+            self.scrcpy_dir = new_dir
+            save_config(self.scrcpy_dir)
+            self.update_display()
+            self.log_to_gui(f"Scrcpy 路径已更新为: {new_dir}")
+
+    def set_status(self, msg, color="black"):
+        self.status_label.config(text=msg, fg=color)
+        self.root.update_idletasks()
+
+    def log_to_gui(self, msg):
+        self.log_text.config(state=NORMAL)
+        self.log_text.insert(END, msg + "\n")
+        self.log_text.see(END)
+        self.log_text.config(state=DISABLED)
+        logging.info(msg)
+
+    def connect_device(self):
+        ip = self.device_ip_var.get().strip()
+        if not ip:
+            messagebox.showerror("错误", "请输入设备 IP 地址！")
+            return
+
+        if not self.adb_exe.exists():
+            messagebox.showerror("错误", f"adb.exe 不存在：{self.adb_exe}")
+            return
+
+        self.set_status("正在连接设备...", "orange")
+        code, out, err = run_adb_command(self.adb_exe, ["connect", ip])
+        if code == 0 and ("connected" in out.lower() or "already connected" in out.lower()):
+            msg = f"✅ 成功连接 {ip}"
+            self.set_status(msg, "green")
+            self.log_to_gui(msg)
+        else:
+            msg = f"❌ 连接失败: {err or out}"
+            self.set_status(msg, "red")
+            self.log_to_gui(msg)
+            messagebox.showerror("连接失败", msg)
+
+    def launch_scrcpy(self):
+        if not self.scrcpy_exe.exists():
+            messagebox.showerror("错误", f"scrcpy.exe 不存在：{self.scrcpy_exe}")
+            return
+
+        try:
+            # 启动 scrcpy（不阻塞）
+            subprocess.Popen([str(self.scrcpy_exe), "--no-audio"], cwd=self.scrcpy_dir)
+            msg = "✅ 已启动 Scrcpy 投屏"
+            self.set_status(msg, "green")
+            self.log_to_gui(msg)
+        except Exception as e:
+            msg = f"❌ 启动失败: {e}"
+            self.set_status(msg, "red")
+            self.log_to_gui(msg)
+            messagebox.showerror("启动失败", str(e))
+
+    def check_adb_devices(self):
+        if not self.adb_exe.exists():
+            self.set_status("adb.exe 不存在", "red")
+            return
+        code, out, _ = run_adb_command(self.adb_exe, ["devices"])
+        if code == 0:
+            lines = [line for line in out.strip().split('\n') if '\t' in line]
+            count = len(lines)
+            self.set_status(f"已连接设备数: {count}", "blue")
+            self.log_to_gui(f"adb devices:\n{out}")
+        else:
+            self.set_status("adb devices 命令失败", "red")
+
+# ==============================
+# 启动程序
+# ==============================
+if __name__ == "__main__":
+    import sys  # needed for frozen check
+
+    root = Tk()
+    app = ADBDeviceManager(root)
+    root.mainloop()
