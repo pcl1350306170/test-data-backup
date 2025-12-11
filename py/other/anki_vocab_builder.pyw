@@ -1,4 +1,4 @@
-# anki_vocab_builder.pyw
+# anki_vocab_builder.py
 import asyncio
 import os
 import json
@@ -30,6 +30,13 @@ try:
     from google.cloud import texttospeech as google_tts
 except ImportError:
     google_tts = None
+
+# --- 新增：Qwen TTS 依赖 ---
+try:
+    import httpx
+except ImportError:
+    httpx = None
+# --- 新增结束 ---
 
 import genanki
 import requests
@@ -80,26 +87,16 @@ APKG_MODEL = genanki.Model(
         {
             'name': 'Card 1',
             'qfmt': '{{Word}}<br>{{Audio}}',
-            'afmt': '''
-{{Audio}}{{Word}}<br>
-{{Phonetic}}<br><br>
-{{Meaning}}<br><br>
-{{ExampleAudio}}<i>{{Example}}</i><br>
-{{ExampleTranslator}}<br><br>
-{{AIHelp}}<br><br>
-{{imgExample}}<br><br>
-''',
+            'afmt': '''{{Audio}}{{Word}}<br>{{Phonetic}}<br><br>{{Meaning}}<br><br>{{ExampleAudio}}<i>{{Example}}</i><br>{{ExampleTranslator}}<br><br>{{AIHelp}}<br><br>{{imgExample}}<br><br>''',
         },
     ],
-    css='''
-.card {
- font-family: Arial, sans-serif;
- font-size: 20px;
- text-align: center;
- color: #333;
- background-color: #fff;
-}
-'''
+    css='''.card {
+        font-family: Arial, sans-serif;
+        font-size: 20px;
+        text-align: center;
+        color: #333;
+        background-color: #fff;
+    }'''
 )
 
 # ==============================
@@ -123,36 +120,28 @@ async def synthesize_edge(text, lang, output_path):
     """使用 Edge TTS（免费），增加重试和延迟"""
     if not edge_tts:
         return False
-
     voice_map = {
         'en': 'en-US-JennyNeural',
         'zh': 'zh-CN-XiaoxiaoNeural',
     }
     voice = voice_map.get(lang, 'en-US-JennyNeural')
-
-    # 重试次数
     max_retries = 3
-    delay = 0.5  # 基础延迟（秒）
-
+    delay = 0.5
     for attempt in range(max_retries):
         try:
             communicate = edge_tts.Communicate(text, voice)
             await communicate.save(output_path)
-
-            # 检查文件是否生成成功（大小是否 > 0）
             if Path(output_path).exists() and Path(output_path).stat().st_size > 0:
                 logger.info(f"Edge TTS success: {output_path}")
-                await asyncio.sleep(delay)  # 请求后延迟
+                await asyncio.sleep(delay)
                 return True
             else:
                 logger.warning(f"Edge TTS returned empty file: {output_path}")
-
         except Exception as e:
             logger.error(f"Edge TTS attempt {attempt+1} failed: {e}")
             if attempt < max_retries - 1:
-                await asyncio.sleep(delay * (attempt + 1))  # 每次重试延迟递增
-            continue
-
+                await asyncio.sleep(delay * (attempt + 1))
+                continue
     logger.error(f"Edge TTS failed after {max_retries} attempts for: {text}")
     return False
 
@@ -163,7 +152,6 @@ def synthesize_google_cloud(text, lang, output_path, credentials_json=None):
     try:
         import os
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = credentials_json
-
         client = google_tts.TextToSpeechClient()
         synthesis_input = google_tts.SynthesisInput(text=text)
         voice = google_tts.VoiceSelectionParams(
@@ -172,7 +160,9 @@ def synthesize_google_cloud(text, lang, output_path, credentials_json=None):
         )
         audio_config = google_tts.AudioConfig(audio_encoding=google_tts.AudioEncoding.MP3)
         response = client.synthesize_speech(
-            input=synthesis_input, voice=voice, audio_config=audio_config
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
         )
         with open(output_path, "wb") as out:
             out.write(response.audio_content)
@@ -189,12 +179,66 @@ def synthesize_gtts(text, lang, output_path):
     try:
         tts = gTTS(text=text, lang=lang, slow=False)
         tts.save(output_path)
-        time.sleep(1.2)  # 防封关键：加延迟
+        time.sleep(1.2)
         return True
     except Exception as e:
         logger.error(f"gTTS failed: {e}")
         time.sleep(2)
         return False
+
+# --- 新增：Qwen3 TTS 实现 ---
+def synthesize_qwen3_tts(text, lang, output_path, api_key):
+    """使用 通义千问 DashScope TTS (Qwen3-TTS)"""
+    if not httpx or not api_key:
+        return False
+
+    # 根据语言选择模型和发音人
+    if lang == 'zh':
+        model = "cosyvoice-v1"
+        voice = "longxiaochun"
+    else:  # 默认英文
+        model = "cosyvoice-v1"
+        voice = "longxiaochun"  # 注意：当前 DashScope CosyVoice 对英文支持有限，可后续替换为专门英文音色
+
+    url = "https://dashscope.aliyuncs.com/api/v1/services/audio/tts/text-to-speech"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": model,
+        "input": {
+            "text": text
+        },
+        "parameters": {
+            "voice": voice,
+            "sample_rate": 24000,
+            "format": "mp3",
+            "volume": 1.0,
+            "speech_rate": 1.0
+        }
+    }
+
+    try:
+        with httpx.Client(timeout=30) as client:
+            response = client.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            result = response.json()
+            audio_b64 = result['output']['results'][0]['audio']
+            audio_data = base64.b64decode(audio_b64)
+            with open(output_path, "wb") as f:
+                f.write(audio_data)
+            if Path(output_path).exists() and Path(output_path).stat().st_size > 0:
+                logger.info(f"Qwen3 TTS success: {output_path}")
+                time.sleep(0.5)  # 遵守速率限制
+                return True
+            else:
+                logger.warning(f"Qwen3 TTS returned empty file: {output_path}")
+                return False
+    except Exception as e:
+        logger.error(f"Qwen3 TTS failed for '{text}': {e}")
+        return False
+# --- 新增结束 ---
 
 # ==============================
 # 主逻辑：生成 APKG
@@ -208,13 +252,12 @@ def generate_apkg(json_path, apkg_name, export_dir, tts_engine, tts_config, prog
         deck = genanki.Deck(deck_id, apkg_name)
         media_files = []
         temp_dir = Path(tempfile.mkdtemp())
-
         total = len(words_data)
+
         for idx, item in enumerate(words_data):
             word = item.get("Word", "").strip()
             if not word:
                 continue
-
             phonetic = item.get("Phonetic", "").strip()
             meaning = item.get("Meaning", "").strip()
             example = item.get("Example", "").strip()
@@ -255,10 +298,13 @@ def generate_apkg(json_path, apkg_name, export_dir, tts_engine, tts_config, prog
             elif tts_engine == "edge" and edge_tts:
                 import asyncio
                 success = asyncio.run(synthesize_edge(word, 'en', str(audio_file)))
-                time.sleep(0.5)  # Edge TTS 后延迟
+                time.sleep(0.5)
             elif tts_engine == "google_cloud":
                 cred_path = tts_config.get("google_cred_path")
                 success = synthesize_google_cloud(word, 'en', str(audio_file), cred_path)
+            elif tts_engine == "qwen3":
+                qwen_api_key = tts_config.get("qwen_api_key")
+                success = synthesize_qwen3_tts(word, 'en', str(audio_file), qwen_api_key)
 
             if success:
                 audio_path = f"[sound:{word_clean}.mp3]"
@@ -272,10 +318,13 @@ def generate_apkg(json_path, apkg_name, export_dir, tts_engine, tts_config, prog
             elif tts_engine == "edge" and edge_tts:
                 import asyncio
                 success = asyncio.run(synthesize_edge(example, 'en', str(example_file)))
-                time.sleep(0.5)  # Edge TTS 后延迟
+                time.sleep(0.5)
             elif tts_engine == "google_cloud":
                 cred_path = tts_config.get("google_cred_path")
                 success = synthesize_google_cloud(example, 'en', str(example_file), cred_path)
+            elif tts_engine == "qwen3":
+                qwen_api_key = tts_config.get("qwen_api_key")
+                success = synthesize_qwen3_tts(example, 'en', str(example_file), qwen_api_key)
 
             if success:
                 example_audio_path = f"[sound:example_{word_clean}.mp3]"
@@ -284,15 +333,8 @@ def generate_apkg(json_path, apkg_name, export_dir, tts_engine, tts_config, prog
             note = genanki.Note(
                 model=APKG_MODEL,
                 fields=[
-                    word,
-                    phonetic,
-                    meaning,
-                    example,
-                    example_translator,
-                    audio_path,
-                    example_audio_path,
-                    ai_help,
-                    img_example_path
+                    word, phonetic, meaning, example, example_translator,
+                    audio_path, example_audio_path, ai_help, img_example_path
                 ]
             )
             deck.add_note(note)
@@ -319,9 +361,8 @@ class AnkiBuilderGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Anki 单词牌组生成器")
-        self.root.geometry("580x520")
+        self.root.geometry("580x780")  # 增加高度以容纳新控件
         self.root.resizable(False, False)
-
         self.config = self.load_config()
         self.create_widgets()
         self.update_tts_options()
@@ -342,6 +383,7 @@ class AnkiBuilderGUI:
             "export_dir": self.export_dir.get(),
             "tts_engine": self.tts_engine.get(),
             "google_cred_path": self.google_cred_path.get(),
+            "qwen_api_key": self.qwen_api_key.get(),  # 保存 Qwen API Key
         }
         with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=2)
@@ -362,18 +404,17 @@ class AnkiBuilderGUI:
             self.google_cred_path.set(path)
 
     def update_tts_options(self):
-        # 检查各引擎可用性
         self.radio_gtts.config(state='normal' if gTTS else 'disabled')
         self.radio_edge.config(state='normal' if edge_tts else 'disabled')
         self.radio_google_cloud.config(state='normal' if google_tts else 'disabled')
+        self.radio_qwen3.config(state='normal' if httpx else 'disabled')  # 新增
 
-        # 如果当前选中的不可用，回退到可用选项
         current = self.tts_engine.get()
         available = []
         if gTTS: available.append("gtts")
         if edge_tts: available.append("edge")
         if google_tts: available.append("google_cloud")
-
+        if httpx: available.append("qwen3")  # 新增
         if available and current not in available:
             self.tts_engine.set(available[0])
 
@@ -400,14 +441,22 @@ class AnkiBuilderGUI:
                 messagebox.showerror("错误", "请提供有效的 Google Cloud 凭据 JSON 文件")
                 return
 
-        self.save_config()
+        # --- 新增：检查 Qwen API Key ---
+        if tts_engine == "qwen3":
+            api_key = self.qwen_api_key.get().strip()
+            if not api_key:
+                messagebox.showerror("错误", "请选择 Qwen3-TTS 引擎并提供 DashScope API Key")
+                return
+        # --- 新增结束 ---
 
+        self.save_config()
         self.btn_generate.config(state='disabled')
         self.progress['value'] = 0
         self.progress_label.config(text="处理中...")
 
         tts_config = {
-            "google_cred_path": self.google_cred_path.get() if tts_engine == "google_cloud" else None
+            "google_cred_path": self.google_cred_path.get() if tts_engine == "google_cloud" else None,
+            "qwen_api_key": self.qwen_api_key.get() if tts_engine == "qwen3" else None,  # 新增
         }
 
         thread = threading.Thread(
@@ -479,6 +528,10 @@ class AnkiBuilderGUI:
         self.radio_edge.pack(anchor=W)
         self.radio_google_cloud = Radiobutton(radio_frame, text="Google Cloud TTS (需API密钥)", variable=self.tts_engine, value="google_cloud")
         self.radio_google_cloud.pack(anchor=W)
+        # --- 新增 Qwen3 选项 ---
+        self.radio_qwen3 = Radiobutton(radio_frame, text="Qwen3-TTS (需API密钥)", variable=self.tts_engine, value="qwen3")
+        self.radio_qwen3.pack(anchor=W)
+        # --- 新增结束 ---
 
         # Google Cloud 凭据
         frame5 = Frame(self.root)
@@ -489,6 +542,17 @@ class AnkiBuilderGUI:
         self.google_cred_path = StringVar(value=self.config.get("google_cred_path", ""))
         Entry(cred_frame, textvariable=self.google_cred_path, state='readonly').pack(side=LEFT, fill=X, expand=True, padx=(0,5))
         Button(cred_frame, text="选择", command=self.select_google_cred).pack(side=RIGHT)
+
+        # --- 新增：Qwen API Key 输入 ---
+        frame6 = Frame(self.root)
+        frame6.pack(pady=5, padx=20, fill=X)
+        Label(frame6, text="DashScope API Key (仅当选择 Qwen3-TTS 时需要):").pack(anchor=W)
+        key_frame = Frame(frame6)
+        key_frame.pack(fill=X, pady=(5,0))
+        self.qwen_api_key = StringVar(value=self.config.get("qwen_api_key", ""))
+        Entry(key_frame, textvariable=self.qwen_api_key, show="*").pack(side=LEFT, fill=X, expand=True, padx=(0,5))
+        # 可选：添加显示/隐藏按钮（此处省略以保持简洁）
+        # --- 新增结束 ---
 
         # 进度条
         self.progress = ttk.Progressbar(self.root, mode='determinate')
@@ -511,7 +575,8 @@ def check_dependencies():
         missing.append("edge-tts")
     if not google_tts:
         missing.append("google-cloud-texttospeech")
-
+    if not httpx:  # 新增
+        missing.append("httpx")
     if missing:
         msg = "缺少以下依赖库，请在命令行运行安装命令：\n\n"
         msg += "pip install " + " ".join(missing) + "\n\n"

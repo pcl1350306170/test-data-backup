@@ -1,10 +1,13 @@
 {
-    "output_dir": "D:/附件/YouTube/VOA/2025年12月10日",
+    "output_dir": "D:/附件/YouTube/VOA/2025年12月11日",
     "ffmpeg_path": "D:/tools/ffmpeg/bin/ffmpeg.exe",
-    "cookie_path": "C:/Users/pcl/文档/Downloads/aeef2c0b-0d27-4d5c-a727-f4a9eb5134cd.txt",
+    "cookie_path": "C:/Users/pcl/文档/Downloads/c3f47267-0065-43c8-83a8-bfb8e5c5e5b7.txt",
     "threads": 1,
     "download_type": "video",
     "audio_format": "mp3",
     "quality": "best",
-    "retry_count": 5
+    "retry_count": 5,
+    "urls": [
+        "https://www.youtube.com/watch?v=1jl-01weKoU"
+    ]
 }

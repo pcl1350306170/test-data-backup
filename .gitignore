@@ -36,3 +36,4 @@ vue.config.js
 /py/other/json/wordJson*
 /py/yarward/build/*
 /py/yarward/dist/*
+/py/qwen/json/config_qwen_vocab_enhancer.json
