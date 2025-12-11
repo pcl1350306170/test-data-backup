@@ -1,5 +1,4 @@
-# qwen_vocab_enhancer.pyw
-
+# qwen_vocab_enhancer.py
 import os
 import json
 import logging
@@ -52,6 +51,7 @@ def load_config():
                 return json.load(f)
         except Exception as e:
             logger.error(f"Failed to load config: {e}")
+            return {}
     return {}
 
 def save_config(data):
@@ -65,51 +65,20 @@ def save_config(data):
 def is_verb_form(word):
     """简单判断是否为动词分词或复数，并尝试还原原形（仅基础规则）"""
     irregulars = {
-        "went": "go",
-        "seen": "see",
-        "done": "do",
-        "taken": "take",
-        "given": "give",
-        "made": "make",
-        "said": "say",
-        "thought": "think",
-        "brought": "bring",
-        "built": "build",
-        "bought": "buy",
-        "taught": "teach",
-        "caught": "catch",
-        "found": "find",
-        "held": "hold",
-        "kept": "keep",
-        "left": "leave",
-        "lost": "lose",
-        "meant": "mean",
-        "met": "meet",
-        "paid": "pay",
-        "put": "put",
-        "read": "read",
-        "run": "run",
-        "sat": "sit",
-        "sold": "sell",
-        "sent": "send",
-        "shut": "shut",
-        "spent": "spend",
-        "stood": "stand",
-        "told": "tell",
-        "understood": "understand",
-        "woke": "wake",
-        "won": "win",
-        "written": "write",
+        "went": "go", "seen": "see", "done": "do", "taken": "take", "given": "give", "made": "make",
+        "said": "say", "thought": "think", "brought": "bring", "built": "build", "bought": "buy",
+        "taught": "teach", "caught": "catch", "found": "find", "held": "hold", "kept": "keep",
+        "left": "leave", "lost": "lose", "meant": "mean", "met": "meet", "paid": "pay", "put": "put",
+        "read": "read", "run": "run", "sat": "sit", "sold": "sell", "sent": "send", "shut": "shut",
+        "spent": "spend", "stood": "stand", "told": "tell", "understood": "understand", "woke": "wake",
+        "won": "win", "written": "write",
     }
     if word.lower() in irregulars:
         return irregulars[word.lower()], "过去分词/过去式"
-
     # 规则动词过去式/过去分词
     if re.search(r'ed$', word) and len(word) > 3:
         base = re.sub(r'ed$', '', word)
-        # 简单去重辅音（不完美）
         return base, "过去分词/过去式"
-
     # 复数名词
     if word.endswith('ies') and len(word) > 4:
         base = word[:-3] + 'y'
@@ -120,14 +89,12 @@ def is_verb_form(word):
     elif word.endswith('s') and len(word) > 2 and not word.endswith(('ss', 'us', 'is')):
         base = word[:-1]
         return base, "复数"
-
     return None, None
 
 def build_ai_help_html(word, base_word=None, form_type=None):
     help_text = f"<p><strong>快速记忆技巧（程序员友好版）：</strong></p>\n<ul>"
     if base_word and form_type:
         help_text += f"<li>💡 <strong>词形提示</strong>：'{word}' 是 '{base_word}' 的 <em>{form_type}</em> 形式。</li>\n"
-
     help_text += f"""<li>🧠 <strong>词根联想</strong>：拆解 '<code>{word.lower()}</code>'，思考其技术场景含义（如 API、日志、错误码等）。</li>
 <li>🎤 <strong>谐音+场景</strong>：尝试用中文谐音编一个程序员日常小故事（例如：“radiating” → “瑞弟哎挺” → “服务器瑞弟一直在 radiating heat！”）。</li>
 <li>💻 <strong>造句强化</strong>：在代码注释、Git 提交信息或技术文档中主动使用该词。</li>
@@ -148,15 +115,11 @@ def call_qwen_api(api_key, prompt, timeout=30):
         "Content-Type": "application/json"
     }
     data = {
-        "model": "qwen-max",  # 或 qwen-plus, qwen-turbo
+        "model": "qwen-max",
         "input": {
-            "messages": [
-                {"role": "user", "content": prompt}
-            ]
+            "messages": [{"role": "user", "content": prompt}]
         },
-        "parameters": {
-            "result_format": "message"
-        }
+        "parameters": {"result_format": "message"}
     }
     try:
         with HTTPXClient(timeout=timeout) as client:
@@ -170,26 +133,50 @@ def call_qwen_api(api_key, prompt, timeout=30):
         raise
 
 def generate_example_and_translation(api_key, word, meaning=""):
-    prompt = f"""你是一名资深程序员和技术英语专家。
-请为单词 "{word}" 生成一个贴近程序员工作场景的英文例句（简洁、真实、技术相关），
-并提供对应的中文翻译。
-
-要求：
+    prompt = f"""你是一名资深程序员和技术英语专家。请为单词 "{word}" 生成一个贴近程序员工作场景的英文例句（简洁、真实、技术相关），并提供对应的中文翻译。要求：
 - 例句必须包含 "{word}"，且自然流畅
 - 场景可包括：编程、系统运维、网络安全、云计算、AI开发等
 - 中文翻译要准确、口语化
-
 只返回两行：
 第一行：英文例句
 第二行：中文翻译
-
 不要任何其他文字、标号或解释。"""
-
     response = call_qwen_api(api_key, prompt)
     lines = response.split('\n')
     en = lines[0].strip() if len(lines) > 0 else f"The term '{word}' is commonly used in technical documentation."
     zh = lines[1].strip() if len(lines) > 1 else en
     return en, zh
+
+# --- 新增函数：获取 Meaning 和 Phonetic ---
+def generate_meaning_and_phonetic(api_key, word):
+    """
+    调用 AI 获取单词的详细含义和音标。
+    返回: (meaning_str, phonetic_str)
+    """
+    prompt = f"""你是一位专业的英语词典编纂者。请为单词 "{word}" 提供以下信息：
+1. **Meaning**: 详细的词性和释义，格式如 "adj. 不变的；恒定的；n. 常数；常量"。
+2. **Phonetic**: 标准英式和美式发音的音标，格式如 "英 [ˈkɒnstənt]，美 [ˈkɑːnstənt]"。
+
+请严格按照以下 JSON 格式返回，不要包含任何其他文字：
+{{
+    "Meaning": "此处填写含义",
+    "Phonetic": "此处填写音标"
+}}"""
+    try:
+        response = call_qwen_api(api_key, prompt)
+        # 尝试解析 JSON
+        import json
+        data = json.loads(response)
+        meaning = data.get("Meaning", "").strip()
+        phonetic = data.get("Phonetic", "").strip()
+        return meaning, phonetic
+    except Exception as e:
+        logger.error(f"Failed to parse Meaning/Phonetic for '{word}': {e}")
+        # 如果解析失败，提供一个安全的回退方案
+        fallback_meaning = f"（AI 未能成功解析含义，请手动补充）"
+        fallback_phonetic = f"（AI 未能成功解析音标，请手动补充）"
+        return fallback_meaning, fallback_phonetic
+# --- 新增函数结束 ---
 
 # ==============================
 # 主处理逻辑
@@ -197,12 +184,33 @@ def generate_example_and_translation(api_key, word, meaning=""):
 def process_json_file(input_path, output_path, api_key, progress_callback):
     with open(input_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
-
     total = len(data)
     for idx, item in enumerate(data):
         word = item.get("Word", "").strip()
         if not word:
             continue
+
+        # --- 新增逻辑：检查并补充 Meaning 和 Phonetic ---
+        need_meaning = not item.get("Meaning", "").strip()
+        need_phonetic = not item.get("Phonetic", "").strip()
+
+        if need_meaning or need_phonetic:
+            try:
+                ai_meaning, ai_phonetic = generate_meaning_and_phonetic(api_key, word)
+                if need_meaning:
+                    item["Meaning"] = ai_meaning
+                if need_phonetic:
+                    item["Phonetic"] = ai_phonetic
+                logger.info(f"Generated Meaning/Phonetic for '{word}': {ai_meaning} | {ai_phonetic}")
+            except Exception as e:
+                fallback_meaning = f"（获取含义失败: {str(e)}）"
+                fallback_phonetic = f"（获取音标失败: {str(e)}）"
+                if need_meaning:
+                    item["Meaning"] = fallback_meaning
+                if need_phonetic:
+                    item["Phonetic"] = fallback_phonetic
+                logger.warning(f"Failed to generate Meaning/Phonetic for '{word}', using fallback. Error: {e}")
+        # --- 新增逻辑结束 ---
 
         # 检查是否需要补全 Example / ExampleTranslator
         need_example = not item.get("Example", "").strip()
@@ -232,7 +240,6 @@ def process_json_file(input_path, output_path, api_key, progress_callback):
 
         # 生成 AIHelp（始终更新，因为可能词形变了）
         item["AIHelp"] = build_ai_help_html(word, base_word, form_type)
-
         progress_callback(idx + 1, total)
 
     # 保存新文件
@@ -249,7 +256,6 @@ class QwenVocabEnhancerGUI:
         self.root.title("Qwen 单词增强器")
         self.root.geometry("600x500")
         self.root.resizable(False, False)
-
         self.config = load_config()
         self.create_widgets()
 
@@ -283,7 +289,6 @@ class QwenVocabEnhancerGUI:
         # 按钮
         btn_frame = Frame(self.root)
         btn_frame.pack(pady=20)
-
         Button(btn_frame, text="开始增强", command=self.start_process, width=15, height=2).pack(side=LEFT, padx=10)
         Button(btn_frame, text="显示明文密钥", command=self.toggle_key_visibility, width=15).pack(side=LEFT, padx=10)
 
@@ -292,9 +297,8 @@ class QwenVocabEnhancerGUI:
         self.progress.pack(pady=10, padx=20, fill=X)
         self.progress_label = Label(self.root, text="")
         self.progress_label.pack()
-
         self.key_visible = False
-        self.key_entry = None  # 用于切换显示
+        self.key_entry = None
 
     def select_json(self):
         path = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
@@ -307,7 +311,7 @@ class QwenVocabEnhancerGUI:
             self.export_dir.set(path)
 
     def toggle_key_visibility(self):
-        current_widget = self.root.winfo_children()[1].winfo_children()[1]  # 粗略定位Entry
+        current_widget = self.root.winfo_children()[1].winfo_children()[1] # 粗略定位Entry
         if isinstance(current_widget, Entry):
             if self.key_visible:
                 current_widget.config(show="*")
@@ -389,7 +393,6 @@ if __name__ == "__main__":
         try:
             with open(DB_CONFIG_PATH, 'r', encoding='utf-8') as f:
                 db_config = json.load(f)
-                # 这里不使用，仅为满足“引入”要求
         except:
             pass
 
