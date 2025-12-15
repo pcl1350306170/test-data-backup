@@ -91,16 +91,15 @@ def is_verb_form(word):
         return base, "复数"
     return None, None
 
-def build_ai_help_html(word, base_word=None, form_type=None):
-    help_text = f"<p><strong>快速记忆技巧（程序员友好版）：</strong></p>\n<ul>"
-    if base_word and form_type:
-        help_text += f"<li>💡 <strong>词形提示</strong>：'{word}' 是 '{base_word}' 的 <em>{form_type}</em> 形式。</li>\n"
-    help_text += f"""<li>🧠 <strong>词根联想</strong>：拆解 '<code>{word.lower()}</code>'，思考其技术场景含义（如 API、日志、错误码等）。</li>
-<li>🎤 <strong>谐音+场景</strong>：尝试用中文谐音编一个程序员日常小故事（例如：“radiating” → “瑞弟哎挺” → “服务器瑞弟一直在 radiating heat！”）。</li>
-<li>💻 <strong>造句强化</strong>：在代码注释、Git 提交信息或技术文档中主动使用该词。</li>
-<li>🔄 <strong>对比近义词</strong>：如 emit vs radiate, serialize vs marshal, deploy vs release —— 注意语境差异。</li>
-</ul>
-<p style="color:#555;font-size:0.9em;">✨ 记忆的本质是<strong>高频接触+情感关联</strong>。把单词放进你的工作流，它就活了！</p>"""
+def build_ai_help_html(api_key, word):
+    prompt = f"""你是专业的英语词典编纂者。帮助一个初学者记住单词 "{word}" 。要求：
+    - 如果单词"{word}"可以拆解，你就把这个单词"{word}"拆解一下，是由那几个词根组成，还有哪些类似的单词
+    - 如果"{word}"可以使用谐音 + 场景记忆，你具体列出来记忆方式。
+    - 给我列出来"{word}"还有哪些含义、词根组成类似的单词
+    。"""
+    response = call_qwen_api(api_key, prompt)
+    lines = response.split('\n')
+    help_text = lines[0].strip() if len(lines) > 0 else f"关于 '{word}' ，自己去死记硬背吧，AI都帮不了你！"
     return help_text
 
 # ==============================
@@ -134,8 +133,8 @@ def call_qwen_api(api_key, prompt, timeout=30):
 
 def generate_example_and_translation(api_key, word, meaning=""):
     prompt = f"""你是一名资深程序员和技术英语专家。请为单词 "{word}" 生成一个贴近程序员工作场景的英文例句（简洁、真实、技术相关），并提供对应的中文翻译。要求：
-- 例句必须包含 "{word}"，且自然流畅
-- 场景可包括：编程、系统运维、网络安全、云计算、AI开发等
+- 例句必须包含 "{word}"，例句长度3到6个短句子，且自然流畅
+- 场景可包括：编程、系统运维、网络安全、云计算、AI开发、吐槽不合理的系统交互等
 - 中文翻译要准确、口语化
 只返回两行：
 第一行：英文例句
@@ -239,7 +238,7 @@ def process_json_file(input_path, output_path, api_key, progress_callback):
                 logger.warning(f"Failed to generate example for '{word}', using fallback. Error: {e}")
 
         # 生成 AIHelp（始终更新，因为可能词形变了）
-        item["AIHelp"] = build_ai_help_html(word, base_word, form_type)
+        item["AIHelp"] = build_ai_help_html(api_key, actual_word)
         progress_callback(idx + 1, total)
 
     # 保存新文件

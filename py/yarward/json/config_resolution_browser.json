@@ -3,6 +3,6 @@
   "height": 900,
   "url": "https://weread.qq.com/",
   "frameless": false,
-  "resizable": false,
+  "resizable": true,
   "movable": true
 }

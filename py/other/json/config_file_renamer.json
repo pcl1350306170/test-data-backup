@@ -1,9 +1,9 @@
 {
   "mode": "replace",
-  "content": "VOA Learning English",
+  "content": "VOA Learning English-",
   "replace_from": "×",
   "replace_to": "-",
   "input_type": "directory",
   "last_files": [],
-  "last_directory": "C:/www/yh/门诊/template1.5.1/src/components/assets/images/design - 副本"
+  "last_directory": "D:/附件/YouTube/VOA"
 }

@@ -5,18 +5,29 @@
     if (url.port !== '7000') return;
 
     // ===== 条件2：如果是 iframeIndex2.html 页面，自动跳转 =====
-    if (url.pathname === '/tpleditor/resource/html/iframeIndex2.html') {
-        // 获取所有查询参数
-        const params = new URLSearchParams(url.search);
-        const queryString = params.toString();
+	
+    // ===== 条件2：匹配 iframeIndex 相关页面，自动跳转 =====
+	if (
+	  url.pathname === '/tpleditor/resource/html/iframeIndex2.html' ||
+	  url.hash.includes('/iframeIndex') ||
+	  (url.pathname === '/tpleditor/design/' && url.hash.startsWith('#/iframeIndex'))
+	) {
+	  // 获取所有查询参数（包括 ? 后面的）
+	  const params = new URLSearchParams(url.search);
+	  // 如果 hash 中有 ?，也要提取（如 #/iframeIndex?xxx）
+	  const hashSearch = url.hash.split('?')[1] || '';
+	  const hashParams = new URLSearchParams(hashSearch);
 
-        // 构造目标 URL
-        const targetUrl = `http://localhost:8080/#/iframeIndex${queryString ? '?' + queryString : ''}`;
+	  // 合并 search 和 hash 中的参数（hash 优先级更高）
+	  for (const [key, value] of hashParams) {
+		params.set(key, value);
+	  }
 
-        // 立即跳转（避免页面渲染）
-        window.location.replace(targetUrl);
-        return;
-    }
+	  const queryString = params.toString();
+	  const targetUrl = `http://localhost:8080/#/iframeIndex${queryString ? '?' + queryString : ''}`;
+	  window.location.replace(targetUrl);
+	  return;
+	}
 
     // ===== 条件3：如果路由包含 /#/sbIndex，不加载按钮 =====
     if (url.hash.includes('/sbIndex')) {
