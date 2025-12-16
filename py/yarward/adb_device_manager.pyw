@@ -2,6 +2,7 @@
 
 import os
 import json
+import sys
 import logging
 import subprocess
 import threading
@@ -11,6 +12,26 @@ from tkinter import filedialog, messagebox, ttk
 
 # ================== 配置与常量 ==================
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+
+# 🔧【关键修改】如果打包为exe，从 _internal 查找 QtScrcpy
+if getattr(sys, 'frozen', False):
+    # PyInstaller 打包后的路径
+    BASE_DIR = Path(sys._MEIPASS)
+    # 尝试从 _internal 查找
+    INTERNAL_QTSCRCPY = BASE_DIR / "_internal" / "QtScrcpy"
+    if INTERNAL_QTSCRCPY.exists():
+        DEFAULT_ADB_DIR = str(INTERNAL_QTSCRCPY)
+        DEFAULT_SCRCPY_EXE = str(INTERNAL_QTSCRCPY / "QtScrcpy.exe")
+    else:
+        # 如果 _internal 中没有，则使用默认路径
+        DEFAULT_ADB_DIR = r"D:\tools\QtScrcpy-win-x86-v3.3.1"
+        DEFAULT_SCRCPY_EXE = r"D:\tools\QtScrcpy-win-x86-v3.3.1\QtScrcpy.exe"
+else:
+    # 开发模式
+    DEFAULT_ADB_DIR = r"D:\tools\QtScrcpy-win-x86-v3.3.1"
+    DEFAULT_SCRCPY_EXE = r"D:\tools\QtScrcpy-win-x86-v3.3.1\QtScrcpy.exe"
+
+
 SCRIPT_NAME = "adb_device_manager"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
@@ -236,8 +257,9 @@ class ADBDeviceManager:
             return
 
         try:
-            # 启动投屏（不阻塞主线程）
-            subprocess.Popen([scrcpy_exe], cwd=Path(scrcpy_exe).parent)
+            # 🔧【关键修改】确保在正确的目录下启动（以便 scrcpy-server 等文件能被找到）
+            exe_path = Path(scrcpy_exe)
+            subprocess.Popen([str(exe_path)], cwd=exe_path.parent)
             msg = "✅ 已启动 QtScrcpy 投屏"
             self.set_status(msg, "green")
             self.log_to_gui(msg)
