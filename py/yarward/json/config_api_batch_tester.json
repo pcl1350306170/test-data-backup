@@ -1,0 +1,8 @@
+{
+  "api_url": "http://192.168.18.228:7000/clinic/api/qcss/register/made",
+  "method": "POST",
+  "call_times": 100,
+  "dynamic_fields": "patientName,patientIdNo",
+  "raw_headers": "POST /clinic/api/qcss/register/made HTTP/1.1\nAccept: application/json, text/plain, */*\nAccept-Encoding: gzip, deflate\nAccept-Language: zh-CN,zh;q=0.9,en;q=0.8,ja;q=0.7\nAuthorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJzeXNfdXNlcjoxOm51bGwiLCJyblN0ciI6InphZDEzazdJRW5KR01WTFdiYmJyZzcxM0pTWkMwZXBQIiwiY2xpZW50aWQiOiJlNWNkN2U0ODkxYmY5NWQxZDE5MjA2Y2UyNGE3YjMyZSIsInRlbmFudElkIjoiMDAwMDAwIiwidXNlcklkIjoxfQ.PMe6oxjx7s7EDDcewV6g5Y4CBtiohmYsdP7UG1GKGuU\nConnection: keep-alive\nContent-Language: zh_CN\nContent-Length: 202\nContent-Type: application/json;charset=UTF-8\nCookie: tenantId=000000; username=yarward; password=Yahua3585668; rememberMe=true; perf_dv6Tr4n=1\nHost: 192.168.18.228:7000\nOrigin: http://192.168.18.228:7000\nReferer: http://192.168.18.228:7000/\nUser-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36\nclientid: e5cd7e4891bf95d1d19206ce24a7b32e",
+  "request_body": "{\"hasBook\":1,\"registerTime\":\"2025-12-16 13:47:38\",\"signTime\":\"2025-12-16 13:47:38\",\"patientName\":\"李四\",\"patientIdNo\":\"ls1\",\"sex\":\"1\",\"age\":0,\"ageType\":\"2\",\"hasPay\":0,\"registerObjId\":1,\"orderTags\":\"\"}"
+}
