@@ -1,5 +1,5 @@
 {
-  "mode": "replace",
+  "mode": "prefix",
   "content": "VOA Learning English-",
   "replace_from": "×",
   "replace_to": "-",

@@ -7,23 +7,5 @@
     "audio_format": "mp3",
     "quality": "best",
     "retry_count": 5,
-    "urls": [
-        "https://www.youtube.com/watch?v=NDDofLfO16U&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=58&pp=iAQB",
-        "https://www.youtube.com/watch?v=5auloFpI-yo&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=59&pp=iAQB",
-        "https://www.youtube.com/watch?v=ZGt3FbkpMkk&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=60&pp=iAQB",
-        "https://www.youtube.com/watch?v=K22AP567WgU&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=61&pp=iAQB",
-        "https://www.youtube.com/watch?v=TyqbgR5CBS4&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=62&pp=iAQB0gcJCRUKAYcqIYzv",
-        "https://www.youtube.com/watch?v=Am9Dzymb5Qw&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=63&pp=iAQB",
-        "https://www.youtube.com/watch?v=W_u_T0IAFag&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=64&pp=iAQB",
-        "https://www.youtube.com/watch?v=qNFoSM6Zjdo&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=65&pp=iAQB",
-        "https://www.youtube.com/watch?v=wUw-Phdpesk&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=66&pp=iAQB",
-        "https://www.youtube.com/watch?v=ZDBmBjYQAeM&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=67&pp=iAQB",
-        "https://www.youtube.com/watch?v=eF3P2Yw6DF0&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=68&pp=iAQB",
-        "https://www.youtube.com/watch?v=o1K11Edj8nI&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=69&pp=iAQB",
-        "https://www.youtube.com/watch?v=TcQKSe3oELw&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=70&pp=iAQB",
-        "https://www.youtube.com/watch?v=7KTnPyQpSgY&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=71&pp=iAQB",
-        "https://www.youtube.com/watch?v=9pqwdLyGiUI&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=72&pp=iAQB",
-        "https://www.youtube.com/watch?v=SGD7q6onczM&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=73&pp=iAQB",
-        "https://www.youtube.com/watch?v=gq7v1IICgbk&list=PLd9hCvj34W5hZxGsu5etKF6bZ9w4Ap2hl&index=74&pp=iAQB"
-    ]
+    "urls": []
 }
