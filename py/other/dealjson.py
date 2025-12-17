@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 
 # 配置路径
-input_file = r"C:\www\test\py\other\json\words-PO未处理.json"
-output_dir = Path(r"C:\www\test\py\other\json\words")
+input_file = r"C:\www\test\py\other\json\words.json"
+output_dir = Path(r"C:\www\test\py\other\json\wordJson")
 
 # 创建输出目录（如果不存在）
 output_dir.mkdir(parents=True, exist_ok=True)

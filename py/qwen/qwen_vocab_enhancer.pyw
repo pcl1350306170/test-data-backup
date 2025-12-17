@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter import filedialog, messagebox, ttk
 import threading
 import re
+import html
 
 # ==============================
 # 第三方库导入
@@ -92,15 +93,48 @@ def is_verb_form(word):
     return None, None
 
 def build_ai_help_html(api_key, word):
+    """
+    调用 AI 获取单词助记信息，并返回完整的、HTML 安全的字符串。
+    不做任何截断，保留全部内容，适合直接嵌入 HTML 页面或富文本显示。
+    """
     prompt = f"""你是专业的英语词典编纂者。帮助一个初学者记住单词 "{word}" 。要求：
-    - 如果单词"{word}"可以拆解，你就把这个单词"{word}"拆解一下，是由那几个词根组成，还有哪些类似的单词
-    - 如果"{word}"可以使用谐音 + 场景记忆，你具体列出来记忆方式。
-    - 给我列出来"{word}"还有哪些含义、词根组成类似的单词
-    。"""
-    response = call_qwen_api(api_key, prompt)
-    lines = response.split('\n')
-    help_text = lines[0].strip() if len(lines) > 0 else f"关于 '{word}' ，自己去死记硬背吧，AI都帮不了你！"
-    return help_text
+- 如果单词"{word}"可以拆解，你就把这个单词"{word}"拆解一下，是由那几个词根组成，还有哪些类似的单词
+- 如果"{word}"可以使用谐音 + 场景记忆，你具体列出来记忆方式。
+- 给我列出来"{word}"还有哪些含义、词根组成类似的单词
+请用清晰、结构化的方式回答（可用分点、段落），可以使用html代码块。
+你可以适当使用自然的中文标点和换行。
+"""
+
+    try:
+        response = call_qwen_api(api_key, prompt)
+        if not response or not response.strip():
+            fallback = f"关于 '{word}'，AI 暂未生成有效助记内容。"
+            return html.escape(fallback)
+
+        # 将纯文本中的换行转为 <br>，保留段落结构（可选增强）
+        # 如果你希望完全原样保留（包括\n），也可以直接 escape 整个字符串
+        cleaned = response.strip()
+
+        # 方案 A：保留原始换行（推荐，前端可用 white-space: pre-line 显示）
+        # safe_html = html.escape(cleaned)
+
+        # 方案 B：自动转为 HTML 段落（取消注释下面几行即可启用）
+        lines = cleaned.split('\n')
+        paragraphs = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped:
+                paragraphs.append(f"<p>{html.escape(stripped)}</p>")
+            else:
+                paragraphs.append("<br>")
+        safe_html = "\n".join(paragraphs)
+
+        return safe_html
+
+    except Exception as e:
+        logger.error(f"生成 AIHelp 失败 for '{word}': {e}")
+        error_msg = f"⚠️ 获取 '{word}' 的助记信息时出错：<br> {html.escape(str(e))}"
+        return error_msg
 
 # ==============================
 # Qwen API 调用
@@ -238,7 +272,7 @@ def process_json_file(input_path, output_path, api_key, progress_callback):
                 logger.warning(f"Failed to generate example for '{word}', using fallback. Error: {e}")
 
         # 生成 AIHelp（始终更新，因为可能词形变了）
-        item["AIHelp"] = build_ai_help_html(api_key, actual_word)
+        # item["AIHelp"] = build_ai_help_html(api_key, actual_word)
         progress_callback(idx + 1, total)
 
     # 保存新文件
