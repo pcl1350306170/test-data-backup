@@ -1,0 +1,1779 @@
+[
+  {
+    "Word": "paint",
+    "Phonetic": "英 [peɪnt]，美 [peɪnt]",
+    "Meaning": "v. 绘画；涂漆；描绘  ",  "Example": "Developers often use tools to paint UI components with different colors in the front-end development.",
+    "ExampleTranslator": "开发人员在前端开发中经常使用工具给UI组件涂上不同的颜色。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：p + aint，aint可联想为“涂料”的近似发音，帮助记忆“绘画、涂漆”的含义。</p><p><strong>场景记忆</strong>：在开发界面时，需要用代码控制元素的paint（绘制）样式，比如设置背景色。</p>"
+  },
+  {
+    "Word": "alongside",
+    "Phonetic": "英 [əˌlɒŋˈsaɪd]，美 [əˌlɔːŋˈsaɪd]",
+    "Meaning": "prep. 在……旁边；与……一起",
+    "Example": "In the project, the new module runs alongside the old system to ensure a smooth transition.",
+    "ExampleTranslator": "在项目中，新模块与旧系统一起运行，以确保平稳过渡。",
+    "AIHelp": "<p><strong>词根拆分</strong>：along（沿着） + side（边），沿着边就是“在……旁边”，引申为“与……一起”。</p><p><strong>程序员场景造句</strong>：When debugging, we can run the test case alongside the main program to compare results.（调试时，我们可以让测试用例和主程序一起运行来对比结果。）</p>"
+  },
+  {
+    "Word": "tunnel",
+    "Phonetic": "英 [ˈtʌnl]，美 [ˈtʌnl]",
+    "Meaning": "n. 隧道；地道；v. 挖隧道",
+    "Example": "The data tunnel between the client and server ensures secure transmission of sensitive information.",
+    "ExampleTranslator": "客户端和服务器之间的数据隧道确保了敏感信息的安全传输。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“逃呢”，想象在隧道里逃跑，帮助记忆“隧道”的意思。</p><p><strong>技术场景联想</strong>：在网络编程中，tunnel（隧道）技术常用于建立安全的通信通道，如VPN隧道。</p>"
+  },
+  {
+    "Word": "buck",
+    "Phonetic": "英 [bʌk]，美 [bʌk]",
+    "Meaning": "v. 反抗；抵制；n. 美元；雄鹿",
+    "Example": "The old code tends to buck against new modifications, causing unexpected errors.",
+    "ExampleTranslator": "旧代码往往会抵制新的修改，导致意外错误。",
+    "AIHelp": "<p><strong>说明</strong>：bucking是buck的现在分词形式。</p><p><strong>场景记忆</strong>：程序员修改旧代码时，经常遇到代码“反抗”（buck）的情况，即出现各种兼容问题。</p><p><strong>对比近义词</strong>：与resist（抵抗）意思相近，但buck更具口语化和形象化，像雄鹿（buck）一样倔强反抗。</p>"
+  },
+  {
+    "Word": "frantic",
+    "Phonetic": "英 [ˈfræntɪk]，美 [ˈfræntɪk]",
+    "Meaning": "adj. 狂乱的；匆忙的；焦虑的",
+    "Example": "The programmer was in a frantic state when trying to fix the bug before the deadline.",
+    "ExampleTranslator": "程序员在截止日期前试图修复bug时处于狂乱的状态。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“烦踢克”，烦恼得想踢东西，形容“狂乱的、焦虑的”状态。</p><p><strong>造句强化</strong>：Frantic coding all night can lead to low - quality code.（整夜狂乱地编码会导致代码质量低下。）</p>"
+  },
+  {
+    "Word": "hollow",
+    "Phonetic": "英 [ˈhɒləʊ]，美 [ˈhɑːloʊ]",
+    "Meaning": "adj. 空的；中空的；n. 洞；凹陷",
+    "Example": "The hollow data structure only reserves space but doesn't store actual values.",
+    "ExampleTranslator": "这种中空的数据结构只预留了空间，却不存储实际值。",
+    "AIHelp": "<p><strong>词根联想</strong>：hol（全部） + low（低），全部变低形成凹陷，即“洞、中空的”。</p><p><strong>技术场景</strong>：在数据结构中，hollow（中空的）节点可能用于占位，等待后续填充数据。</p>"
+  },
+  {
+    "Word": "vacuum",
+    "Phonetic": "英 [ˈvækjuəm]，美 [ˈvækjuəm]",
+    "Meaning": "n. 真空；空白；v. 用真空吸尘器打扫",
+    "Example": "The memory leak left a vacuum in the system's resources, affecting its performance.",
+    "ExampleTranslator": "内存泄漏在系统资源中留下了空白（指资源被无效占用后的缺失），影响了其性能。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“哇Q姆”，想象真空状态下发出的奇怪声音，帮助记忆“真空”。</p><p><strong>程序员场景</strong>：当程序释放资源不彻底时，可能会出现内存vacuum（空白，即资源浪费）的情况。</p>"
+  },
+  {
+    "Word": "retaliate",
+    "Phonetic": "英 [rɪˈtælieɪt]，美 [rɪˈtælieɪt]",
+    "Meaning": "v. 报复；反击",
+    "Example": "The system can retaliate against malicious attacks by blocking the intruder's IP address.",
+    "ExampleTranslator": "系统可以通过封锁入侵者的IP地址来反击恶意攻击。",
+    "AIHelp": "<p><strong>说明</strong>：retaliates是retaliate的第三人称单数形式。</p><p><strong>词根拆分</strong>：re（回） + tali（打击） + ate（动词后缀），回击即“报复、反击”。</p><p><strong>技术场景造句</strong>：Firewalls are designed to retaliate against unauthorized access attempts.（防火墙旨在反击未授权的访问尝试。）</p>"
+  },
+  {
+    "Word": "smash",
+    "Phonetic": "英 [smæʃ]，美 [smæʃ]",
+    "Meaning": "v. 打碎；猛击；n. 破碎；猛击",
+    "Example": "A single wrong parameter can smash the entire database query, resulting in errors.",
+    "ExampleTranslator": "一个错误的参数就可能破坏整个数据库查询，导致错误。",
+    "AIHelp": "<p><strong>说明</strong>：smashing是smash的现在分词形式。</p><p><strong>场景记忆</strong>：想象错误的代码像锤子一样smash（打碎）了正常的程序运行。</p><p><strong>对比近义词</strong>：与break（打破）相比，smash更强调猛烈地、彻底地破坏。</p>"
+  },
+  {
+    "Word": "brutal",
+    "Phonetic": "英 [ˈbruːtl]，美 [ˈbruːtl]",
+    "Meaning": "adj. 残忍的；野蛮的；严酷的",
+    "Example": "The brutal performance test exposed the weaknesses of the algorithm under high load.",
+    "ExampleTranslator": "严酷的性能测试暴露了该算法在高负载下的弱点。",
+    "AIHelp": "<p><strong>词根联想</strong>：brut（野兽） + al（形容词后缀），像野兽一样的，即“残忍的、严酷的”。</p><p><strong>程序员场景</strong>：面对brutal（严酷的） deadlines，程序员需要高效规划工作。</p>"
+  },
+  {
+    "Word": "circle",
+    "Phonetic": "英 [ˈsɜːkl]，美 [ˈsɜːrkl]",
+    "Meaning": "n. 圆；圈子；v. 盘旋；环绕",
+    "Example": "The event loop in JavaScript circles through tasks to handle asynchronous operations.",
+    "ExampleTranslator": "JavaScript中的事件循环通过循环处理任务来应对异步操作。",
+    "AIHelp": "<p><strong>说明</strong>：circles是circle的第三人称单数形式。</p><p><strong>形象记忆</strong>：circle本身就是“圆”的意思，像圆圈一样转动就是“盘旋、环绕”。</p><p><strong>技术场景</strong>：在编程中，circle（循环）的概念很常见，如事件循环、for循环等。</p>"
+  },
+  {
+    "Word": "fill",
+    "Phonetic": "英 [fɪl]，美 [fɪl]",
+    "Meaning": "v. 填充；充满；n. 填充；填满",
+    "Example": "The function is used to fill the array with default values before processing.",
+    "ExampleTranslator": "该函数用于在处理前用默认值填充数组。",
+    "AIHelp": "<p><strong>说明</strong>：fills是fill的第三人称单数形式。</p><p><strong>简单记忆</strong>：发音类似“费欧”，费劲地把东西弄满，即“填充”。</p><p><strong>程序员常用</strong>：在开发中，fill（填充）数据是常见操作，如fill an array（填充数组）、fill a form（填充表单）。</p>"
+  },
+  {
+    "Word": "filth",
+    "Phonetic": "英 [fɪlθ]，美 [fɪlθ]",
+    "Meaning": "n. 污秽；肮脏；污物",
+    "Example": "Unoptimized and redundant code is like filth in the project, affecting maintainability.",
+    "ExampleTranslator": "未优化且冗余的代码就像项目中的污秽，影响可维护性。",
+    "AIHelp": "<p><strong>联想记忆</strong>：与fill（填充）相关，填充了不好的东西就变成了filth（污秽）。</p><p><strong>场景比喻</strong>：程序员应清理代码中的“filth”（污秽），即糟糕的代码，保持代码整洁。</p>"
+  },
+  {
+    "Word": "growl",
+    "Phonetic": "英 [ɡraʊl]，美 [ɡraʊl]",
+    "Meaning": "v. 咆哮；低吼；n. 咆哮声",
+    "Example": "The server growled with error messages when the connection timed out.",
+    "ExampleTranslator": "当连接超时时，服务器发出了错误信息的“低吼”（指大量错误提示）。",
+    "AIHelp": "<p><strong>说明</strong>：growling是growl的现在分词形式。</p><p><strong>谐音记忆</strong>：“够咯”，够了就咆哮起来，帮助记忆“咆哮”。</p><p><strong>技术场景比喻</strong>：服务器出现故障时，日志里的错误信息像在growl（咆哮）。</p>"
+  },
+  {
+    "Word": "shatter",
+    "Phonetic": "英 [ˈʃætə(r)]，美 [ˈʃætər]",
+    "Meaning": "v. 粉碎；破碎；破坏",
+    "Example": "A single logical error can shatter the entire program's functionality.",
+    "ExampleTranslator": "一个逻辑错误就可能破坏整个程序的功能。",
+    "AIHelp": "<p><strong>联想记忆</strong>：发音类似“沙特”，想象玻璃破碎的声音，帮助记忆“粉碎、破碎”。</p><p><strong>对比近义词</strong>：与break（打破）相比，shatter强调破碎成许多碎片，破坏程度更深。</p><p><strong>程序员造句</strong>：Careless coding can shatter the reliability of the software.（粗心的编码会破坏软件的可靠性。）</p>"
+  },
+  {
+    "Word": "fist",
+    "Phonetic": "英 [fɪst]，美 [fɪst]",
+    "Meaning": "n. 拳头；v. 紧握；用拳头打",
+    "Example": "The programmer clenched his fist in frustration when the code wouldn't compile.",
+    "ExampleTranslator": "当代码无法编译时，程序员沮丧地握紧了拳头。",
+    "AIHelp": "<p><strong>简单记忆</strong>：发音简单，直接记忆“拳头”的意思。</p><p><strong>场景联想</strong>：程序员调试遇到难题时，可能会有握紧fist（拳头）的动作，表达无奈或决心。</p>"
+  },
+  {
+    "Word": "explode",
+    "Phonetic": "英 [ɪkˈspləʊd]，美 [ɪkˈsploʊd]",
+    "Meaning": "v. 爆炸；爆发；激增",
+    "Example": "The number of error logs exploded after the new feature was deployed.",
+    "ExampleTranslator": "新功能部署后，错误日志的数量激增。",
+    "AIHelp": "<p><strong>说明</strong>：explodes是explode的第三人称单数形式。</p><p><strong>词根拆分</strong>：ex（出） + plode（鼓掌），原指鼓掌喝彩，后引申为“爆发、爆炸”。</p><p><strong>技术场景</strong>：当系统负载过高时，请求量可能会explode（激增），导致系统崩溃。</p>"
+  },
+  {
+    "Word": "jet",
+    "Phonetic": "英 [dʒet]，美 [dʒet]",
+    "Meaning": "n. 喷气式飞机；喷射流；v. 喷射",
+    "Example": "Data jets through the network cable at high speed during large file transfers.",
+    "ExampleTranslator": "在大文件传输过程中，数据以高速通过网络电缆喷射（传输）。",
+    "AIHelp": "<p><strong>说明</strong>：jets是jet的第三人称单数形式。</p><p><strong>形象记忆</strong>：像喷气式飞机一样快速移动，即“喷射、高速移动”。</p><p><strong>程序员比喻</strong>：高效的网络能让数据像jet（喷射流）一样快速传输。</p>"
+  },
+  {
+    "Word": "shoot",
+    "Phonetic": "英 [ʃuːt]，美 [ʃuːt]",
+    "Meaning": "v. 射击；发射；快速移动；拍摄",
+    "Example": "The API shoots requests to the server and waits for responses in real - time.",
+    "ExampleTranslator": "API向服务器快速发送请求，并实时等待响应。",
+    "AIHelp": "<p><strong>说明</strong>：shooting是shoot的现在分词形式。</p><p><strong>场景记忆</strong>：想象API像射击一样快速shoot（发送）请求到服务器。</p><p><strong>多义联想</strong>：在编程中，除了“发送”，shoot还可用于“shoot a bug”（解决一个bug，口语化表达）。</p>"
+  },
+  {
+    "Word": "ride",
+    "Phonetic": "英 [raɪd]，美 [raɪd]",
+    "Meaning": "v. 骑；乘；驾驭；n. 骑；乘坐",
+    "Example": "Developers ride the wave of new technologies to improve project efficiency.",
+    "ExampleTranslator": "开发人员借助新技术的浪潮来提高项目效率。",
+    "AIHelp": "<p><strong>说明</strong>：riding是ride的现在分词形式。</p><p><strong>简单记忆</strong>：常用词，“骑、乘”的意思，可联想“ride a bike”（骑自行车）。</p><p><strong>技术场景比喻</strong>：程序员需要ride（驾驭）各种编程语言和框架来完成开发。</p>"
+  },
+  {
+    "Word": "wreck",
+    "Phonetic": "英 [rek]，美 [rek]",
+    "Meaning": "v. 破坏；毁坏；n.  wreckage 残骸；破坏",
+    "Example": "A sudden power outage wrecked the unsaved code, causing great losses.",
+    "ExampleTranslator": "突然断电破坏了未保存的代码，造成了巨大损失。",
+    "AIHelp": "<p><strong>说明</strong>：wrecks是wreck的第三人称单数形式。</p><p><strong>联想记忆</strong>：发音类似“ wreck”，想象船 wreck（失事）后的破坏景象。</p><p><strong>程序员警示</strong>：要养成及时保存代码的习惯，避免意外wreck（破坏）劳动成果。</p>"
+  },
+  {
+    "Word": "drench",
+    "Phonetic": "英 [drentʃ]，美 [drentʃ]",
+    "Meaning": "v. 湿透；浸透",
+    "Example": "The server was drenched with requests during the peak hours of the online event.",
+    "ExampleTranslator": "在在线活动的高峰期，服务器被请求“淹没”（大量请求涌入）。",
+    "AIHelp": "<p><strong>说明</strong>：drenched是drench的过去分词形式。</p><p><strong>谐音记忆</strong>：“准去”，准去淋雨就会湿透，帮助记忆“湿透、浸透”。</p><p><strong>技术场景比喻</strong>：高并发时，服务器会被drenched（淹没）在请求中，需要做好负载均衡。</p>"
+  },
+  {
+    "Word": "chin",
+    "Phonetic": "英 [tʃɪn]，美 [tʃɪn]",
+    "Meaning": "n. 下巴；v. 用下巴夹住；聊天",
+    "Example": "The programmer rested his chin on his hand, thinking about the solution to the algorithm problem.",
+    "ExampleTranslator": "程序员用手托着下巴，思考算法问题的解决方案。",
+    "AIHelp": "<p><strong>说明</strong>：chins是chin的复数形式。</p><p><strong>简单记忆</strong>：身体部位名词，直接记忆“下巴”。</p><p><strong>场景联想</strong>：程序员思考问题时，常做出托着chin（下巴）的动作。</p>"
+  },
+  {
+    "Word": "helplessly",
+    "Phonetic": "英 [ˈhelpləsli]，美 [ˈhelpləsli]",
+    "Meaning": "adv. 无助地；无能为力地",
+    "Example": "The developer watched helplessly as the database crashed due to a hardware failure.",
+    "ExampleTranslator": "由于硬件故障，数据库崩溃，开发人员只能无助地看着。",
+    "AIHelp": "<p><strong>词根拆分</strong>：help（帮助） + less（无……的） + ly（副词后缀），无帮助地，即“无助地”。</p><p><strong>场景造句</strong>：When facing unknown bugs, programmers may feel helplessly at first.（面对未知的bug，程序员起初可能会感到无助。）</p>"
+  },
+  {
+    "Word": "clean",
+    "Phonetic": "英 [kliːn]，美 [kliːn]",
+    "Meaning": "v. 打扫；清理；adj. 干净的；整洁的",
+    "Example": "It's important to clean up unused variables and functions to optimize the code.",
+    "ExampleTranslator": "清理未使用的变量和函数对优化代码很重要。",
+    "AIHelp": "<p><strong>说明</strong>：cleans是clean的第三人称单数形式。</p><p><strong>简单记忆</strong>：常用词，“干净的、清理”，可联想“clean the room”（打扫房间）。</p><p><strong>程序员习惯</strong>：保持代码clean（整洁）是良好的编程习惯，便于维护。</p>"
+  },
+  {
+    "Word": "nowhere",
+    "Phonetic": "英 [ˈnəʊweə(r)]，美 [ˈnoʊwer]",
+    "Meaning": "adv. 无处；任何地方都不；n. 无处",
+    "Example": "The bug seems to come from nowhere, making it difficult to trace its source.",
+    "ExampleTranslator": "这个bug似乎不知从何而来，很难追踪其源头。",
+    "AIHelp": "<p><strong>词根拆分</strong>：no（没有） + where（哪里），没有地方，即“无处”。</p><p><strong>场景造句</strong>：If you don't log errors properly, the problem will lead you nowhere.（如果不妥善记录错误，问题会让你无从下手。）</p>"
+  },
+  {
+    "Word": "near",
+    "Phonetic": "英 [nɪə(r)]，美 [nɪr]",
+    "Meaning": "prep. 接近；靠近；adj. 近的；adv. 接近",
+    "Example": "The deadline is drawing near, and the development team is working overtime to finish the task.",
+    "ExampleTranslator": "截止日期越来越近，开发团队正在加班完成任务。",
+    "AIHelp": "<p><strong>简单记忆</strong>：常用词，“接近、近的”，可联想“near the house”（在房子附近）。</p><p><strong>程序员场景</strong>：项目接近（near）截止日期时，团队通常会加快开发进度。</p>"
+  },
+  {
+    "Word": "do",
+    "Phonetic": "英 [duː]，美 [duː]",
+    "Meaning": "v. 做；干；执行；aux. 构成疑问句和否定句",
+    "Example": "Once the unit tests are done, we can proceed to integrate the modules.",
+    "ExampleTranslator": "一旦单元测试完成，我们就可以进行模块集成了。",
+    "AIHelp": "<p><strong>说明</strong>：done是do的过去分词形式。</p><p><strong>常用搭配</strong>：“be done”表示“被完成”，在编程中常用于描述任务、测试等的状态。</p><p><strong>场景记忆</strong>：程序员常说“Is it done?”（完成了吗？）来询问任务进度。</p>"
+  },
+  {
+    "Word": "whoever",
+    "Phonetic": "英 [huːˈevə(r)]，美 [huːˈevər]",
+    "Meaning": "pron. 无论谁；任何人",
+    "Example": "Whoever writes the code should follow the team's coding standards.",
+    "ExampleTranslator": "无论谁写代码，都应该遵循团队的编码规范。",
+    "AIHelp": "<p><strong>词根拆分</strong>：who（谁） + ever（无论），无论谁，即“whoever”。</p><p><strong>语法用途</strong>：在编程相关的文档或规则中，常用whoever指代任何参与开发的人。</p><p><strong>造句强化</strong>：Whoever maintains this project must understand the core logic.（无论谁维护这个项目，都必须理解核心逻辑。）</p>"
+  },
+  {
+    "Word": "frame",
+    "Phonetic": "英 [freɪm]，美 [freɪm]",
+    "Meaning": "v. 给……做框；陷害；设计；n. 框架；结构",
+    "Example": "The attacker tried to frame the system by injecting malicious code into the framework.",
+    "ExampleTranslator": "攻击者试图通过向框架中注入恶意代码来陷害（破坏）系统。",
+    "AIHelp": "<p><strong>说明</strong>：framed是frame的过去分词形式。</p><p><strong>技术相关含义</strong>：在编程中，frame有“框架”的意思，如“web frame”（web框架）。</p><p><strong>联想记忆</strong>：框架（frame）是用来支撑和设计系统的，就像给画做框（frame）一样。</p>"
+  },
+  {
+    "Word": "loose",
+    "Phonetic": "英 [luːs]，美 [luːs]",
+    "Meaning": "adj. 松的；松散的；v. 释放；松开",
+    "Example": "Loose coupling between modules makes the system easier to maintain and expand.",
+    "ExampleTranslator": "模块之间的松散耦合使系统更易于维护和扩展。",
+    "AIHelp": "<p><strong>对比记忆</strong>：与lose（丢失）发音相近，注意区分，loose是“松的”，lose是“丢失”。</p><p><strong>技术概念</strong>：在软件设计中，loose coupling（松散耦合）是重要原则，有利于系统灵活性。</p><p><strong>造句强化</strong>：Avoid tight connections; keep the modules loose.（避免紧密连接，保持模块松散。）</p>"
+  },
+  {
+    "Word": "listen",
+    "Phonetic": "英 [ˈlɪsn]，美 [ˈlɪsn]",
+    "Meaning": "v. 听；倾听；听从",
+    "Example": "Developers should listen to user feedback to improve the functionality of the application.",
+    "ExampleTranslator": "开发人员应该倾听用户反馈，以改进应用程序的功能。",
+    "AIHelp": "<p><strong>说明</strong>：listening是listen的现在分词形式。</p><p><strong>简单记忆</strong>：常用词，“听、倾听”，可联想“listen to music”（听音乐）。</p><p><strong>团队合作</strong>：在开发团队中，listen（倾听）同事的建议有助于提升项目质量。</p>"
+  },
+  {
+    "Word": "peak",
+    "Phonetic": "英 [piːk]，美 [piːk]",
+    "Meaning": "n. 顶峰；顶点；v. 达到顶峰；adj. 最高的",
+    "Example": "The system's performance peaked when the number of concurrent users reached 10,000.",
+    "ExampleTranslator": "当并发用户数达到10,000时，系统性能达到了顶峰。",
+    "AIHelp": "<p><strong>说明</strong>：peaked是peak的过去分词形式。</p><p><strong>形象记忆</strong>：像山峰（peak）一样达到最高点，即“顶峰、达到顶峰”。</p><p><strong>技术场景</strong>：需要关注系统性能的peak（峰值），以确保在高负载下稳定运行。</p>"
+  },
+  {
+    "Word": "pale",
+    "Phonetic": "英 [peɪl]，美 [peɪl]",
+    "Meaning": "adj. 苍白的；浅色的；v. 变苍白；显得逊色",
+    "Example": "The new algorithm's performance pales in comparison with the optimized version.",
+    "ExampleTranslator": "与优化版本相比，新算法的性能显得逊色。",
+    "AIHelp": "<p><strong>联想记忆</strong>：发音类似“peel”（剥皮），剥皮后颜色变浅，即“浅色的、苍白的”。</p><p><strong>技术对比</strong>：在算法比较中，性能差的会pale（显得逊色）于性能好的。</p><p><strong>造句强化</strong>：This solution pales when compared to the efficient one.（与高效的解决方案相比，这个方案相形见绌。）</p>"
+  },
+  {
+    "Word": "tone",
+    "Phonetic": "英 [təʊn]，美 [toʊn]",
+    "Meaning": "n. 语气；音调；色调；v. 使更健壮；调和",
+    "Example": "The error message should be in a clear tone to help users understand the problem.",
+    "ExampleTranslator": "错误信息应该语气清晰，以帮助用户理解问题。",
+    "AIHelp": "<p><strong>说明</strong>：toned是tone的过去分词形式。</p><p><strong>多义联想</strong>：在UI设计中，tone（色调）很重要；在错误提示中，tone（语气）要友好明了。</p><p><strong>程序员注意</strong>：设计提示信息时，要注意其tone（语气），避免让用户困惑。</p>"
+  },
+  {
+    "Word": "rumor",
+    "Phonetic": "英 [ˈruːmə(r)]，美 [ˈruːmər]",
+    "Meaning": "n. 谣言；传闻；v. 谣传；传说",
+    "Example": "There's a rumor that the company will adopt a new programming language for the next project.",
+    "ExampleTranslator": "有传闻说公司下一个项目将采用一种新的编程语言。",
+    "AIHelp": "<p><strong>说明</strong>：rumors是rumor的复数形式。</p><p><strong>谐音记忆</strong>：“入魔”，谣言让人入魔，帮助记忆“谣言、传闻”。</p><p><strong>场景提醒</strong>：对于技术相关的rumors（谣言），要以官方消息为准。</p>"
+  },
+  {
+    "Word": "wax",
+    "Phonetic": "英 [wæks]，美 [wæks]",
+    "Meaning": "v. 打蜡；渐渐变大；n. 蜡；蜂蜡",
+    "Example": "The number of users accessing the platform waxes during weekends.",
+    "ExampleTranslator": "周末访问该平台的用户数量逐渐增加。",
+    "AIHelp": "<p><strong>说明</strong>：waxed是wax的过去分词形式。</p><p><strong>联想记忆</strong>：蜡（wax）加热后会融化变大，帮助记忆“渐渐变大”。</p><p><strong>技术场景</strong>：需要关注用户访问量wax（增加）的时间段，做好服务器准备。</p>"
+  },
+  {
+    "Word": "porcelain",
+    "Phonetic": "英 [ˈpɔːsəlɪn]，美 [ˈpɔːrsəlɪn]",
+    "Meaning": "n. 瓷器；瓷；adj. 瓷制的；精美的",
+    "Example": "The UI design of the application has a porcelain - like smoothness and elegance.",
+    "ExampleTranslator": "该应用程序的UI设计具有瓷器般的光滑和优雅。",
+    "AIHelp": "<p><strong>联想记忆</strong>：发音可拆解为“porce + lain”，想象精美的瓷器（porcelain） lain（放置）在展示架上。</p><p><strong>场景比喻</strong>：优秀的UI设计像porcelain（瓷器）一样精美，给用户良好体验。</p>"
+  },
+  {
+    "Word": "perfection",
+    "Phonetic": "英 [pəˈfekʃn]，美 [pərˈfekʃn]",
+    "Meaning": "n. 完美；完善；极致",
+    "Example": "Striving for perfection in code writing can reduce the number of bugs in the later stage.",
+    "ExampleTranslator": "在代码编写中追求完美可以减少后期的bug数量。",
+    "AIHelp": "<p><strong>词根拆分</strong>：perfect（完美的） + ion（名词后缀），即“完美、完善”。</p><p><strong>程序员追求</strong>：虽然没有绝对的perfection（完美），但程序员应尽力写出高质量代码。</p><p><strong>造句强化</strong>：Code review helps us get closer to perfection.（代码审查帮助我们更接近完美。）</p>"
+  },
+  {
+    "Word": "form",
+    "Phonetic": "英 [fɔːm]，美 [fɔːrm]",
+    "Meaning": "n. 形式；表格；形状；v. 形成；构成",
+    "Example": "Users need to fill in the registration form with valid information to access the system.",
+    "ExampleTranslator": "用户需要填写带有有效信息的注册表才能访问系统。",
+    "AIHelp": "<p><strong>多义记忆</strong>：在编程中，form有“表单”的意思，是用户输入信息的形式（form）。</p><p><strong>常用搭配</strong>：“form data”（表单数据），是前后端交互的重要部分。</p><p><strong>联想记忆</strong>：信息形成（form）表单，便于系统处理。</p>"
+  },
+  {
+    "Word": "mound",
+    "Phonetic": "英 [maʊnd]，美 [maʊnd]",
+    "Meaning": "n. 土堆；一堆；v. 堆起；堆积",
+    "Example": "A mound of log files accumulated on the server after running for a month.",
+    "ExampleTranslator": "服务器运行一个月后，堆积了一堆日志文件。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“冒的”，冒出来的一堆东西，即“土堆、一堆”。</p><p><strong>技术场景</strong>：服务器长时间运行会产生mound（一堆）日志，需要定期清理。</p>"
+  },
+  {
+    "Word": "split",
+    "Phonetic": "英 [splɪt]，美 [splɪt]",
+    "Meaning": "v. 分裂；分割；分开；n. 分裂；裂口",
+    "Example": "The large dataset is split into smaller chunks for efficient processing by the algorithm.",
+    "ExampleTranslator": "为了便于算法高效处理，大型数据集被分割成更小的数据块。",
+    "AIHelp": "<p><strong>联想记忆</strong>：发音像“撕劈它”，撕开劈成两半，即“分裂、分割”。</p><p><strong>编程常用</strong>：split（分割）字符串是常见操作，如在Python中用split()方法。</p><p><strong>造句强化</strong>：We can split the task into several steps to complete it easily.（我们可以把任务分成几个步骤，以便轻松完成。）</p>"
+  },
+  {
+    "Word": "razor",
+    "Phonetic": "英 [ˈreɪzə(r)]，美 [ˈreɪzər]",
+    "Meaning": "n. 剃刀；v. 用剃刀刮",
+    "Example": "The razor - sharp algorithm can quickly cut through redundant data to extract key information.",
+    "ExampleTranslator": "这个极其精准的算法能快速剔除冗余数据，提取关键信息。",
+    "AIHelp": "<p><strong>联想记忆</strong>：razor（剃刀）很锋利，可联想“锋利的、精准的”。</p><p><strong>技术比喻</strong>：形容算法像razor（剃刀）一样精准高效，能处理冗余信息。</p>"
+  },
+  {
+    "Word": "delicate",
+    "Phonetic": "英 [ˈdelɪkət]，美 [ˈdelɪkət]",
+    "Meaning": "adj. 微妙的；易碎的；精致的",
+    "Example": "Handling concurrent requests requires delicate coordination between multiple threads.",
+    "ExampleTranslator": "处理并发请求需要多线程之间的微妙协调。",
+    "AIHelp": "<p><strong>词根联想</strong>：de（强调） + licate（引诱），被精致的东西引诱，即“精致的、微妙的”。</p><p><strong>技术场景</strong>：多线程编程中，线程间的协调是delicate（微妙的），容易出现问题。</p>"
+  },
+  {
+    "Word": "seam",
+    "Phonetic": "英 [siːm]，美 [siːm]",
+    "Meaning": "n. 缝；接缝；v. 缝合；接合",
+    "Example": "The seamless integration of the two modules ensures smooth data transmission between them.",
+    "ExampleTranslator": "两个模块的无缝接合确保了它们之间数据的顺畅传输。",
+    "AIHelp": "<p><strong>联想记忆</strong>：发音类似“seem”（看起来），接缝（seam）看起来要平整，才是好的接合。</p><p><strong>技术概念</strong>：“seamless”（无缝的）常用来形容模块、系统之间的完美接合。</p>"
+  },
+  {
+    "Word": "shift",
+    "Phonetic": "英 [ʃɪft]，美 [ʃɪft]",
+    "Meaning": "v. 转移；改变；换挡；n. 转移；改变；轮班",
+    "Example": "The company decided to shift from the old framework to a more efficient one for the new project.",
+    "ExampleTranslator": "公司决定为新项目从旧框架转向更高效的框架。",
+    "AIHelp": "<p><strong>说明</strong>：shifts是shift的第三人称单数形式。</p><p><strong>技术常用</strong>：在编程中，shift有“移位”的意思，如bit shift（位移位）；也可表示技术栈的“转移”。</p><p><strong>联想记忆</strong>：“shift”有改变位置的意思，像换挡（shift gears）一样改变方向。</p>"
+  },
+  {
+    "Word": "part",
+    "Phonetic": "英 [pɑːt]，美 [pɑːrt]",
+    "Meaning": "n. 部分；零件；v. 分开；分离",
+    "Example": "The database is an important part of the application, storing all user information.",
+    "ExampleTranslator": "数据库是应用程序的重要部分，存储着所有用户信息。",
+    "AIHelp": "<p><strong>说明</strong>：parts是part的复数形式。</p><p><strong>简单记忆</strong>：常用词，“部分、零件”，可联想“part of speech”（词性）。</p><p><strong>编程概念</strong>：一个系统由多个part（部分）组成，如前端、后端、数据库等。</p>"
+  },
+  {
+    "Word": "rosy",
+    "Phonetic": "英 [ˈrəʊzi]，美 [ˈroʊzi]",
+    "Meaning": "adj. 玫瑰色的；美好的；乐观的",
+    "Example": "The initial test results painted a rosy picture of the new system's performance.",
+    "ExampleTranslator": "初步测试结果描绘了新系统性能的美好前景。",
+    "AIHelp": "<p><strong>词根联想</strong>：rose（玫瑰） + y（形容词后缀），像玫瑰一样的颜色，即“玫瑰色的”，引申为“美好的”。</p><p><strong>场景比喻</strong>：当新系统测试顺利时，我们会有rosy（乐观的）预期。</p>"
+  },
+  {
+    "Word": "flesh",
+    "Phonetic": "英 [fleʃ]，美 [fleʃ]",
+    "Meaning": "n. 肉；肉体；果肉；v. 充实；使丰满",
+    "Example": "The developer needs to flesh out the project plan with specific technical details.",
+    "ExampleTranslator": "开发人员需要用具体的技术细节来充实项目计划。",
+    "AIHelp": "<p><strong>联想记忆</strong>：“flesh”本意是“肉”，引申为“充实”，像给骨架添肉一样。</p><p><strong>技术场景</strong>：项目初期的计划比较简略，需要逐步flesh out（充实）细节。</p>"
+  },
+  {
+    "Word": "despite",
+    "Phonetic": "英 [dɪˈspaɪt]，美 [dɪˈspaɪt]",
+    "Meaning": "prep. 尽管；不管；n. 轻视；憎恨",
+    "Example": "Despite the technical challenges, the team successfully completed the project on time.",
+    "ExampleTranslator": "尽管存在技术挑战，团队仍按时成功完成了项目。",
+    "AIHelp": "<p><strong>近义词对比</strong>：与in spite of意思相近，都表示“尽管”，但despite是介词，后面接名词或代词。</p><p><strong>场景造句</strong>：Despite the tight schedule, we managed to fix all bugs.（尽管时间紧张，我们还是设法修复了所有bug。）</p>"
+  },
+  {
+    "Word": "jiggle",
+    "Phonetic": "英 [ˈdʒɪɡl]，美 [ˈdʒɪɡl]",
+    "Meaning": "v. 轻摇；抖动；n. 轻摇；抖动",
+    "Example": "The unstable network connection caused the data to jiggle during transmission.",
+    "ExampleTranslator": "不稳定的网络连接导致数据在传输过程中抖动。",
+    "AIHelp": "<p><strong>说明</strong>：jiggling是jiggle的现在分词形式。</p><p><strong>谐音记忆</strong>：“ jiggle”发音像“挤够”，挤得东西抖动，即“轻摇、抖动”。</p><p><strong>技术场景</strong>：网络不稳定时，数据传输可能会jiggle（抖动），影响通信质量。</p>"
+  },
+  {
+    "Word": "amuse",
+    "Phonetic": "英 [əˈmjuːz]，美 [əˈmjuːz]",
+    "Meaning": "v. 逗乐；使发笑；使消遣",
+    "Example": "The funny error message in the code amused the developers during debugging.",
+    "ExampleTranslator": "代码中有趣的错误提示在调试时逗乐了开发人员。",
+    "AIHelp": "<p><strong>说明</strong>：amused是amuse的过去分词形式。</p><p><strong>词根拆分</strong>：a（强调） + muse（沉思），让人从沉思中笑出来，即“逗乐”。</p><p><strong>场景联想</strong>：有时程序员会在错误提示中加入幽默元素，amuse（逗乐）同事。</p>"
+  },
+  {
+    "Word": "confidence",
+    "Phonetic": "英 [ˈkɒnfɪdəns]，美 [ˈkɑːnfɪdəns]",
+    "Meaning": "n. 信心；信任；自信心",
+    "Example": "Thorough testing gives developers confidence in the stability of the released software.",
+    "ExampleTranslator": "全面的测试让开发人员对发布的软件的稳定性充满信心。",
+    "AIHelp": "<p><strong>词根拆分</strong>：confident（自信的） + ce（名词后缀），即“信心、自信心”。</p><p><strong>程序员心态</strong>：良好的代码质量能增强开发人员的confidence（信心）。</p><p><strong>造句强化</strong>：Writing unit tests can boost your confidence in the code.（编写单元测试能增强你对代码的信心。）</p>"
+  },
+  {
+    "Word": "girlfriend",
+    "Phonetic": "英 [ˈɡɜːlfrend]，美 [ˈɡɜːrlfrend]",
+    "Meaning": "n. 女朋友",
+    "Example": "The programmer's girlfriend helped him test the user - friendliness of the new app interface.",
+    "ExampleTranslator": "程序员的女朋友帮他测试新应用界面的用户友好性。",
+    "AIHelp": "<p><strong>词根拆分</strong>：girl（女孩） + friend（朋友），女孩朋友，即“女朋友”。</p><p><strong>场景联想</strong>：身边的人（如girlfriend）可以作为软件的测试者，提供不同视角的反馈。</p>"
+  },
+  {
+    "Word": "buffet",
+    "Phonetic": "英 [ˈbʌfeɪ]，美 [bəˈfeɪ]",
+    "Meaning": "n. 自助餐；打击；v. 连续猛击",
+    "Example": "The server was buffeted by a flood of requests during the promotional event.",
+    "ExampleTranslator": "在促销活动期间，服务器受到了大量请求的连续冲击。",
+    "AIHelp": "<p><strong>多义记忆</strong>：除了“自助餐”，在技术场景中常表示“连续猛击”，如服务器被请求buffet（冲击）。</p><p><strong>联想记忆</strong>：自助餐（buffet）有很多食物，像大量请求冲击服务器一样。</p>"
+  },
+  {
+    "Word": "land",
+    "Phonetic": "英 [lænd]，美 [lænd]",
+    "Meaning": "v. 着陆；登陆；得到；n. 陆地；土地",
+    "Example": "The new feature finally landed in the production environment after weeks of testing.",
+    "ExampleTranslator": "经过几周的测试，这个新功能终于部署到了生产环境中。",
+    "AIHelp": "<p><strong>说明</strong>：lands是land的第三人称单数形式。</p><p><strong>技术引申义</strong>：在开发中，“land”可表示新功能、代码等“部署、落地”到生产环境。</p><p><strong>场景记忆</strong>：像飞机着陆（land）一样，新功能成功部署到生产环境。</p>"
+  },
+  {
+    "Word": "rock",
+    "Phonetic": "英 [rɒk]，美 [rɑːk]",
+    "Meaning": "v. 摇动；震动；n. 岩石；摇滚乐",
+    "Example": "The sudden server crash rocked the development team, requiring an emergency response.",
+    "ExampleTranslator": "服务器突然崩溃震动了开发团队，需要紧急响应。",
+    "AIHelp": "<p><strong>多义联想</strong>：除了“岩石”，“rock”还有“震动”的意思，服务器崩溃会rock（震动）整个团队。</p><p><strong>场景比喻</strong>：重大技术故障像岩石（rock）掉落一样，带来冲击。</p>"
+  },
+  {
+    "Word": "tiny",
+    "Phonetic": "英 [ˈtaɪni]，美 [ˈtaɪni]",
+    "Meaning": "adj. 极小的；微小的",
+    "Example": "Even a tiny mistake in the configuration file can cause the entire system to fail.",
+    "ExampleTranslator": "即使配置文件中的一个微小错误也可能导致整个系统失败。",
+    "AIHelp": "<p><strong>说明</strong>：tiniest是tiny的最高级形式。</p><p><strong>联想记忆</strong>：“tiny”比“small”更小，强调“极小的”。</p><p><strong>程序员警示</strong>：不要忽视tiny（微小的）错误，它们可能引发大问题。</p>"
+  },
+  {
+    "Word": "hint",
+    "Phonetic": "英 [hɪnt]，美 [hɪnt]",
+    "Meaning": "n. 暗示；提示；线索；v. 暗示；示意",
+    "Example": "The error log gave a hint about the location of the bug in the source code.",
+    "ExampleTranslator": "错误日志给出了源代码中bug位置的提示。",
+    "AIHelp": "<p><strong>简单记忆</strong>：“hint”就是“提示、暗示”，在调试中很重要。</p><p><strong>技术场景</strong>：良好的错误提示应包含解决问题的hint（线索）。</p><p><strong>造句强化</strong>：Reading the documentation can give you hints on how to use the API.（阅读文档能给你使用这个API的提示。）</p>"
+  },
+  {
+    "Word": "account",
+    "Phonetic": "英 [əˈkaʊnt]，美 [əˈkaʊnt]",
+    "Meaning": "n. 账户；账目；描述；v. 解释；说明；认为",
+    "Example": "Users need to create an account and log in to access the personalized features of the platform.",
+    "ExampleTranslator": "用户需要创建账户并登录才能使用该平台的个性化功能。",
+    "AIHelp": "<p><strong>多义记忆</strong>：在IT领域，“account”主要指“账户”，如user account（用户账户）。</p><p><strong>常用搭配</strong>：“account for”表示“解释、说明”，如“account for the error”（解释错误原因）。</p><p><strong>场景联想</strong>：几乎所有平台都需要用户注册account（账户）来提供服务。</p>"
+  },
+
+    {
+      "Word": "twenty",
+      "Phonetic": "英 [ˈtwenti]，美 [ˈtwenti]",
+      "Meaning": "二十；二十个",
+      "Example": "The developer finished debugging twenty lines of code in an hour.",
+      "ExampleTranslator": "开发者在一小时内完成了二十行代码的调试。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：无特定词根，可联想“two（二）”+“ty（表十的后缀）”，二乘十就是二十。<br>2. 场景记忆：程序员调试时，经常会遇到“error code 20”，可联想“twenty”就是20。<br>3. 造句强化：When the server receives twenty concurrent requests, it needs to enable the load balancing mechanism.（当服务器收到二十个并发请求时，需要启用负载均衡机制。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "minute",
+      "Phonetic": "英 [ˈmɪnɪt]，美 [ˈmɪnɪt]",
+      "Meaning": "分钟；片刻",
+      "Example": "The compilation of this large project takes only a few minutes.",
+      "ExampleTranslator": "这个大型项目的编译只需要几分钟。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：无特定词根，可记“min”有“小”的含义，“minute”表示很小的时间单位“分钟”。<br>2. 场景记忆：程序员等待程序运行结果时，常说“Wait a minute”（等一下），很容易记住。<br>3. 造句强化：It takes me ten minutes to write a simple Python script.（我花十分钟写一个简单的Python脚本。）<br>注：原单词“minutes”是“minute”的复数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "die",
+      "Phonetic": "英 [daɪ]，美 [daɪ]",
+      "Meaning": "死亡；熄灭；停止运行",
+      "Example": "The application will die immediately if it can't connect to the database.",
+      "ExampleTranslator": "如果无法连接到数据库，应用程序将立即停止运行。",
+      "AIHelp": "<p>快速记忆：<br>1. 谐音记忆：“die”发音类似“戴”，可联想“程序崩溃了，像戴了沉重的枷锁一样无法运行”。<br>2. 场景记忆：程序员常说“The process died”（进程死了），指进程停止运行。<br>3. 对比近义词：与“stop”相比，“die”在程序语境中更强调突然、意外地停止。<br>注：原单词“dying”是“die”的现在分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "hello",
+      "Phonetic": "英 [həˈləʊ]，美 [həˈloʊ]",
+      "Meaning": "喂；你好",
+      "Example": "The first program many programmers write is a 'Hello World' script.",
+      "ExampleTranslator": "许多程序员写的第一个程序是“Hello World”脚本。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：几乎所有编程语言的入门示例都是“Hello World”，太熟悉了，很容易记住。<br>2. 造句强化：In JavaScript, we can use console.log('Hello, Programmers!') to print messages.（在JavaScript中，我们可以用console.log('Hello, Programmers!')来打印消息。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "walk",
+      "Phonetic": "英 [wɔːk]，美 [wɔːk]",
+      "Meaning": "走；步行；移动",
+      "Example": "We can walk through the code step by step using the debugger.",
+      "ExampleTranslator": "我们可以使用调试器逐步单步执行代码。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：无特定词根，可联想“walk through”在编程中是“单步执行”的意思。<br>2. 场景记忆：调试代码时的“单步执行”操作就像“walk”一样一步一步来。<br>3. 造句强化：The developer likes to walk through the logic before writing code.（开发者喜欢在写代码前梳理逻辑。）<br>注：原单词“walks”是“walk”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "climb",
+      "Phonetic": "英 [klaɪm]，美 [klaɪm]",
+      "Meaning": "攀登；上升；爬坡",
+      "Example": "The memory usage of the application began to climb rapidly after running for an hour.",
+      "ExampleTranslator": "应用程序运行一小时后，内存使用量开始迅速上升。",
+      "AIHelp": "<p>快速记忆：<br>1. 谐音记忆：“climb”发音类似“可来爬”，可以联想“数据像爬山一样上升”。<br>2. 场景记忆：监控系统中，CPU使用率“climb”（上升）是需要关注的情况。<br>3. 造句强化：When the number of users increases, the server load will climb.（当用户数量增加时，服务器负载会上升。）<br>注：原单词“climbs”是“climb”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "permission",
+      "Phonetic": "英 [pəˈmɪʃn]，美 [pərˈmɪʃn]",
+      "Meaning": "允许；许可；权限",
+      "Example": "The user can't access the file without the appropriate read permission.",
+      "ExampleTranslator": "没有适当的读取权限，用户无法访问该文件。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：来自“permit（允许）”，“permission”是其名词形式，“per-”表示“完全”，“mit”表示“送，派”，合起来就是“完全派送出去”即“允许”。<br>2. 场景记忆：在Linux系统中，文件权限（permission）是很重要的概念，如“rwx”分别代表读、写、执行权限。<br>3. 对比近义词：与“allowance”相比，“permission”更侧重于正式的、具体的许可，尤其是在计算机权限方面。<br>4. 造句强化：You need to request permission from the administrator to modify the configuration file.（你需要向管理员请求权限才能修改配置文件。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "darling",
+      "Phonetic": "英 [ˈdɑːlɪŋ]，美 [ˈdɑːrlɪŋ]",
+      "Meaning": "亲爱的；心爱的人",
+      "Example": "The developer affectionately called his favorite programming language his darling.",
+      "ExampleTranslator": "这位开发者亲切地称他最喜欢的编程语言为他的“宝贝”。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：无特定词根，可拆分“dar”+“ling”，“ling”常作爱称后缀。<br>2. 场景记忆：程序员对自己钟爱的技术或工具可能会用类似“darling”的昵称。<br>3. 造句强化：Many developers consider Python their darling because of its simplicity.（许多开发者因为Python的简洁而把它视为心爱之物。）<br>注：原单词“darlings”是“darling”的复数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "force",
+      "Phonetic": "英 [fɔːs]，美 [fɔːrs]",
+      "Meaning": "力量；武力；强制",
+      "Example": "The system will force a restart if the process hangs for more than five minutes.",
+      "ExampleTranslator": "如果进程挂起超过五分钟，系统将强制重启。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：无特定词根，可记“force quit”是“强制退出”，在操作系统中很常见。<br>2. 场景记忆：程序无响应时，我们会“force close”（强制关闭）它。<br>3. 造句强化：The developer had to force the database connection to close due to an error.（由于错误，开发者不得不强制关闭数据库连接。）<br>注：原单词“forces”是“force”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "queen",
+      "Phonetic": "英 [kwiːn]，美 [kwiːn]",
+      "Meaning": "女王；王后；最重要的事物",
+      "Example": "In some chess - playing programs, the queen is the most powerful piece.",
+      "ExampleTranslator": "在一些下棋程序中，皇后是最强大的棋子。",
+      "AIHelp": "<p>快速记忆：<br>1. 谐音记忆：“queen”发音类似“困”，可联想“女王处理太多事务会困”。<br>2. 场景记忆：在开发象棋类程序时，会经常用到“queen”这个单词表示“皇后”棋子。<br>3. 造句强化：The programmer accurately simulated the movement of the queen in the chess program.（程序员在象棋程序中精确模拟了皇后的走法。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "push",
+      "Phonetic": "英 [pʊʃ]，美 [pʊʃ]",
+      "Meaning": "推；推动；推送",
+      "Example": "Developers push their code changes to the remote repository every day.",
+      "ExampleTranslator": "开发者每天都把他们的代码更改推送到远程仓库。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：在Git版本控制中，“git push”是常用命令，意为将本地代码推送到远程仓库，非常好记。<br>2. 对比近义词：与“pull”相对，“push”是推送，“pull”是拉取，在Git操作中经常成对出现。<br>3. 造句强化：Before merging, you should push your branch to the server for review.（合并之前，你应该把你的分支推送到服务器进行审核。）<br>注：原单词“pushed”是“push”的过去式和过去分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "command",
+      "Phonetic": "英 [kəˈmɑːnd]，美 [kəˈmænd]",
+      "Meaning": "命令；指挥；指令",
+      "Example": "The 'ls' command in Linux is used to list directory contents.",
+      "ExampleTranslator": "Linux中的“ls”命令用于列出目录内容。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：“com-”表示“共同”，“mand”表示“命令”，合起来就是“共同的命令”即“指令”。<br>2. 场景记忆：程序员在终端中输入各种“command”（命令）来操作计算机，如“cd”“mkdir”等。<br>3. 造句强化：Learning basic terminal commands is essential for every programmer.（学习基本的终端命令对每个程序员来说都很重要。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "boy",
+      "Phonetic": "英 [bɔɪ]，美 [bɔɪ]",
+      "Meaning": "男孩；少年；小伙子",
+      "Example": "The young boy developed his first mobile app at the age of twelve.",
+      "ExampleTranslator": "这个小男孩在十二岁时开发了他的第一个移动应用程序。",
+      "AIHelp": "<p>快速记忆：<br>1. 简单词汇，可通过日常场景记忆，如“a boy who loves coding”（一个热爱编程的男孩）。<br>2. 造句强化：The little boy is interested in how games are programmed.（这个小男孩对游戏是如何编程的很感兴趣。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "dive",
+      "Phonetic": "英 [daɪv]，美 [daɪv]",
+      "Meaning": "潜水；俯冲；深入研究",
+      "Example": "The developer decided to dive into the source code to find the bug.",
+      "ExampleTranslator": "开发者决定深入研究源代码以找到这个bug。",
+      "AIHelp": "<p>快速记忆：<br>1. 谐音记忆：“dive”发音类似“戴吾”，可联想“戴上吾的眼镜深入研究代码”。<br>2. 场景记忆：调试复杂问题时，程序员需要“dive into”（深入钻研）代码。<br>3. 造句强化：To solve this problem, we need to dive into the underlying principles of the framework.（为了解决这个问题，我们需要深入研究框架的底层原理。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "pop",
+      "Phonetic": "英 [pɒp]，美 [pɑːp]",
+      "Meaning": "突然出现；弹出；流行的",
+      "Example": "A dialog box will pop up when the user clicks this button.",
+      "ExampleTranslator": "当用户点击这个按钮时，会弹出一个对话框。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：在前端开发中，“pop up”表示“弹出”，如弹窗、下拉菜单弹出等，很常用。<br>2. 对比近义词：与“appear”相比，“pop”更强调突然地出现，像弹窗一样突然弹出。<br>3. 造句强化：The function is designed to make a notification pop up on the screen.（这个函数被设计用来让通知在屏幕上弹出。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "tight",
+      "Phonetic": "英 [taɪt]，美 [taɪt]",
+      "Meaning": "紧的；紧密的；严格的",
+      "Example": "The tight loop in the code caused the program to consume too much CPU.",
+      "ExampleTranslator": "代码中的死循环导致程序消耗了过多的CPU。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：无特定词根，可记“tight coupling”是“紧耦合”，在软件设计中是需要避免的。<br>2. 场景记忆：“tight security”（严密的安全措施）在编程中涉及用户数据保护时经常提到。<br>3. 造句强化：We should avoid tight coupling between modules to improve code maintainability.（我们应该避免模块间的紧耦合，以提高代码的可维护性。）<br>注：原单词“tightest”是“tight”的最高级形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "juicy",
+      "Phonetic": "英 [ˈdʒuːsi]，美 [ˈdʒuːsi]",
+      "Meaning": "多汁的；有趣的；有价值的",
+      "Example": "The developer found some juicy details in the API documentation that simplified the task.",
+      "ExampleTranslator": "开发者在API文档中发现了一些有价值的细节，简化了这项任务。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：来自“juice（果汁）”，“juicy”表示“多汁的”，引申为“有价值的”。<br>2. 场景记忆：在阅读技术文档时，找到“juicy information”（有价值的信息）会很有帮助。<br>3. 造句强化：The conference revealed some juicy insights into the future of artificial intelligence.（这次会议揭示了一些关于人工智能未来的重要见解。）<br>注：原单词“juiciest”是“juicy”的最高级形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "clear",
+      "Phonetic": "英 [klɪə(r)]，美 [klɪr]",
+      "Meaning": "清楚的；清晰的；清除",
+      "Example": "Writing clear comments in the code helps other developers understand it quickly.",
+      "ExampleTranslator": "在代码中写清晰的注释有助于其他开发者快速理解代码。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：“clear cache”（清除缓存）是程序员在调试网页时常用的操作。<br>2. 对比近义词：与“obvious”相比，“clear”更强调表达或逻辑上的清晰，如“clear code”（清晰的代码）。<br>3. 造句强化：A clear algorithm structure can reduce the difficulty of debugging.（清晰的算法结构可以降低调试的难度。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "coat",
+      "Phonetic": "英 [kəʊt]，美 [koʊt]",
+      "Meaning": "外套；覆盖层；给……穿外套",
+      "Example": "The database has a protective coat of encryption to prevent data leakage.",
+      "ExampleTranslator": "这个数据库有一层加密保护壳，以防止数据泄露。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：可联想“coat”像外套一样，“encryption coat”（加密层）就像给数据穿上了外套。<br>2. 造句强化：The new software adds a protective coat to the system's core files.（这款新软件给系统的核心文件加了一层保护。）<br>注：原单词“coats”是“coat”的复数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "expensive",
+      "Phonetic": "英 [ɪkˈspensɪv]，美 [ɪkˈspensɪv]",
+      "Meaning": "昂贵的；花钱多的",
+      "Example": "Using cloud computing services for large - scale projects can be expensive.",
+      "ExampleTranslator": "在大型项目中使用云计算服务可能会很昂贵。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：来自“expense（费用）”，“expensive”是其形容词形式，表示“花费多的”即“昂贵的”。<br>2. 场景记忆：程序员在选择服务器或云服务时，会考虑“expensive”（昂贵的）与否。<br>3. 对比近义词：与“dear”相比，“expensive”更正式，常用于描述价格高的物品或服务，如“expensive software”（昂贵的软件）。<br>4. 造句强化：Opting for high - performance hardware may be expensive but can improve development efficiency.（选择高性能硬件可能很贵，但能提高开发效率。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "save",
+      "Phonetic": "英 [seɪv]，美 [seɪv]",
+      "Meaning": "保存；节省；拯救",
+      "Example": "Remember to save your code frequently to avoid losing changes due to unexpected crashes.",
+      "ExampleTranslator": "记得经常保存你的代码，以避免因意外崩溃而丢失更改。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：程序员写代码时，“Ctrl + S”是“save”（保存）的快捷键，每天都会用到无数次，极易记住。<br>2. 对比近义词：与“preserve”相比，“save”更侧重于避免丢失，如“save data”（保存数据）。<br>3. 造句强化：The auto - save function of the IDE can save us a lot of trouble.（IDE的自动保存功能能给我们省去很多麻烦。）<br>注：原单词“saving”是“save”的现在分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "virgin",
+      "Phonetic": "英 [ˈvɜːdʒɪn]，美 [ˈvɜːrdʒɪn]",
+      "Meaning": "未开发的；原始的；处女",
+      "Example": "The developer set up a virgin environment for testing the new software.",
+      "ExampleTranslator": "开发者为测试新软件搭建了一个全新的环境。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：可联想“virgin forest”（原始森林），类比“virgin environment”（全新环境）在编程测试中的使用。<br>2. 造句强化：Before deploying the application, we need to test it in a virgin system.（在部署应用程序之前，我们需要在一个全新的系统中测试它。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "attack",
+      "Phonetic": "英 [əˈtæk]，美 [əˈtæk]",
+      "Meaning": "攻击；袭击；抨击",
+      "Example": "The firewall successfully blocked a malicious attack on the server.",
+      "ExampleTranslator": "防火墙成功阻挡了一次对服务器的恶意攻击。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：无特定词根，可记“cyber attack”（网络攻击）是程序员需要防范的。<br>2. 场景记忆：在网络安全领域，“attack”（攻击）如SQL注入、DDoS等是常见术语。<br>3. 造句强化：The security team is working hard to defend against possible network attacks.（安全团队正努力抵御可能的网络攻击。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "latch",
+      "Phonetic": "英 [lætʃ]，美 [lætʃ]",
+      "Meaning": "门闩；锁存器；闩上",
+      "Example": "The flip - flop in the circuit acts like a latch to store binary information.",
+      "ExampleTranslator": "电路中的触发器就像一个锁存器，用于存储二进制信息。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：在计算机硬件中，“latch”（锁存器）是一种存储器件，可联想它像门闩一样“锁住”信息。<br>2. 造句强化：The latch circuit is crucial for temporary data storage in the CPU.（锁存器电路在CPU中对临时数据存储至关重要。）<br>注：原单词“latches”是“latch”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "teeth",
+      "Phonetic": "英 [tiːθ]，美 [tiːθ]",
+      "Meaning": "牙齿（tooth的复数）",
+      "Example": "The regular expression's pattern matches like teeth, gripping the target string tightly.",
+      "ExampleTranslator": "正则表达式的模式像牙齿一样匹配，紧紧抓住目标字符串。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“teeth”是“tooth”的复数，可联想“gear teeth”（齿轮齿），在编程模拟机械时可能会用到。<br>2. 造句强化：The algorithm's matching mechanism is as precise as teeth meshing.（该算法的匹配机制像牙齿啮合一样精确。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "peak",
+      "Phonetic": "英 [piːk]，美 [piːk]",
+      "Meaning": "顶峰；顶点；达到高峰",
+      "Example": "The server's traffic reaches its peak during the morning rush hour.",
+      "ExampleTranslator": "服务器的流量在早高峰时段达到顶峰。",
+      "AIHelp": "<p>快速记忆：<br>1. 谐音记忆：“peak”发音类似“匹克”，可联想“达到匹配的顶峰”。<br>2. 场景记忆：监控服务器性能时，会关注“peak load”（峰值负载）。<br>3. 造句强化：We need to optimize the system to handle the peak number of online users.（我们需要优化系统以应对在线用户的峰值数量。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "knead",
+      "Phonetic": "英 [niːd]，美 [niːd]",
+      "Meaning": "揉；捏；按摩",
+      "Example": "The developer needs to knead the complex logic into a concise algorithm.",
+      "ExampleTranslator": "开发者需要把复杂的逻辑揉合成一个简洁的算法。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：可联想“揉面团”，类比“knead logic”（揉合逻辑）把复杂逻辑变得有条理。<br>2. 造句强化：It takes time to knead various requirements into a feasible program design.（把各种需求揉合成可行的程序设计需要时间。）<br>注：原单词“kneads”是“knead”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "heavier",
+      "Phonetic": "英 [ˈhevɪə(r)]，美 [ˈhevɪər]",
+      "Meaning": "更重的；更繁重的（heavy的比较级）",
+      "Example": "Processing large datasets puts a heavier load on the database server.",
+      "ExampleTranslator": "处理大型数据集给数据库服务器带来了更繁重的负载。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：来自“heavy（重的）”，“heavier”是其比较级形式。<br>2. 场景记忆：“heavier computation”（更繁重的计算）在处理大数据时会遇到。<br>3. 造句强化：The new feature adds heavier processing tasks to the backend server.（这个新功能给后端服务器增加了更繁重的处理任务。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "screen",
+      "Phonetic": "英 [skriːn]，美 [skriːn]",
+      "Meaning": "屏幕；筛选；遮蔽",
+      "Example": "The application's login screen requires users to enter a username and password.",
+      "ExampleTranslator": "该应用程序的登录界面要求用户输入用户名和密码。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：程序员每天面对电脑“screen”（屏幕）写代码，“screen resolution”（屏幕分辨率）是前端开发需要考虑的。<br>2. 对比近义词：与“filter”相比，“screen”在“筛选”的意思上更侧重于全面检查，如“screen data”（筛选数据）。<br>3. 造句强化：The function is used to screen out invalid input from users.（这个函数用于筛选出用户的无效输入。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "drool",
+      "Phonetic": "英 [druːl]，美 [druːl]",
+      "Meaning": "流口水；过分着迷",
+      "Example": "Programmers drool over the new features of the latest programming language.",
+      "ExampleTranslator": "程序员们对最新编程语言的新特性非常着迷。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“drool”本义是流口水，引申为“着迷”，可联想程序员对新技术“流口水”般地着迷。<br>2. 造句强化：Many developers drool at the thought of using the advanced framework.（想到能使用这个先进的框架，许多开发者都很着迷。）<br>注：原单词“drooling”是“drool”的现在分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "Auntie",
+      "Phonetic": "英 [ˈɑːnti]，美 [ˈænti]",
+      "Meaning": "阿姨；姑妈；伯母",
+      "Example": "My auntie learned basic Python programming to manage her small business data.",
+      "ExampleTranslator": "我的阿姨学习了基本的Python编程来管理她的小生意数据。",
+      "AIHelp": "<p>快速记忆：<br>1. 简单词汇，可通过亲属关系记忆，如“auntie who learns coding”（学编程的阿姨）。<br>2. 造句强化：Auntie asked me to teach her how to write a simple data statistics program.（阿姨让我教她如何写一个简单的数据统计程序。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "scalp",
+      "Phonetic": "英 [skælp]，美 [skælp]",
+      "Meaning": "头皮；剥头皮；倒卖",
+      "Example": "The hacker tried to scalp user data from the insecure website.",
+      "ExampleTranslator": "黑客试图从这个不安全的网站上窃取用户数据。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：可联想“scalp”有“窃取”的意思，在网络安全中，“scalp data”（窃取数据）是黑客的行为。<br>2. 造句强化：The website's security vulnerabilities allow criminals to scalp sensitive information.（该网站的安全漏洞让犯罪分子能够窃取敏感信息。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "brutally",
+      "Phonetic": "英 [ˈbruːtəli]，美 [ˈbruːtəli]",
+      "Meaning": "残忍地；野蛮地；极其",
+      "Example": "The old algorithm was brutally slow when dealing with large amounts of data.",
+      "ExampleTranslator": "这个旧算法在处理大量数据时极其缓慢。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：来自“brutal（残忍的）”，“brutally”是其副词形式。<br>2. 场景记忆：形容程序性能差时，可用“brutally slow”（极其缓慢）。<br>3. 造句强化：The poorly optimized code runs brutally inefficiently on low - end devices.（优化不佳的代码在低端设备上运行得极其低效。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "destroy",
+      "Phonetic": "英 [dɪˈstrɔɪ]，美 [dɪˈstrɔɪ]",
+      "Meaning": "破坏；摧毁；消灭",
+      "Example": "A single wrong command can destroy all the data in the database.",
+      "ExampleTranslator": "一个错误的命令就可能摧毁数据库中的所有数据。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：“de-”表示“相反”，“stroy”来自“struct”（建造），合起来就是“与建造相反”即“破坏”。<br>2. 场景记忆：在操作数据库时，要小心避免“destroy data”（破坏数据）。<br>3. 对比近义词：与“damage”相比，“destroy”程度更深，指彻底破坏，如“destroy a file”（删除一个文件，使其无法恢复）。<br>4. 造句强化：Careless operation may destroy the entire project's code repository.（粗心的操作可能会摧毁整个项目的代码仓库。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "depraved",
+      "Phonetic": "英 [dɪˈpreɪvd]，美 [dɪˈpreɪvd]",
+      "Meaning": "堕落的；腐败的；邪恶的",
+      "Example": "The depraved hacker wrote a virus to corrupt the company's system.",
+      "ExampleTranslator": "这个堕落的黑客编写了一个病毒来破坏公司的系统。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：“de-”表示“向下”，“prave”与“pure（纯洁）”相对，合起来就是“变得不纯洁”即“堕落的”。<br>2. 场景记忆：形容恶意攻击者时可用“depraved hacker”（堕落的黑客）。<br>3. 造句强化：The depraved behavior of stealing user privacy is condemned by the programming community.（窃取用户隐私的堕落行为受到编程界的谴责。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "breed",
+      "Phonetic": "英 [briːd]，美 [briːd]",
+      "Meaning": "繁殖；培育；产生",
+      "Example": "Poorly written code can breed bugs that are hard to fix.",
+      "ExampleTranslator": "写得不好的代码会产生难以修复的bug。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“breed”本义是“繁殖”，可联想“bug breed”（bug滋生），就像虫子繁殖一样。<br>2. 造句强化：Lack of code reviews can breed a lot of potential problems.（缺乏代码审查会滋生很多潜在问题。）<br>注：原单词“breeding”是“breed”的现在分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "has not",
+      "Phonetic": "英 [hæz nɒt]，美 [hæz nɑːt]",
+      "Meaning": "没有；未曾",
+      "Example": "The new function has not been tested in the production environment yet.",
+      "ExampleTranslator": "这个新功能还没有在生产环境中测试过。",
+      "AIHelp": "<p>快速记忆：<br>1. “hasn't”是“has not”的缩写形式，在编程的条件判断中常用，如“If the file has not been found, return an error.”（如果文件未找到，返回一个错误。）<br>2. 造句强化：The developer has not completed the documentation of the API.（开发者还没有完成这个API的文档。）<br>注：原单词“hasn”是“has not”的不完整缩写形式，完整形式为“has not”。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "real",
+      "Phonetic": "英 [ˈriːəl]，美 [ˈriːəl]，美 [ˈrel]",
+      "Meaning": "真实的；实际的；现实的",
+      "Example": "The simulation results are very close to the real data obtained from experiments.",
+      "ExampleTranslator": "模拟结果与从实验中获得的真实数据非常接近。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：在编程中，“real number”（实数）是基本数据类型之一。<br>2. 对比近义词：与“true”相比，“real”更强调客观存在的，如“real data”（真实数据）；“true”更强调符合事实的，如“true value”（真值）。<br>3. 造句强化：The program can convert virtual coordinates into real - world positions.（这个程序可以将虚拟坐标转换为现实世界的位置。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "month",
+      "Phonetic": "英 [mʌnθ]，美 [mʌnθ]",
+      "Meaning": "月；月份",
+      "Example": "The development team plans to release the new version of the software next month.",
+      "ExampleTranslator": "开发团队计划下个月发布这个软件的新版本。",
+      "AIHelp": "<p>快速记忆：<br>1. 简单词汇，可通过项目周期记忆，如“a two - month project”（一个两个月的项目）。<br>2. 造句强化：We need to complete the code refactoring within a month.（我们需要在一个月内完成代码重构。）<br>注：原单词“months”是“month”的复数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "throw",
+      "Phonetic": "英 [θrəʊ]，美 [θroʊ]",
+      "Meaning": "扔；投掷；抛出；引发",
+      "Example": "The program will throw an exception if the input format is incorrect.",
+      "ExampleTranslator": "如果输入格式不正确，程序将抛出一个异常。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：在Java、C#等编程语言中，“throw exception”（抛出异常）是处理错误的常用方式，非常好记。<br>2. 造句强化：The function is designed to throw a custom error when encountering invalid parameters.（这个函数被设计为在遇到无效参数时抛出一个自定义错误。）<br>注：原单词“thrown”是“throw”的过去分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "peel",
+      "Phonetic": "英 [piːl]，美 [piːl]",
+      "Meaning": "剥；削；剥落；果皮",
+      "Example": "The data preprocessing step needs to peel off the redundant information in the raw data.",
+      "ExampleTranslator": "数据预处理步骤需要剥离原始数据中的冗余信息。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“peel”像剥果皮一样，“peel off redundant data”（剥离冗余数据）很形象。<br>2. 造句强化：We can use this algorithm to peel the noise from the signal data.（我们可以用这个算法从信号数据中剥离噪声。）<br>注：原单词“peeled”是“peel”的过去式和过去分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "drive",
+      "Phonetic": "英 [draɪv]，美 [draɪv]",
+      "Meaning": "驱动；驾驶；驱使；驱动器",
+      "Example": "The new software can drive multiple hardware devices through a unified interface.",
+      "ExampleTranslator": "这款新软件可以通过统一的接口驱动多个硬件设备。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：“device driver”（设备驱动程序）是程序员熟悉的术语，“drive”有“驱动”的意思。<br>2. 对比近义词：与“motivate”相比，“drive”更侧重于通过外部力量促使行动，如“drive innovation”（推动创新）。<br>3. 造句强化：The operating system provides interfaces to drive various peripheral devices.（操作系统提供接口来驱动各种外围设备。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "straddle",
+      "Phonetic": "英 [ˈstrædl]，美 [ˈstrædl]",
+      "Meaning": "跨坐；横跨；包含",
+      "Example": "The programming language straddles the fields of web development and data science.",
+      "ExampleTranslator": "这种编程语言横跨web开发和数据科学领域。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“straddle”可以想象成一条腿在一个领域，另一条腿在另一个领域，即“横跨”多个领域。<br>2. 造句强化：The framework is designed to straddle different operating systems.（这个框架被设计为横跨不同的操作系统。）<br>注：原单词“straddles”是“straddle”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "backward",
+      "Phonetic": "英 [ˈbækwəd]，美 [ˈbækwərd]",
+      "Meaning": "向后的；落后的；倒序的",
+      "Example": "The function can reverse the string by reading it backward.",
+      "ExampleTranslator": "这个函数可以通过反向读取来反转字符串。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：“back（后）”+“ward（方向）”，即“向后的”。<br>2. 场景记忆：在处理字符串时，“read backward”（反向读取）是常见操作。<br>3. 造句强化：The algorithm sorts the array in backward order for specific needs.（为了特定需求，该算法按倒序对数组进行排序。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "lower",
+      "Phonetic": "英 [ˈləʊə(r)]，美 [ˈloʊər]",
+      "Meaning": "降低；减少；较低的",
+      "Example": "Optimizing the code can lower the memory usage of the application.",
+      "ExampleTranslator": "优化代码可以降低应用程序的内存使用率。",
+      "AIHelp": "<p>快速记忆：<br>1. 对比记忆：与“raise”（提高）相反，“lower”是“降低”，如“lower CPU usage”（降低CPU使用率）。<br>2. 场景记忆：在性能优化中，“lower response time”（降低响应时间）是重要目标。<br>3. 造句强化：We need to find a way to lower the energy consumption of the server.（我们需要找到一种方法来降低服务器的能耗。）<br>注：原单词“lowering”是“lower”的现在分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "spear",
+      "Phonetic": "英 [spɪə(r)]，美 [spɪr]",
+      "Meaning": "矛；标枪；刺穿",
+      "Example": "The efficient search algorithm can spear through large datasets to find the target quickly.",
+      "ExampleTranslator": "这种高效的搜索算法能刺穿大型数据集，快速找到目标。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“spear”像矛一样“刺穿”，类比搜索算法快速“刺穿”数据找到目标。<br>2. 造句强化：The index mechanism allows the database to spear into massive data for retrieval.（索引机制使数据库能够快速检索海量数据。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "gush",
+      "Phonetic": "英 [ɡʌʃ]，美 [ɡʌʃ]",
+      "Meaning": "涌出；喷出；迸发",
+      "Example": "The log file gushes with error messages when the system crashes.",
+      "ExampleTranslator": "当系统崩溃时，日志文件中涌出大量错误信息。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“gush”像水流涌出一样，“error messages gush”（错误信息涌出）很形象。<br>2. 造句强化：The server's output gushes with real - time data during the test.（测试期间，服务器的输出中涌出大量实时数据。）<br>注：原单词“gushes”是“gush”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "crash",
+      "Phonetic": "英 [kræʃ]，美 [kræʃ]",
+      "Meaning": "碰撞；崩溃；暴跌",
+      "Example": "The application will crash if it runs out of memory.",
+      "ExampleTranslator": "如果内存耗尽，应用程序将会崩溃。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：程序员经常遇到程序“crash”（崩溃）的情况，是非常熟悉的词汇。<br>2. 对比近义词：与“break down”相比，“crash”更侧重于突然、意外地停止工作，如“system crash”（系统崩溃）。<br>3. 造句强化：A single wrong pointer operation can cause the program to crash.（一个错误的指针操作就可能导致程序崩溃。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "mouth",
+      "Phonetic": "英 [maʊθ]，美 [maʊθ]",
+      "Meaning": "嘴；口；说话方式",
+      "Example": "The voice recognition program can convert what you say into text through the mouth microphone.",
+      "ExampleTranslator": "这个语音识别程序可以通过麦克风将你嘴里说的话转换成文本。",
+      "AIHelp": "<p>快速记忆：<br>1. 简单词汇，可联想“voice input from mouth”（来自嘴的语音输入）在语音识别程序中的应用。<br>2. 造句强化：The chatbot can understand the commands spoken from the user's mouth.（这个聊天机器人能理解用户嘴里说出的指令。）<br>注：原单词“mouths”是“mouth”的复数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "fight",
+      "Phonetic": "英 [faɪt]，美 [faɪt]",
+      "Meaning": "战斗；斗争；对抗",
+      "Example": "Developers fight against bugs day and night to ensure the software runs stably.",
+      "ExampleTranslator": "开发者们日夜与bug作斗争，以确保软件稳定运行。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“fight against bugs”（与bug作斗争）是程序员的日常，很容易记住。<br>2. 造句强化：We need to fight with various technical difficulties in the development process.（在开发过程中，我们需要与各种技术难题作斗争。）<br>注：原单词“fighting”是“fight”的现在分词形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "friend",
+      "Phonetic": "英 [frend]，美 [frend]",
+      "Meaning": "朋友；支持者；伙伴",
+      "Example": "Collaborating with friends in the development team can improve work efficiency.",
+      "ExampleTranslator": "在开发团队中与朋友合作可以提高工作效率。",
+      "AIHelp": "<p>快速记忆：<br>1. 简单词汇，可通过团队合作场景记忆，如“coding with friends”（和朋友一起编程）。<br>2. 造句强化：The open - source community is like a big family where developers are friends.（开源社区就像一个大家庭，开发者们都是朋友。）<br>注：原单词“friends”是“friend”的复数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "destroy",
+      "Phonetic": "英 [dɪˈstrɔɪ]，美 [dɪˈstrɔɪ]",
+      "Meaning": "破坏；摧毁；消灭",
+      "Example": "A virus can destroy all the important files on the hard disk.",
+      "ExampleTranslator": "病毒可以摧毁硬盘上所有的重要文件。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：“de-”表示“相反”，“stroy”与“struct”（建造）相关，意为“与建造相反的行为”即“破坏”。<br>2. 场景记忆：在讨论网络安全时，常提到“malware that can destroy systems”（能破坏系统的恶意软件）。<br>3. 对比近义词：“destroy”比“damage”程度更深，“damage”指部分损坏，“destroy”指彻底摧毁。<br>4. 造句强化：Careless use of the 'rm -rf' command in Linux can destroy the entire file system.（在Linux中不小心使用“rm -rf”命令会摧毁整个文件系统。）<br>注：原单词“destroys”是“destroy”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "free",
+      "Phonetic": "英 [friː]，美 [friː]",
+      "Meaning": "自由的；免费的；释放",
+      "Example": "Many excellent open - source software are free for developers to use and modify.",
+      "ExampleTranslator": "许多优秀的开源软件是免费的，供开发者使用和修改。",
+      "AIHelp": "<p>快速记忆：<br>1. 场景记忆：“free software”（自由软件）是编程领域的重要概念，如Linux系统。<br>2. 对比近义词：“free”表示“免费的”时，与“gratis”意思相近；表示“自由的”时，与“libre”（在自由软件语境中）相关。<br>3. 造句强化：The open - source license allows users to use the software for free.（开源许可证允许用户免费使用该软件。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "smash",
+      "Phonetic": "英 [smæʃ]，美 [smæʃ]",
+      "Meaning": "打碎；粉碎；猛击",
+      "Example": "The powerful encryption algorithm can smash the hacker's attempt to crack the password.",
+      "ExampleTranslator": "这种强大的加密算法可以粉碎黑客破解密码的企图。",
+      "AIHelp": "<p>快速记忆：<br>1. 联想记忆：“smash”像粉碎东西一样，“smash hacker's attempt”（粉碎黑客的企图）很形象。<br>2. 造句强化：The security system is designed to smash any unauthorized access attempts.（这个安全系统旨在粉碎任何未授权的访问企图。）<br>注：原单词“smashes”是“smash”的第三人称单数形式。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "chaos",
+      "Phonetic": "英 [ˈkeɪɒs]，美 [ˈkeɪɑːs]",
+      "Meaning": "混乱；无秩序；混沌",
+      "Example": "A small bug in the code can cause chaos in the entire system's operation.",
+      "ExampleTranslator": "代码中的一个小bug就可能导致整个系统运行陷入混乱。",
+      "AIHelp": "<p>快速记忆：<br>1. 词根联想：来自希腊语，原意为“混沌”，在编程中可指系统的混乱状态。<br>2. 场景记忆：当多个线程竞争资源且未正确同步时，系统容易陷入“chaos”（混乱）。<br>3. 造句强化：Poor project management can lead to chaos in the development process.（糟糕的项目管理会导致开发过程陷入混乱。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+
+    {
+      "Word": "slam",
+      "Phonetic": "英 [slæm]，美 [slæm]",
+      "Meaning": "v. 猛击；用力一放；n. 猛击；砰然声",
+      "Example": "When the server crashes, the log file might slam shut without saving the latest data.",
+      "ExampleTranslator": "当服务器崩溃时，日志文件可能会在未保存最新数据的情况下突然关闭。",
+      "AIHelp": "<p><strong>词根联想记忆法</strong>：与“slap（拍打）”相关，都有快速、用力接触的意思，slam更强调猛烈程度。</p><p><strong>场景记忆</strong>：想象程序员调试时，因代码运行错误而猛地合上笔记本电脑的动作，就是slam。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "slamming 是 slam 的现在分词"
+    },
+    {
+      "Word": "piston",
+      "Phonetic": "英 [ˈpɪstən]，美 [ˈpɪstən]",
+      "Meaning": "n. 活塞（发动机等中的部件）",
+      "Example": "In a high-performance database, data processing can be as efficient as a piston moving in a well-oiled engine.",
+      "ExampleTranslator": "在高性能数据库中，数据处理可以像活塞在润滑良好的发动机中运动一样高效。",
+      "AIHelp": "<p><strong>谐音记忆</strong>：“匹斯顿”，可以联想成匹配速度的“斯顿”部件，就像活塞匹配发动机的运转速度。</p><p><strong>对比记忆</strong>：与“cylinder（气缸）”相关，活塞（piston）在气缸内运动，就像数据在管道内传输。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "pistoning 是 piston 的现在分词（此处作动词义“像活塞一样运动”）"
+    },
+    {
+      "Word": "devour",
+      "Phonetic": "英 [dɪˈvaʊə(r)]，美 [dɪˈvaʊər]",
+      "Meaning": "v. 狼吞虎咽地吃；吞噬；贪婪地阅读或消耗",
+      "Example": "The data processing task can devour a lot of memory if the algorithm is not optimized.",
+      "ExampleTranslator": "如果算法未优化，数据处理任务会消耗大量内存。",
+      "AIHelp": "<p><strong>词根联想</strong>：de-（加强）+ vour（吃），加强“吃”的动作，即吞噬。</p><p><strong>程序员场景</strong>：想象一个未优化的循环，像吞噬内存的“怪兽”一样 devour 系统资源，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "devouring 是 devour 的现在分词"
+    },
+    {
+      "Word": "grind",
+      "Phonetic": "英 [ɡraɪnd]，美 [ɡraɪnd]",
+      "Meaning": "v. 磨碎；研磨；用力挤压；n. 苦差事",
+      "Example": "Compiling large projects can feel like a grind, but the result is a smooth-running application.",
+      "ExampleTranslator": "编译大型项目可能感觉像件苦差事，但结果是一个运行流畅的应用程序。",
+      "AIHelp": "<p><strong>谐音记忆</strong>：“ grind ”音似“ grind（ grind ）”，想象研磨代码中的错误，就像磨碎坚硬的颗粒。</p><p><strong>造句强化</strong>：Every developer has to grind through debugging sessions to fix tricky bugs.（每个开发者都得熬过调试阶段来修复棘手的bug。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "grinds 是 grind 的第三人称单数形式"
+    },
+    {
+      "Word": "boyfriend",
+      "Phonetic": "英 [ˈbɔɪfrend]，美 [ˈbɔɪfrend]",
+      "Meaning": "n. 男朋友",
+      "Example": "My boyfriend helped me debug the code when I was stuck for hours.",
+      "ExampleTranslator": "当我被困了几个小时时，我的男朋友帮我调试了代码。",
+      "AIHelp": "<p><strong>拆分记忆</strong>：boy（男孩）+ friend（朋友），男孩朋友即男朋友。</p><p><strong>场景联想</strong>：程序员情侣一起结对编程，男朋友（boyfriend）帮忙解决技术难题，加深记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "lose",
+      "Phonetic": "英 [luːz]，美 [luːz]",
+      "Meaning": "v. 失去；丢失；输掉；减少",
+      "Example": "If you don't commit your code regularly, you might lose important changes after a system crash.",
+      "ExampleTranslator": "如果你不经常提交代码，在系统崩溃后可能会丢失重要的修改。",
+      "AIHelp": "<p><strong>对比记忆</strong>：与“loose（松散的）”区分，lose 是动词“丢失”，loose 是形容词“松散的”。</p><p><strong>程序员场景</strong>：忘记保存代码而 lose（丢失）工作成果，这种经历能帮助牢记该词。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "explode",
+      "Phonetic": "英 [ɪkˈspləʊd]，美 [ɪkˈsploʊd]",
+      "Meaning": "v. 爆炸；爆发；激增；推翻",
+      "Example": "The number of error messages can explode when the input validation is not properly implemented.",
+      "ExampleTranslator": "当输入验证未正确实现时，错误消息的数量会激增。",
+      "AIHelp": "<p><strong>词根联想</strong>：ex-（向外）+ plode（爆炸），向外爆炸即 explode。</p><p><strong>场景记忆</strong>：想象程序因内存泄漏而崩溃，错误日志像爆炸一样涌出，就是 explode 的场景。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "unload",
+      "Phonetic": "英 [ˌʌnˈləʊd]，美 [ˌʌnˈloʊd]",
+      "Meaning": "v. 卸货；卸下；倾诉；退出（程序等）",
+      "Example": "The application needs to unload unused modules to free up system resources.",
+      "ExampleTranslator": "该应用程序需要卸载未使用的模块以释放系统资源。",
+      "AIHelp": "<p><strong>词根联想</strong>：un-（相反）+ load（加载），与加载相反的动作即卸载（unload）。</p><p><strong>造句强化</strong>：Before shutting down the server, make sure to unload all the active processes.（关闭服务器前，确保卸载所有活动进程。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "unloads 是 unload 的第三人称单数形式"
+    },
+    {
+      "Word": "torrent",
+      "Phonetic": "英 [ˈtɒrənt]，美 [ˈtɔːrənt]",
+      "Meaning": "n. 激流；洪流；连续不断的事物",
+      "Example": "A torrent of data flows through the network when syncing large files between servers.",
+      "ExampleTranslator": "在服务器之间同步大文件时，大量数据在网络中流动。",
+      "AIHelp": "<p><strong>谐音记忆</strong>：“托伦特”，可以联想成“托着很多数据的洪流”，即 torrent。</p><p><strong>近义词对比</strong>：与“flood（洪水）”相近，torrent 更强调数据或信息的连续且大量的流动，如 torrent of requests（大量请求）。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "collapse",
+      "Phonetic": "英 [kəˈlæps]，美 [kəˈlæps]",
+      "Meaning": "v. 倒塌；崩溃；瓦解；n. 崩溃；倒塌",
+      "Example": "The database connection will collapse if too many concurrent requests are sent without proper handling.",
+      "ExampleTranslator": "如果在没有适当处理的情况下发送过多并发请求，数据库连接将会崩溃。",
+      "AIHelp": "<p><strong>词根联想</strong>：col-（一起）+ lapse（滑落），一起滑落即崩溃（collapse）。</p><p><strong>程序员场景</strong>：系统因负载过高而突然 collapse（崩溃），这种经历能加深记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "pile",
+      "Phonetic": "英 [paɪl]，美 [paɪl]",
+      "Meaning": "n. 堆；摞；大量；v. 堆积；积累",
+      "Example": "Developers often pile up technical debt when rushing to meet project deadlines.",
+      "ExampleTranslator": "开发者在急于赶项目截止日期时，往往会积累技术债务。",
+      "AIHelp": "<p><strong>场景记忆</strong>：想象代码仓库里 pile（堆积）如山的未合并分支，帮助记忆。</p><p><strong>造句强化</strong>：Don't pile too many tasks on a single thread; it will slow down the program.（不要在单个线程上堆积太多任务，这会减慢程序速度。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "cock",
+      "Phonetic": "英 [kɒk]，美 [kɑːk]",
+      "Meaning": "n. 公鸡；雄鸟；龙头；v. 竖起；翘起",
+      "Example": "",
+      "ExampleTranslator": "",
+      "AIHelp": "",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "cocks 是 cock 的第三人称单数形式及复数形式，因存在多义性且部分含义敏感，故不生成示例"
+    },
+    {
+      "Word": "taboo",
+      "Phonetic": "英 [təˈbuː]，美 [təˈbuː]",
+      "Meaning": "n. 禁忌；忌讳；adj. 禁忌的；忌讳的",
+      "Example": "Hardcoding passwords in the source code is a taboo in software development.",
+      "ExampleTranslator": "在源代码中硬编码密码是软件开发中的一大禁忌。",
+      "AIHelp": "<p><strong>谐音记忆</strong>：“塔布”，可以联想成“塔一样不能触碰的禁忌”，即 taboo。</p><p><strong>场景联想</strong>：程序员之间，将未经测试的代码直接合并到主分支是一种 taboo（禁忌）。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "leak",
+      "Phonetic": "英 [liːk]，美 [liːk]",
+      "Meaning": "v. 泄漏；渗漏；n. 泄漏；漏洞",
+      "Example": "A memory leak in the application can cause it to crash after running for a long time.",
+      "ExampleTranslator": "应用程序中的内存泄漏会导致其运行很长时间后崩溃。",
+      "AIHelp": "<p><strong>场景记忆</strong>：想象程序中的内存像水一样 leak（泄漏）出去，最终导致系统出问题，帮助记忆。</p><p><strong>近义词对比</strong>：与“drip（滴漏）”相比，leak 更常用于抽象事物，如信息泄漏、内存泄漏。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "claw",
+      "Phonetic": "英 [klɔː]，美 [klɔː]",
+      "Meaning": "n. 爪；爪子；v. 用爪抓；费力地前进",
+      "Example": "The crawler program uses its algorithm to claw through the web pages and collect data.",
+      "ExampleTranslator": "爬虫程序利用其算法费力地在网页中抓取并收集数据。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象爪子（claw）抓东西的动作，就像程序抓取数据时的状态。</p><p><strong>造句强化</strong>：The data scraper can claw its way through complex website structures to extract useful information.（数据抓取工具能费力地穿过复杂的网站结构提取有用信息。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "clawing 是 claw 的现在分词"
+    },
+    {
+      "Word": "rotate",
+      "Phonetic": "英 [rəʊˈteɪt]，美 [ˈroʊteɪt]",
+      "Meaning": "v. 旋转；转动；轮流；轮换",
+      "Example": "In a load-balanced system, requests are rotated among multiple servers to ensure stability.",
+      "ExampleTranslator": "在负载均衡系统中，请求在多个服务器之间轮换以确保稳定性。",
+      "AIHelp": "<p><strong>词根联想</strong>：rot（旋转）+ -ate（动词后缀），旋转的动作即 rotate。</p><p><strong>程序员场景</strong>：服务器集群中，任务 rotate（轮换）执行，防止单个服务器过载，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "rotates 是 rotate 的第三人称单数形式"
+    },
+    {
+      "Word": "coat",
+      "Phonetic": "英 [kəʊt]，美 [koʊt]",
+      "Meaning": "n. 外套；涂层；v. 覆盖；涂上",
+      "Example": "The encryption algorithm coats the sensitive data with a layer of protection before transmission.",
+      "ExampleTranslator": "加密算法在传输前给敏感数据覆盖上一层保护。",
+      "AIHelp": "<p><strong>多义联想</strong>：除了“外套”，coat 作动词有“覆盖”义，像给数据穿上“保护外套”一样覆盖一层加密，帮助记忆。</p><p><strong>造句强化</strong>：The new framework coats the underlying code with a user-friendly interface.（这个新框架给底层代码覆盖了一个用户友好的界面。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "sound",
+      "Phonetic": "英 [saʊnd]，美 [saʊnd]",
+      "Meaning": "n. 声音；声响；v. 听起来；发出声音；adj. 合理的；健全的",
+      "Example": "A sound error-handling mechanism is crucial for the stability of any software application.",
+      "ExampleTranslator": "健全的错误处理机制对任何软件应用程序的稳定性都至关重要。",
+      "AIHelp": "<p><strong>多义记忆</strong>：除了“声音”，在技术场景中常用“健全的”义，如 sound code（健全的代码）。</p><p><strong>对比记忆</strong>：与“healthy（健康的）”近义，sound 更侧重逻辑或结构上的合理性。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "present",
+      "Phonetic": "英 [ˈpreznt]（n. 礼物；adj. 现在的），[prɪˈzent]（v. 呈现；介绍）；美 [ˈpreznt]（n. 礼物；adj. 现在的），[prɪˈzent]（v. 呈现；介绍）",
+      "Meaning": "v. 呈现；介绍；提出；n. 礼物；现在；adj. 现在的；出席的",
+      "Example": "The dashboard presents real-time metrics of the server's performance to the administrators.",
+      "ExampleTranslator": "仪表板向管理员呈现服务器性能的实时指标。",
+      "AIHelp": "<p><strong>词根联想</strong>：pre-（前）+ sent（送），送到面前即呈现（present）。</p><p><strong>程序员场景</strong>：开发人员在会议上 present（展示）新功能的实现方案，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "presented 是 present 的过去分词及过去式"
+    },
+    {
+      "Word": "offer",
+      "Phonetic": "英 [ˈɒfə(r)]，美 [ˈɔːfər]",
+      "Meaning": "v. 提供；给予；提议；n. 提议；出价",
+      "Example": "This library offers a set of APIs to simplify database operations in the project.",
+      "ExampleTranslator": "这个库提供了一组API，以简化项目中的数据库操作。",
+      "AIHelp": "<p><strong>场景记忆</strong>：开源社区中，开发者 offer（提供）代码贡献，帮助项目完善，加深记忆。</p><p><strong>近义词对比</strong>：与“provide（提供）”近义，offer 更强调主动提供，如 offer help（主动提供帮助）。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "offering 是 offer 的现在分词及动名词"
+    },
+    {
+      "Word": "mom",
+      "Phonetic": "英 [mɒm]，美 [mɑːm]",
+      "Meaning": "n. 妈妈（口语）",
+      "Example": "My mom learned basic programming to better understand what I do for a living.",
+      "ExampleTranslator": "我妈妈学习了基本的编程，以便更好地理解我的工作。",
+      "AIHelp": "<p><strong>对比记忆</strong>：与“mother（母亲）”相比，mom 更口语化，是日常生活中的常用词。</p><p><strong>场景联想</strong>：程序员给妈妈解释自己开发的APP功能时，会用到 mom 这个词。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "moms 是 mom 的复数形式"
+    },
+    {
+      "Word": "scoop",
+      "Phonetic": "英 [skuːp]，美 [skuːp]",
+      "Meaning": "v. 舀取；获取；搜集；n. 勺子；独家新闻",
+      "Example": "The data mining tool can scoop relevant information from large datasets efficiently.",
+      "ExampleTranslator": "这个数据挖掘工具能高效地从大型数据集中搜集相关信息。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象用勺子（scoop）舀东西的动作，就像工具从数据中 scoop（搜集）信息。</p><p><strong>造句强化</strong>：The crawler is designed to scoop the latest updates from the website.（这个爬虫旨在从网站上获取最新更新。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "scooped 是 scoop 的过去分词及过去式"
+    },
+    {
+      "Word": "jet",
+      "Phonetic": "英 [dʒet]，美 [dʒet]",
+      "Meaning": "n. 喷气式飞机；喷射流；v. 乘喷气式飞机；喷射",
+      "Example": "The high-speed data jet transfers files between the client and server in milliseconds.",
+      "ExampleTranslator": "高速数据喷射在几毫秒内完成客户端和服务器之间的文件传输。",
+      "AIHelp": "<p><strong>场景联想</strong>：想象数据像喷气式飞机（jet）一样快速传输，即 data jet（数据喷射），帮助记忆。</p><p><strong>多义记忆</strong>：除了“飞机”，“喷射”义在技术场景中可描述数据快速流动。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "tag",
+      "Phonetic": "英 [tæɡ]，美 [tæɡ]",
+      "Meaning": "n. 标签；标记；v. 给……加标签；标记",
+      "Example": "Developers use Git tags to mark specific versions of the code for release.",
+      "ExampleTranslator": "开发者使用Git标签来标记代码的特定版本以供发布。",
+      "AIHelp": "<p><strong>技术场景记忆</strong>：在代码管理中，tag（标签）用于标记版本，如 v1.0.0 这样的 tag，帮助记忆。</p><p><strong>近义词对比</strong>：与“label（标签）”近义，tag 更常用于数字或代码环境中。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "team",
+      "Phonetic": "英 [tiːm]，美 [tiːm]",
+      "Meaning": "n. 队；组；v. 合作；协作",
+      "Example": "Developers and designers need to team up to create user-friendly software products.",
+      "ExampleTranslator": "开发人员和设计师需要协作来创建用户友好的软件产品。",
+      "AIHelp": "<p><strong>场景记忆</strong>：程序员在 team（团队）中协作开发项目，team up（组队）完成任务，帮助记忆。</p><p><strong>造句强化</strong>：The backend and frontend teams will team together to solve the integration issue.（后端和前端团队将合作解决集成问题。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "teaming 是 team 的现在分词"
+    },
+    {
+      "Word": "breed",
+      "Phonetic": "英 [briːd]，美 [briːd]",
+      "Meaning": "v. 繁殖；培育；产生；n. 品种；种类",
+      "Example": "Poorly written code can breed bugs that are difficult to debug later.",
+      "ExampleTranslator": "写得不好的代码会产生难以调试的错误。",
+      "AIHelp": "<p><strong>词根联想</strong>：与“brood（孵化）”相关，都有“产生、培育”的含义，breed 更侧重“滋生、产生”抽象事物。</p><p><strong>程序员场景</strong>：混乱的代码结构会 breed（滋生）各种问题，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "breeds 是 breed 的第三人称单数形式"
+    },
+    {
+      "Word": "mommy",
+      "Phonetic": "英 [ˈmɒmi]，美 [ˈmɑːmi]",
+      "Meaning": "n. 妈妈（儿语，更亲昵）",
+      "Example": "The kid showed his mommy the game he made with a programming tutorial.",
+      "ExampleTranslator": "那个孩子向他妈妈展示了他通过编程教程制作的游戏。",
+      "AIHelp": "<p><strong>对比记忆</strong>：与“mom”相比，mommy 更具亲昵感，是儿童常用的称呼。</p><p><strong>场景联想</strong>：孩子用自己编的小程序向 mommy（妈妈）展示成果，加深记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "mommies 是 mommy 的复数形式"
+    },
+    {
+      "Word": "Grandma",
+      "Phonetic": "英 [ˈɡrænmɑː]，美 [ˈɡrænmɑː]",
+      "Meaning": "n. （外）祖母；奶奶；外婆",
+      "Example": "Grandma was amazed by how the video call app connects family members from different cities.",
+      "ExampleTranslator": "奶奶对视频通话应用如何连接不同城市的家庭成员感到惊讶。",
+      "AIHelp": "<p><strong>拆分记忆</strong>：Grand（ grand 有“祖辈的”含义）+ ma（妈妈），即祖母（Grandma）。</p><p><strong>场景联想</strong>：教 Grandma 使用智能设备上的应用程序，这样的场景能帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "splash",
+      "Phonetic": "英 [splæʃ]，美 [splæʃ]",
+      "Meaning": "v. 泼洒；溅落；n. 溅泼声；溅出的水",
+      "Example": "The new UI design makes colorful elements splash across the screen when users interact with the app.",
+      "ExampleTranslator": "新的UI设计在用户与应用交互时，让彩色元素在屏幕上“飞溅”。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象水溅起（splash）的样子，就像UI元素在屏幕上动态显示的效果。</p><p><strong>造句强化</strong>：The animation makes the notification splash onto the screen for attention.（这个动画让通知“溅”到屏幕上以吸引注意。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "splashes 是 splash 的第三人称单数形式"
+    },
+    {
+      "Word": "rip",
+      "Phonetic": "英 [rɪp]，美 [rɪp]",
+      "Meaning": "v. 撕裂；扯破；猛地拉开；n. 裂口；裂缝",
+      "Example": "A single syntax error can rip through the entire codebase, causing compilation failures.",
+      "ExampleTranslator": "一个语法错误就能“撕裂”整个代码库，导致编译失败。",
+      "AIHelp": "<p><strong>场景记忆</strong>：想象代码因错误而像被撕裂（rip）一样无法正常运行，帮助记忆。</p><p><strong>近义词对比</strong>：与“tear（撕裂）”近义，rip 更强调用力、猛地撕裂。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "ripping 是 rip 的现在分词"
+    },
+    {
+      "Word": "cum",
+      "Phonetic": "",
+      "Meaning": "",
+      "Example": "",
+      "ExampleTranslator": "",
+      "AIHelp": "",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "cums 是 cum 的第三人称单数形式，该词涉及敏感含义，故不补充内容"
+    },
+    {
+      "Word": "heap",
+      "Phonetic": "英 [hiːp]，美 [hiːp]",
+      "Meaning": "n. 堆；大量；v. 堆积；堆起",
+      "Example": "The garbage collector cleans up the heap to free memory occupied by unused objects.",
+      "ExampleTranslator": "垃圾回收器清理堆内存，以释放未使用对象占用的内存。",
+      "AIHelp": "<p><strong>技术场景记忆</strong>：在Java等语言中，heap（堆）是内存的一种分配区域，用于存储对象，这是程序员常用的概念，帮助记忆。</p><p><strong>对比记忆</strong>：与“stack（栈）”相对，heap 用于动态内存分配。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "mother",
+      "Phonetic": "英 [ˈmʌðə(r)]，美 [ˈmʌðər]",
+      "Meaning": "n. 母亲；妈妈；v. 生育；养育",
+      "Example": "The open-source community is like a mother that nurtures new developers and their projects.",
+      "ExampleTranslator": "开源社区就像一位母亲，培育着新的开发者和他们的项目。",
+      "AIHelp": "<p><strong>对比记忆</strong>：与“mom”相比，mother 更正式，“mothers”是其复数形式。</p><p><strong>场景联想</strong>：用“mother”比喻孕育技术的源头，如“the mother of all inventions（所有发明之母）”。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "mothers 是 mother 的复数形式"
+    },
+    {
+      "Word": "size",
+      "Phonetic": "英 [saɪz]，美 [saɪz]",
+      "Meaning": "n. 大小；尺寸；规模；v. 确定……的大小",
+      "Example": "Developers need to size the database appropriately to handle future growth in user data.",
+      "ExampleTranslator": "开发者需要适当确定数据库的规模，以应对未来用户数据的增长。",
+      "AIHelp": "<p><strong>技术场景记忆</strong>：在编程中，常需要获取或设置对象的 size（大小），如 array.size()，帮助记忆。</p><p><strong>造句强化</strong>：The function returns the size of the list to help with memory allocation.（该函数返回列表的大小以辅助内存分配。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "sized 是 size 的过去分词及过去式"
+    },
+    {
+      "Word": "dominate",
+      "Phonetic": "英 [ˈdɒmɪneɪt]，美 [ˈdɑːmɪneɪt]",
+      "Meaning": "v. 支配；控制；在……中占主导地位",
+      "Example": "Cloud computing continues to dominate the tech industry, changing how applications are deployed.",
+      "ExampleTranslator": "云计算继续在科技行业占主导地位，改变着应用程序的部署方式。",
+      "AIHelp": "<p><strong>词根联想</strong>：domin（统治）+ -ate（动词后缀），统治、支配即 dominate。</p><p><strong>场景记忆</strong>：某种编程语言在特定领域 dominate（占主导地位），如Python在数据分析领域，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "dominates 是 dominate 的第三人称单数形式"
+    },
+    {
+      "Word": "expansive",
+      "Phonetic": "英 [ɪkˈspænsɪv]，美 [ɪkˈspænsɪv]",
+      "Meaning": "adj. 广阔的；扩张的；健谈的",
+      "Example": "An expansive API allows developers to extend the functionality of the framework easily.",
+      "ExampleTranslator": "一个功能丰富的API允许开发者轻松扩展框架的功能。",
+      "AIHelp": "<p><strong>词根联想</strong>：expan(d)（扩展）+ -sive（形容词后缀），具有扩展性的即 expansive。</p><p><strong>对比记忆</strong>：与“extensive（广泛的）”近义，expansive 更强调“可扩展的”特性。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "rumple",
+      "Phonetic": "英 [ˈrʌmpl]，美 [ˈrʌmpl]",
+      "Meaning": "v. 弄皱；使凌乱；n. 褶皱；凌乱",
+      "Example": "A poorly formatted codebase with inconsistent indentation looks as rumpled as an unmade bed.",
+      "ExampleTranslator": "一个格式糟糕、缩进不一致的代码库看起来就像未整理的床一样凌乱。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象皱巴巴的纸（rumple），就像格式混乱的代码，帮助记忆。</p><p><strong>造句强化</strong>：Hasty edits can rumple the structure of the document, making it hard to read.（仓促的编辑会弄乱文档结构，使其难以阅读。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "rumpled 是 rumple 的过去分词及过去式"
+    },
+    {
+      "Word": "stain",
+      "Phonetic": "英 [steɪn]，美 [steɪn]",
+      "Meaning": "v. 玷污；染色；n. 污点；污渍",
+      "Example": "Hard-to-fix bugs can stain the reputation of a software release if not addressed promptly.",
+      "ExampleTranslator": "难以修复的bug如果不及时处理，会玷污软件版本的声誉。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象污渍（stain）难以去除，就像顽固的bug难以修复，帮助记忆。</p><p><strong>近义词对比</strong>：与“blemish（瑕疵）”近义，stain 更强调对声誉、质量等的负面影响。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "stained 是 stain 的过去分词及过去式"
+    },
+    {
+      "Word": "nonstop",
+      "Phonetic": "英 [ˌnɒnˈstɒp]，美 [ˌnɑːnˈstɑːp]",
+      "Meaning": "adj. 不停的；不间断的；adv. 不停地",
+      "Example": "The monitoring system provides nonstop updates on the server's health status 24/7.",
+      "ExampleTranslator": "监控系统每周7天、每天24小时不间断地提供服务器健康状态的更新。",
+      "AIHelp": "<p><strong>拆分记忆</strong>：non-（不）+ stop（停止），不停止的即 nonstop。</p><p><strong>场景记忆</strong>：服务器 nonstop（不间断地）运行，保障服务可用性，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "debauchery",
+      "Phonetic": "英 [dɪˈbɔːtʃəri]，美 [dɪˈbɔːtʃəri]",
+      "Meaning": "n. 放荡；沉湎酒色；道德败坏",
+      "Example": "",
+      "ExampleTranslator": "",
+      "AIHelp": "",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "该词涉及不恰当含义，故不生成示例"
+    },
+    {
+      "Word": "stretch",
+      "Phonetic": "英 [stretʃ]，美 [stretʃ]",
+      "Meaning": "v. 伸展；延伸；拉长；n. 伸展；延伸；一段时间",
+      "Example": "The cloud infrastructure can stretch to accommodate sudden spikes in user traffic.",
+      "ExampleTranslator": "云基础设施可以扩展以适应用户流量的突然激增。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象橡皮筋被拉长（stretch），就像系统扩展（stretch）以应对负载，帮助记忆。</p><p><strong>造句强化</strong>：The application's architecture allows it to stretch its resources during peak hours.（该应用的架构使其能在高峰时段扩展资源。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "stretches 是 stretch 的第三人称单数形式"
+    },
+    {
+      "Word": "create",
+      "Phonetic": "英 [kriˈeɪt]，美 [kriˈeɪt]",
+      "Meaning": "v. 创造；创建；造成；生成",
+      "Example": "Developers use frameworks to create robust and scalable web applications efficiently.",
+      "ExampleTranslator": "开发者使用框架高效地创建健壮且可扩展的Web应用程序。",
+      "AIHelp": "<p><strong>词根联想</strong>：cre（产生）+ -ate（动词后缀），产生、创造即 create。</p><p><strong>程序员场景</strong>：每天都在 create（创建）代码、函数、应用，这是核心工作内容，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "creating 是 create 的现在分词"
+    },
+    {
+      "Word": "chaotic",
+      "Phonetic": "英 [keɪˈɒtɪk]，美 [keɪˈɑːtɪk]",
+      "Meaning": "adj. 混乱的；无秩序的",
+      "Example": "A chaotic codebase with no documentation makes maintenance extremely difficult.",
+      "ExampleTranslator": "一个没有文档且混乱的代码库使维护变得极其困难。",
+      "AIHelp": "<p><strong>词根联想</strong>：chaos（混乱）+ -tic（形容词后缀），混乱的即 chaotic。</p><p><strong>场景记忆</strong>：未经整理的代码仓库，文件乱放、命名混乱，就是 chaotic 的状态。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "map",
+      "Phonetic": "英 [mæp]，美 [mæp]",
+      "Meaning": "n. 地图；图表；v. 绘制地图；映射",
+      "Example": "In programming, a hash map stores key-value pairs for efficient data retrieval.",
+      "ExampleTranslator": "在编程中，哈希映射存储键值对以实现高效的数据检索。",
+      "AIHelp": "<p><strong>多义记忆</strong>：除了“地图”，在编程中“map”有“映射”义，如 hash map（哈希映射），是核心数据结构。</p><p><strong>场景记忆</strong>：使用 map 存储用户ID和信息的对应关系，帮助理解和记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "sin",
+      "Phonetic": "英 [sɪn]，美 [sɪn]",
+      "Meaning": "n. 罪；罪恶；过失；v. 犯罪；犯过失",
+      "Example": "In software development, not writing unit tests is considered a sin by many developers.",
+      "ExampleTranslator": "在软件开发中，不编写单元测试被许多开发者视为一种“罪过”。",
+      "AIHelp": "<p><strong>比喻记忆</strong>：在程序员语境中，用“sin（罪过）”比喻不规范的做法，如不写注释、复制粘贴代码等。</p><p><strong>造句强化</strong>：Skipping code reviews is a sin that can lead to hidden bugs.（跳过代码审查是一种可能导致隐藏bug的“罪过”。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "sins 是 sin 的复数形式及第三人称单数形式"
+    },
+    {
+      "Word": "ambient",
+      "Phonetic": "英 [ˈæmbiənt]，美 [ˈæmbiənt]",
+      "Meaning": "adj. 周围的；环境的",
+      "Example": "Ambient temperature can affect the performance of server hardware in data centers.",
+      "ExampleTranslator": "环境温度会影响数据中心服务器硬件的性能。",
+      "AIHelp": "<p><strong>词根联想</strong>：ambi-（周围）+ -ent（形容词后缀），周围的即 ambient。</p><p><strong>技术场景</strong>：ambient light（环境光）、ambient noise（环境噪音）在硬件部署中是需要考虑的因素，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "light",
+      "Phonetic": "英 [laɪt]，美 [laɪt]",
+      "Meaning": "n. 光；光线；灯；v. 点燃；照亮；adj. 轻的；明亮的",
+      "Example": "The status LED lights up green when the database connection is successful.",
+      "ExampleTranslator": "当数据库连接成功时，状态LED灯亮绿色。",
+      "AIHelp": "<p><strong>多义记忆</strong>：在技术场景中，“lighting”是 light 的动名词，指“照明”，如 ambient lighting（环境照明）。</p><p><strong>场景联想</strong>：服务器机房的 lighting（照明）系统确保设备维护时视线清晰，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "lighting 是 light 的动名词及现在分词"
+    },
+    {
+      "Word": "nightstand",
+      "Phonetic": "英 [ˈnaɪtstænd]，美 [ˈnaɪtstænd]",
+      "Meaning": "n. 床头柜",
+      "Example": "The smart speaker on the nightstand can be controlled via a mobile app developed by our team.",
+      "ExampleTranslator": "床头柜上的智能音箱可以通过我们团队开发的移动应用程序控制。",
+      "AIHelp": "<p><strong>拆分记忆</strong>：night（夜晚）+ stand（架子），夜晚用的架子即床头柜（nightstand）。</p><p><strong>场景联想</strong>：智能家居应用控制 nightstand 上的设备，如调节灯光、播放音乐，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "nightstands 是 nightstand 的复数形式"
+    },
+    {
+      "Word": "cast",
+      "Phonetic": "英 [kɑːst]，美 [kæst]",
+      "Meaning": "v. 投射；投掷；铸造；n. 铸件；演员表",
+      "Example": "The security camera casts a wide view of the server room to monitor all activities.",
+      "ExampleTranslator": "监控摄像头投射出服务器机房的广阔视野，以监控所有活动。",
+      "AIHelp": "<p><strong>多义记忆</strong>：在技术场景中，“casting”有“投射”义，如 casting shadows（投射阴影）、casting light（投射光线）。</p><p><strong>造句强化</strong>：The sensor casts a beam to detect any movement in the restricted area.（该传感器投射出一道光束以检测限制区域内的任何移动。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "casting 是 cast 的现在分词"
+    },
+    {
+      "Word": "hazy",
+      "Phonetic": "英 [ˈheɪzi]，美 [ˈheɪzi]",
+      "Meaning": "adj. 朦胧的；模糊的；不清楚的",
+      "Example": "A hazy understanding of the requirements can lead to incorrect implementation of features.",
+      "ExampleTranslator": "对需求的模糊理解会导致功能实现错误。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象雾霾（haze）中模糊的景象，就像对概念的 hazy（模糊）理解，帮助记忆。</p><p><strong>对比记忆</strong>：与“vague（模糊的）”近义，hazy 更强调因不清晰而难以分辨。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "intimate",
+      "Phonetic": "英 [ˈɪntɪmət]（adj.），[ˈɪntɪmeɪt]（v.）；美 [ˈɪntɪmət]（adj.），[ˈɪntɪmeɪt]（v.）",
+      "Meaning": "adj. 亲密的；私人的；详尽的；v. 暗示；透露",
+      "Example": "The API documentation provides intimate details about the functions' parameters and return values.",
+      "ExampleTranslator": "API文档提供了关于函数参数和返回值的详尽细节。",
+      "AIHelp": "<p><strong>词根联想</strong>：intim（内在的）+ -ate（形容词/动词后缀），内在的、深入的即 intimate（详尽的）。</p><p><strong>场景记忆</strong>：开发者需要 intimate（详尽的）了解框架内部机制才能进行定制化开发，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "glow",
+      "Phonetic": "英 [ɡləʊ]，美 [ɡloʊ]",
+      "Meaning": "v. 发光；发热；n. 光辉；光芒",
+      "Example": "The LED indicators glow blue when the system is in standby mode.",
+      "ExampleTranslator": "当系统处于待机模式时，LED指示灯发出蓝光。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象设备指示灯 glow（发光）的样子，如服务器正常运行时的绿色 glow，帮助记忆。</p><p><strong>造句强化</strong>：The progress bar starts to glow when the download is about to complete.（当下载即将完成时，进度条开始发光。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "highlight",
+      "Phonetic": "英 [ˈhaɪlaɪt]，美 [ˈhaɪlaɪt]",
+      "Meaning": "v. 强调；突出；使显著；n. 精彩部分；亮点",
+      "Example": "Syntax highlighting in code editors helps developers identify keywords and errors quickly.",
+      "ExampleTranslator": "代码编辑器中的语法高亮帮助开发者快速识别关键字和错误。",
+      "AIHelp": "<p><strong>拆分记忆</strong>：high（高的）+ light（光线），用高亮度光线照亮即突出（highlight）。</p><p><strong>程序员场景</strong>：IDE中用不同颜色 highlight（突出显示）代码元素，这是日常开发常见功能，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "curve",
+      "Phonetic": "英 [kɜːv]，美 [kɜːrv]",
+      "Meaning": "n. 曲线；弧线；v. 弯曲；成曲线形",
+      "Example": "The performance curve of the algorithm shows optimal results with moderate input sizes.",
+      "ExampleTranslator": "该算法的性能曲线显示在输入规模适中时能达到最佳结果。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象图表中的曲线（curve），如性能测试中的响应时间 curve，帮助记忆。</p><p><strong>造句强化</strong>：The learning curve of this framework is steep but rewarding.（这个框架的学习曲线较陡，但值得投入。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "shadow",
+      "Phonetic": "英 [ˈʃædəʊ]，美 [ˈʃædoʊ]",
+      "Meaning": "n. 阴影；影子；v. 遮蔽；尾随",
+      "Example": "The proxy server acts as a shadow, handling requests on behalf of the main server.",
+      "ExampleTranslator": "代理服务器像影子一样，代表主服务器处理请求。",
+      "AIHelp": "<p><strong>形象记忆</strong>：想象物体的影子（shadow）跟随物体运动，就像代理服务器 shadow（跟随）主服务器处理任务，帮助记忆。</p><p><strong>技术术语</strong>：在计算机图形中，shadow mapping（阴影映射）是生成阴影的技术，可辅助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "veil",
+      "Phonetic": "英 [veɪl]，美 [veɪl]",
+      "Meaning": "n. 面纱；面罩；遮盖物；v. 掩饰；遮盖",
+      "Example": "Encryption acts as a veil to protect sensitive data from unauthorized access.",
+      "ExampleTranslator": "加密像一层面纱，保护敏感数据免受未授权访问。",
+      "AIHelp": "<p><strong>比喻记忆</strong>：用“面纱（veil）”比喻加密对数据的保护作用，数据被 veil 遮盖，无法被轻易查看。</p><p><strong>造句强化</strong>：The abstraction layer veils the complex underlying logic from the user.（抽象层为用户掩盖了复杂的底层逻辑。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "sultry",
+      "Phonetic": "英 [ˈsʌltri]，美 [ˈsʌltri]",
+      "Meaning": "adj. 闷热的；性感的",
+      "Example": "The server room became sultry due to a malfunctioning cooling system, affecting equipment performance.",
+      "ExampleTranslator": "由于冷却系统故障，服务器机房变得闷热，影响了设备性能。",
+      "AIHelp": "<p><strong>场景记忆</strong>：想象闷热（sultry）的服务器机房，因散热问题导致设备运行缓慢，帮助记忆其“闷热的”含义。</p><p><strong>对比记忆</strong>：注意区分其“闷热的”和“性感的”含义，在技术场景中常用前者。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "secrecy",
+      "Phonetic": "英 [ˈsiːkrəsi]，美 [ˈsiːkrəsi]",
+      "Meaning": "n. 保密；秘密；隐秘",
+      "Example": "Maintaining secrecy of API keys is essential to prevent unauthorized access to the service.",
+      "ExampleTranslator": "对API密钥保密对于防止对服务的未授权访问至关重要。",
+      "AIHelp": "<p><strong>词根联想</strong>：secret（秘密）+ -cy（名词后缀），保密的状态即 secrecy。</p><p><strong>程序员场景</strong>：开发中需重视数据 secrecy（保密），如使用加密技术保护隐私信息，帮助记忆。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "shower",
+      "Phonetic": "英 [ˈʃaʊə(r)]，美 [ˈʃaʊər]",
+      "Meaning": "n. 淋浴；阵雨；一系列；v. 淋浴；倾注",
+      "Example": "The log file was hit with a shower of error messages after the network failure.",
+      "ExampleTranslator": "网络故障后，日志文件中涌现出大量错误消息。",
+      "AIHelp": "<p><strong>比喻记忆</strong>：用“阵雨（shower）”比喻大量事物的涌现，如 shower of requests（大量请求），帮助记忆。</p><p><strong>造句强化</strong>：The server received a shower of user login attempts during peak hours.（高峰时段，服务器收到大量用户登录尝试。）</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": "",
+      "Note": "showers 是 shower 的第三人称单数形式及复数形式"
+    },
+    {
+      "Word": "animal",
+      "Phonetic": "英 [ˈænɪml]，美 [ˈænɪml]",
+      "Meaning": "n. 动物；牲畜；adj. 动物的；野兽的",
+      "Example": "The AI-powered image recognition system can distinguish between different animal species in photos.",
+      "ExampleTranslator": "这款人工智能图像识别系统能区分照片中不同的动物种类。",
+      "AIHelp": "<p><strong>场景记忆</strong>：在开发动物识别APP时，会频繁用到 animal 这个词，帮助记忆。</p><p><strong>词根联想</strong>：anim（生命）+ -al（名词后缀），有生命的生物即 animal。</p>",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    }
+  ]

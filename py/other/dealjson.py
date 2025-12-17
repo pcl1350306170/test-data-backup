@@ -17,7 +17,7 @@ if not isinstance(data, list):
     raise ValueError("JSON 根元素不是数组！")
 
 total = len(data)
-batch_size = 60
+batch_size = 50
 num_batches = (total + batch_size - 1) // batch_size  # 向上取整
 
 print(f"共 {total} 个元素，将拆分为 {num_batches} 个文件（每组 {batch_size} 个）")
@@ -29,7 +29,7 @@ for i in range(num_batches):
     batch = data[start:end]
 
     # 生成带前导零的文件名：words-001.json, words-002.json, ...
-    filename = f"words-{i+1:03d}.json"
+    filename = f"绿山墙的安妮-{i+1:03d}.json"
     output_path = output_dir / filename
 
     with open(output_path, "w", encoding="utf-8") as f:

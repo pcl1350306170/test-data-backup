@@ -33,7 +33,7 @@ vue.config.js
 /py/other/json/chinese_translator_config.json
 /py/other/json/md_translator_config.json
 /py/other/json/config_zip_password_crack_7z.json
-/py/other/json/wordJson*
+
 /py/yarward/build/*
 /py/yarward/dist/*
 /py/qwen/json/config_qwen_vocab_enhancer.json

@@ -1,0 +1,1784 @@
+[
+  {
+    "Word": "many",
+    "Phonetic": "英 [ˈmeni]，美 [ˈmeni]",
+    "Meaning": "形容词/代词，表示‘许多的’或‘大量的’，用于可数名词复数前。",
+    "Example": "Many developers prefer using open-source tools for their projects.",
+    "ExampleTranslator": "许多开发者更喜欢在项目中使用开源工具。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🧠 <strong>记忆技巧</strong>：<br>谐音联想：‘many’ 听起来像‘蛮腻’——东西太多（many）会让人觉得‘蛮腻’。<br>造句强化：每天用 ‘many + 可数名词复数’ 造一句，比如 ‘I have many tasks today.’<br>⚠️ 注意：many 修饰<strong>可数名词复数</strong>，不可用于不可数名词（如 water、information）。</p>"
+  },
+  {
+    "Word": "switch",
+    "Phonetic": "英 [swɪtʃ]，美 [swɪtʃ]",
+    "Meaning": "动词/名词，作动词时表示‘切换、转换’；作名词时指‘开关’或‘转变’。",
+    "Example": "You can switch between dark mode and light mode in the app settings.",
+    "ExampleTranslator": "你可以在应用设置中切换深色模式和浅色模式。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💡 <strong>词根+场景记忆</strong>：<br>想象程序员按下一个物理 <em>switch</em>（开关），屏幕立刻从白天模式 <em>switch to</em> 夜间模式。<br>✅ 动词用法：switch to/from something；名词用法：flip the switch。<br>🔁 近义对比：<em>change</em> 更泛，<em>switch</em> 强调‘快速切换’。</p>"
+  },
+  {
+    "Word": "clits",
+    "Phonetic": "",
+    "Meaning": "该词为不适宜词汇，建议替换为合适表达。此处视为拼写错误或误录。",
+    "Example": "",
+    "ExampleTranslator": "",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚠️ <strong>注意</strong>：该词属于敏感/不当用语，不适合出现在学习材料中。建议检查原始数据来源，确认是否应为其他单词（如 'clips'、'lists' 等）。</p>"
+  },
+  {
+    "Word": "entrance",
+    "Phonetic": "英 [ˈentrəns]，美 [ˈentrəns]",
+    "Meaning": "名词，指‘入口’或‘进入权’；也可作动词（较少见），意为‘使着迷’。",
+    "Example": "The main entrance to the office building is under renovation.",
+    "ExampleTranslator": "办公楼的主入口正在翻修。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🚪 <strong>场景记忆法</strong>：<br>想象你打卡上班，走向公司大楼的 <em>entrance</em>（入口）。<br>🔍 词形提示：原 JSON 中为 'entrances'（复数），已还原为单数 'entrance'；其复数形式为 <strong>entrances</strong>。<br>🎯 搭配：main entrance, fire exit/entrance, gain entrance to...</p>"
+  },
+  {
+    "Word": "compete",
+    "Phonetic": "英 [kəmˈpiːt]，美 [kəmˈpiːt]",
+    "Meaning": "动词，意为‘竞争、比赛’，常与 with/against 连用。",
+    "Example": "Tech companies compete fiercely for top AI talent.",
+    "ExampleTranslator": "科技公司为争夺顶尖人工智能人才激烈竞争。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🏆 <strong>词根+对比记忆</strong>：<br>词根 <em>pet</em> = seek（寻求），<em>com-</em>（共同）→ 多人一起‘寻求’同一个目标 → 竞争。<br>✅ 原 JSON 中为 'competing'（现在分词），已还原为动词原形 <strong>compete</strong>；其现在分词为 <em>competing</em>，过去式为 <em>competed</em>。<br>🔁 近义词：rival（作动词）、contend；反义：cooperate。</p>"
+  },
+  {
+    "Word": "recipe",
+    "Phonetic": "英 [ˈresəpi]，美 [ˈresəpi]",
+    "Meaning": "名词，原指‘食谱’，引申为‘方法、秘诀’（尤指成功的方法）。",
+    "Example": "Good communication is a key recipe for team success in remote work.",
+    "ExampleTranslator": "良好的沟通是远程团队成功的关键秘诀。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🍲 <strong>隐喻联想</strong>：<br>把项目管理想象成做菜——你需要一份清晰的 <em>recipe</em>（配方/流程）。<br>✅ 职场用法：a recipe for disaster/success（灾难/成功的根源）。<br>📚 拓展：不仅用于烹饪，也广泛用于商业、技术场景。</p>"
+  },
+  {
+    "Word": "job",
+    "Phonetic": "英 [dʒɒb]，美 [dʒɑːb]",
+    "Meaning": "名词，指‘工作、职位、任务’；也可指‘一件具体的工作事项’。",
+    "Example": "My job as a backend engineer involves designing APIs and optimizing databases.",
+    "ExampleTranslator": "我作为后端工程师的工作包括设计 API 和优化数据库。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💼 <strong>高频词强化</strong>：<br>‘Job’ 是职场核心词，搭配极多：<br>- land a job（找到工作）<br>- job description（职位描述）<br>- full-time/part-time job<br>✅ 原词已是单数，无需变形。</p>"
+  },
+  {
+    "Word": "adjourn",
+    "Phonetic": "英 [əˈdʒɜːn]，美 [əˈdʒɜːrn]",
+    "Meaning": "动词，正式用语，意为‘休会、延期、暂时中止（会议等）’。",
+    "Example": "The meeting was adjourned until next Monday due to lack of quorum.",
+    "ExampleTranslator": "由于未达到法定人数，会议被延期至下周一。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📅 <strong>场景+词根记忆</strong>：<br>想象董事会主席说：“Let’s adjourn!”（休会！）→ 大家收拾电脑离开会议室。<br>✅ 原 JSON 中为 'adjourned'（过去式/过去分词），已还原为原形 <strong>adjourn</strong>；其过去式为 <em>adjourned</em>。<br>🔍 词根：<em>ad-</em>（to）+ <em>jour</em>（day）→ 字面‘转向另一天’→ 延期。</p>"
+  },
+  {
+    "Word": "someone",
+    "Phonetic": "英 [ˈsʌmwʌn]，美 [ˈsʌmwʌn]",
+    "Meaning": "不定代词，指‘某人、有人’，用于肯定句中。",
+    "Example": "Someone left their laptop charger in the conference room.",
+    "ExampleTranslator": "有人把笔记本电脑充电器落在会议室了。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>👤 <strong>语境记忆</strong>：<br>办公室常见场景：‘Someone took my coffee!’（谁拿了我的咖啡！）<br>✅ 注意：<em>someone</em> 用于肯定句；疑问/否定常用 <em>anyone</em>。<br>📌 搭配：someone important/special/responsible...</p>"
+  },
+  {
+    "Word": "schedule",
+    "Phonetic": "英 [ˈʃedjuːl]，美 [ˈskedʒuːl]",
+    "Meaning": "名词/动词，作名词指‘时间表、日程’；作动词意为‘安排、排定’。",
+    "Example": "We need to schedule a sprint planning meeting for Thursday morning.",
+    "ExampleTranslator": "我们需要把冲刺计划会议安排在周四上午。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⏰ <strong>双词性记忆法</strong>：<br>名词：check your schedule（查日程）<br>动词：schedule a call（安排通话）<br>✅ 原 JSON 中为 'schedules'（第三人称单数/复数），已还原为原形 <strong>schedule</strong>；其第三人称单数为 <em>schedules</em>，复数也是 <em>schedules</em>。<br>🇺🇸 发音差异：英式 /ˈʃedjuːl/，美式 /ˈskedʒuːl/。</p>"
+  },
+  {
+    "Word": "performance",
+    "Phonetic": "英 [pəˈfɔːməns]，美 [pərˈfɔːrməns]",
+    "Meaning": "名词，指‘性能、表现、演出’；在技术中常指系统运行效率。",
+    "Example": "The new database index significantly improved query performance.",
+    "ExampleTranslator": "新的数据库索引显著提升了查询性能。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚡ <strong>技术场景联想</strong>：<br>程序员常说：‘This code has poor performance.’（这段代码性能差。）<br>✅ 搭配：<br>- system/application performance<br>- performance review（绩效评估）<br>- high-performance computing<br>🔍 词根：<em>perform</em>（执行）+ <em>-ance</em>（名词后缀）。</p>"
+  },
+  {
+    "Word": "review",
+    "Phonetic": "英 [rɪˈvjuː]，美 [rɪˈvjuː]",
+    "Meaning": "动词/名词，意为‘回顾、审查、评审’；在职场中常指‘绩效评估’或‘代码审查’。",
+    "Example": "All pull requests must go through a code review before merging.",
+    "ExampleTranslator": "所有拉取请求在合并前都必须经过代码审查。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔍 <strong>职场高频词</strong>：<br>在互联网公司，<em>review</em> 无处不在：<br>- code review<br>- performance review<br>- product review<br>✅ 动词/名词同形，注意语境区分。<br>🔁 近义：evaluate, assess, examine。</p>"
+  },
+  {
+    "Word": "intercom",
+    "Phonetic": "英 [ˈɪntəkɒm]，美 [ˈɪntərkɑːm]",
+    "Meaning": "名词，指‘对讲机、内部通话系统’，用于建筑物内通信。",
+    "Example": "She used the intercom to announce that the meeting room was ready.",
+    "ExampleTranslator": "她通过对讲系统通知会议室已准备就绪。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📞 <strong>构词法记忆</strong>：<br><em>inter-</em>（之间）+ <em>com(munication)</em> → 内部通信装置。<br>🏢 场景：老式办公楼前台按 intercom 通知访客；现代办公室可能用 Slack 替代，但该词仍常见于硬件设备说明。</p>"
+  },
+  {
+    "Word": "buzz",
+    "Phonetic": "英 [bʌz]，美 [bʌz]",
+    "Meaning": "动词/名词，指‘发出嗡嗡声’；引申为‘引起轰动、热议’。",
+    "Example": "The new AI feature created a buzz across the tech community.",
+    "ExampleTranslator": "这项新的人工智能功能在科技圈引发了热议。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🐝 <strong>拟声+引申记忆</strong>：<br>蜜蜂飞过 → buzz（嗡嗡声）→ 新闻/产品太火 → create a buzz（引发轰动）。<br>✅ 原 JSON 中为 'buzzes'（第三人称单数），已还原为原形 <strong>buzz</strong>；其第三人称单数为 <em>buzzes</em>。<br>💬 搭配：create/generate a buzz, phone buzzes（手机震动/响铃）。</p>"
+  },
+  {
+    "Word": "breathy",
+    "Phonetic": "英 [ˈbreθi]，美 [ˈbreθi]",
+    "Meaning": "形容词，指‘气息声重的、带喘息声的’，常用于描述声音或说话方式。",
+    "Example": "Her breathy voice made the ASMR recording very relaxing.",
+    "ExampleTranslator": "她气息感十足的声音让这段ASMR录音非常放松。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🌬️ <strong>感官联想</strong>：<br>想象耳语、ASMR、或紧张时的喘息声 → 都是 <em>breathy</em>。<br>✅ 由名词 <em>breath</em> + <em>-y</em> 构成，表示‘充满…的’。<br>⚠️ 注意：非职场常用词，多用于语音、表演、音频制作领域。</p>"
+  },
+  {
+    "Word": "Harper",
+    "Phonetic": "英 [ˈhɑːpə(r)]，美 [ˈhɑːrpər]",
+    "Meaning": "专有名词，常见英文姓氏或名字，无普通词汇含义。",
+    "Example": "Harper from Marketing will join our cross-functional team next week.",
+    "ExampleTranslator": "市场部的哈珀下周将加入我们的跨职能团队。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📛 <strong>专有名词处理</strong>：<br>‘Harper’ 是人名，无需词义解释，但可在职场对话中自然出现。<br>✅ 记忆：著名人物如 Harper Lee（《杀死一只知更鸟》作者）。</p>"
+  },
+  {
+    "Word": "business",
+    "Phonetic": "英 [ˈbɪznəs]，美 [ˈbɪznəs]",
+    "Meaning": "名词，指‘商业、生意、公司事务’；也可泛指‘正事’。",
+    "Example": "We need to align our technical roadmap with overall business goals.",
+    "ExampleTranslator": "我们需要将技术路线图与整体业务目标对齐。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📊 <strong>核心职场词</strong>：<br>高频搭配：<br>- business requirements（业务需求）<br>- business logic（业务逻辑）<br>- do business with...<br>✅ 原词已是单数，注意不可数（不说 a business 除非指‘一家公司’）。</p>"
+  },
+  {
+    "Word": "development",
+    "Phonetic": "英 [dɪˈveləpmənt]，美 [dɪˈveləpmənt]",
+    "Meaning": "名词，指‘发展、开发’；在 IT 中特指‘软件开发’。",
+    "Example": "Frontend development requires knowledge of React or Vue.",
+    "ExampleTranslator": "前端开发需要掌握 React 或 Vue。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💻 <strong>技术语境聚焦</strong>：<br>在互联网公司，<em>development</em> 几乎等于 ‘coding’。<br>✅ 原 JSON 中为 'Development'（首字母大写，可能是标题），已标准化为小写 <strong>development</strong>。<br>🔍 词根：<em>de-</em>（加强）+ <em>velop</em>（卷）→ 展开 → 发展。</p>"
+  },
+  {
+    "Word": "call",
+    "Phonetic": "英 [kɔːl]，美 [kɔːl]",
+    "Meaning": "动词/名词，意为‘打电话、呼叫、召集’；也可指‘决定、判断’。",
+    "Example": "Let’s call a quick stand-up meeting to sync on the blockers.",
+    "ExampleTranslator": "我们开个简短的站会，同步一下遇到的阻碍吧。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>☎️ <strong>多义词场景化</strong>：<br>1. call someone（打电话）<br>2. call a meeting（召集会议）<br>3. make a judgment call（做出判断）<br>✅ 原 JSON 中为 'called'（过去式），已还原为原形 <strong>call</strong>；其过去式为 <em>called</em>。</p>"
+  },
+  {
+    "Word": "team",
+    "Phonetic": "英 [tiːm]，美 [tiːm]",
+    "Meaning": "名词/动词，作名词指‘团队’；作动词意为‘组队合作’。",
+    "Example": "Our DevOps team automates deployment pipelines.",
+    "ExampleTranslator": "我们的 DevOps 团队负责自动化部署流水线。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🤝 <strong>职场核心概念</strong>：<br>在敏捷开发中，<em>team</em> 是基本单位。<br>✅ 原 JSON 中为 'Team'（首字母大写），已标准化为小写 <strong>team</strong>。<br>💡 搭配：cross-functional team, team up with..., team lead.</p>"
+  },
+  {
+    "Word": "prep",
+    "Phonetic": "英 [prep]，美 [prep]",
+    "Meaning": "动词，是 prepare 的缩写，意为‘准备、预处理’。",
+    "Example": "I need to prep my demo before the client presentation.",
+    "ExampleTranslator": "在客户演示前，我需要准备好我的演示内容。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📝 <strong>缩略词记忆</strong>：<br><em>Prep = prepare</em>，口语/职场常用缩写。<br>✅ 原 JSON 中为 'prepped'（过去式），已还原为原形 <strong>prep</strong>；其过去式为 <em>prepped</em>，现在分词为 <em>prepping</em>。<br>🎯 场景：prep a report/meeting/demo/data.</p>"
+  },
+  {
+    "Word": "conference",
+    "Phonetic": "英 [ˈkɒnfərəns]，美 [ˈkɑːnfərəns]",
+    "Meaning": "名词，指‘会议、研讨会’，通常规模较大、正式。",
+    "Example": "She presented her research at the international AI conference.",
+    "ExampleTranslator": "她在国际人工智能会议上展示了她的研究成果。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎤 <strong>学术/职场场景</strong>：<br>区别于 <em>meeting</em>（小型会议），<em>conference</em> 通常持续多天，有多个演讲者。<br>✅ 原 JSON 中为 'Conference'（首字母大写），已标准化为小写 <strong>conference</strong>。<br>🔍 搭配：attend/host a conference, conference room（会议室）。</p>"
+  },
+  {
+    "Word": "request",
+    "Phonetic": "英 [rɪˈkwest]，美 [rɪˈkwest]",
+    "Meaning": "动词/名词，意为‘请求、要求’，语气较正式礼貌。",
+    "Example": "The client requested additional features for the MVP.",
+    "ExampleTranslator": "客户要求为最小可行产品增加额外功能。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📬 <strong>礼貌表达关键</strong>：<br>在职场邮件中，常用：<br>- I’d like to request...<br>- As per your request...<br>✅ 原 JSON 中为 'requested'（过去式），已还原为原形 <strong>request</strong>；其过去式为 <em>requested</em>。<br>🔁 近义：ask for（更口语），demand（更强硬）。</p>"
+  },
+  {
+    "Word": "impale",
+    "Phonetic": "英 [ɪmˈpeɪl]，美 [ɪmˈpeɪl]",
+    "Meaning": "动词，意为‘刺穿、钉住’，通常指用尖锐物贯穿身体，属暴力/文学用语。",
+    "Example": "In the horror game, the monster impales its victims with sharp tentacles.",
+    "ExampleTranslator": "在这款恐怖游戏中，怪物用锋利的触手将受害者刺穿。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚠️ <strong>注意使用场景</strong>：<br>该词具有暴力色彩，日常/职场极少使用，多见于小说、游戏、影视。<br>✅ 词根：<em>in-</em>（入）+ <em>pale</em>（桩子）→ 刺穿在桩上。<br>🚫 不建议在正式沟通中使用。</p>"
+  },
+  {
+    "Word": "hang",
+    "Phonetic": "英 [hæŋ]，美 [hæŋ]",
+    "Meaning": "动词，意为‘悬挂、吊’；也可指‘拖延、滞留’；在 IT 中常指‘程序卡死’。",
+    "Example": "The application hung for 30 seconds when loading large datasets.",
+    "ExampleTranslator": "加载大型数据集时，应用程序卡住了30秒。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🖥️ <strong>技术引申义</strong>：<br>程序员常说：‘My computer is hanging.’（电脑卡死了。）<br>✅ 原 JSON 中为 'hanging'（现在分词），已还原为原形 <strong>hang</strong>；其过去式为 <em>hung</em>（悬挂义）或 <em>hanged</em>（绞刑义）。<br>💡 搭配：hang up（挂电话），hang out（闲逛）。</p>"
+  },
+  {
+    "Word": "surprise",
+    "Phonetic": "英 [səˈpraɪz]，美 [sərˈpraɪz]",
+    "Meaning": "名词/动词，指‘惊喜、意外之事’或‘使惊讶’。",
+    "Example": "The team organized a surprise birthday party for their manager.",
+    "ExampleTranslator": "团队为经理组织了一场惊喜生日派对。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎉 <strong>情感+职场文化</strong>：<br>外企常见惊喜文化（surprise party, surprise bonus）。<br>✅ 搭配：<br>- pleasant/unpleasant surprise<br>- take someone by surprise<br>🧠 记忆：sur-（超）+ prise（=prise, take）→ 超出预期 → 惊讶。</p>"
+  },
+  {
+    "Word": "naturally",
+    "Phonetic": "英 [ˈnætʃrəli]，美 [ˈnætʃrəli]",
+    "Meaning": "副词，意为‘自然地、当然地、顺理成章地’。",
+    "Example": "Naturally, the engineering team prioritized bug fixes over new features.",
+    "ExampleTranslator": "工程团队自然优先处理漏洞修复而非新功能。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🌱 <strong>逻辑连接词</strong>：<br>在汇报中用 <em>naturally</em> 表示‘合乎逻辑的结果’。<br>✅ 由形容词 <em>natural</em> + <em>-ly</em> 构成。<br>🔁 同义替换：of course, obviously, logically.</p>"
+  },
+  {
+    "Word": "age",
+    "Phonetic": "英 [eɪdʒ]，美 [eɪdʒ]",
+    "Meaning": "名词/动词，作名词指‘年龄、时代’；作动词意为‘变老、老化’。",
+    "Example": "Our legacy system is showing its age and needs to be refactored.",
+    "ExampleTranslator": "我们的遗留系统已显老旧，需要重构。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⏳ <strong>技术隐喻</strong>：<br>代码/系统也会 ‘show its age’（显露年代感）。<br>✅ 原 JSON 中为 'ages'（复数/第三人称单数），已还原为原形 <strong>age</strong>；其复数为 <em>ages</em>，动词第三人称单数也为 <em>ages</em>。<br>📚 搭配：digital age, come of age（成熟）。</p>"
+  },
+  {
+    "Word": "eighteen",
+    "Phonetic": "英 [ˌeɪˈtiːn]，美 [ˌeɪˈtiːn]",
+    "Meaning": "数词，表示数字 18。",
+    "Example": "The project timeline spans eighteen working days.",
+    "ExampleTranslator": "该项目周期为十八个工作日。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔢 <strong>数字记忆</strong>：<br>‘Eight’ + ‘teen’ → 18。<br>✅ 注意 teen 数字（13-19）发音重音在第二音节。<br>💡 职场用途：估算工期、统计用户数等。</p>"
+  },
+  {
+    "word": "cherry",
+    "Phonetic": "英 [ˈtʃeri]，美 [ˈtʃeri]",
+    "Meaning": "名词，指‘樱桃’；在技术俚语中，‘cherry-pick’ 指选择性合并提交。",
+    "Example": "We’ll cherry-pick this hotfix commit into the release branch.",
+    "ExampleTranslator": "我们会把这个热修复提交 cherry-pick 到发布分支。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🍒 <strong>技术俚语重点</strong>：<br>Git 中 <em>cherry-pick</em> = 只摘‘最红的樱桃’（特定 commit）。<br>✅ 原 JSON 中为 'cherries'（复数），已还原为单数 <strong>cherry</strong>；其复数为 <em>cherries</em>。<br>⚠️ 注意：单独 ‘cherry’ 很少用，多出现在 <em>cherry-pick</em> 中。</p>"
+  },
+  {
+    "Word": "honey",
+    "Phonetic": "英 [ˈhʌni]，美 [ˈhʌni]",
+    "Meaning": "名词，指‘蜂蜜’；也可作亲昵称呼‘亲爱的’（需注意语境）。",
+    "Example": "She added a spoonful of honey to her tea during the late-night coding session.",
+    "ExampleTranslator": "她在深夜编码时往茶里加了一勺蜂蜜。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🍯 <strong>生活+谨慎用法</strong>：<br>作为食物很安全；但称呼同事 ‘honey’ 可能被视为不专业或冒犯（尤其跨性别/文化）。<br>✅ 原 JSON 中为 'honeys'（复数），已还原为单数 <strong>honey</strong>；其复数形式较少用，通常为不可数名词。</p>"
+  },
+  {
+    "Word": "inspect",
+    "Phonetic": "英 [ɪnˈspekt]，美 [ɪnˈspekt]",
+    "Meaning": "动词，意为‘检查、 inspect’，强调仔细查看以发现问题。",
+    "Example": "QA engineers inspect every build for potential regressions.",
+    "ExampleTranslator": "质量保证工程师会检查每个构建版本是否存在潜在的回归问题。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔍 <strong>词根+职业关联</strong>：<br><em>in-</em>（入）+ <em>spect</em>（看）→ 仔细看 → inspect。<br>✅ 同根词：inspect, inspection, inspector, perspective.<br>🎯 职场：code inspection, security inspection.</p>"
+  },
+  {
+    "Word": "hall",
+    "Phonetic": "英 [hɔːl]，美 [hɔːl]",
+    "Meaning": "名词，指‘大厅、走廊’；也可指‘学生宿舍’（如 dorm hall）。",
+    "Example": "The company rented a conference hall for the annual hackathon.",
+    "ExampleTranslator": "公司租了一个会议大厅举办年度黑客马拉松。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🏛️ <strong>空间场景</strong>：<br>office hall（办公大厅），hallway（走廊）。<br>✅ 原词已是单数，复数为 <em>halls</em>。<br>📚 搭配：town hall meeting（全员会议）— 虽叫 hall，但常在线上举行。</p>"
+  },
+  {
+    "Word": "trophy",
+    "Phonetic": "英 [ˈtrəʊfi]，美 [ˈtroʊfi]",
+    "Meaning": "名词，指‘奖杯、战利品’，象征成就或胜利。",
+    "Example": "Winning the startup pitch competition earned them a shiny trophy and investor interest.",
+    "ExampleTranslator": "赢得初创企业路演比赛为他们赢得了闪亮的奖杯和投资人的关注。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🏆 <strong>成就象征</strong>：<br>在科技竞赛、黑客松中常见 trophy。<br>✅ 原 JSON 中为 'trophies'（复数），已还原为单数 <strong>trophy</strong>；其复数为 <em>trophies</em>。<br>💡 引申：digital trophy（如 GitHub stars）。</p>"
+  },
+  {
+    "Word": "hop",
+    "Phonetic": "英 [hɒp]，美 [hɑːp]",
+    "Meaning": "动词/名词，指‘单脚跳’；在技术中常指‘网络跳数’（如 router hop）。",
+    "Example": "Data packets traveled through five hops before reaching the server.",
+    "ExampleTranslator": "数据包经过五跳才到达服务器。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📶 <strong>技术引申义</strong>：<br>网络术语：each router = one hop.<br>✅ 原 JSON 中为 'hops'（复数/第三人称单数），已还原为原形 <strong>hop</strong>；其复数为 <em>hops</em>。<br>🐰 生活义：bunny hops, hop on a call（快速加入通话）。</p>"
+  },
+  {
+    "Word": "wrap",
+    "Phonetic": "英 [ræp]，美 [ræp]",
+    "Meaning": "动词，意为‘包裹、包起来’；引申为‘结束、完成’（如 wrap up a meeting）。",
+    "Example": "Let’s wrap up this sprint by Friday and deploy to staging.",
+    "ExampleTranslator": "我们周五前结束这个冲刺，并部署到预发环境。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎁 <strong>职场惯用语</strong>：<br>‘Wrap up’ = 收尾、完成，比 ‘finish’ 更口语化。<br>✅ 原 JSON 中为 'wraps'（第三人称单数），已还原为原形 <strong>wrap</strong>；其第三人称单数为 <em>wraps</em>。<br>🎬 搭配：wrap a meeting/project/release.</p>"
+  },
+  {
+    "Word": "weigh",
+    "Phonetic": "英 [weɪ]，美 [weɪ]",
+    "Meaning": "动词，意为‘称重’；引申为‘权衡、考虑（重要性）’。",
+    "Example": "We need to weigh the pros and cons before choosing a cloud provider.",
+    "ExampleTranslator": "在选择云服务商之前，我们需要权衡利弊。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚖️ <strong>隐喻记忆</strong>：<br>想象天平（scale）上放着 options → you <em>weigh</em> them.<br>✅ 搭配：weigh heavily on someone（使忧虑），weigh in（发表意见）。<br>⚠️ 注意：不是 weight（名词）！</p>"
+  },
+  {
+    "Word": "alternate",
+    "Phonetic": "英 [ˈɔːltəneɪt]，美 [ˈɔːltərneɪt]",
+    "Meaning": "动词，意为‘交替、轮流’；也可作形容词‘交替的’。",
+    "Example": "The team alternates between coding and testing phases each week.",
+    "ExampleTranslator": "团队每周在编码和测试阶段之间轮换。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔄 <strong>动作循环联想</strong>：<br>A → B → A → B... 这就是 <em>alternate</em>。<br>✅ 原 JSON 中为 'alternating'（现在分词），已还原为动词原形 <strong>alternate</strong>；其现在分词为 <em>alternating</em>。<br>🔁 近义：switch back and forth, rotate.</p>"
+  },
+  {
+    "Word": "heaven",
+    "Phonetic": "英 [ˈhevn]，美 [ˈhevn]",
+    "Meaning": "名词，指‘天堂、天国’；口语中可表示‘极乐、理想之地’。",
+    "Example": "For a data scientist, having clean, labeled datasets feels like heaven.",
+    "ExampleTranslator": "对数据科学家来说，拥有干净且带标签的数据集简直如同天堂。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>😇 <strong>夸张修辞</strong>：<br>职场中用 ‘like heaven’ 表达极度满意。<br>✅ 注意：通常大写 Heaven 指宗教概念；小写 heaven 可作比喻。<br>🚫 避免在正式文档中使用。</p>"
+  },
+  {
+    "Word": "parade",
+    "Phonetic": "英 [pəˈreɪd]，美 [pəˈreɪd]",
+    "Meaning": "名词/动词，指‘游行、炫耀’；在技术中可比喻‘展示成果’。",
+    "Example": "The startup parade at TechCrunch Disrupt showcased 50 new AI companies.",
+    "ExampleTranslator": "TechCrunch Disrupt 大会上的新创公司展示环节展出了 50 家新的人工智能公司。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎪 <strong>隐喻+行业场景</strong>：<br>虽然字面是‘游行’，但在科技圈常用于比喻性表达，如 ‘a parade of features’（功能大秀）。<br>✅ 搭配：military parade, fashion parade, parade of innovations.<br>💡 动词用法：Don’t parade your success—stay humble.（别炫耀成就。）</p>"
+  },
+  {
+    "Word": "happen",
+    "Phonetic": "英 [ˈhæpən]，美 [ˈhæpən]",
+    "Meaning": "动词，意为‘发生、出现’，强调事件的自然或偶然性。",
+    "Example": "Unexpected bugs often happen during production deployment.",
+    "ExampleTranslator": "生产环境部署过程中常常会出现意外的 bug。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎲 <strong>被动感+职场现实</strong>：<br>程序员常说：‘Stuff happens.’（事情总会出岔子。）<br>✅ 原 JSON 中为 'happens'（第三人称单数），已还原为原形 <strong>happen</strong>；其第三人称单数为 <em>happens</em>。<br>📌 注意：不用于进行时（不说 is happening 除非强调此刻正在发生）。</p>"
+  },
+  {
+    "Word": "click",
+    "Phonetic": "英 [klɪk]，美 [klɪk]",
+    "Meaning": "动词/名词，指‘点击（鼠标）’；也可表示‘发出咔哒声’或‘突然理解’。",
+    "Example": "Just click the ‘Deploy’ button to trigger the CI/CD pipeline.",
+    "ExampleTranslator": "只需点击‘部署’按钮即可触发 CI/CD 流水线。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🖱️ <strong>数字时代核心动作</strong>：<br>从 UI 到用户体验，<em>click</em> 是最基本交互。<br>✅ 引申义：<br>- We clicked immediately.（我们一见如故。）<br>- It finally clicked!（我终于明白了！）<br>🔊 拟声记忆：click = 咔哒声。</p>"
+  },
+  {
+    "Word": "clack",
+    "Phonetic": "英 [klæk]，美 [klæk]",
+    "Meaning": "动词/名词，指‘发出咔嗒声’，常用于描述键盘、高跟鞋等硬物碰撞声。",
+    "Example": "The sound of mechanical keyboards clacking filled the open office.",
+    "ExampleTranslator": "机械键盘咔嗒作响的声音充满了开放式办公室。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⌨️ <strong>拟声词强化记忆</strong>：<br><em>Clack</em> 比 <em>click</em> 更响、更硬，像老式打字机。<br>✅ 职场场景：程序员敲代码 → keyboard clacks.<br>🔁 对比：<em>click</em>（轻快），<em>clack</em>（清脆带节奏）。</p>"
+  },
+  {
+    "Word": "dangle",
+    "Phonetic": "英 [ˈdæŋɡl]，美 [ˈdæŋɡl]",
+    "Meaning": "动词，意为‘悬荡、悬挂晃动’；引申为‘诱人地提供（某物）’。",
+    "Example": "Don’t dangle a promotion in front of someone without real intent.",
+    "ExampleTranslator": "不要在没有真正意图的情况下向某人空许升职承诺。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎣 <strong>视觉+隐喻记忆</strong>：<br>想象鱼钩上晃动的诱饵 → <em>dangle a reward</em>（以奖励诱惑）。<br>✅ 原 JSON 中为 'dangling'（现在分词），已还原为原形 <strong>dangle</strong>；其现在分词为 <em>dangling</em>。<br>⚠️ 技术注意：避免 dangling pointer（悬空指针）！</p>"
+  },
+  {
+    "Word": "foot",
+    "Phonetic": "英 [fʊt]，美 [fʊt]",
+    "Meaning": "名词，指‘脚’；也可作长度单位‘英尺’（≈30.48厘米）。",
+    "Example": "The server rack is six feet tall and requires proper ventilation.",
+    "ExampleTranslator": "服务器机柜高六英尺，需要良好的通风。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📏 <strong>单位+身体双义</strong>：<br>在硬件部署、数据中心设计中常用英尺（feet）作为单位。<br>✅ 原 JSON 中为 'feet'（复数），已还原为单数 <strong>foot</strong>；其复数为 <em>feet</em>（不规则变化）。<br>🧠 记忆口诀：1 foot, 2 feet — like tooth/teeth!</p>"
+  },
+  {
+    "Word": "kick",
+    "Phonetic": "英 [kɪk]，美 [kɪk]",
+    "Meaning": "动词/名词，指‘踢’；引申为‘启动、激发’（如 kick off a project）。",
+    "Example": "We’ll kick off the new product development next Monday.",
+    "ExampleTranslator": "我们将在下周一启动新产品开发。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🚀 <strong>职场惯用语重点</strong>：<br><em>Kick off</em> = 正式开始（项目/会议/活动）。<br>✅ 原 JSON 中为 'kicking'（现在分词），已还原为原形 <strong>kick</strong>；其现在分词为 <em>kicking</em>。<br>🎯 搭配：kick start, kick the bucket（俚语：去世，慎用）。</p>"
+  },
+  {
+    "Word": "bounce",
+    "Phonetic": "英 [baʊns]，美 [baʊns]",
+    "Meaning": "动词/名词，指‘弹跳’；在邮件中指‘退信’；在会议中可指‘临时换人’。",
+    "Example": "His email bounced because the domain no longer exists.",
+    "ExampleTranslator": "他的邮件被退回了，因为该域名已不存在。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📨 <strong>多场景引申义</strong>：<br>1. Ball bounces（球弹跳）<br>2. Email bounces（邮件退信）<br>3. Bounce ideas off someone（与人讨论想法）<br>✅ 职场高频：check bounce rate（邮件退信率）。</p>"
+  },
+  {
+    "Word": "slap",
+    "Phonetic": "英 [slæp]，美 [slæp]",
+    "Meaning": "动词/名词，指‘拍、打’；口语中可表示‘粗略添加’或‘轻松完成’。",
+    "Example": "He just slapped together a prototype in an hour using low-code tools.",
+    "ExampleTranslator": "他只用了一个小时就用低代码工具草草拼凑出一个原型。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>✋ <strong>口语化表达</strong>：<br><em>Slap together</em> = 快速、粗糙地组装（常带贬义或自嘲）。<br>✅ 原 JSON 中为 'slaps'（第三人称单数），已还原为原形 <strong>slap</strong>；其第三人称单数为 <em>slaps</em>。<br>⚠️ 注意：正式文档中避免使用。</p>"
+  },
+  {
+    "Word": "staff",
+    "Phonetic": "英 [stɑːf]，美 [stæf]",
+    "Meaning": "名词/动词，作名词指‘全体员工’；作动词意为‘配备人员’。",
+    "Example": "We need to staff the new project with two backend engineers.",
+    "ExampleTranslator": "我们需要为新项目配备两名后端工程师。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>👥 <strong>集体 vs 动作</strong>：<br>名词：The <em>staff</em> voted unanimously.（全体员工一致投票。）<br>动词：We must <em>staff</em> this role quickly.（必须尽快填补这个岗位。）<br>✅ 注意：staff 作名词时已是集合名词，无复数形式（不说 staffs，除非指多根‘棍子’——古义）。</p>"
+  },
+  {
+    "Word": "office",
+    "Phonetic": "英 [ˈɒfɪs]，美 [ˈɑːfɪs]",
+    "Meaning": "名词，指‘办公室、职位、职能’。",
+    "Example": "Remote work has redefined what an office means in the tech industry.",
+    "ExampleTranslator": "远程办公重新定义了科技行业中‘办公室’的含义。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🏢 <strong>抽象+具体双重含义</strong>：<br>1. Physical office（实体办公室）<br>2. Office of CTO（CTO 职位）<br>✅ 原 JSON 中为 'offices'（复数），已还原为单数 <strong>office</strong>；其复数为 <em>offices</em>。<br>📚 搭配：head office, branch office, hold office.</p>"
+  },
+  {
+    "Word": "phone",
+    "Phonetic": "英 [fəʊn]，美 [foʊn]",
+    "Meaning": "名词/动词，指‘电话’；作动词意为‘打电话’（较口语）。",
+    "Example": "I’ll phone you once the build passes all tests.",
+    "ExampleTranslator": "一旦构建通过所有测试，我就给你打电话。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📱 <strong>动词用法提醒</strong>：<br>虽然 <em>call</em> 更常见，但 <em>phone</em> 作动词完全正确（尤英式英语）。<br>✅ 原 JSON 中为 'phones'（第三人称单数），已还原为原形 <strong>phone</strong>；其第三人称单数为 <em>phones</em>。<br>🔁 同义替换：give someone a call / ring / phone.</p>"
+  },
+  {
+    "Word": "recording",
+    "Phonetic": "英 [rɪˈkɔːdɪŋ]，美 [rɪˈkɔːrdɪŋ]",
+    "Meaning": "名词，指‘录音、录像’；也可指‘记录的数据’。",
+    "Example": "All team meetings are saved as recordings for future reference.",
+    "ExampleTranslator": "所有团队会议都会保存为录像以供日后参考。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📼 <strong>远程协作必备</strong>：<br>在混合办公时代，<em>meeting recordings</em> 是知识沉淀的关键。<br>✅ 原词为动名词，但本身可作独立名词使用，无需还原；其动词原形为 <em>record</em>。<br>🔍 搭配：audio/video recording, screen recording.</p>"
+  },
+  {
+    "Word": "accounting",
+    "Phonetic": "英 [əˈkaʊntɪŋ]，美 [əˈkaʊntɪŋ]",
+    "Meaning": "名词，指‘会计、会计工作’，涉及财务记录与报表。",
+    "Example": "Our SaaS platform integrates with popular accounting software like QuickBooks.",
+    "ExampleTranslator": "我们的 SaaS 平台与 QuickBooks 等主流会计软件集成。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💰 <strong>跨部门协作关键词</strong>：<br>技术团队需理解 basic accounting principles（如 invoicing, revenue recognition）。<br>✅ 原词为动名词，但作为学科/职业名称，通常以 <strong>accounting</strong> 形式出现，无需还原为 account。<br>📚 词根：<em>account</em> + <em>-ing</em> → 会计学。</p>"
+  },
+  {
+    "Word": "commute",
+    "Phonetic": "英 [kəˈmjuːt]，美 [kəˈmjuːt]",
+    "Meaning": "动词/名词，指‘通勤’，即往返于住所与工作地点之间。",
+    "Example": "Many engineers switched to remote work to avoid long commutes.",
+    "ExampleTranslator": "许多工程师转为远程办公，以避免长时间通勤。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🚇 <strong>现代职场痛点</strong>：<br><em>Commute time</em> 是影响员工满意度的重要因素。<br>✅ 原 JSON 中为 'commutes'（第三人称单数），已还原为原形 <strong>commute</strong>；其第三人称单数为 <em>commutes</em>。<br>📊 搭配：daily commute, commute by bike/train.</p>"
+  },
+  {
+    "Word": "crack",
+    "Phonetic": "英 [kræk]，美 [kræk]",
+    "Meaning": "动词/名词，指‘破裂、破解、解决难题’；也可表示‘开瓶’或‘讲笑话’。",
+    "Example": "She managed to crack the encryption algorithm in under a week.",
+    "ExampleTranslator": "她在不到一周内成功破解了该加密算法。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔐 <strong>黑客文化关键词</strong>：<br>1. Crack a code（破译密码）<br>2. Crack a tough problem（解决难题）<br>3. Crack open a beer（开瓶庆祝）<br>✅ 原 JSON 中为 'cracked'（过去式），已还原为原形 <strong>crack</strong>；其过去式为 <em>cracked</em>。<br>💡 搭配：crack the whip（严厉督促）— 慎用！</p>"
+  },
+  {
+    "Word": "stunning",
+    "Phonetic": "英 [ˈstʌnɪŋ]，美 [ˈstʌnɪŋ]",
+    "Meaning": "形容词，意为‘极美的、令人震惊的’，语气强烈。",
+    "Example": "The dashboard UI received stunning feedback from beta users.",
+    "ExampleTranslator": "该仪表盘界面获得了测试用户的惊艳反馈。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>✨ <strong>情感强化形容词</strong>：<br>比 beautiful/amazing 更强烈，适合用于产品演示、设计评审。<br>✅ 由动词 <em>stun</em>（使震惊）+ <em>-ing</em> 构成。<br>⚠️ 注意：过度使用会削弱效果，保留给真正出色的事物。</p>"
+  },
+  {
+    "Word": "stand",
+    "Phonetic": "英 [stænd]，美 [stænd]",
+    "Meaning": "动词/名词，指‘站立’；引申为‘立场、摊位、忍受’等。",
+    "Example": "During the stand-up meeting, each member shares their progress and blockers.",
+    "ExampleTranslator": "在站会中，每位成员分享自己的进展和阻碍。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🧍 <strong>敏捷开发术语</strong>：<br><em>Stand-up meeting</em>（站会）因站着开会而得名，强调简短高效。<br>✅ 原 JSON 中为 'standing'（现在分词/形容词），但 ‘standing’ 本身不单独表‘站’的动作，故还原为动词原形 <strong>stand</strong>。<br>📚 搭配：take a stand, can’t stand (something), hot dog stand.</p>"
+  },
+  {
+    "Word": "semicircle",
+    "Phonetic": "英 [ˈsemisaɪkl]，美 [ˈsemisaɪkl]",
+    "Meaning": "名词，指‘半圆’，常用于描述座位或布局形状。",
+    "Example": "The interview panel sat in a semicircle to create a more open atmosphere.",
+    "ExampleTranslator": "面试小组围成半圆形就座，以营造更开放的氛围。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⭕️ <strong>空间布局联想</strong>：<br>会议室、教室、舞台常用 semicircle 布局促进互动。<br>✅ 构词：<em>semi-</em>（半）+ <em>circle</em>（圆）→ 半圆。<br>📐 几何+职场结合：UX 设计中也考虑用户视线的 semicircular range。</p>"
+  },
+  {
+    "Word": "lace",
+    "Phonetic": "英 [leɪs]，美 [leɪs]",
+    "Meaning": "名词/动词，作名词指‘蕾丝、鞋带’；作动词意为‘系带、掺入’。",
+    "Example": "He laced his coffee with a shot of whiskey after the stressful release.",
+    "ExampleTranslator": "在紧张的版本发布后，他在咖啡里加了一小杯威士忌。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🧵 <strong>动词引申义</strong>：<br><em>Lace something with...</em> = 掺入（常指酒精、药物等）。<br>✅ 职场慎用：该用法偏口语/文学，正式场合避免。<br>👗 名词义：design with lace（蕾丝设计）— 多用于时尚、UI 视觉描述。</p>"
+  },
+  {
+    "Word": "lingerie",
+    "Phonetic": "英 [ˈlænʒəri]，美 [ˌlɑːnʒəˈreɪ]",
+    "Meaning": "名词，指‘女式内衣、 lingerie’，通常带有装饰性或性感意味。",
+    "Example": "The e-commerce site uses AI to recommend lingerie based on body measurements.",
+    "ExampleTranslator": "该电商平台利用人工智能根据身体尺寸推荐内衣。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🛍️ <strong>电商+AI 应用场景</strong>：<br>虽属敏感品类，但在个性化推荐、计算机视觉领域有实际应用。<br>✅ 注意：该词为法语借词，重音在末尾（美式）；职场中仅限相关行业使用。<br>🚫 非相关场合避免提及，以免造成不适。</p>"
+  },
+
+    {
+      "Word": "color",
+      "Phonetic": "英 [ˈkʌlə(r)]，美 [ˈkʌlər]",
+      "Meaning": "名词/动词，指‘颜色’；作动词时表示‘给……上色’。在 UI/UX 设计和前端开发中常用于主题、样式配置。",
+      "Example": "The design system defines a consistent color palette for all user interfaces.",
+      "ExampleTranslator": "该设计系统为所有用户界面定义了一套统一的配色方案。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🎨 <strong>技术+视觉记忆</strong>：<br>前端开发中常用 <code>color</code>、<code>background-color</code> 等 CSS 属性。<br>✅ 原 JSON 中为 'colors'（复数），已还原为单数 <strong>color</strong>；其复数形式为 <em>colors</em>（美式拼写）或 <em>colours</em>（英式）。<br>💡 搭配：primary color, color scheme, color contrast.</p>"
+    },
+    {
+      "Word": "college",
+      "Phonetic": "英 [ˈkɒlɪdʒ]，美 [ˈkɑːlɪdʒ]",
+      "Meaning": "名词，指‘大学、学院’，尤指本科教育机构；也可指专业学院（如商学院）。",
+      "Example": "She graduated from college with a degree in Computer Science and joined a startup right away.",
+      "ExampleTranslator": "她大学计算机科学专业毕业后立即加入了一家初创公司。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🎓 <strong>教育背景关键词</strong>：<br>在简历、LinkedIn、招聘中高频出现。<br>✅ 注意：在英国，'college' 可能指高中后教育（非大学）；在美国通常等同于 undergraduate university.<br>📚 对比：<em>university</em>（综合性大学），<em>institute</em>（理工学院）。</p>"
+    },
+    {
+      "Word": "intern",
+      "Phonetic": "英 [ˈɪntɜːn]，美 [ˈɪntɜːrn]",
+      "Meaning": "名词/动词，作名词指‘实习生’；作动词意为‘实习’。",
+      "Example": "Our team mentors two software engineering interns every summer.",
+      "ExampleTranslator": "我们团队每年夏天指导两名软件工程实习生。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💼 <strong>职场入门角色</strong>：<br>科技公司校招核心环节：<em>intern → return offer → full-time hire</em>。<br>✅ 原 JSON 中为 'interns'（复数），已还原为单数 <strong>intern</strong>；其复数为 <em>interns</em>。<br>🎯 动词用法：She interned at Google last year.</p>"
+    },
+    {
+      "Word": "slit",
+      "Phonetic": "英 [slɪt]，美 [slɪt]",
+      "Meaning": "名词/动词，指‘狭长的切口、裂缝’；作动词表示‘切开、撕裂’。",
+      "Example": "The designer added a subtle slit to the side of the dress for better mobility.",
+      "ExampleTranslator": "设计师在裙子侧面加了一道细微的开衩，以提升活动便利性。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>✂️ <strong>视觉+动作联想</strong>：<br>想象用剪刀快速划出一道细缝 —— 这就是 <em>slit</em>。<br>✅ 原 JSON 中为 'slits'（复数/第三人称单数），已还原为原形 <strong>slit</strong>；其复数为 <em>slits</em>。<br>⚠️ 技术场景较少见，多用于服装、材料、光学（如 slit lamp）。</p>"
+    },
+    {
+      "Word": "perky",
+      "Phonetic": "英 [ˈpɜːki]，美 [ˈpɜːrki]",
+      "Meaning": "形容词，意为‘活泼的、精神饱满的、翘起的’，常带可爱或俏皮意味。",
+      "Example": "Her perky attitude made her a great fit for customer-facing roles.",
+      "ExampleTranslator": "她活泼开朗的性格使她非常适合面向客户的工作岗位。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>😊 <strong>性格描述词</strong>：<br>面试评价中可能用到：<em>perky, upbeat, energetic</em>。<br>✅ 联想：'perk up'（振作起来）→ <em>perky</em> = always perked up!<br>👗 引申义：perky ears（竖起的耳朵），perky nose（小巧翘鼻）。</p>"
+    },
+    {
+      "Word": "executive",
+      "Phonetic": "英 [ɪɡˈzekjətɪv]，美 [ɪɡˈzekjətɪv]",
+      "Meaning": "名词/形容词，作名词指‘高管、执行官’；作形容词表示‘执行的、行政的’。",
+      "Example": "The CTO presented the AI roadmap to the executive team.",
+      "ExampleTranslator": "CTO 向高管团队展示了人工智能路线图。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👔 <strong>组织架构关键词</strong>：<br>常见职位：<em>executive director, executive assistant, executive summary</em>。<br>✅ 原 JSON 中为 'executives'（复数），已还原为单数 <strong>executive</strong>；其复数为 <em>executives</em>。<br>📊 搭配：executive decision, executive level, non-executive director.</p>"
+    },
+    {
+      "Word": "peach",
+      "Phonetic": "英 [piːtʃ]，美 [piːtʃ]",
+      "Meaning": "名词，指‘桃子’；口语中可形容人‘极好的、讨人喜欢的’（较老派）。",
+      "Example": "After the sprint review, the team celebrated with peach smoothies.",
+      "ExampleTranslator": "冲刺评审结束后，团队用桃子奶昔庆祝了一下。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍑 <strong>生活化场景+色彩联想</strong>：<br>UI 设计中常用 ‘peach’ 描述柔和暖色调（#FFE5B4）。<br>✅ 原 JSON 中为 'peaches'（复数），已还原为单数 <strong>peach</strong>；其复数为 <em>peaches</em>。<br>💬 俚语（慎用）：‘You’re a real peach!’ = 你真贴心！</p>"
+    },
+    {
+      "Word": "carry",
+      "Phonetic": "英 [ˈkæri]，美 [ˈkæri]",
+      "Meaning": "动词，意为‘携带、搬运、承载’；引申为‘承担（责任）、继续进行’。",
+      "Example": "This microservice carries the authentication logic for the entire platform.",
+      "ExampleTranslator": "这个微服务承载了整个平台的身份验证逻辑。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📦 <strong>技术隐喻</strong>：<br>系统组件 ‘carries’ data/responsibility/load.<br>✅ 原 JSON 中为 'carrying'（现在分词），已还原为原形 <strong>carry</strong>；其现在分词为 <em>carrying</em>，过去式为 <em>carried</em>。<br>🔁 搭配：carry out (执行), carry on (继续), carry weight (有影响力)。</p>"
+    },
+    {
+      "Word": "asset",
+      "Phonetic": "英 [ˈæset]，美 [ˈæset]",
+      "Meaning": "名词，指‘资产、有价值的人或物’；在 IT 中可指‘资源文件（如图片、视频）’。",
+      "Example": "All static assets like images and fonts are stored in the /public/assets folder.",
+      "ExampleTranslator": "所有静态资源（如图片和字体）都存储在 /public/assets 文件夹中。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💎 <strong>双重含义重点</strong>：<br>1. Financial asset（金融资产）<br>2. Digital asset（数字资源）<br>✅ 复数为 <em>assets</em>（原词已是复数形式，但作为可数名词，单数为 <strong>asset</strong>）。<br>🔍 技术场景：asset pipeline, asset bundling (Webpack)。</p>"
+    },
+    {
+      "Word": "freshman",
+      "Phonetic": "英 [ˈfreʃmən]，美 [ˈfreʃmæn]",
+      "Meaning": "名词，指‘大学一年级新生’；也可泛指某领域的初学者。",
+      "Example": "As a freshman in computer science, he was already contributing to open-source projects.",
+      "ExampleTranslator": "作为一名计算机科学专业的大一新生，他已经在为开源项目做贡献了。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🎒 <strong>教育阶段术语</strong>：<br>美国学制：<em>freshman → sophomore → junior → senior</em>。<br>✅ 注意：<em>freshman</em> 单复数同形（但现代也接受 <em>freshmen</em> 作复数）。<br>💡 引申：a freshman mistake（新手错误）。</p>"
+    },
+    {
+      "Word": "MILF",
+      "Phonetic": "",
+      "Meaning": "该缩写属于不适宜的网络俚语，不适合出现在学习或职场材料中。",
+      "Example": "",
+      "ExampleTranslator": "",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⚠️ <strong>内容过滤提示</strong>：<br>此词为成人俚语（Mother I'd Like to...），不符合正经、中性、合理的要求。<br>建议从学习词表中移除，替换为合适词汇（如 'mentor', 'manager' 等）。</p>"
+    },
+    {
+      "Word": "near",
+      "Phonetic": "英 [nɪə(r)]，美 [nɪr]",
+      "Meaning": "形容词/副词/介词，表示‘近的、接近的’；作动词时意为‘靠近’（较少用）。",
+      "Example": "The nearest coffee shop is just a two-minute walk from our office.",
+      "ExampleTranslator": "最近的咖啡店离我们办公室只有两分钟步行路程。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📍 <strong>空间关系核心词</strong>：<br>搭配：<br>- near/far<br>- nearest exit/server/store<br>- draw near (靠近)<br>✅ 原 JSON 中为 'nearest'（最高级），但作为独立词条，应以原级 <strong>near</strong> 为主；<em>nearest</em> 是其最高级形式。<br>🧠 记忆：'near' vs 'next to'（更紧邻）。</p>"
+    },
+    {
+      "Word": "original",
+      "Phonetic": "英 [əˈrɪdʒənl]，美 [əˈrɪdʒənl]",
+      "Meaning": "形容词/名词，作形容词指‘原始的、原创的’；作名词可指‘原件、原作’。",
+      "Example": "We must preserve the original design intent while refactoring the legacy code.",
+      "ExampleTranslator": "在重构遗留代码时，我们必须保留原始的设计意图。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📜 <strong>版权与创新关键词</strong>：<br>技术文档强调：<em>original author</em>, <em>original version</em>。<br>✅ 对比：<em>copy</em>（副本）, <em>duplicate</em>（复制品）。<br>💡 搭配：be original (有创意), the original plan/file/code.</p>"
+    },
+    {
+      "Word": "throne",
+      "Phonetic": "英 [θrəʊn]，美 [θroʊn]",
+      "Meaning": "名词，指‘王座、宝座’；比喻用法可指‘权威地位’或‘主导位置’。",
+      "Example": "In the gaming industry, this console once sat on the throne of market share.",
+      "ExampleTranslator": "在游戏行业，这款主机曾一度占据市场占有率的宝座。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👑 <strong>比喻修辞记忆</strong>：<br>商业分析中常用：<em>top the throne</em>, <em>dethrone the leader</em>。<br>✅ 职场慎用：多用于媒体、营销文案，正式报告建议用 <em>leading position</em>。<br>📚 文化联想：Game of Thrones（权力的游戏）。</p>"
+    },
+    {
+      "Word": "everyone",
+      "Phonetic": "英 [ˈevriwʌn]，美 [ˈevriwʌn]",
+      "Meaning": "不定代词，指‘每个人、所有人’，相当于 everybody，语气更正式。",
+      "Example": "Everyone on the team received access to the new staging environment.",
+      "ExampleTranslator": "团队中的每个人都获得了新预发环境的访问权限。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👥 <strong>全员沟通关键词</strong>：<br>邮件开头常用：<em>Hello everyone,</em><br>✅ 语法注意：<em>everyone</em> 是单数，谓语用单数（Everyone <strong>is</strong> here）。<br>🔁 同义：everybody（更口语），all（需接 of + 名词）。</p>"
+    },
+    {
+      "Word": "fourteen",
+      "Phonetic": "英 [ˌfɔːˈtiːn]，美 [ˌfɔːrˈtiːn]",
+      "Meaning": "数词，表示数字 14。",
+      "Example": "The API returns a list of fourteen error codes for validation failures.",
+      "ExampleTranslator": "该 API 为验证失败返回了十四个错误代码。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🔢 <strong>数字发音重点</strong>：<br>teen 数字重音在第二音节：<em>four-TEEN</em>（≠ forty）。<br>✅ 对比：<em>forty</em>（40）发音为 /ˈfɔːrti/，无重音在 teen。<br>🧠 记忆口诀：‘-teen = 十几，-ty = 几十’。</p>"
+    },
+    {
+      "Word": "polish",
+      "Phonetic": "英 [ˈpɒlɪʃ]，美 [ˈpɑːlɪʃ]",
+      "Meaning": "动词/名词，作动词指‘打磨、润色、完善’；作名词指‘抛光剂’或‘优雅精致’。",
+      "Example": "Before demo day, we spent two days polishing the UI animations and copy.",
+      "ExampleTranslator": "在演示日前，我们花了两天时间打磨 UI 动画和文案。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>✨ <strong>产品交付关键动作</strong>：<br>‘Polish’ 是 MVP 到正式版的重要步骤。<br>✅ 注意：不要与国家名 Poland（波兰）混淆！<br>🎯 搭配：polish a document/presentation/product, final polish.</p>"
+    },
+    {
+      "Word": "clear",
+      "Phonetic": "英 [klɪə(r)]，美 [klɪr]",
+      "Meaning": "形容词/动词/副词，意为‘清晰的、清除、空闲的’；在技术中常指‘清空缓存、屏幕等’。",
+      "Example": "Please clear your browser cache if the new styles aren’t loading.",
+      "ExampleTranslator": "如果新样式未加载，请清除浏览器缓存。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🧹 <strong>多义高频动词</strong>：<br>技术场景：<br>- clear cache/cookies/console<br>- clear the room (清场)<br>- clear skies (晴朗)<br>✅ 原 JSON 中为 'cleared'（过去式），已还原为原形 <strong>clear</strong>；其过去式为 <em>cleared</em>。<br>🔁 同义：erase, remove, wipe.</p>"
+    },
+    {
+      "Word": "neat",
+      "Phonetic": "英 [niːt]，美 [niːt]",
+      "Meaning": "形容词，意为‘整洁的、简洁的、出色的’，口语中可表赞叹。",
+      "Example": "That’s a neat solution to the race condition problem!",
+      "ExampleTranslator": "这是解决竞态条件问题的一个巧妙方案！",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🧼 <strong>简洁即美</strong>：<br>程序员赞美代码：<em>neat, clean, elegant</em>。<br>✅ 对比：<em>messy code</em>（混乱的代码）vs <em>neat code</em>。<br>💬 口语：‘Neat!’ = ‘酷！’（较老派，年轻人多用 ‘cool’ 或 ‘awesome’）。</p>"
+    },
+    {
+      "Word": "row",
+      "Phonetic": "英 [rəʊ]，美 [roʊ]",
+      "Meaning": "名词，指‘一行、一排’；在数据库中特指‘记录行’；也可指‘争吵’（发音相同，但语境不同）。",
+      "Example": "Each row in the user table contains a unique ID and email address.",
+      "ExampleTranslator": "用户表中的每一行都包含一个唯一 ID 和邮箱地址。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📊 <strong>数据结构基础</strong>：<br>SQL 查询结果由 rows 和 columns 构成。<br>✅ 原 JSON 中为 'rows'（复数），已还原为单数 <strong>row</strong>；其复数为 <em>rows</em>。<br>⚠️ 注意：与 ‘row’（争吵，读作 /raʊ/）同形异义，靠语境区分。</p>"
+    },
+    {
+      "Word": "young",
+      "Phonetic": "英 [jʌŋ]，美 [jʌŋ]",
+      "Meaning": "形容词，指‘年轻的、初级的’；在职场中可描述经验较少的员工。",
+      "Example": "Our team includes both seasoned engineers and young talents fresh from coding bootcamps.",
+      "ExampleTranslator": "我们的团队既包括经验丰富的工程师，也有刚从编程训练营毕业的年轻人才。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌱 <strong>年龄 vs 经验</strong>：<br>避免直接说 ‘young employee’，可用 ‘early-career professional’ 更专业。<br>✅ 原 JSON 中为 'youngest'（最高级），但作为基础词，应以原级 <strong>young</strong> 为主；<em>youngest</em> 是其最高级形式。<br>📈 搭配：young startup, young talent, young at heart.</p>"
+    },
+    {
+      "Word": "ripe",
+      "Phonetic": "英 [raɪp]，美 [raɪp]",
+      "Meaning": "形容词，指‘成熟的（水果）、时机成熟的’；引申为‘准备就绪的’。",
+      "Example": "The market is ripe for a new AI-powered productivity tool.",
+      "ExampleTranslator": "市场已准备好迎接一款全新的人工智能驱动的生产力工具。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍑 <strong>时机隐喻</strong>：<br>商业分析常用：<em>ripe for disruption</em>（适合颠覆）。<br>✅ 原 JSON 中包含 'ripe' 和 'ripest'，以基础形式 <strong>ripe</strong> 为主；<em>ripest</em> 是其最高级。<br>🔁 对比：<em>raw</em>（未成熟的）, <em>mature</em>（成熟的，更正式）。</p>"
+    },
+    {
+      "Word": "shade",
+      "Phonetic": "英 [ʃeɪd]，美 [ʃeɪd]",
+      "Meaning": "名词/动词，指‘阴影、遮阳物、色度’；在 UI 设计中常指颜色的明暗变化。",
+      "Example": "The designer chose three shades of blue to create visual hierarchy in the dashboard.",
+      "ExampleTranslator": "设计师选用了三种蓝色色度，在仪表盘中创建视觉层次。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🎨 <strong>色彩理论关键词</strong>：<br>Color shade = 加黑色变深；tint = 加白色变浅。<br>✅ 原 JSON 中为 'shades'（复数），已还原为单数 <strong>shade</strong>；其复数为 <em>shades</em>。<br>🕶️ 搭配：light/dark shade, window shades, subtle shades of meaning.</p>"
+    },
+    {
+      "Word": "scent",
+      "Phonetic": "英 [sent]，美 [sent]",
+      "Meaning": "名词/动词，指‘气味、香味’；作动词意为‘嗅出、察觉’（较少用）。",
+      "Example": "The new office has a subtle lavender scent from the air purifier.",
+      "ExampleTranslator": "新办公室的空气净化器散发出淡淡的薰衣草香味。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👃 <strong>感官体验词</strong>：<br>虽非技术核心词，但在用户体验（如零售、VR）中有应用。<br>✅ 原 JSON 中为 'scents'（复数），已还原为单数 <strong>scent</strong>；其复数为 <em>scents</em>。<br>🔁 同义：odor（中性/负面），fragrance（正面，香水）。</p>"
+    },
+    {
+      "Word": "fill",
+      "Phonetic": "英 [fɪl]，美 [fɪl]",
+      "Meaning": "动词/名词，意为‘装满、填充’；在表单、UI 中指‘填写’。",
+      "Example": "Users need to fill out the registration form before accessing the beta features.",
+      "ExampleTranslator": "用户需要先填写注册表单，才能访问测试功能。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📝 <strong>交互动词</strong>：<br>Web 开发高频短语：<em>fill out a form</em>。<br>✅ 原 JSON 中为 'filling'（现在分词），已还原为原形 <strong>fill</strong>；其现在分词为 <em>filling</em>，过去式为 <em>filled</em>。<br>🔄 搭配：fill in (英式), fill up (装满容器)。</p>"
+    },
+    {
+      "Word": "proud",
+      "Phonetic": "英 [praʊd]，美 [praʊd]",
+      "Meaning": "形容词，意为‘自豪的、引以为豪的’；也可指‘傲慢的’（语境决定褒贬）。",
+      "Example": "We’re proud of how our app improved accessibility for visually impaired users.",
+      "ExampleTranslator": "我们为自己的应用如何改善视障用户的无障碍体验而感到自豪。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌟 <strong>情感表达</strong>：<br>团队文化中鼓励表达 pride in work.<br>✅ 搭配：<br>- be proud of (something)<br>- take pride in (your work)<br>⚠️ 注意：‘proud’ 本身中性，但 ‘too proud’ 可能含贬义（骄傲自大）。</p>"
+    },
+    {
+      "Word": "shine",
+      "Phonetic": "英 [ʃaɪn]，美 [ʃaɪn]",
+      "Meaning": "动词/名词，指‘发光、闪耀’；引申为‘表现出色’。",
+      "Example": "During the hackathon, her problem-solving skills really shone.",
+      "ExampleTranslator": "在黑客马拉松期间，她的解决问题能力大放异彩。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>✨ <strong>表现力动词</strong>：<br>面试反馈常用：<em>shone in the technical interview</em>。<br>✅ 原 JSON 中为 'shining'（现在分词），已还原为原形 <strong>shine</strong>；其现在分词为 <em>shining</em>，过去式为 <em>shone</em>（或 <em>shined</em>，当指‘擦亮’时）。<br>💡 搭配：shine a light on (揭示), let your talent shine.</p>"
+    },
+    {
+      "Word": "ring",
+      "Phonetic": "英 [rɪŋ]，美 [rɪŋ]",
+      "Meaning": "动词/名词，指‘（铃声）响、打电话’；也可指‘戒指、环形物’。",
+      "Example": "My phone rang during the stand-up meeting, which was quite embarrassing.",
+      "ExampleTranslator": "我的手机在站会期间响了，相当尴尬。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📞 <strong>声音+通讯</strong>：<br>传统用法：<em>ring someone</em>（英式）= call someone（美式）。<br>✅ 原 JSON 中为 'ringing'（现在分词），已还原为原形 <strong>ring</strong>；其现在分词为 <em>ringing</em>，过去式为 <em>rang</em>。<br>🔔 搭配：ring true (听起来真实), ring the changes (做出改变)。</p>"
+    },
+    {
+      "Word": "lady",
+      "Phonetic": "英 [ˈleɪdi]，美 [ˈleɪdi]",
+      "Meaning": "名词，指‘女士、夫人’；复数为 ladies，常用于正式称呼或礼貌用语。",
+      "Example": "Ladies and gentlemen, welcome to our product launch event.",
+      "ExampleTranslator": "女士们先生们，欢迎参加我们的产品发布会。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👩 <strong>正式场合称呼</strong>：<br>演讲、会议开场白经典句式。<br>✅ 原 JSON 中为 'Ladies'（复数/首字母大写），已还原为单数 <strong>lady</strong>；其复数为 <em>ladies</em>。<br>⚠️ 注意：日常避免单独称呼女性为 ‘lady’（可能显得居高临下），用 ‘woman’ 或直接称呼名字更佳。</p>"
+    },
+    {
+      "Word": "metric",
+      "Phonetic": "英 [ˈmetrɪk]，美 [ˈmetrɪk]",
+      "Meaning": "名词，指‘指标、度量标准’；在数据分析、DevOps 中用于衡量性能或业务成果。",
+      "Example": "We track several key metrics, including daily active users and error rate.",
+      "ExampleTranslator": "我们跟踪多个关键指标，包括日活跃用户数和错误率。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📈 <strong>数据驱动核心词</strong>：<br>OKR/KPI 都由 metrics 支撑。<br>✅ 复数为 <em>metrics</em>（原词已是复数形式，但单数为 <strong>metric</strong>）。<br>📊 搭配：performance metric, business metric, define/measure a metric.</p>"
+    },
+    {
+      "Word": "fifty",
+      "Phonetic": "英 [ˈfɪfti]，美 [ˈfɪfti]",
+      "Meaning": "数词，表示数字 50。",
+      "Example": "The server responded with a 500 Internal Server Error.",
+      "ExampleTranslator": "服务器返回了 500 内部服务器错误。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>5️⃣ <strong>HTTP 状态码关联</strong>：<br>5xx 错误 = 服务器端错误（500, 502, 503...）。<br>✅ 发音注意：/ˈfɪfti/，不是 /faɪfti/。<br>🧠 记忆：fif-（来自 five），-ty（几十）→ fifty = 5 × 10。</p>"
+    },
+    {
+      "Word": "clock",
+      "Phonetic": "英 [klɒk]，美 [klɑːk]",
+      "Meaning": "名词/动词，指‘时钟’；作动词可表示‘记录时间’或‘达到（速度/时间）’。",
+      "Example": "The new algorithm clocks in at under 10 milliseconds per request.",
+      "ExampleTranslator": "新算法每次请求的耗时不到 10 毫秒。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⏱️ <strong>性能测试用语</strong>：<br><em>Clock in at...</em> = 测得时间为...<br>✅ 原 JSON 中为 'Clock'（首字母大写），已标准化为小写 <strong>clock</strong>。<br>🔁 搭配：clock speed (CPU 主频), punch the clock (打卡下班)。</p>"
+    },
+    {
+      "Word": "Hailey",
+      "Phonetic": "英 [ˈheɪli]，美 [ˈheɪli]",
+      "Meaning": "专有名词，常见英文女性名字，无普通词汇含义。",
+      "Example": "Hailey from DevOps will lead the migration to Kubernetes.",
+      "ExampleTranslator": "来自 DevOps 团队的海莉将主导向 Kubernetes 的迁移工作。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📛 <strong>人名处理</strong>：<br>作为专有名词，无需词义解释，但可在团队协作中自然出现。<br>✅ 拼写变体：Hailey, Haley, Hayley。<br>💡 记忆：与 ‘hail’（冰雹/致敬）同音，可联想 ‘Hail Hailey!’（致敬海莉！）。</p>"
+    },
+    {
+      "Word": "donut",
+      "Phonetic": "英 [ˈdəʊnʌt]，美 [ˈdoʊnʌt]",
+      "Meaning": "名词，指‘甜甜圈’；在数据可视化中指‘环形图（donut chart）’。",
+      "Example": "We used a donut chart to show the distribution of user roles in the admin panel.",
+      "ExampleTranslator": "我们使用环形图展示了管理面板中用户角色的分布情况。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍩 <strong>技术+生活双关</strong>：<br>1. Snack: coffee + donut<br>2. Chart: donut chart = pie chart with a hole<br>✅ 拼写：美式常用 <em>donut</em>，英式多用 <em>doughnut</em>。<br>📊 图表类型：bar chart, line chart, donut chart.</p>"
+    },
+    {
+      "Word": "whine",
+      "Phonetic": "英 [waɪn]，美 [waɪn]",
+      "Meaning": "动词/名词，指‘抱怨、发牢骚’，语气带负面或孩子气。",
+      "Example": "Instead of whining about the legacy code, let’s refactor it together.",
+      "ExampleTranslator": "与其抱怨遗留代码，不如我们一起重构它。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>😠 <strong>情绪管理反面教材</strong>：<br>职场中应避免 whining，提倡 constructive feedback（建设性反馈）。<br>✅ 原 JSON 中为 'whining'（现在分词），已还原为原形 <strong>whine</strong>；其现在分词为 <em>whining</em>。<br>🔁 同义（负面）：complain, grumble, moan.</p>"
+    },
+    {
+      "Word": "swear",
+      "Phonetic": "英 [sweə(r)]，美 [swer]",
+      "Meaning": "动词，意为‘发誓、宣誓’；也可指‘咒骂、说脏话’。",
+      "Example": "I swear this bug only appears in production—it never happens locally!",
+      "ExampleTranslator": "我发誓这个 bug 只在生产环境出现——本地从来不会发生！",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🤬 <strong>双义动词</strong>：<br>1. Swear an oath（宣誓）<br>2. Swear at someone（骂人）<br>✅ 职场建议：用 ‘I promise’ 代替 ‘I swear’ 更专业。<br>📚 固定搭配：swear by (信赖), swear off (戒掉)。</p>"
+    },
+    {
+      "Word": "nine",
+      "Phonetic": "英 [naɪn]，美 [naɪn]",
+      "Meaning": "数词，表示数字 9。",
+      "Example": "The team works from nine to five, but often stays late during release week.",
+      "ExampleTranslator": "团队朝九晚五工作，但在发布周期常常加班到很晚。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>9️⃣ <strong>时间表达基础</strong>：<br>‘9 to 5’ = 标准工作时间。<br>✅ 发音 /naɪn/，注意与 ‘night’ 区分。<br>🧠 联想：cat has nine lives（猫有九条命）→ 记住拼写。</p>"
+    },
+  {
+    "Word": "Riley",
+    "Phonetic": "英 [ˈraɪli]，美 [ˈraɪli]",
+    "Meaning": "专有名词，常见英文人名（男女皆可），无普通词汇含义。",
+    "Example": "Riley submitted a pull request to fix the memory leak in the authentication module.",
+    "ExampleTranslator": "莱利提交了一个拉取请求，修复了身份验证模块中的内存泄漏问题。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📛 <strong>人名使用场景</strong>：<br>在团队协作、Git 提交记录、会议中自然出现。<br>✅ 拼写固定，发音为 /ˈraɪli/（‘rye-lee’）。<br>💡 联想：与 ‘smiley’ 押韵，可想象 Riley 总是乐观积极。</p>"
+  },
+  {
+    "Word": "full",
+    "Phonetic": "英 [fʊl]，美 [fʊl]",
+    "Meaning": "形容词，意为‘满的、完整的、充分的’；在技术中可指‘full-stack’、‘full capacity’等。",
+    "Example": "We’re running at full capacity after the latest traffic spike.",
+    "ExampleTranslator": "在最近流量激增后，我们的系统已满负荷运行。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔋 <strong>资源状态描述</strong>：<br>常用搭配：<br>- full disk<br>- full access<br>- full-time employee<br>- full-stack developer<br>✅ 原 JSON 中为 'fuller'（比较级），但基础词应为 <strong>full</strong>；其比较级为 <em>fuller</em>，最高级为 <em>fullest</em>。<br>⚠️ 注意：'fuller' 也可作姓氏或名词（漂洗工），但此处为形容词比较级。</p>"
+  },
+  {
+    "Word": "last",
+    "Phonetic": "英 [lɑːst]，美 [læst]",
+    "Meaning": "动词/形容词/副词/名词，多义词：作动词意为‘持续’；作形容词指‘最后的’；作副词表‘最终’。",
+    "Example": "How long will the battery last under heavy load?",
+    "ExampleTranslator": "在高负载下，这块电池能持续多久？",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⏳ <strong>时间+顺序核心词</strong>：<br>1. The meeting lasted two hours.（持续）<br>2. Last commit broke the build.（最后的）<br>3. Who spoke last?（最后）<br>✅ 原 JSON 中为 'lasts'（第三人称单数），已还原为原形 <strong>last</strong>；其第三人称单数为 <em>lasts</em>，过去式为 <em>lasted</em>。<br>🔁 同义（持续）：endure, persist.</p>"
+  },
+  {
+    "Word": "break",
+    "Phonetic": "英 [breɪk]，美 [breɪk]",
+    "Meaning": "动词/名词，指‘打破、中断、休息’；在开发中常指‘break the build’（破坏构建）。",
+    "Example": "Don’t merge that PR—it will break the CI pipeline!",
+    "ExampleTranslator": "别合并那个拉取请求——它会破坏 CI 流水线！",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💥 <strong>开发高频警告词</strong>：<br>经典短语：<br>- break the build<br>- hard break vs soft break<br>- coffee break<br>✅ 原 JSON 中为 'breaks'（第三人称单数），已还原为原形 <strong>break</strong>；其第三人称单数为 <em>breaks</em>，过去式为 <em>broke</em>。<br>🛠️ 反义：fix, repair, restore.</p>"
+  },
+  {
+    "Word": "mid",
+    "Phonetic": "英 [mɪd]，美 [mɪd]",
+    "Meaning": "前缀/形容词，表示‘中间的’，常用于复合词如 midday, mid-term, mid-sprint。",
+    "Example": "We hold a mid-sprint review to adjust priorities if needed.",
+    "ExampleTranslator": "我们在冲刺中期进行一次评审，必要时调整优先级。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🕗 <strong>时间定位前缀</strong>：<br>敏捷开发常用：<em>mid-sprint</em>, <em>mid-release</em>。<br>✅ 注意：<em>mid</em> 通常不单独使用，而是作为前缀构成复合词（如 midpoint, midweek）。<br>📚 构词法：<em>mid-</em> + 名词 → 表示时间段/位置的中点。</p>"
+  },
+  {
+    "Word": "Brooklyn",
+    "Phonetic": "英 [ˈbrʊklɪn]，美 [ˈbrʊklɪn]",
+    "Meaning": "专有名词，美国纽约市的一个行政区，也常用作人名。",
+    "Example": "Our remote team spans from Brooklyn to Bangalore.",
+    "ExampleTranslator": "我们的远程团队从布鲁克林一直延伸到班加罗尔。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🗽 <strong>地理+文化符号</strong>：<br>科技公司常以城市命名会议室（如 Brooklyn Room）。<br>✅ 作为地名，首字母大写，不可数。<br>💡 联想：Brooklyn ≠ Brooklyn Bridge（虽相关，但后者是具体建筑）。</p>"
+  },
+  {
+    "Word": "shape",
+    "Phonetic": "英 [ʃeɪp]，美 [ʃeɪp]",
+    "Meaning": "名词/动词，指‘形状、外形’；作动词意为‘塑造、影响发展’。",
+    "Example": "User feedback helped shape the final design of the feature.",
+    "ExampleTranslator": "用户反馈帮助塑造了该功能的最终设计。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📐 <strong>抽象+具象双重用法</strong>：<br>1. Geometric shape（几何形状）<br>2. Shape the future（塑造未来）<br>✅ 原 JSON 中为 'shaped'（过去式），已还原为原形 <strong>shape</strong>；其过去式为 <em>shaped</em>。<br>🎯 搭配：take shape（成形）, in good/bad shape（状态好/差）。</p>"
+  },
+  {
+    "Word": "forty",
+    "Phonetic": "英 [ˈfɔːti]，美 [ˈfɔːrti]",
+    "Meaning": "数词，表示数字 40。",
+    "Example": "The team celebrated their fortieth successful deployment this quarter.",
+    "ExampleTranslator": "团队庆祝本季度第四十次成功部署。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>4️⃣ <strong>拼写陷阱提醒</strong>：<br>❌ 错误拼写：fourty（不存在！）<br>✅ 正确拼写：forty（没有 'u'）<br>🧠 记忆口诀：‘Four has a U, but forty does not!’<br>📊 对比：fourteen（14）有 'u'，forty（40）没有。</p>"
+  },
+  {
+    "Word": "Sienna",
+    "Phonetic": "英 [siˈenə]，美 [siˈɛnə]",
+    "Meaning": "专有名词，既可作女性名字，也指‘赭色’（一种红棕色颜料或颜色）。",
+    "Example": "The UI theme uses a sienna accent color for error states.",
+    "ExampleTranslator": "该 UI 主题在错误状态下使用赭色作为强调色。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎨 <strong>颜色+人名双义</strong>：<br>1. Sienna (name) — like actress Sienna Miller<br>2. Sienna (color) — earthy red-brown, from Italian soil<br>✅ 在设计系统中，sienna 是标准颜色名称之一（CSS 支持）。<br>🌍 词源：来自意大利锡耶纳城（Siena）的土壤颜色。</p>"
+  },
+  {
+    "Word": "detonate",
+    "Phonetic": "英 [ˈdetəneɪt]，美 [ˈdetəneɪt]",
+    "Meaning": "动词，意为‘引爆、使爆炸’；比喻用法可指‘引发剧烈反应’。",
+    "Example": "Merging untested code into main can detonate the entire release cycle.",
+    "ExampleTranslator": "将未经测试的代码合并到主分支可能会引爆整个发布周期。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💣 <strong>夸张修辞记忆</strong>：<br>技术场景中多用于比喻：<em>detonate a crisis</em>。<br>✅ 原 JSON 中为 'detonates'（第三人称单数），已还原为原形 <strong>detonate</strong>；其第三人称单数为 <em>detonates</em>。<br>🔬 词根：<em>de-</em>（完全）+ <em>tonare</em>（拉丁语“雷鸣”）→ 引爆如雷。</p>"
+  },
+  {
+    "Word": "fiftieth",
+    "Phonetic": "英 [ˈfɪftiəθ]，美 [ˈfɪftiəθ]",
+    "Meaning": "序数词，表示‘第五十’。",
+    "Example": "This is our fiftieth customer support ticket this week!",
+    "ExampleTranslator": "这是本周我们收到的第五十张客户支持工单！",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>5️⃣0️⃣ <strong>序数词构成</strong>：<br>基数词 fifty → 序数词 fiftieth（注意：y → ie + th）。<br>✅ 规则：以 -y 结尾的数字变序数词时，y → ie + th（twenty → twentieth）。<br>📅 使用场景：周年庆、里程碑事件（50th commit, 50th user）。</p>"
+  },
+  {
+    "Word": "anyway",
+    "Phonetic": "英 [ˈeniweɪ]，美 [ˈeniweɪ]",
+    "Meaning": "副词，意为‘无论如何、反正、不管怎样’；常用于转换话题或强调结论。",
+    "Example": "The test failed, but we deployed anyway because it was a minor flake.",
+    "ExampleTranslator": "测试失败了，但我们还是部署了，因为那只是个微不足道的偶发问题。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔄 <strong>对话衔接词</strong>：<br>口语中高频出现，用于：<br>- 转折：Anyway, let’s move on.<br>- 坚持：I’ll do it anyway.<br>✅ 注意：正式写作中建议用 ‘nevertheless’ 或 ‘regardless’ 替代。<br>💬 发音：/ˈeniweɪ/，非 /æniweɪ/。</p>"
+  },
+  {
+    "Word": "survive",
+    "Phonetic": "英 [səˈvaɪv]，美 [sərˈvaɪv]",
+    "Meaning": "动词，意为‘幸存、存活、经受住’；在职场中可指‘熬过困难时期’。",
+    "Example": "Only three startups from that batch survived the market crash.",
+    "ExampleTranslator": "那批初创公司中只有三家挺过了市场崩盘。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🛡️ <strong>韧性表达</strong>：<br>商业分析常用：<em>survive a downturn</em>, <em>survive competition</em>。<br>✅ 构词：<em>sur-</em>（超）+ <em>vivere</em>（拉丁语“活”）→ 活下来。<br>🔁 搭配：survive on (靠…生存), barely survive, survival rate.</p>"
+  },
+  {
+    "Word": "one",
+    "Phonetic": "英 [wʌn]，美 [wʌn]",
+    "Meaning": "数词/代词，表示数字 1；也可泛指‘任何人’（如 ‘one should...’）。",
+    "Example": "One of the core principles of clean code is readability.",
+    "ExampleTranslator": "清晰代码的核心原则之一是可读性。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>1️⃣ <strong>最基础但多功能</strong>：<br>1. 数字：version 1.0<br>2. 代词：One never knows.<br>3. 强调：the one and only<br>✅ 原 JSON 中为 'ones'（复数/代词复数形式），已还原为单数 <strong>one</strong>；其复数代词形式为 <em>ones</em>（如 ‘the red ones’）。<br>🧠 记忆：one → once → only（同源）。</p>"
+  },
+  {
+    "Word": "Vanessa",
+    "Phonetic": "英 [vəˈnesə]，美 [vəˈnesə]",
+    "Meaning": "专有名词，常见英文女性名字，源自文学创作，无普通词汇含义。",
+    "Example": "Vanessa from Product led the workshop on user story mapping.",
+    "ExampleTranslator": "产品团队的凡妮莎主持了用户故事地图工作坊。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>👩‍💼 <strong>跨职能协作人名</strong>：<br>在产品、设计、研发协作中自然出现。<br>✅ 发音：/vəˈnesə/，重音在第二音节。<br>🦋 趣味知识：‘Vanessa’ 最早由作家 Jonathan Swift 创造，后来成为蝴蝶属名和人名。</p>"
+  },
+  {
+    "Word": "growl",
+    "Phonetic": "英 [ɡraʊl]，美 [ɡraʊl]",
+    "Meaning": "动词/名词，指‘（狗、雷等）低吼、咆哮’；比喻用法可指‘抱怨、发出威胁声’。",
+    "Example": "My stomach started to growl during the long planning meeting.",
+    "ExampleTranslator": "在漫长的规划会议期间，我的肚子开始咕咕叫了。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🐶 <strong>拟声+身体信号</strong>：<br>1. Dog growls（狗低吼）<br>2. Stomach growls（肚子咕咕叫）<br>✅ 原 JSON 中为 'growls'（第三人称单数），已还原为原形 <strong>growl</strong>；其第三人称单数为 <em>growls</em>。<br>🔊 发音模仿：/ɡraʊl/ ≈ ‘grrr-owl’。</p>"
+  },
+  {
+    "Word": "clench",
+    "Phonetic": "英 [klenʧ]，美 [klenʧ]",
+    "Meaning": "动词，意为‘紧握、咬紧（牙关）’，常表示紧张、愤怒或决心。",
+    "Example": "He clenched his jaw when the client criticized the timeline again.",
+    "ExampleTranslator": "当客户再次批评项目时间表时，他咬紧了牙关。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>😤 <strong>情绪肢体语言</strong>：<br>职场压力下的微表情：<em>clench fists</em>, <em>clench teeth</em>。<br>✅ 原 JSON 中为 'clenched'（过去式），已还原为原形 <strong>clench</strong>；其过去式为 <em>clenched</em>。<br>💪 搭配：clench your fist (握紧拳头), clench up (紧张僵硬)。</p>"
+  },
+  {
+    "Word": "purr",
+    "Phonetic": "英 [pɜː(r)]，美 [pɜːr]",
+    "Meaning": "动词/名词，指‘（猫）发出呼噜声’；引申为‘平稳运行、令人愉悦的声音’。",
+    "Example": "The new server farm purrs quietly in the data center.",
+    "ExampleTranslator": "新的服务器集群在数据中心里安静地平稳运行。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🐱 <strong>拟声隐喻</strong>：<br>技术赞美语：<em>The engine purrs</em> = 运行极其顺畅。<br>✅ 原 JSON 中为 'purring'（现在分词），已还原为原形 <strong>purr</strong>；其现在分词为 <em>purring</em>。<br>🔊 发音即模仿猫呼噜声：/pɜːr/。</p>"
+  },
+  {
+    "Word": "excess",
+    "Phonetic": "英 [ɪkˈses]，美 [ˈekses]",
+    "Meaning": "名词/形容词，作名词指‘过多、过剩’；作形容词意为‘额外的、过量的’。",
+    "Example": "The system flagged excess API calls from a single IP address.",
+    "ExampleTranslator": "系统标记了来自单一 IP 地址的过量 API 调用。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚠️ <strong>资源监控关键词</strong>：<br>安全/运维常用：<em>excess usage</em>, <em>excess bandwidth</em>。<br>✅ 注意：作名词时重音在第二音节（/ɪkˈses/），作形容词时在第一音节（/ˈekses/）。<br>📉 反义：deficit, shortage, scarcity.</p>"
+  },
+  {
+    "Word": "river",
+    "Phonetic": "英 [ˈrɪvə(r)]，美 [ˈrɪvər]",
+    "Meaning": "名词，指‘河流’；在技术中可作比喻，如‘data river’（数据流）。",
+    "Example": "Our architecture treats real-time events as a river of data flowing through Kafka.",
+    "ExampleTranslator": "我们的架构将实时事件视为通过 Kafka 流动的数据河流。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🌊 <strong>数据流隐喻</strong>：<br>现代数据工程常用：<em>data lake</em>, <em>data stream</em>, <em>data river</em>。<br>✅ 原 JSON 中为 'rivers'（复数），已还原为单数 <strong>river</strong>；其复数为 <em>rivers</em>。<br>📚 搭配：cross the river (克服障碍), go with the flow.</p>"
+  },
+  {
+    "Word": "Lauren",
+    "Phonetic": "英 [ˈlɔːrən]，美 [ˈlɔːrən]",
+    "Meaning": "专有名词，常见英文女性名字，无普通词汇含义。",
+    "Example": "Lauren reviewed the security compliance checklist before the audit.",
+    "ExampleTranslator": "劳伦在审计前审核了安全合规检查清单。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔐 <strong>合规与安全角色</strong>：<br>在安全、法务、审计等职能中自然出现。<br>✅ 发音：/ˈlɔːrən/，与 ‘loran’（无线电导航系统）同音。<br>💡 联想：Lauren → law + run（跑合规流程）— 谐音助记。</p>"
+  },
+
+    {
+      "Word": "photoshop",
+      "Phonetic": "英 [ˈfəʊtəʃɒp]，美 [ˈfoʊtəʃɑːp]",
+      "Meaning": "动词，指使用 Adobe Photoshop 软件编辑图像；引申为‘对图片进行数字篡改’。",
+      "Example": "The marketing team photoshopped the product image to remove the background clutter.",
+      "ExampleTranslator": "市场团队用 Photoshop 处理了产品图片，去除了背景杂乱元素。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🖼️ <strong>动词化品牌名</strong>：<br>Adobe Photoshop → to photoshop（小写，动词）。<br>✅ 原 JSON 中为 'photoshopped'（过去式），已还原为原形 <strong>photoshop</strong>；其过去式/过去分词为 <em>photoshopped</em>。<br>⚠️ 注意：正式写作中建议用 ‘edit digitally’ 或 ‘retouch’，避免品牌泛化。</p>"
+    },
+    {
+      "Word": "dot",
+      "Phonetic": "英 [dɒt]，美 [dɑːt]",
+      "Meaning": "名词/动词，作名词指‘点、圆点’；在技术中常指域名中的句点（如 example.com）或数据可视化中的散点。",
+      "Example": "In the domain name, each segment is separated by a dot.",
+      "ExampleTranslator": "在域名中，每个部分都由一个点分隔。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>• <strong>技术符号基础</strong>：<br>1. URL: https://<strong>api.example.com</strong><br>2. Graph: scatter plot with data dots<br>✅ 单复数同形规则不适用，复数为 <em>dots</em>。<br>🧠 联想：‘dot notation’（对象属性访问：user.name）。</p>"
+    },
+    {
+      "Word": "Natalia",
+      "Phonetic": "英 [nəˈteɪliə]，美 [nəˈteɪljə]",
+      "Meaning": "专有名词，常见女性名字，源自拉丁语，意为‘诞生’，无普通词汇含义。",
+      "Example": "Natalia from QA found a critical edge case in the login flow.",
+      "ExampleTranslator": "来自质量保障团队的娜塔莉亚在登录流程中发现了一个关键边界情况。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👩‍💻 <strong>国际化团队人名</strong>：<br>在跨国协作、Git 提交、会议中自然出现。<br>✅ 发音：/nəˈteɪliə/，重音在第二音节。<br>🌍 词源：与 ‘nativity’（诞生）同根，联想 Christmas Nativity Scene。</p>"
+    },
+    {
+      "Word": "dark",
+      "Phonetic": "英 [dɑːk]，美 [dɑːrk]",
+      "Meaning": "形容词/名词，作形容词指‘黑暗的、深色的’；在 UI/UX 中特指‘深色模式（dark mode）’。",
+      "Example": "Users can toggle between light and dark themes in the settings.",
+      "ExampleTranslator": "用户可以在设置中切换浅色和深色主题。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌙 <strong>UI 设计高频词</strong>：<br>现代应用标配：<em>dark mode</em>（护眼、省电）。<br>✅ 原 JSON 中为 'darkest'（最高级），但基础词应为 <strong>dark</strong>；其最高级为 <em>darkest</em>。<br>🎨 搭配：dark background, dark theme, go dark (上线隐藏功能)。</p>"
+    },
+    {
+      "Word": "brat",
+      "Phonetic": "英 [bræt]，美 [bræt]",
+      "Meaning": "名词，指‘被宠坏的孩子、任性的人’，含贬义；网络俚语中有时用于自嘲或调侃。",
+      "Example": "He acted like a brat when his PR got rejected without review.",
+      "ExampleTranslator": "当他的拉取请求未经审查就被拒时，他表现得像个被宠坏的孩子。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>😤 <strong>情绪管理反面教材</strong>：<br>职场中应避免 bratty behavior（任性行为）。<br>✅ 近义：spoiled child, tantrum-thrower<br>💡 谐音记忆：‘brat’ 听起来像 ‘bratwurst’（德国香肠）— 但别混淆！<br>⚠️ 使用场景：非正式，慎用于专业沟通。</p>"
+    },
+    {
+      "Word": "beg",
+      "Phonetic": "英 [beɡ]，美 [beɡ]",
+      "Meaning": "动词，意为‘恳求、乞求’；在口语中可表强烈建议（如 ‘It begs the question...’）。",
+      "Example": "The inconsistent API responses beg for a unified error-handling strategy.",
+      "ExampleTranslator": "不一致的 API 响应迫切需要一套统一的错误处理策略。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🙏 <strong>修辞强调动词</strong>：<br>技术讨论常用：<em>This begs the question...</em>（这引出了一个问题…）<br>✅ 原 JSON 中为 'begs'（第三人称单数），已还原为原形 <strong>beg</strong>；其第三人称单数为 <em>begs</em>，过去式为 <em>begged</em>。<br>🔁 正确用法：‘begs the question’ ≠ ‘raises the question’（常见误用）。</p>"
+    },
+    {
+      "Word": "bulge",
+      "Phonetic": "英 [bʌldʒ]，美 [bʌldʒ]",
+      "Meaning": "动词/名词，指‘鼓起、凸出’；在数据或性能分析中可比喻‘突增’。",
+      "Example": "The server costs bulged last month due to unexpected traffic spikes.",
+      "ExampleTranslator": "由于意外的流量激增，上个月服务器成本大幅上涨。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📈 <strong>异常增长隐喻</strong>：<br>1. Physical: a bulge in the cable<br>2. Data: a bulge in the metric curve<br>✅ 原 JSON 中为 'bulges'（第三人称单数），已还原为原形 <strong>bulge</strong>；其第三人称单数为 <em>bulges</em>。<br>📊 反义：dip, drop, flatten.</p>"
+    },
+    {
+      "Word": "Isabella",
+      "Phonetic": "英 [ˌɪzəˈbelə]，美 [ˌɪzəˈbelə]",
+      "Meaning": "专有名词，常见女性英文名，无普通词汇含义。",
+      "Example": "Isabella designed the new onboarding flow that increased user retention by 20%.",
+      "ExampleTranslator": "伊莎贝拉设计了新的用户引导流程，使用户留存率提升了 20%。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>✨ <strong>产品设计角色</strong>：<br>在 UX/UI 团队、用户研究中自然出现。<br>✅ 发音：/ˌɪzəˈbelə/，重音在第三音节。<br>👑 趣味联想：历史上多位 Queen Isabella，象征决策力。</p>"
+    },
+    {
+      "Word": "veteran",
+      "Phonetic": "英 [ˈvetərən]，美 [ˈvetərən]",
+      "Meaning": "名词/形容词，作名词指‘经验丰富的老手、退伍军人’；作形容词表示‘资深的’。",
+      "Example": "We paired the new hire with a veteran engineer for mentorship.",
+      "ExampleTranslator": "我们将新员工与一位资深工程师配对，进行指导。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🎖️ <strong>经验价值关键词</strong>：<br>1. Industry veteran（行业老将）<br>2. Veteran developer（资深开发者）<br>✅ 单复数：veteran → veterans<br>🔁 对比：<em>novice</em>（新手）vs <em>veteran</em>（老手）<br>💼 职场用语：‘a veteran of three startups’。</p>"
+    },
+    {
+      "Word": "fat",
+      "Phonetic": "英 [fæt]，美 [fæt]",
+      "Meaning": "形容词/名词，作形容词指‘胖的、肥的’；在技术中可指‘冗余的、资源消耗大的’（如 fat binary, fat model）。",
+      "Example": "The legacy codebase is fat with unused dependencies.",
+      "ExampleTranslator": "这个遗留代码库因包含大量未使用的依赖而显得臃肿。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🗑️ <strong>技术隐喻（带贬义）</strong>：<br>1. Fat JAR（包含所有依赖的可执行 JAR）<br>2. Fat model（业务逻辑过重的模型）<br>✅ 原 JSON 中为 'fattest'（最高级），但基础词应为 <strong>fat</strong>；其最高级为 <em>fattest</em>。<br>⚠️ 描述人时敏感，技术场景中较安全。</p>"
+    },
+    {
+      "Word": "impossible",
+      "Phonetic": "英 [ɪmˈpɒsəbl]，美 [ɪmˈpɑːsəbl]",
+      "Meaning": "形容词，意为‘不可能的、无法实现的’；在创新语境中常被挑战（如 ‘Nothing is impossible’）。",
+      "Example": "What seemed impossible a decade ago—real-time translation—is now a standard feature.",
+      "ExampleTranslator": "十年前看似不可能的事情——实时翻译——如今已成为标准功能。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🚀 <strong>突破性思维反衬词</strong>：<br>科技史就是不断把 ‘impossible’ 变成 ‘I’m possible’ 的过程。<br>✅ 构词：<em>im-</em>（否定）+ <em>possible</em>（可能的）<br>🔁 反义：feasible, achievable, viable<br>💡 名言联想：‘The only impossible journey is the one you never begin.’</p>"
+    },
+    {
+      "Word": "kid",
+      "Phonetic": "英 [kɪd]，美 [kɪd]",
+      "Meaning": "名词/动词，作名词指‘小孩’；作动词意为‘开玩笑’（非正式，常用于 ‘just kidding’）。",
+      "Example": "Don’t worry—I was just kidding about the broken build!",
+      "ExampleTranslator": "别担心——我刚才说构建坏了只是在开玩笑！",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>😄 <strong>职场幽默边界</strong>：<br>‘Kidding’ 常用于缓解紧张，但需注意场合。<br>✅ 原 JSON 中为 'kids'（复数/第三人称单数），已还原为单数/原形 <strong>kid</strong>；其复数为 <em>kids</em>，动词第三人称单数为 <em>kids</em>。<br>💬 固定搭配：just kidding, kid around（胡闹）。</p>"
+    },
+    {
+      "Word": "record",
+      "Phonetic": "英 [ˈrekɔːd]（名词） / [rɪˈkɔːd]（动词），美 [ˈrekərd] / [rɪˈkɔːrd]",
+      "Meaning": "名词/动词，作名词指‘记录、档案’；作动词意为‘录制、记录’。在数据库中特指‘一条数据记录’。",
+      "Example": "Each user action is recorded in the audit log as a separate record.",
+      "ExampleTranslator": "每个用户操作都会作为一条独立记录被记入审计日志。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💾 <strong>多音多义核心词</strong>：<br>• 名词（重音在前）：database record<br>• 动词（重音在后）：record a meeting<br>✅ 单复数：record → records<br>📊 技术场景：CRUD（Create, Read, Update, Delete）操作对象即 records。</p>"
+    },
+    {
+      "Word": "seventy",
+      "Phonetic": "英 [ˈsevnti]，美 [ˈsevnti]",
+      "Meaning": "数词，表示数字 70。",
+      "Example": "The system achieved seventy percent test coverage after the refactor.",
+      "ExampleTranslator": "重构后，系统测试覆盖率达到了百分之七十。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>7️⃣0️⃣ <strong>发音要点</strong>：<br>/ˈsevnti/ — 注意中间是 /vn/，不是 /vən/。<br>🧠 构词：seven + -ty（几十）→ seventy<br>📊 对比：seventeen（17）重音在 teen，seventy（70）重音在首音节。</p>"
+    },
+    {
+      "Word": "splash",
+      "Phonetic": "英 [splæʃ]，美 [splæʃ]",
+      "Meaning": "动词/名词，指‘溅起水花、泼洒’；在 UI 中特指‘启动页（splash screen）’。",
+      "Example": "The app shows a branded splash screen while loading assets.",
+      "ExampleTranslator": "应用在加载资源时会显示一个带有品牌标识的启动页。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📱 <strong>移动端开发术语</strong>：<br>Splash screen = 应用启动时的过渡画面。<br>✅ 搭配：splash page（网页版）, splash effect（视觉动效）<br>🔊 拟声记忆：/splæʃ/ ≈ 水花声！</p>"
+    },
+    {
+      "Word": "overflow",
+      "Phonetic": "英 [ˌəʊvəˈfləʊ]，美 [ˌoʊvərˈfloʊ]",
+      "Meaning": "动词/名词，指‘溢出、超出容量’；在编程中特指‘缓冲区溢出（buffer overflow）’或 CSS 中的内容溢出。",
+      "Example": "The integer overflow caused the counter to reset to zero unexpectedly.",
+      "ExampleTranslator": "整数溢出导致计数器意外地重置为零。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⚠️ <strong>安全与布局关键词</strong>：<br>1. Security: buffer overflow（高危漏洞）<br>2. CSS: overflow: hidden/scroll<br>✅ 原 JSON 中为 'overflows'（第三人称单数），已还原为原形 <strong>overflow</strong>；其第三人称单数为 <em>overflows</em>。<br>🧯 防御：input validation, use safe libraries.</p>"
+    },
+    {
+      "Word": "heartbeat",
+      "Phonetic": "英 [ˈhɑːtbiːt]，美 [ˈhɑːrtbiːt]",
+      "Meaning": "名词，指‘心跳’；在分布式系统中指‘心跳信号（heartbeat signal）’，用于检测服务存活状态。",
+      "Example": "The monitoring system uses a heartbeat mechanism to detect node failures.",
+      "ExampleTranslator": "监控系统使用心跳机制来检测节点故障。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💓 <strong>系统健康监测隐喻</strong>：<br>服务如生命体，需定期发送 heartbeat 证明‘我还活着’。<br>✅ 构词：heart + beat（复合名词）<br>⚙️ 技术实现：TCP keep-alive, Kubernetes liveness probe.</p>"
+    },
+    {
+      "Word": "erupt",
+      "Phonetic": "英 [ɪˈrʌpt]，美 [ɪˈrʌpt]",
+      "Meaning": "动词，意为‘爆发、喷发’；可指火山、冲突、情绪或突发事件（如线上故障）。",
+      "Example": "A critical bug erupted in production right after the holiday release.",
+      "ExampleTranslator": "一个严重 bug 在假期发布后立即在生产环境中爆发了。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌋 <strong>突发危机动词</strong>：<br>1. Volcano erupts<br>2. Conflict erupts<br>3. Bug erupts in prod<br>✅ 原 JSON 中为 'erupts'（第三人称单数），已还原为原形 <strong>erupt</strong>；其第三人称单数为 <em>erupts</em>，过去式为 <em>erupted</em>。<br>🔥 词根：<em>e-</em>（出）+ <em>rupt</em>（破）→ 突然破裂而出。</p>"
+    },
+    {
+      "Word": "war",
+      "Phonetic": "英 [wɔː(r)]，美 [wɔːr]",
+      "Meaning": "名词/动词，指‘战争’；在商业或技术中常作比喻，如 ‘browser war’, ‘format war’。",
+      "Example": "The team declared war on technical debt this quarter.",
+      "ExampleTranslator": "团队本季度向技术债务宣战。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⚔️ <strong>竞争隐喻</strong>：<br>1. Browser wars（浏览器大战）<br>2. War room（作战室，指应急响应会议室）<br>✅ 搭配：declare war on..., win the war against bugs<br>💡 注意：避免过度军事化语言，可用 ‘campaign’ 替代。</p>"
+    },
+    {
+      "Word": "crew",
+      "Phonetic": "英 [kruː]，美 [kruː]",
+      "Meaning": "名词，指‘全体船员、团队成员’；在敏捷开发中可指‘项目组全体成员’。",
+      "Example": "The entire crew joined the retrospective to discuss what went well.",
+      "ExampleTranslator": "全体成员参加了回顾会议，讨论哪些地方做得好。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👥 <strong>团队协作术语</strong>：<br>1. Flight crew<br>2. Film crew<br>3. Dev crew（非正式）<br>✅ 单复数同形？否！复数仍为 <em>crews</em>（但通常作集合名词用单数动词）。<br>🚢 联想：‘crew’ 源自法语，原指‘一群’。</p>"
+    },
+    {
+      "Word": "beauty",
+      "Phonetic": "英 [ˈbjuːti]，美 [ˈbjuːti]",
+      "Meaning": "名词，指‘美、美人、美好的事物’；在技术中可赞叹简洁优雅的设计（如 ‘the beauty of this algorithm’）。",
+      "Example": "The beauty of the solution lies in its simplicity and scalability.",
+      "ExampleTranslator": "该解决方案之美在于其简洁性和可扩展性。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💎 <strong>美学评价词</strong>：<br>程序员也追求 beauty：<br>- beautiful code<br>- elegant architecture<br>✅ 原 JSON 中为 'beauties'（复数），已还原为单数 <strong>beauty</strong>；其复数为 <em>beauties</em>（指多个美人或美好事物）。<br>🎨 对比：elegance, grace, simplicity.</p>"
+    },
+    {
+      "Word": "blow",
+      "Phonetic": "英 [bləʊ]，美 [bloʊ]",
+      "Meaning": "动词/名词，指‘吹、爆炸、浪费’；在运维中可指‘系统崩溃’（slang: blow up）。",
+      "Example": "The server blew up under heavy load during the live demo.",
+      "ExampleTranslator": "服务器在直播演示期间因高负载而崩溃了。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💥 <strong>多义动词（含俚语）</strong>：<br>1. Blow air（吹气）<br>2. Blow a fuse（烧断保险丝）<br>3. Blow the deadline（错过截止日期）<br>✅ 原 JSON 中为 'blowing'（现在分词），已还原为原形 <strong>blow</strong>；其现在分词为 <em>blowing</em>，过去式为 <em>blew</em>。<br>⚠️ 注意：‘blow up’ = 爆炸 or 放大（歧义！）</p>"
+    },
+    {
+      "Word": "great",
+      "Phonetic": "英 [ɡreɪt]，美 [ɡreɪt]",
+      "Meaning": "形容词，意为‘伟大的、极好的、重要的’；在日常交流中常作感叹（Great! = 好极了！）。",
+      "Example": "Great job on fixing the race condition—users haven’t reported any issues since!",
+      "ExampleTranslator": "修复竞态条件的工作做得太棒了——用户从那以后再没报告过问题！",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👍 <strong>积极反馈高频词</strong>：<br>1. Great work!<br>2. Great idea!<br>3. Great Scott!（老派感叹）<br>✅ 注意：过度使用会显得敷衍，可替换为 specific praise（如 ‘clever fix!’）。<br>🌟 同义：awesome, excellent, fantastic（按正式程度排序）。</p>"
+    },
+    {
+      "Word": "quarterly",
+      "Phonetic": "英 [ˈkwɔːtəli]，美 [ˈkwɔːrtərli]",
+      "Meaning": "形容词/副词，指‘每季度的（地）’；在商业中常用于财报、目标回顾等周期性活动。",
+      "Example": "We align our engineering OKRs with the company’s quarterly business reviews.",
+      "ExampleTranslator": "我们将工程团队的 OKR 与公司季度业务评审对齐。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📅 <strong>企业节奏关键词</strong>：<br>1. Quarterly report<br>2. Quarterly planning<br>3. Q1, Q2, Q3, Q4<br>✅ 构词：<em>quarter</em>（四分之一）+ <em>-ly</em>（形容词/副词后缀）<br>📊 联想：Fiscal year → 4 quarters → 12 months.</p>"
+    },
+    {
+      "Word": "number",
+      "Phonetic": "英 [ˈnʌmbə(r)]，美 [ˈnʌmbər]",
+      "Meaning": "名词/动词，作名词指‘数字、号码、数量’；作动词意为‘编号、总计’。",
+      "Example": "The number of daily active users crossed one million this week.",
+      "ExampleTranslator": "本周日活跃用户数突破了一百万。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>#️⃣ <strong>数据度量基础</strong>：<br>1. Phone number<br>2. Serial number<br>3. A large number of requests<br>✅ 原 JSON 中为 'numbers'（复数），已还原为单数 <strong>number</strong>；其复数为 <em>numbers</em>。<br>🔢 搭配：prime number, even/odd number, assign a number.</p>"
+    },
+    {
+      "Word": "month",
+      "Phonetic": "英 [mʌnθ]，美 [mʌnθ]",
+      "Meaning": "名词，指‘月、月份’；常用于项目周期、账单周期、订阅服务等时间单位。",
+      "Example": "The SaaS platform charges on a per-month basis with annual discounts.",
+      "ExampleTranslator": "该 SaaS 平台按月收费，并提供年度折扣。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🗓️ <strong>时间计量单位</strong>：<br>1. Billing cycle: monthly<br>2. Project timeline: 3-month sprint<br>✅ 单复数：month → months<br>📆 记忆：一年 12 months，拼写注意 /θ/ 音（非 /s/）。</p>"
+    },
+    {
+      "Word": "forearm",
+      "Phonetic": "英 [ˈfɔːrɑːm]，美 [ˈfɔːrærm]",
+      "Meaning": "名词，指‘前臂’；在人体工学中常涉及键盘鼠标使用姿势。",
+      "Example": "Ergonomic keyboards help reduce strain on the forearms during long coding sessions.",
+      "ExampleTranslator": "人体工学键盘有助于在长时间编码时减轻前臂压力。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🦾 <strong>健康办公关键词</strong>：<br>程序员职业病预防重点部位之一。<br>✅ 构词：fore-（前）+ arm（手臂）→ forearm<br>🩺 搭配：forearm pain, wrist rest, RSI（重复性劳损）。</p>"
+    },
+    {
+      "Word": "jaw",
+      "Phonetic": "英 [dʒɔː]，美 [dʒɔː]",
+      "Meaning": "名词，指‘下巴、颌骨’；常与紧张、惊讶等表情相关（如 ‘drop your jaw’）。",
+      "Example": "He clenched his jaw when the client demanded an impossible deadline.",
+      "ExampleTranslator": "当客户要求一个不可能完成的截止日期时，他紧咬牙关。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>😬 <strong>微表情身体部位</strong>：<br>1. Jaw drops（惊讶）<br>2. Clench jaw（紧张/愤怒）<br>✅ 单复数：jaw → jaws（但通常用单数指人类下巴）<br>🦷 解剖：upper jaw（上颌），lower jaw（下颌）。</p>"
+    },
+    {
+      "Word": "main",
+      "Phonetic": "英 [meɪn]，美 [meɪn]",
+      "Meaning": "形容词/名词，作形容词指‘主要的、最重要的’；在编程中常指‘主函数（main function）’或‘主分支（main branch）’。",
+      "Example": "All feature branches must be merged into main after passing CI checks.",
+      "ExampleTranslator": "所有功能分支在通过 CI 检查后必须合并到主分支。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🏠 <strong>核心路径标识</strong>：<br>1. main() function（C/Java 入口）<br>2. main branch（Git 默认分支，取代 master）<br>✅ 搭配：main idea, main thread, main event loop<br>🔄 反义：secondary, auxiliary, side.</p>"
+    },
+    {
+      "Word": "event",
+      "Phonetic": "英 [ɪˈvent]，美 [ɪˈvent]",
+      "Meaning": "名词，指‘事件、活动’；在编程中特指‘事件驱动架构中的事件（如 click event）’。",
+      "Example": "The frontend listens for user events like clicks and keypresses.",
+      "ExampleTranslator": "前端监听用户的点击和按键等事件。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🖱️ <strong>交互编程基石</strong>：<br>1. Event loop<br>2. Event handler<br>3. Custom event<br>✅ 单复数：event → events<br>📡 架构模式：Event-driven architecture (EDA)。</p>"
+    },
+    {
+      "Word": "stray",
+      "Phonetic": "英 [streɪ]，美 [streɪ]",
+      "Meaning": "动词/形容词/名词，作动词指‘走失、偏离’；作形容词指‘迷路的、零星的’。",
+      "Example": "A stray process was consuming CPU even after the service shut down.",
+      "ExampleTranslator": "一个残留进程在服务关闭后仍在消耗 CPU。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🐾 <strong>系统清理关键词</strong>：<br>1. Stray process（残留进程）<br>2. Stray file（孤立文件）<br>✅ 动词过去式：strayed<br>🧹 运维命令：ps aux | grep ... → kill stray processes.</p>"
+    },
+    {
+      "Word": "flower",
+      "Phonetic": "英 [ˈflaʊə(r)]，美 [ˈflaʊər]",
+      "Meaning": "名词/动词，作名词指‘花’；作动词意为‘开花、繁荣’（较文学化）。",
+      "Example": "The garden-themed UI uses soft flower icons for the wellness app.",
+      "ExampleTranslator": "这款健康应用的花园主题界面使用了柔和的花朵图标。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌸 <strong>设计元素+隐喻</strong>：<br>1. Flower icon（UI 装饰）<br>2. The project finally flowered after two years.（项目终于开花结果）<br>✅ 原 JSON 中为 'Flowers'（复数/首字母大写），已标准化为单数 <strong>flower</strong>；其复数为 <em>flowers</em>。<br>🎨 搭配：wildflower, bouquet, floral pattern.</p>"
+    },
+    {
+      "Word": "penthouse",
+      "Phonetic": "英 [ˈpenthaʊs]，美 [ˈpenthaʊs]",
+      "Meaning": "名词，指‘顶层豪华公寓’；在营销或比喻中象征成功、高端地位。",
+      "Example": "After the IPO, the founders joked about buying a penthouse in Manhattan.",
+      "ExampleTranslator": "上市后，创始人们开玩笑说要在曼哈顿买一套顶层公寓。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🏙️ <strong>成功象征隐喻</strong>：<br>1. Literal: luxury apartment on top floor<br>2. Figurative: peak of success<br>✅ 单复数：penthouse → penthouses<br>🏢 对比：loft（阁楼式公寓）, studio（单间公寓）。</p>"
+    },
+    {
+      "Word": "residence",
+      "Phonetic": "英 [ˈrezɪdəns]，美 [ˈrezɪdəns]",
+      "Meaning": "名词，指‘住所、居住地’；比 ‘home’ 更正式，常用于法律、官方文件。",
+      "Example": "Please update your official residence address in the HR system.",
+      "ExampleTranslator": "请在人力资源系统中更新您的官方居住地址。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🏡 <strong>正式地址用语</strong>：<br>1. Legal residence<br>2. Country of residence<br>✅ 词根：<em>sid</em>（坐）→ reside（居住）→ residence<br>📋 对比：<em>home</em>（情感）vs <em>residence</em>（法律/地理）。</p>"
+    },
+    {
+      "Word": "decadence",
+      "Phonetic": "英 [ˈdekədəns]，美 [ˈdekədəns]",
+      "Meaning": "名词，指‘颓废、堕落、奢侈放纵’；在描述过度消费或浮华设计时使用。",
+      "Example": "The UI felt like visual decadence—too many animations and gradients.",
+      "ExampleTranslator": "这个用户界面显得视觉上过于奢靡——动画和渐变效果太多了。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🎭 <strong>批判性美学词</strong>：<br>1. Moral decadence<br>2. Design decadence（过度设计）<br>✅ 词根：<em>de-</em>（下）+ <em>cadere</em>（拉丁语“落下”）→ 衰落<br>📉 反义：austerity, minimalism, restraint.</p>"
+    },
+    {
+      "Word": "amber",
+      "Phonetic": "英 [ˈæmbə(r)]，美 [ˈæmbər]",
+      "Meaning": "名词/形容词，指‘琥珀色、黄褐色’；在状态指示中表示‘警告’（介于 green 和 red 之间）。",
+      "Example": "The deployment status turned amber, indicating partial failure.",
+      "ExampleTranslator": "部署状态变为琥珀色，表示部分失败。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🟠 <strong>状态颜色语义</strong>：<br>交通灯模型：<br>- Green: OK<br>- <strong>Amber</strong>: Warning<br>- Red: Critical<br>✅ 自然界：amber = fossilized tree resin（化石树脂）<br>🎨 设计系统：use amber for warnings, not errors.</p>"
+    },
+    {
+      "Word": "champagne",
+      "Phonetic": "英 [ʃæmˈpeɪn]，美 [ʃæmˈpeɪn]",
+      "Meaning": "名词，指‘香槟酒’；常用于庆祝成功（如产品发布、融资）。",
+      "Example": "The team popped champagne after shipping the v1.0 release.",
+      "ExampleTranslator": "团队在发布 v1.0 版本后开了香槟庆祝。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍾 <strong>里程碑庆祝符号</strong>：<br>1. Product launch<br>2. Funding round closed<br>✅ 注意：只有法国香槟区产的起泡酒才能叫 Champagne（受地理标志保护）<br>🎉 搭配：pop champagne, champagne toast.</p>"
+    },
+  {
+    "Word": "chill",
+    "Phonetic": "英 [tʃɪl]，美 [tʃɪl]",
+    "Meaning": "动词/形容词/名词，作动词指‘冷却、放松’；作形容词意为‘冷静的、随和的’（slang）。",
+    "Example": "Let’s chill for a bit before the next debugging session.",
+    "ExampleTranslator": "在下一轮调试之前，我们先放松一下吧。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": ""
+  },
+  {
+    "Word": "size",
+    "Phonetic": "英 [saɪz]，美 [saɪz]",
+    "Meaning": "名词/动词，作名词指‘大小、尺寸、规模’；作动词意为‘估量大小、按尺寸裁剪’。在技术中常用于描述数据量、资源占用或屏幕适配。",
+    "Example": "The Docker image size was reduced by 40% after removing unused dependencies.",
+    "ExampleTranslator": "移除未使用的依赖后，Docker 镜像体积减少了 40%。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📏 <strong>资源优化核心指标</strong>：<br>1. File size<br>2. Payload size<br>3. Screen size (responsive design)<br>✅ 单复数：size → sizes<br>📊 搭配：right-size resources, oversized response, disk size quota.</p>"
+  },
+  {
+    "Word": "stage",
+    "Phonetic": "英 [steɪdʒ]，美 [steɪdʒ]",
+    "Meaning": "名词/动词，作名词指‘阶段、舞台、部署环境（如 staging）’；作动词意为‘筹备、上演、暂存（如 git add）’。",
+    "Example": "We stage all changes in the staging environment before pushing to production.",
+    "ExampleTranslator": "我们在将更改推送到生产环境之前，会先在预发环境中进行验证。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎭 <strong>开发流程关键词</strong>：<br>1. Git: git add stages changes<br>2. CI/CD: staging environment<br>3. Project: early stage vs late stage<br>✅ 动词过去式：staged；名词复数：stages<br>🔁 同义（环境）：pre-production, test env.</p>"
+  },
+  {
+    "Word": "Hollywood",
+    "Phonetic": "英 [ˈhɒliwʊd]，美 [ˈhɑːliwʊd]",
+    "Meaning": "专有名词，指美国加利福尼亚州洛杉矶的著名影视产业中心；常用来比喻‘光鲜亮丽但可能浮华的表象’。",
+    "Example": "The demo looked like Hollywood—smooth animations and perfect data—but it was all mocked.",
+    "ExampleTranslator": "这个演示看起来像好莱坞大片——动画流畅、数据完美——但全是模拟的。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎬 <strong>表象 vs 现实隐喻</strong>：<br>技术圈常用 ‘Hollywood-style demo’ 讽刺过度包装的演示。<br>✅ 地理知识：位于洛杉矶，非独立城市<br>💡 联想：‘All that glitters is not gold’ — Hollywood shines, but may lack substance.</p>"
+  },
+  {
+    "Word": "crescent",
+    "Phonetic": "英 [ˈkresnt]，美 [ˈkresnt]",
+    "Meaning": "名词/形容词，指‘新月、弯月形’；也可指新月形物体（如牛角包 croissant）或地名（如 Crescent City）。",
+    "Example": "The app icon features a minimalist crescent moon to indicate night mode.",
+    "ExampleTranslator": "该应用图标采用极简风格的新月图案，表示夜间模式。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🌙 <strong>符号化设计元素</strong>：<br>1. Crescent moon = night/dark mode<br>2. Crescent shape = elegance, subtlety<br>✅ 词源：拉丁语 ‘crescere’（增长）→ 新月是月亮“增长”的开始<br>🥐 趣味：法语 croissant（牛角包）= 小新月（形状像 crescent）</p>"
+  },
+  {
+    "Word": "diamond",
+    "Phonetic": "英 [ˈdaɪəmənd]，美 [ˈdaɪəmənd]",
+    "Meaning": "名词，指‘钻石、菱形’；在 UI/UX 中可指菱形图标或流程图中的判断节点。",
+    "Example": "In the flowchart, each diamond represents a decision point with yes/no branches.",
+    "ExampleTranslator": "在流程图中，每个菱形代表一个带有是/否分支的决策点。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💎 <strong>双重含义词</strong>：<br>1. Gemstone: diamond ring<br>2. Shape: diamond icon, diamond operator (Java generics)<br>✅ 单复数：diamond → diamonds<br>📐 技术联想：UML / BPMN 中，diamond = decision node.</p>"
+  },
+  {
+    "Word": "choker",
+    "Phonetic": "英 [ˈtʃəʊkə(r)]，美 [ˈtʃoʊkər]",
+    "Meaning": "名词，指‘紧贴颈部的短项链’；在时尚或角色设计中常见。",
+    "Example": "Her character design includes a black velvet choker, giving her a gothic vibe.",
+    "ExampleTranslator": "她的角色设计包含一条黑色丝绒颈链，营造出哥特风格。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🖤 <strong>时尚细节词</strong>：<br>1. Fashion accessory: pearl choker, leather choker<br>2. Not to confuse with ‘choke’ (窒息) — though it’s tight, it’s stylish!<br>✅ 单复数：choker → chokers<br>👗 搭配：goth fashion, minimalist jewelry, statement piece.</p>"
+  },
+  {
+    "Word": "spell",
+    "Phonetic": "英 [spel]，美 [spel]",
+    "Meaning": "动词/名词，作动词指‘拼写、意味着’；作名词指‘一段时间、咒语’。在编程中常涉及拼写检查（spell check）。",
+    "Example": "A typo in the config file spelled disaster for the entire deployment.",
+    "ExampleTranslator": "配置文件中的一个拼写错误给整个部署带来了灾难。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔤 <strong>双关记忆点</strong>：<br>1. Spell your name correctly<br>2. This mistake spells trouble<br>3. Magic spell (less common in tech)<br>✅ 动词过去式：spelled 或 spelt（英式）<br>🛠️ 工具：IDE 内置 spell checker for comments/docs.</p>"
+  },
+  {
+    "Word": "title",
+    "Phonetic": "英 [ˈtaɪtl]，美 [ˈtaɪtl]",
+    "Meaning": "名词/动词，作名词指‘标题、头衔、产权’；在网页开发中特指 HTML 的 &lt;title&gt; 标签或窗口标题。",
+    "Example": "Make sure the page title accurately reflects the content for SEO purposes.",
+    "ExampleTranslator": "请确保页面标题准确反映内容，以利于搜索引擎优化。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🏷️ <strong>元数据关键字段</strong>：<br>1. HTML: &lt;title&gt;My Page&lt;/title&gt;<br>2. Job title: Senior Frontend Engineer<br>3. Property title (legal)<br>✅ 单复数：title → titles<br>🔍 SEO 提示：title 是 Google 排名重要因子。</p>"
+  },
+  {
+    "Word": "letter",
+    "Phonetic": "英 [ˈletə(r)]，美 [ˈletər]",
+    "Meaning": "名词，指‘字母、信件’；在编程中常涉及字符串处理（如 uppercase letter）。",
+    "Example": "The password must contain at least one uppercase letter and one digit.",
+    "ExampleTranslator": "密码必须包含至少一个大写字母和一个数字。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>✉️ <strong>字符与通信双重义</strong>：<br>1. Alphabet letter: A–Z, a–z<br>2. Business letter: formal email alternative<br>✅ 单复数：letter → letters<br>🔐 安全规则：password policy often requires specific letter types.</p>"
+  },
+  {
+    "Word": "laser",
+    "Phonetic": "英 [ˈleɪzə(r)]，美 [ˈleɪzər]",
+    "Meaning": "名词/动词，指‘激光’；作动词意为‘用激光照射’或比喻‘专注地聚焦’。",
+    "Example": "She laser-focused on optimizing the critical rendering path.",
+    "ExampleTranslator": "她全神贯注地优化关键渲染路径。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🔦 <strong>科技+专注隐喻</strong>：<br>1. Hardware: laser printer<br>2. Metaphor: laser focus (高度集中)<br>✅ 词源：Light Amplification by Stimulated Emission of Radiation（首字母缩略词）<br>🎯 搭配：laser precision, laser beam, stay laser-focused.</p>"
+  },
+  {
+    "Word": "Emma",
+    "Phonetic": "英 [ˈemə]，美 [ˈemə]",
+    "Meaning": "专有名词，常见英文女性名字，无普通词汇含义。",
+    "Example": "Emma from Data Science built a model that predicts user churn with 92% accuracy.",
+    "ExampleTranslator": "来自数据科学团队的艾玛构建了一个能以 92% 准确率预测用户流失的模型。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>👩‍🔬 <strong>数据角色代表</strong>：<br>在跨职能团队中自然出现的人名。<br>✅ 发音：/ˈemə/，重音在首音节<br>📚 文化联想：Jane Austen 的小说《Emma》— 聪明、有主见的女性形象。</p>"
+  },
+  {
+    "Word": "Stone",
+    "Phonetic": "英 [stəʊn]，美 [stoʊn]",
+    "Meaning": "名词/动词，作名词指‘石头、宝石’；作姓氏时首字母大写（如 Emma Stone）。无普通动词用法在此上下文中。",
+    "Example": "Emma Stone starred in the film that inspired our team's naming convention for microservices.",
+    "ExampleTranslator": "艾玛·斯通主演的那部电影启发了我们团队对微服务的命名规范。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🎬 <strong>姓氏 + 自然物双关</strong>：<br>1. As surname: Emma Stone<br>2. As object: stone wall, milestone<br>✅ 注意：此处为专有名词（姓氏），故保留首字母大写<br>🪨 联想：‘set in stone’ = 不可更改（like immutable infrastructure）</p>"
+  },
+  {
+    "Word": "nervous",
+    "Phonetic": "英 [ˈnɜːvəs]，美 [ˈnɜːrvəs]",
+    "Meaning": "形容词，指‘紧张的、焦虑的、神经质的’；常用于描述演讲、上线前或面试等高压场景。",
+    "Example": "He felt nervous presenting the architecture redesign to the CTO.",
+    "ExampleTranslator": "他在向首席技术官介绍架构重构方案时感到紧张。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>😰 <strong>情绪状态描述</strong>：<br>1. Nervous about a demo<br>2. Nervous system（神经系统，不同义）<br>✅ 词根：nerve（神经）→ nervous<br>🧘 应对：deep breath, practice, remember — everyone gets nervous!</p>"
+  },
+  {
+    "Word": "Margot",
+    "Phonetic": "英 [ˈmɑːɡəʊ]，美 [ˈmɑːrɡoʊ]",
+    "Meaning": "专有名词，女性名字，常见于英语和法语国家，无普通词汇含义。",
+    "Example": "Margot led the accessibility audit and ensured WCAG compliance.",
+    "ExampleTranslator": "玛戈特主导了无障碍审计，并确保符合 WCAG 标准。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>♿ <strong>包容性设计代表</strong>：<br>在 UX、合规、伦理技术讨论中自然出现。<br>✅ 发音：/ˈmɑːrɡoʊ/（美式），重音在首音节<br>🇫🇷 词源：法语，意为“珍珠”（marguerite）</p>"
+  },
+  {
+    "Word": "Robbie",
+    "Phonetic": "英 [ˈrɒbi]，美 [ˈrɑːbi]",
+    "Meaning": "专有名词，常见英文昵称，通常为 Robert 或 Robin 的简称，无普通词汇含义。",
+    "Example": "Robbie automated the weekly report generation using Python scripts.",
+    "ExampleTranslator": "罗比用 Python 脚本自动化了周报生成流程。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🤖 <strong>自动化达人昵称</strong>：<br>在 DevOps、脚本编写场景中亲切使用。<br>✅ 全名可能是 Robert（男）或 Robin（中性）<br>🔧 联想：Robbie → robot → automation（谐音助记）</p>"
+  },
+  {
+    "Word": "Aussie",
+    "Phonetic": "英 [ˈɒzi]，美 [ˈɔːzi]",
+    "Meaning": "名词/形容词，非正式用语，指‘澳大利亚人’或‘澳大利亚的’。",
+    "Example": "Our Aussie colleague suggested using UTC+10 for the Sydney office calendar.",
+    "ExampleTranslator": "我们的澳大利亚同事建议悉尼办公室的日历使用 UTC+10 时区。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🦘 <strong>国籍昵称（非正式）</strong>：<br>1. Aussie rules football<br>2. Aussie accent<br>✅ 来源：Australia → Aussie（典型英语昵称化：-ie/-y 后缀）<br>🌏 正式场合用 ‘Australian’，日常聊天可用 ‘Aussie’</p>"
+  },
+  {
+    "Word": "Zendaya",
+    "Phonetic": "英 [zenˈdaɪ.ə]，美 [zenˈdaɪ.ə]",
+    "Meaning": "专有名词，美国知名女演员及歌手姓名，无普通词汇含义。",
+    "Example": "The team joked that our new UI had 'Zendaya-level elegance'—simple yet stunning.",
+    "ExampleTranslator": "团队开玩笑说，我们的新界面拥有“赞达亚级别的优雅”——简约却惊艳。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🌟 <strong>文化参照人名</strong>：<br>用于比喻优雅、时尚或突破性表现。<br>✅ 发音：/zenˈdaɪ.ə/，重音在第二音节<br>🎭 背景：Zendaya Coleman，因《蜘蛛侠》《沙丘》等作品闻名，代表多元与格调。</p>"
+  },
+  {
+    "Word": "elegant",
+    "Phonetic": "英 [ˈelɪɡənt]，美 [ˈelɪɡənt]",
+    "Meaning": "形容词，指‘优雅的、简洁而高效的’；在工程中常赞美代码或设计的精炼之美。",
+    "Example": "The solution was elegant—just ten lines of code solved a complex synchronization issue.",
+    "ExampleTranslator": "这个解决方案非常优雅——仅用十行代码就解决了复杂的同步问题。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🕊️ <strong>工程师的最高赞美之一</strong>：<br>• Elegant code = simple, readable, efficient<br>• Elegant architecture = minimal coupling, clear boundaries<br>✅ 词根：eligere（拉丁语“挑选”）→ 精挑细选 → 优雅<br>🔁 反义：clunky, bloated, hacky</p>"
+  },
+  {
+    "Word": "carve",
+    "Phonetic": "英 [kɑːv]，美 [kɑːrv]",
+    "Meaning": "动词，指‘雕刻、切开、开拓’；在商业或技术中可比喻‘开辟市场’或‘划分职责’（如 carve out）。",
+    "Example": "The startup carved out a niche in the AI-powered legal tech space.",
+    "ExampleTranslations": "这家初创公司在人工智能驱动的法律科技领域开辟了一片细分市场。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🪓 <strong>创造与分割动词</strong>：<br>1. Carve wood（雕刻）<br>2. Carve out time（挤出时间）<br>3. Carve a niche（开辟利基市场）<br>✅ 过去式：carved<br>💼 商业用语：carve-out（业务剥离）、carve-up（瓜分）</p>"
+  },
+  {
+    "Word": "Ana",
+    "Phonetic": "英 [ˈɑːnə]，美 [ˈɑːnə]",
+    "Meaning": "专有名词，常见女性名字，为 Anna 的变体，无普通词汇含义。",
+    "Example": "Ana configured the CI pipeline to run tests in parallel, cutting build time in half.",
+    "ExampleTranslator": "安娜配置了 CI 流水线以并行运行测试，将构建时间缩短了一半。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚡ <strong>效率提升代表</strong>：<br>在 DevOps、SRE 场景中自然出现。<br>✅ 发音：/ˈɑːnə/，与 ‘banana’ 后两音节同<br>🌍 国际化：Ana 在西班牙语、葡萄牙语、英语中均常见</p>"
+  },
+  {
+    "Word": "Armas",
+    "Phonetic": "英 [ˈɑːrməs]，美 [ˈɑːrməs]",
+    "Meaning": "专有名词，常见西班牙语姓氏，意为‘武器’，但作为人名时无实际含义。",
+    "Example": "Ana de Armas starred in the movie that inspired our spy-themed hackathon.",
+    "ExampleTranslator": "安娜·德·阿玛斯主演的那部电影启发了我们举办间谍主题的黑客松。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🕶️ <strong>文化姓氏识别</strong>：<br>1. Spanish origin surname<br>2. Literally means ‘weapons’ but used as proper noun<br>✅ 注意：作为姓氏，首字母大写，不可直译<br>🎬 联想：Ana de Armas — Cuban-American actress known for action roles</p>"
+  },
+  {
+    "Word": "Cuban",
+    "Phonetic": "英 [ˈkjuːbən]，美 [ˈkjuːbən]",
+    "Meaning": "形容词/名词，指‘古巴的’或‘古巴人’；用于描述国籍、文化或产品来源（如 Cuban coffee）。",
+    "Example": "The team celebrated with Cuban coffee after resolving the critical outage.",
+    "ExampleTranslator": "团队在解决严重故障后，用古巴咖啡庆祝了一下。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>☕ <strong>国籍与文化标签</strong>：<br>1. Cuban citizen<br>2. Cuban music, food, culture<br>✅ 构词：Cuba + -an（表示归属）<br>🌎 注意：描述人时用 ‘Cuban’（中性），避免刻板印象</p>"
+  }
+]
