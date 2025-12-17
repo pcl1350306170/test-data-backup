@@ -22,6 +22,12 @@ CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
 
+# 新增对 VB-Cable 和 VoiceMeeter 的支持
+VIRTUAL_CABLE_KEYWORDS = [
+    'stereo mix', 'what you hear', '立体声混音', 'loopback',
+    'cable output', 'vb-audio', 'voicemeeter', 'virtual audio'
+]
+
 # DB_CONFIG_PATH 按规范定义（即使未使用）
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
 
@@ -166,7 +172,6 @@ class AudioRecorderApp:
     def _start_recording(self):
         try:
             self.p = pyaudio.PyAudio()
-
             # 尝试查找“立体声混音”或默认输入设备
             device_index = None
             for i in range(self.p.get_device_count()):
@@ -174,10 +179,21 @@ class AudioRecorderApp:
                 if dev_info['maxInputChannels'] > 0:
                     # 优先匹配包含 "stereo mix" 或 "what you hear" 的设备（Windows）
                     name_lower = dev_info['name'].lower()
-                    if any(kw in name_lower for kw in ['stereo mix', 'what you hear', '立体声混音', 'loopback']):
+                    if any(kw in name_lower for kw in VIRTUAL_CABLE_KEYWORDS):
                         device_index = i
                         break
             if device_index is None:
+                messagebox.showerror(
+                    "设备错误",
+                    "未找到「立体声混音」、「What U Hear」或「Loopback」设备！\n\n"
+                    "请按以下步骤启用：\n"
+                    "1. 右键点击音量图标 → 声音设置 → 输入设备\n"
+                    "2. 点击「更多声音设置」→ 录制选项卡\n"
+                    "3. 右键空白处 → 勾选「显示禁用的设备」\n"
+                    "4. 启用「立体声混音」并设为默认设备"
+                )
+                self._log("未找到系统声音录制设备", logging.ERROR)
+                return  # ← 直接返回，不启动录音
                 # 若未找到，使用默认输入设备（可能录不到系统声音！）
                 device_index = self.p.get_default_input_device_info()['index']
 

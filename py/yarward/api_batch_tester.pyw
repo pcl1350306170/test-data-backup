@@ -125,7 +125,7 @@ def generate_random_name():
 
     last = random.choice(last_names)
     first = random.choice(first_names)
-    return last + first
+    return first + last
 
 def generate_random_id():
     return ''.join(random.choices(string.digits, k=6))
