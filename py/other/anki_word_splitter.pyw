@@ -103,7 +103,7 @@ class WordSplitterApp:
         """应用配置到界面"""
         self.word_file_path.set(self.config.get("word_file_path", ""))
         # 将过滤词列表转为字符串，每行一个词
-        exclude_str = "\n".join(self.config.get("exclude_words", []))
+        exclude_str = "\n".join(sorted(self.config.get("exclude_words", [])))
         self.exclude_text.delete("1.0", tk.END)
         self.exclude_text.insert("1.0", exclude_str)
 
@@ -125,7 +125,7 @@ class WordSplitterApp:
             # 获取当前配置中的过滤词
             current_exclude_words = set(self.config.get("exclude_words", []))
 
-            # 从文件中提取新单词
+            # 从文件中提取新单词（强制小写）
             new_words = set()
             for item in word_list:
                 word = item.get("Word", "").strip().lower()
@@ -206,7 +206,7 @@ class WordSplitterApp:
                 # 获取当前配置中的过滤词（保留原有）
                 current_exclude_words = set(self.config.get("exclude_words", []))
 
-                # 从文件中提取新单词
+                # 从文件中提取新单词（小写）
                 new_words = set()
                 for item in word_list:
                     word = item.get("Word", "").strip().lower()
@@ -233,7 +233,7 @@ class WordSplitterApp:
                 messagebox.showerror("错误", error_msg)
 
     def split_and_write(self):
-        """拆分句子并写入 JSON"""
+        """拆分句子并写入 JSON，单词统一转为小写"""
         sentence = self.sentence_text.get("1.0", tk.END).strip()
         if not sentence:
             messagebox.showwarning("警告", "请输入要拆分的句子")
@@ -254,44 +254,48 @@ class WordSplitterApp:
             with open(word_file_path, "r", encoding="utf-8") as f:
                 word_list = json.load(f)
 
-            # 拆分句子为单词
+            # 拆分句子为单词（保留原始形式，但内部按小写去重）
             words = self.split_sentence(sentence)
 
-            # 获取过滤词（从文本框中读取）
+            # 获取过滤词（从文本框中读取，转为小写集合）
             exclude_text = self.exclude_text.get("1.0", tk.END).strip()
             exclude_set = set()
             for part in exclude_text.split(','):
                 part = part.strip()
                 if part:
                     exclude_set.update(word.strip().lower() for word in part.split('\n') if word.strip())
+            exclude_set = {w for w in exclude_set if w}
 
-            # 转换为小写集合，用于快速查找重复
-            existing_words = set(item.get("Word", "").lower() for item in word_list)
+            # 构建现有词库的小写集合（用于快速查重）
+            existing_words_lower = set(item.get("Word", "").lower() for item in word_list)
 
-            # 统计
             added_count = 0
             skipped_count = 0
 
             for word in words:
                 lower_word = word.lower()
+
+                # 跳过短词（<3）
                 if len(lower_word) < 3:
                     skipped_count += 1
                     self.log(f"跳过短单词: {word} (长度<{3})")
                     continue
 
+                # 跳过过滤词
                 if lower_word in exclude_set:
                     skipped_count += 1
                     self.log(f"跳过过滤词: {word}")
                     continue
 
-                if lower_word in existing_words:
+                # 跳过已存在单词（按小写判断）
+                if lower_word in existing_words_lower:
                     skipped_count += 1
                     self.log(f"跳过已存在单词: {word}")
                     continue
 
-                # 添加新单词
+                # ✅ 关键：存入小写形式的单词
                 new_entry = {
-                    "Word": word,
+                    "Word": lower_word,  # 统一转为小写
                     "Phonetic": "",
                     "Meaning": "",
                     "Example": "",
@@ -302,15 +306,15 @@ class WordSplitterApp:
                     "imgExample": ""
                 }
                 word_list.append(new_entry)
-                existing_words.add(lower_word)
+                existing_words_lower.add(lower_word)
                 added_count += 1
-                self.log(f"添加新单词: {word}")
+                self.log(f"添加新单词: {lower_word}")
 
             # 写回文件
             with open(word_file_path, "w", encoding="utf-8") as f:
                 json.dump(word_list, f, ensure_ascii=False, indent=2)
 
-            # 更新配置中的 exclude_words（添加新添加的单词）
+            # 更新过滤词（包含新添加的单词）
             self.update_exclude_words_after_split(word_list)
 
             self.log(f"拆分完成！新增: {added_count}, 跳过: {skipped_count}")
@@ -323,48 +327,35 @@ class WordSplitterApp:
             messagebox.showerror("错误", error_msg)
 
     def update_exclude_words_after_split(self, word_list):
-        """拆分完成后更新配置中的 exclude_words"""
+        """拆分完成后更新配置中的 exclude_words（全部小写）"""
         try:
-            # 获取当前配置中的过滤词
             current_exclude_words = set(self.config.get("exclude_words", []))
-
-            # 从词库中提取所有单词
             all_words = set()
             for item in word_list:
                 word = item.get("Word", "").strip().lower()
                 if word:
                     all_words.add(word)
-
-            # 合并：保留原有 + 词库中的单词
             updated_words = current_exclude_words.union(all_words)
-
-            # 更新配置
-            self.config["exclude_words"] = list(updated_words)
-
-            # 更新界面显示
+            self.config["exclude_words"] = sorted(updated_words)
             exclude_str = "\n".join(sorted(updated_words))
             self.exclude_text.delete("1.0", tk.END)
             self.exclude_text.insert("1.0", exclude_str)
-
             self.log(f"拆分后更新过滤词：总计过滤词: {len(updated_words)} 个")
-
         except Exception as e:
             error_msg = f"更新过滤词失败: {e}"
             logging.error(error_msg)
             self.log(error_msg)
 
     def split_sentence(self, sentence):
-        """拆分句子为单词"""
-        # 使用正则表达式拆分，保留字母数字组成的单词
+        """拆分句子为单词，返回去重后的列表（保留原始形式，但内部按小写去重）"""
         words = re.findall(r'\b[a-zA-Z]+\b', sentence)
-        # 去重，保持顺序
         seen = set()
         result = []
         for word in words:
             lower_word = word.lower()
-            if lower_word not in seen:
+            if lower_word not in seen and len(lower_word) >= 3:
                 seen.add(lower_word)
-                result.append(word)
+                result.append(word)  # 保留原始用于日志，但最终存小写
         return result
 
     def clear_log(self):

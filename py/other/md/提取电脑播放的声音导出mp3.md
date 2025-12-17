@@ -142,4 +142,6 @@ break
 怎么用？ 1. 播放设备设为 CABLE Input<br>2. 录音设备选 CABLE Output
 ✅ 结论：只要你正确配置音频路由，“Cable Output” 是录制系统声音的绝佳选择！
 
-![配置图](https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/md/Snipaste_2025-12-17_10-57-29.png)
+---
+
+![开发者模式](https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/md/Snipaste_2025-12-17_10-57-29.png)
