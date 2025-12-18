@@ -1,8 +1,8 @@
 {
-  "last_json": "C:/www/test/py/qwen/output/test_enhanced.json",
-  "last_apkg_name": "评重楼CORK",
+  "last_json": "C:/www/test/py/other/json/wordJson/A绿山墙的安妮-2025年12月18日-1.json",
+  "last_apkg_name": "评重楼Novel",
   "export_dir": "D:/附件/Anki",
-  "tts_engine": "edge",
+  "tts_engine": "gtts",
   "google_cred_path": "",
   "qwen_api_key": ""
 }

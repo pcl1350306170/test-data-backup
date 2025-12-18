@@ -214,7 +214,7 @@ class YarwardUpgradeGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Yarward 门诊前端一键升级")
-        self.root.geometry("650x480")
+        self.root.geometry("650x580")
         self.root.resizable(False, False)
 
         self.config = load_config()
@@ -225,13 +225,24 @@ class YarwardUpgradeGUI:
         frame_server.pack(pady=5, padx=10, fill=X)
 
         Label(frame_server, text="服务器地址:").grid(row=0, column=0, sticky=W, pady=3)
-        self.server_var = StringVar(value=self.config.get("last_server", ""))
-        server_entry = Entry(frame_server, textvariable=self.server_var, width=30)
-        server_entry.grid(row=0, column=1, padx=5, pady=3)
+        self.server_var = StringVar()
+        server_list = list(self.config.get("servers", {}).keys())
+        if not server_list:
+            server_list = [""]  # 避免空列表
+        self.server_combo = ttk.Combobox(
+            frame_server,
+            textvariable=self.server_var,
+            values=server_list,
+            width=28,
+            state="normal"  # 允许手动输入新地址
+        )
+        self.server_combo.grid(row=0, column=1, padx=5, pady=3)
+        self.server_combo.bind("<<ComboboxSelected>>", self.on_server_selected)
+        self.server_combo.bind("<KeyRelease>", self.on_server_typed)  # 支持手动输入
 
-        Label(frame_server, text="通用密码:").grid(row=1, column=0, sticky=W, pady=3)
-        self.pwd_var = StringVar(value=self.config.get("common_password", ""))
-        pwd_entry = Entry(frame_server, textvariable=self.pwd_var, show="*", width=30)
+        Label(frame_server, text="密码:").grid(row=1, column=0, sticky=W, pady=3)
+        self.pwd_var = StringVar()
+        pwd_entry = Entry(frame_server, textvariable=self.pwd_var, width=30)  # 明文！
         pwd_entry.grid(row=1, column=1, padx=5, pady=3)
 
         Button(frame_server, text="保存配置", command=self.save_server_config).grid(row=0, column=2, rowspan=2, padx=10)
@@ -261,6 +272,24 @@ class YarwardUpgradeGUI:
         self.progress = ttk.Progressbar(self.root, mode='indeterminate')
         self.progress.pack(padx=20, fill=X)
 
+    def on_server_selected(self, event=None):
+        """当选中已有服务器时，自动填入密码"""
+        host = self.server_var.get().strip()
+        servers = self.config.get("servers", {})
+        if host in servers:
+            self.pwd_var.set(servers[host])
+        else:
+            self.pwd_var.set("")
+
+    def on_server_typed(self, event=None):
+        """当手动输入服务器时，清空密码（除非恰好匹配已存）"""
+        host = self.server_var.get().strip()
+        servers = self.config.get("servers", {})
+        if host in servers:
+            self.pwd_var.set(servers[host])
+        else:
+            self.pwd_var.set("")
+
     def save_server_config(self):
         server = self.server_var.get().strip()
         pwd = self.pwd_var.get().strip()
@@ -273,6 +302,9 @@ class YarwardUpgradeGUI:
             self.config["servers"] = {}
         self.config["servers"][server] = pwd
         save_config(self.config)
+        # 更新下拉框选项
+        current_values = list(self.config["servers"].keys())
+        self.server_combo['values'] = current_values
         messagebox.showinfo("成功", "服务器配置已保存！")
 
     def select_path(self):
@@ -305,16 +337,40 @@ class YarwardUpgradeGUI:
             messagebox.showerror("错误", "所选路径不是有效压缩包！")
             return
 
-        password = ""
-        if host in self.config.get("servers", {}):
-            password = self.config["servers"][host]
+        password = self.pwd_var.get().strip()
+        if password:
+            # 如果用户已输入密码，直接使用
+            final_password = password
         else:
-            password = self.config.get("common_password", "")
+            # 尝试默认密码列表
+            DEFAULT_PASSWORDS = ["Yahua3585668", "yh123456", "Huawei@123"]
+            final_password = None
+            for pwd in DEFAULT_PASSWORDS:
+                try:
+                    self.progress_label.config(text=f"尝试默认密码: {pwd}")
+                    self.root.update()
+                    # 快速测试连接
+                    test_client = get_ssh_client(host, password=pwd, timeout=5)
+                    test_client.close()
+                    final_password = pwd
+                    self.pwd_var.set(pwd)  # 填入成功密码
+                    break
+                except Exception as e:
+                    logger.warning(f"密码 {pwd} 连接失败: {e}")
+                    continue
 
-        if not password:
-            password = simpledialog.askstring("输入密码", f"未找到 {host} 的密码，请手动输入（用户名：root）：", show='*')
-            if not password:
-                return
+            if final_password is None:
+                # 所有默认密码都失败，弹出手动输入
+                pwd_input = simpledialog.askstring(
+                    "密码错误",
+                    f"默认密码（123456/888888/666666）均无法连接 {host}。\n"
+                    "请手动输入 root 密码：",
+                    parent=self.root
+                )
+                if not pwd_input:
+                    return
+                final_password = pwd_input
+                self.pwd_var.set(final_password)  # 记住这次输入
 
         self.progress.start(10)
         self.progress_label.config(text="准备升级...")

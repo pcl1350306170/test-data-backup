@@ -1,0 +1,1330 @@
+[
+  {
+    "Word": "conscience",
+    "Phonetic": "英 [ˈkɒnʃəns]，美 [ˈkɑːnʃəns]",
+    "Meaning": "n. 良心；良知；道德心",
+    "Example": "Anne's conscience troubled her after she lied about breaking the dish.",
+    "ExampleTranslator": "安妮在撒谎说自己没打碎盘子后，良心备受煎熬。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：con-（共同）+ sci（知道，如science科学）+ -ence（名词后缀）→ 大家都知道的道德准则→良心。</p><p><strong>场景记忆</strong>：想象绿山墙的安妮做错事后内心不安的样子，就能记住conscience是良心啦。</p>"
+  },
+  {
+    "Word": "take",
+    "Phonetic": "英 [teɪk]，美 [teɪk]",
+    "Meaning": "v. 拿；取；带走；接受；花费等",
+    "Example": "Marilla took Anne to Green Gables to live with her and Matthew.",
+    "ExampleTranslator": "玛丽拉把安妮带到绿山墙，让她和自己以及马修一起生活。",
+    "AIHelp": "<p><strong>提示</strong>：taken是take的过去分词。</p><p><strong>对比近义词</strong>：take、bring、fetch都有“拿”的意思，take强调从说话者处带走，如Take this book to the library.；bring强调带到说话者处，如Bring the book to me.；fetch强调去取再带回，如Fetch the doctor.。</p><p><strong>造句强化（日常）</strong>：I take a walk every morning.（我每天早上散步。）</p>"
+  },
+  {
+    "Word": "accordingly",
+    "Phonetic": "英 [əˈkɔːdɪŋli]，美 [əˈkɔːrdɪŋli]",
+    "Meaning": "adv. 因此；于是；相应地",
+    "Example": "The weather was bad, accordingly, we canceled the picnic planned in the backyard.",
+    "ExampleTranslator": "天气很糟糕，因此我们取消了在后院计划的野餐。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：来自according（相符的）+ -ly（副词后缀）→ 相符地→相应地，进而引申为因此。</p><p><strong>职场场景造句</strong>：Please adjust your work plan accordingly to the new requirements.（请根据新要求相应地调整你的工作计划。）</p>"
+  },
+  {
+    "Word": "set",
+    "Phonetic": "英 [set]，美 [set]",
+    "Meaning": "v. 放置；设置；安排；使处于某种状态 n. 一套；一组；布景 adj. 固定的；安排好的",
+    "Example": "Matthew set the table carefully before Anne and Marilla came to dinner.",
+    "ExampleTranslator": "马修在安妮和玛丽拉来吃晚饭前，仔细地摆好了餐桌。",
+    "AIHelp": "<p><strong>多场景记忆</strong>：在绿山墙的安妮中，set可以是“摆放（餐具）”；在科技场景中，set可以是“设置”，如Set the alarm clock.（设置闹钟）；在日常中，a set of books（一套书）。</p><p><strong>对比近义词</strong>：set和put都有“放置”的意思，set更强调有目的地放置并安排好，put则更通用。</p>"
+  },
+  {
+    "Word": "rambling",
+    "Phonetic": "英 [ˈræmblɪŋ]，美 [ˈræmblɪŋ]",
+    "Meaning": "adj. 杂乱无章的；冗长的；漫步的 n. 漫步；漫谈",
+    "Example": "Anne's rambling stories often made Marilla smile, even if they were a bit long.",
+    "ExampleTranslator": "安妮那些杂乱无章的故事常常让玛丽拉微笑，即使它们有点长。",
+    "AIHelp": "<p><strong>提示</strong>：rambling是ramble的现在分词形式，也可作形容词和名词。</p><p><strong>词根联想记忆法</strong>：ramble（v. 漫步；漫谈）+ -ing→ 漫步的；漫谈的。</p><p><strong>场景记忆</strong>：想象安妮在绿山墙的小路上漫步（ramble），嘴里说着冗长的（rambling）话语，就能记住啦。</p>"
+  },
+  {
+    "Word": "embowered",
+    "Phonetic": "英 [ɪmˈbaʊəd]，美 [ɪmˈbaʊərd]",
+    "Meaning": "adj. 被树荫环绕的；被遮蔽的",
+    "Example": "The small house was embowered by tall trees, just like a hidden gem in the forest.",
+    "ExampleTranslator": "那座小房子被高大的树木环绕着，就像森林里的一颗隐藏的宝石。",
+    "AIHelp": "<p><strong>提示</strong>：embowered是embower的过去分词和过去式，也可作形容词。</p><p><strong>词根联想记忆法</strong>：em-（进入）+ bower（凉亭；树荫处）+ -ed→ 进入树荫处的→被树荫环绕的。</p><p><strong>科普场景</strong>：Many ancient temples are embowered by century-old trees to keep cool.（许多古老的寺庙被百年古树环绕着以保持凉爽。）</p>"
+  },
+  {
+    "Word": "scant",
+    "Phonetic": "英 [skænt]，美 [skænt]",
+    "Meaning": "adj. 不足的；缺乏的；少量的 vt. 节省；限制",
+    "Example": "There was scant food in the house, so Marilla had to go to the town to buy some.",
+    "ExampleTranslator": "家里食物不多了，所以玛丽拉得去镇上买一些。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“ scant ” 谐音 “ 死看它 ”，想象面对不足的（scant）资源，只能死死地看着它，记起来是不是很容易？</p><p><strong>职场场景造句</strong>：We have scant time to finish this project, so we need to work overtime.（我们完成这个项目的时间不足，所以需要加班。）</p>"
+  },
+  {
+    "Word": "quarter",
+    "Phonetic": "英 [ˈkwɔːtə(r)]，美 [ˈkwɔːrtər]",
+    "Meaning": "n. 四分之一；季度；一刻钟；地区；住处 v. 把……分成四等份；供给……住宿",
+    "Example": "It's a quarter past three, and Anne should be back from school soon.",
+    "ExampleTranslator": "现在是三点一刻，安妮应该很快就从学校回来了。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：来自拉丁语quartus（第四），所以有“四分之一”的意思，进而引申出“季度”（一年的四分之一）等含义。</p><p><strong>日常场景造句</strong>：A quarter of the students in our class like reading.（我们班四分之一的学生喜欢阅读。）</p>"
+  },
+  {
+    "Word": "mile",
+    "Phonetic": "英 [maɪl]，美 [maɪl]",
+    "Meaning": "n. 英里（长度单位，1英里约合1.609千米）",
+    "Example": "The village is just a mile away from Green Gables, so Anne often walks there.",
+    "ExampleTranslator": "那个村庄离绿山墙只有一英里远，所以安妮经常步行去那里。",
+    "AIHelp": "<p><strong>场景记忆</strong>：在绿山墙的安妮中，安妮经常步行去几英里外的地方，记住这个场景，就能想起mile是英里啦。</p><p><strong>科普小知识</strong>：1 mile（英里）≈1.609 kilometers（千米），在国外的路牌上经常能看到英里的标识。</p>"
+  },
+  {
+    "Word": "lane",
+    "Phonetic": "英 [leɪn]，美 [leɪn]",
+    "Meaning": "n. 小巷；车道；跑道；航道",
+    "Example": "Anne loved to walk along the grassy lane with flowers on both sides after school.",
+    "ExampleTranslator": "安妮放学后喜欢沿着两旁长满鲜花的长满草的小巷散步。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“lane” 谐音 “ 累呢 ”，走在长长的小巷（lane）里，是不是会觉得累呢？这样就记住啦。</p><p><strong>对比近义词</strong>：lane和alley都有“小巷”的意思，lane通常指乡间或城镇里较窄的小路，alley则更侧重城镇中两旁有建筑物的窄巷。</p>"
+  },
+  {
+    "Word": "father",
+    "Phonetic": "英 [ˈfɑːðə(r)]，美 [ˈfɑːðər]",
+    "Meaning": "n. 父亲；神父；祖先 vt. 成为……的父亲；创立；发明",
+    "Example": "Anne often thought about what her father might have been like, even though she never knew him.",
+    "ExampleTranslator": "安妮经常想知道她的父亲会是什么样子，尽管她从未见过他。",
+    "AIHelp": "<p><strong>对比记忆</strong>：father（父亲）和mother（母亲）是对应的词汇，一起记忆更容易。</p><p><strong>日常场景造句</strong>：My father often tells me stories about his childhood.（我爸爸经常给我讲他童年的故事。）</p>"
+  },
+  {
+    "Word": "possibly",
+    "Phonetic": "英 [ˈpɒsəbli]，美 [ˈpɑːsəbli]",
+    "Meaning": "adv. 可能；也许；大概",
+    "Example": "Can you possibly come to Green Gables this weekend to visit Anne?",
+    "ExampleTranslator": "这个周末你有可能来绿山墙看望安妮吗？",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：来自possible（可能的）+ -ly（副词后缀）→ 可能地。</p><p><strong>职场场景造句</strong>：We can't possibly finish the task without more help.（没有更多帮助，我们不可能完成这项任务。）</p>"
+  },
+  {
+    "Word": "fellow",
+    "Phonetic": "英 [ˈfeləʊ]，美 [ˈfeloʊ]",
+    "Meaning": "n. 男人；家伙；同事；同类 adj. 同类的；同伴的",
+    "Example": "The fellow who delivered the goods to Green Gables was very friendly to Anne.",
+    "ExampleTranslator": "给绿山墙送货的那个家伙对安妮非常友好。",
+    "AIHelp": "<p><strong>场景记忆</strong>：想象绿山墙来了一个陌生的家伙（fellow），和安妮打招呼的场景，就能记住这个词啦。</p><p><strong>职场场景造句</strong>：He is a good fellow to work with.（和他一起工作是个不错的同事。）</p>"
+  },
+  {
+    "Word": "man",
+    "Phonetic": "英 [mæn]，美 [mæn]",
+    "Meaning": "n. 男人；人类；男子汉 vt. 操纵；配备人员",
+    "Example": "The old man in the village often told Anne interesting stories about the past.",
+    "ExampleTranslator": "村里的那位老人经常给安妮讲过去有趣的故事。",
+    "AIHelp": "<p><strong>提示</strong>：men是man的复数形式。</p><p><strong>对比记忆</strong>：man（男人）的复数是men，woman（女人）的复数是women，一起记忆特殊变化。</p><p><strong>日常场景造句</strong>：Many men like playing football.（许多男人喜欢踢足球。）</p>"
+  },
+  {
+    "Word": "found",
+    "Phonetic": "英 [faʊnd]，美 [faʊnd]",
+    "Meaning": "v. 建立；创立；创办；找到（find的过去式和过去分词）",
+    "Example": "The small school near Green Gables was founded by a kind lady many years ago.",
+    "ExampleTranslator": "绿山墙附近的那所小学校是许多年前一位善良的女士创办的。",
+    "AIHelp": "<p><strong>提示</strong>：founded是found的过去分词和过去式，found作动词有“建立”之意，同时它也是find的过去式和过去分词，意为“找到”。</p><p><strong>词根联想记忆法</strong>：found有“建立”的意思，如foundation（基础；基金会）就是由它变形而来。</p><p><strong>职场场景造句</strong>：The company was founded in 1990.（这家公司成立于1990年。）</p>"
+  },
+  {
+    "Word": "homestead",
+    "Phonetic": "英 [ˈhəʊmsted]，美 [ˈhoʊmsted]",
+    "Meaning": "n. 家宅；农庄；宅地 vt. 获得宅基地",
+    "Example": "Green Gables was not just a house, but a homestead full of memories for Anne.",
+    "ExampleTranslator": "绿山墙不仅仅是一座房子，对安妮来说是一个充满回忆的农庄。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：home（家）+ stead（场所）→ 家所在的场所→家宅；农庄。</p><p><strong>场景记忆</strong>：绿山墙就是安妮的homestead（农庄），记住这个核心场景，就能掌握这个词啦。</p>"
+  },
+  {
+    "Word": "far",
+    "Phonetic": "英 [fɑː(r)]，美 [fɑːr]",
+    "Meaning": "adj. 远的；遥远的；久远的 adv. 远；遥远地；久远地",
+    "Example": "The furthest house from Green Gables is where Diana lives, but Anne still visits her often.",
+    "ExampleTranslator": "离绿山墙最远的房子是戴安娜住的地方，但安妮仍然经常去看望她。",
+    "AIHelp": "<p><strong>提示</strong>：furthest是far的最高级形式，far的比较级是farther/further，最高级是farthest/furthest。</p><p><strong>对比记忆</strong>：farther强调距离上的远，further强调程度上的进一步，如I can't walk any farther.（我走不动更远了。）；We need further discussion.（我们需要进一步讨论。）</p>"
+  },
+  {
+    "Word": "land",
+    "Phonetic": "英 [lænd]，美 [lænd]",
+    "Meaning": "n. 陆地；土地；国土；地产 v. 着陆；登陆；到达；获得",
+    "Example": "The Cuthberts' land was full of green grass and beautiful flowers in spring.",
+    "ExampleTranslator": "春天，卡思伯特家的土地上长满了青草和美丽的花朵。",
+    "AIHelp": "<p><strong>多场景记忆</strong>：在绿山墙的安妮中，land是“土地”；在机场场景中，land是“着陆”，如The plane will land in 10 minutes.（飞机将在10分钟后着陆。）</p><p><strong>对比近义词</strong>：land和ground都有“陆地”的意思，land指相对于海洋的陆地，ground指地面。</p>"
+  },
+  {
+    "Word": "house",
+    "Phonetic": "英 [haʊs]，美 [haʊs, haʊz]",
+    "Meaning": "n. 房屋；住宅；房子 v. 给……提供住房；收藏",
+    "Example": "The old houses in the village had a special charm that Anne loved.",
+    "ExampleTranslator": "村里的那些老房子有一种安妮喜欢的特殊魅力。",
+    "AIHelp": "<p><strong>提示</strong>：houses是house的复数形式。</p><p><strong>场景记忆</strong>：绿山墙的house（房子）是安妮的家，记住这个场景，同时注意复数形式是houses。</p><p><strong>日常场景造句</strong>：We live in a small house with a big garden.（我们住在一个带大花园的小房子里。）</p>"
+  },
+  {
+    "Word": "sociably",
+    "Phonetic": "英 [ˈsəʊʃəbli]，美 [ˈsoʊʃəbli]",
+    "Meaning": "adv. 和蔼可亲地；善于交际地；友善地",
+    "Example": "Anne smiled sociably at the new neighbor when they first met.",
+    "ExampleTranslator": "安妮第一次见到新邻居时，友善地笑了笑。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：来自social（社交的；友善的）+ -ly（副词后缀）→ 善于交际地；友善地。</p><p><strong>职场场景造句</strong>：He greeted everyone sociably at the meeting.（他在会议上友善地和每个人打招呼。）</p>"
+  },
+  {
+    "Word": "situate",
+    "Phonetic": "英 [ˈsɪtʃueɪt]，美 [ˈsɪtʃueɪt]",
+    "Meaning": "v. 使位于；使处于",
+    "Example": "Green Gables is situated on a hill with a beautiful view of the surrounding fields.",
+    "ExampleTranslator": "绿山墙坐落在一座小山上，能看到周围田野的美丽景色。",
+    "AIHelp": "<p><strong>提示</strong>：situated是situate的过去分词和过去式，也可作形容词，意为“位于……的”。</p><p><strong>词根联想记忆法</strong>：来自site（地点）+ -uate（动词后缀）→ 使处于某个地点→使位于。</p><p><strong>科普场景</strong>：The city is situated at the foot of a mountain.（这座城市位于山脚下。）</p>"
+  },
+  {
+    "Word": "stay",
+    "Phonetic": "英 [steɪ]，美 [steɪ]",
+    "Meaning": "v. 停留；待；保持；暂住 n. 停留；逗留",
+    "Example": "Anne was happy to stay at Green Gables for the rest of her life.",
+    "ExampleTranslator": "安妮很高兴能在绿山墙度过余生。",
+    "AIHelp": "<p><strong>提示</strong>：staying是stay的现在分词形式。</p><p><strong>对比近义词</strong>：stay和remain都有“停留”的意思，stay强调暂时停留，remain强调继续留在原处。</p><p><strong>日常场景造句</strong>：I will stay at home tonight.（我今晚将待在家里。）</p>"
+  },
+  {
+    "Word": "step",
+    "Phonetic": "英 [step]，美 [step]",
+    "Meaning": "v. 迈步；踏；踩 n. 步；脚步；步骤；台阶",
+    "Example": "Matthew stepped carefully over the stones in the yard to avoid falling.",
+    "ExampleTranslator": "马修小心翼翼地跨过院子里的石头，以免摔倒。",
+    "AIHelp": "<p><strong>提示</strong>：stepped是step的过去分词和过去式。</p><p><strong>场景记忆</strong>：想象马修在绿山墙的院子里迈步（step）的样子，记住这个场景，同时注意过去式是stepped。</p><p><strong>职场场景造句</strong>：We need to take the first step to solve this problem.（我们需要迈出解决这个问题的第一步。）</p>"
+  },
+  {
+    "Word": "rut",
+    "Phonetic": "英 [rʌt]，美 [rʌt]",
+    "Meaning": "n. 车辙；凹槽；常规；刻板乏味的生活 v. 在……形成车辙",
+    "Example": "The rutted road to the village was difficult to walk on after the rain.",
+    "ExampleTranslator": "雨后，通往村庄的那条有车辙的路很难走。",
+    "AIHelp": "<p><strong>提示</strong>：rutted是rut的过去分词和过去式，也可作形容词，意为“有车辙的”。</p><p><strong>场景记忆</strong>：想象雨后乡间有车辙（rutted）的小路，难走的样子，就能记住啦。</p><p><strong>日常场景造句</strong>：The old road is full of ruts.（这条老路布满了车辙。）</p>"
+  },
+  {
+    "Word": "grass",
+    "Phonetic": "英 [ɡrɑːs]，美 [ɡræs]",
+    "Meaning": "n. 草；草地；青草 v. 放牧；（向警方）告密",
+    "Example": "The grassy field behind Green Gables was Anne's favorite place to play.",
+    "ExampleTranslator": "绿山墙后面长满草的田野是安妮最喜欢玩耍的地方。",
+    "AIHelp": "<p><strong>提示</strong>：grassy是grass的形容词形式，意为“长满草的；草绿色的”。</p><p><strong>词根联想记忆法</strong>：grass（草）+ -y（形容词后缀，意为“多……的”）→ 长满草的。</p><p><strong>科普场景</strong>：Grass is an important part of the ecosystem.（草是生态系统的重要组成部分。）</p>"
+  },
+  {
+    "Word": "border",
+    "Phonetic": "英 [ˈbɔːdə(r)]，美 [ˈbɔːrdər]",
+    "Meaning": "v. 接壤；毗邻；给……镶边 n. 边界；边境；边缘",
+    "Example": "The garden is bordered by colorful flowers, making it very beautiful.",
+    "ExampleTranslator": "花园四周种着五颜六色的花，使它非常美丽。",
+    "AIHelp": "<p><strong>提示</strong>：bordered是border的过去分词和过去式。</p><p><strong>场景记忆</strong>：想象绿山墙的花园被花镶边（bordered）的样子，就能记住这个词啦。</p><p><strong>科普场景</strong>：Canada borders the United States.（加拿大与美国接壤。）</p>"
+  },
+  {
+    "Word": "bush",
+    "Phonetic": "英 [bʊʃ]，美 [bʊʃ]",
+    "Meaning": "n. 灌木；灌木丛；荒野 adj. 浓密的；粗野的",
+    "Example": "Anne hid behind the bushes to surprise Diana when she came to visit.",
+    "ExampleTranslator": "当戴安娜来拜访时，安妮躲在灌木丛后面想给她一个惊喜。",
+    "AIHelp": "<p><strong>提示</strong>：bushes是bush的复数形式。</p><p><strong>场景记忆</strong>：绿山墙周围有很多bushes（灌木丛），安妮经常在那里玩耍，记住这个场景，同时注意复数形式是bushes。</p><p><strong>日常场景造句</strong>：There are many small animals living in the bushes.（灌木丛里生活着许多小动物。）</p>"
+  },
+  {
+    "Word": "tree",
+    "Phonetic": "英 [triː]，美 [triː]",
+    "Meaning": "n. 树；乔木 v. 把……赶上树；使处于困境",
+    "Example": "The tall trees in front of Green Gables provided shade on hot summer days.",
+    "ExampleTranslator": "绿山墙前的高大树木在炎热的夏天提供了阴凉。",
+    "AIHelp": "<p><strong>提示</strong>：trees是tree的复数形式。</p><p><strong>对比记忆</strong>：tree（树）和grass（草）都是植物，一起记忆。</p><p><strong>科普场景</strong>：Trees can help purify the air.（树木有助于净化空气。）</p>"
+  },
+  {
+    "Word": "company",
+    "Phonetic": "英 [ˈkʌmpəni]，美 [ˈkʌmpəni]",
+    "Meaning": "n. 公司；陪伴；同伴；连队",
+    "Example": "Anne enjoyed the company of Diana, and they spent a lot of time together.",
+    "ExampleTranslator": "安妮喜欢有戴安娜陪伴，她们一起度过了很多时光。",
+    "AIHelp": "<p><strong>多场景记忆</strong>：在绿山墙的安妮中，company是“陪伴”；在职场场景中，company是“公司”，如She works in a big company.（她在一家大公司工作。）</p><p><strong>词根联想记忆法</strong>：com-（一起）+ pan（面包）+ -y→ 一起分享面包的人→同伴；陪伴，进而引申为公司。</p>"
+  },
+  {
+    "Word": "rather",
+    "Phonetic": "英 [ˈrɑːðə(r)]，美 [ˈræðər]",
+    "Meaning": "adv. 相当；宁愿；宁可；反而",
+    "Example": "Anne would rather read books in the attic than do housework on rainy days.",
+    "ExampleTranslator": "下雨天，安妮宁愿在阁楼看书也不愿做家务。",
+    "AIHelp": "<p><strong>提示</strong>：ruther 是 rather 的方言或古体形式，现在常用 rather。</p><p><strong>场景记忆</strong>：想象安妮宁愿（rather）做某事的场景，就能记住这个词啦。</p><p><strong>日常场景造句</strong>：This book is rather interesting.（这本书相当有趣。）</p>"
+  },
+  {
+    "Word": "content",
+    "Phonetic": "英 [kənˈtent]，美 [kənˈtent]；英 [ˈkɒntent]，美 [ˈkɑːntent]",
+    "Meaning": "v. 使满足；使满意 adj. 满意的；满足的 n. 内容；目录；含量",
+    "Example": "Anne was content with her life at Green Gables, even with its small troubles.",
+    "ExampleTranslator": "安妮对自己在绿山墙的生活很满足，即使有一些小麻烦。",
+    "AIHelp": "<p><strong>提示</strong>：contented是content的过去分词和过去式，也可作形容词，意为“满足的；满意的”。</p><p><strong>对比近义词</strong>：contented和satisfied都有“满意的”意思，contented更强调内心的满足，satisfied更强调因需求得到满足而满意。</p><p><strong>日常场景造句</strong>：He is contented with his simple life.（他对自己简单的生活很满足。）</p>"
+  },
+  {
+    "Word": "hang",
+    "Phonetic": "英 [hæŋ]，美 [hæŋ]",
+    "Meaning": "v. 悬挂；垂下；吊死；绞死 n. 悬挂方式；下垂",
+    "Example": "Anne hanged the painting on the wall of her room in Green Gables.",
+    "ExampleTranslator": "安妮把那幅画挂在了她在绿山墙房间的墙上。",
+    "AIHelp": "<p><strong>提示</strong>：hanged是hang的过去分词和过去式，hang表示“吊死；绞死”时，过去式和过去分词是hanged；表示“悬挂”时，过去式和过去分词是hung。</p><p><strong>场景记忆</strong>：想象安妮在绿山墙挂（hang）东西的场景，注意不同含义的过去式和过去分词变化。</p><p><strong>日常场景造句</strong>：She hung her coat on the hook.（她把外套挂在了钩子上。）</p>"
+  },
+  {
+    "Word": "Irishman",
+    "Phonetic": "英 [ˈaɪrɪʃmæn]，美 [ˈaɪrɪʃmæn]",
+    "Meaning": "n. 爱尔兰人（男性）",
+    "Example": "The kind Irishman helped Anne find her way back to Green Gables when she got lost.",
+    "ExampleTranslator": "当安妮迷路时，那位善良的爱尔兰男人帮她找到了回绿山墙的路。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：Irish（爱尔兰的；爱尔兰人的）+ man（男人）→ 爱尔兰男人。</p><p><strong>场景记忆</strong>：在绿山墙的故事背景中，可能会出现不同国家的人，记住Irishman是爱尔兰男人。</p>"
+  },
+  {
+    "Word": "backyard",
+    "Phonetic": "英 [ˌbækˈjɑːd]，美 [ˌbækˈjɑːrd]",
+    "Meaning": "n. 后院；后庭",
+    "Example": "Anne and Diana often played games in the backyard of Green Gables.",
+    "ExampleTranslator": "安妮和戴安娜经常在绿山墙的后院玩游戏。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：back（后面的）+ yard（院子）→ 后院。</p><p><strong>场景记忆</strong>：绿山墙的后院（backyard）是安妮和小伙伴玩耍的地方，记住这个场景就能掌握这个词啦。</p><p><strong>日常场景造句</strong>：We grow vegetables in our backyard.（我们在后院种蔬菜。）</p>"
+  },
+  {
+    "Word": "precise",
+    "Phonetic": "英 [prɪˈsaɪs]，美 [prɪˈsaɪs]",
+    "Meaning": "adj. 精确的；准确的；确切的；严谨的",
+    "Example": "Marilla liked to give precise instructions when Anne was doing housework.",
+    "ExampleTranslator": "当安妮做家务时，玛丽拉喜欢给出精确的指示。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：pre-（预先）+ cis（切割，如decide决定）+ -e→ 预先切割好的→精确的。</p><p><strong>职场场景造句</strong>：We need precise data to support our decision.（我们需要精确的数据来支持我们的决定。）</p>"
+  },
+  {
+    "Word": "yard",
+    "Phonetic": "英 [jɑːd]，美 [jɑːrd]",
+    "Meaning": "n. 院子；庭院；码（长度单位，1码约合0.9144米）",
+    "Example": "Matthew built a small shed in the yard to store tools for Green Gables.",
+    "ExampleTranslator": "马修在院子里建了一个小棚子，用来存放绿山墙的工具。",
+    "AIHelp": "<p><strong>场景记忆</strong>：绿山墙的yard（院子）里有很多东西，马修在那里建棚子，记住这个场景。</p><p><strong>科普小知识</strong>：1 yard（码）≈0.9144 meters（米），在一些国家会用到这个长度单位。</p>"
+  },
+  {
+    "Word": "patriarchal",
+    "Phonetic": "英 [ˌpeɪtriˈɑːkl]，美 [ˌpeɪtriˈɑːrkl]",
+    "Meaning": "adj. 父权制的；家长的；由男性统治的",
+    "Example": "In some old stories, the patriarchal family structure was very common.",
+    "ExampleTranslator": "在一些古老的故事中，父权制家庭结构很常见。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：patri-（父亲，如patriot爱国者）+ arch（统治）+ -al（形容词后缀）→ 父亲统治的→父权制的。</p><p><strong>科普场景</strong>：Many ancient societies were patriarchal.（许多古代社会是父权制的。）</p>"
+  },
+  {
+    "Word": "willow",
+    "Phonetic": "英 [ˈwɪləʊ]，美 [ˈwɪloʊ]",
+    "Meaning": "n. 柳树；柳木 adj. 柳木制的",
+    "Example": "The willows by the river near Green Gables looked very beautiful in the wind.",
+    "ExampleTranslator": "绿山墙附近河边的柳树在风中看起来很美。",
+    "AIHelp": "<p><strong>提示</strong>：willows是willow的复数形式。</p><p><strong>场景记忆</strong>：想象绿山墙附近河边柳树（willows）随风摆动的样子，记住这个场景，同时注意复数形式是willows。</p><p><strong>科普场景</strong>：Willows are often planted near water because they like moist soil.（柳树常种在水边，因为它们喜欢湿润的土壤。）</p>"
+  },
+  {
+    "Word": "prim",
+    "Phonetic": "英 [prɪm]，美 [prɪm]",
+    "Meaning": "adj. 拘谨的；古板的；整洁的；端正的 v. 使整洁；使古板",
+    "Example": "Marilla was always prim and proper, which was different from Anne's lively personality.",
+    "ExampleTranslator": "玛丽拉总是拘谨而得体，这与安妮活泼的性格不同。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“prim” 谐音 “ 普瑞姆 ”，想象一个叫普瑞姆的人很拘谨（prim），就能记住啦。</p><p><strong>对比近义词</strong>：prim和proper都有“得体的”意思，prim更强调拘谨、古板，proper更强调符合规范。</p>"
+  },
+  {
+    "Word": "Lombardy",
+    "Phonetic": "英 [ˈlɒmbədi]，美 [ˈlɑːmbərdi]",
+    "Meaning": "n. 伦巴第（意大利北部地区）；伦巴第白杨",
+    "Example": "The Lombardies in the garden of Green Gables grew very tall and straight.",
+    "ExampleTranslator": "绿山墙花园里的伦巴第白杨长得又高又直。",
+    "AIHelp": "<p><strong>提示</strong>：lombardies是Lombardy的复数形式，此处指伦巴第白杨。</p><p><strong>场景记忆</strong>：绿山墙花园里的Lombardies（伦巴第白杨）又高又直，记住这个场景。</p>"
+  },
+  {
+    "Word": "stick",
+    "Phonetic": "英 [stɪk]，美 [stɪk]",
+    "Meaning": "v. 粘贴；粘住；插入；刺入；坚持 n. 棍；棒；手杖；枝条",
+    "Example": "Anne used a small stick to draw pictures on the ground in front of Green Gables.",
+    "ExampleTranslator": "安妮用一根小树枝在绿山墙前的地上画画。",
+    "AIHelp": "<p><strong>多场景记忆</strong>：在绿山墙的安妮中，stick是“树枝”；在日常场景中，stick可以是“粘贴”，如Stick the stamp on the envelope.（把邮票贴在信封上。）</p><p><strong>短语记忆</strong>：stick to（坚持），如Stick to your dream.（坚持你的梦想。）</p>"
+  },
+  {
+    "Word": "nor",
+    "Phonetic": "英 [nɔː(r)]，美 [nɔːr]",
+    "Meaning": "conj. 也不；也没有 adv. 也不",
+    "Example": "Anne didn't like the dark, nor did she enjoy being alone at night.",
+    "ExampleTranslator": "安妮不喜欢黑暗，也不喜欢在晚上独自一人。",
+    "AIHelp": "<p><strong>搭配记忆</strong>：nor常与neither搭配使用，构成“neither...nor...”结构，意为“既不……也不……”。</p><p><strong>场景记忆</strong>：想象安妮既不喜欢这个也不喜欢那个的场景，记住nor的用法。</p><p><strong>日常场景造句</strong>：He can't speak French, nor can he speak German.（他不会说法语，也不会说德语。）</p>"
+  },
+  {
+    "Word": "privately",
+    "Phonetic": "英 [ˈpraɪvətli]，美 [ˈpraɪvətli]",
+    "Meaning": "adv. 私下地；秘密地；私自地",
+    "Example": "Anne told Diana her secret privately under the old tree in the backyard.",
+    "ExampleTranslator": "安妮在后院的老树下私下告诉了戴安娜她的秘密。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：来自private（私人的；秘密的）+ -ly（副词后缀）→ 私下地；秘密地。</p><p><strong>职场场景造句</strong>：The manager talked to him privately about his work performance.（经理私下和他谈了他的工作表现。）</p>"
+  },
+  {
+    "Word": "opinion",
+    "Phonetic": "英 [əˈpɪnjən]，美 [əˈpɪnjən]",
+    "Meaning": "n. 意见；看法；主张；判断",
+    "Example": "Marilla and Matthew had different opinions on how to educate Anne.",
+    "ExampleTranslator": "玛丽拉和马修在如何教育安妮方面有不同的意见。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：op-（相反）+ inion→ 与他人相反的想法→意见；看法。</p><p><strong>短语记忆</strong>：in one's opinion（在某人看来），如In my opinion, Anne is a lovely girl.（在我看来，安妮是个可爱的女孩。）</p>"
+  },
+  {
+    "Word": "sweep",
+    "Phonetic": "英 [swiːp]，美 [swiːp]",
+    "Meaning": "v. 扫；打扫；清扫；掠过；席卷 n. 打扫；清扫；范围；挥动",
+    "Example": "Anne swept the floor of the kitchen in Green Gables every morning.",
+    "ExampleTranslator": "安妮每天早上打扫绿山墙厨房的地板。",
+    "AIHelp": "<p><strong>提示</strong>：swept是sweep的过去分词和过去式。</p><p><strong>场景记忆</strong>：想象安妮在绿山墙打扫（sweep）地板的场景，记住过去式是swept。</p><p><strong>日常场景造句</strong>：She swept the leaves in the yard.（她清扫了院子里的树叶。）</p>"
+  },
+  {
+    "Word": "brim",
+    "Phonetic": "英 [brɪm]，美 [brɪm]",
+    "Meaning": "v. 注满；盛满；充满 n. 帽檐；边缘；杯边",
+    "Example": "The small stream near Green Gables was brimming with water after the heavy rain.",
+    "ExampleTranslator": "大雨过后，绿山墙附近的小溪涨满了水。",
+    "AIHelp": "<p><strong>提示</strong>：brimming是brim的现在分词形式，常用搭配brim with（充满）。</p><p><strong>场景记忆</strong>：想象大雨后绿山墙附近的小溪充满（brim with）水的样子，记住这个场景。</p><p><strong>日常场景造句</strong>：Her eyes were brimming with tears.（她的眼里充满了泪水。）</p>"
+  },
+  {
+    "Word": "proverbial",
+    "Phonetic": "英 [prəˈvɜːbiəl]，美 [prəˈvɜːrbial]",
+    "Meaning": "adj. 众所周知的；谚语的； proverb 中常出现的",
+    "Example": "The proverbial kindness of the people in Avonlea made Anne feel at home.",
+    "ExampleTranslator": "埃文利镇人众所周知的善良让安妮感到宾至如归。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：来自proverb（谚语；格言）+ -ial（形容词后缀）→ 谚语的；众所周知的。</p><p><strong>场景记忆</strong>：想象一个像绿山墙所在小镇一样，人们有着众所周知（proverbial）的善良的地方，记住这个词。</p><p><strong>日常场景造句</strong>：The proverbial honesty of the old man is admired by everyone.（这位老人众所周知的诚实受到每个人的钦佩。）</p>"
+  },
+  {
+    "Word": "peck",
+    "Phonetic": "英 [pek]，美 [pek]",
+    "Meaning": "v. 啄；啄食；匆匆轻吻；匆匆地做 n. 啄；匆匆轻吻；少量",
+    "Example": "The chickens in the yard of Green Gables pecked at the corn Anne threw to them.",
+    "ExampleTranslator": "绿山墙院子里的鸡啄着安妮扔给它们的玉米。",
+    "AIHelp": "<p><strong>场景记忆</strong>：想象绿山墙院子里的鸡啄（peck）食玉米的样子，记住这个场景。</p><p><strong>科普场景</strong>：Birds peck at food with their beaks.（鸟用喙啄食食物。）</p>"
+  },
+  {
+    "Word": "dirt",
+    "Phonetic": "英 [dɜːt]，美 [dɜːrt]",
+    "Meaning": "n. 污垢；泥土；尘土；丑闻",
+    "Example": "Anne got dirt on her dress while playing in the field behind Green Gables.",
+    "ExampleTranslator": "安妮在绿山墙后面的田野里玩耍时，裙子上沾了泥土。",
+    "AIHelp": "<p><strong>谐音记忆</strong>：“dirt” 谐音 “ 德特 ”，想象一个叫德特的人身上有污垢（dirt），就能记住啦。</p><p><strong>对比近义词</strong>：dirt和soil都有“泥土”的意思，dirt更强调污垢、尘土，soil更强调可耕种的土壤。</p><p><strong>日常场景造句</strong>：Please wipe the dirt off the table.（请把桌子上的污垢擦掉。）</p>"
+  },
+
+    {
+      "Word": "rap",
+      "Phonetic": "英 [ræp]，美 [ræp]",
+      "Meaning": "动词，意为‘轻敲、急敲’；也可指‘说唱音乐’。在日常中常用于‘rap on the door’（敲门）。",
+      "Example": "Anne rapped lightly on Marilla’s bedroom door before entering with a tray of tea.",
+      "ExampleTranslator": "安妮端着茶盘进来前，轻轻地敲了敲玛丽拉的卧室门。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🚪 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>rap</strong><br>• rapped = 过去式/过去分词（原文件为 rapped，已还原）<br>✅ 场景记忆：<br>- Rap on wood（敲木头求好运）<br>- Rap your knuckles on the table<br>🔁 近义：knock, tap<br>💡 联想：‘Rap = quick, sharp sound — not a song here!’</p>"
+    },
+    {
+      "Word": "smartly",
+      "Phonetic": "英 [ˈsmɑːtli]，美 [ˈsmɑːrtli]",
+      "Meaning": "副词，意为‘利落地、时髦地、机敏地’；在《绿山墙的安妮》中可形容衣着或举止。",
+      "Example": "Diana walked smartly down the lane in her new Sunday dress, her curls bouncing in the sunshine.",
+      "ExampleTranslator": "戴安娜穿着崭新的礼拜日连衣裙，利落地走在小路上，卷发在阳光下跳跃。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👗 <strong>多义副词</strong>：<br>• Smartly dressed = 穿得时髦<br>• Move smartly = 动作敏捷<br>✅ 小说语境高频：<br>- Smart reply<br>- Smart outfit<br>🔁 近义：neatly, stylishly, briskly<br>💡 注意：≠ ‘smart’ as in intelligent（但有关联：机敏 → 利落）</p>"
+    },
+    {
+      "Word": "bid",
+      "Phonetic": "英 [bɪd]，美 [bɪd]",
+      "Meaning": "动词，意为‘吩咐、出价、祝（晚安等）’；古语/文学用法常见于‘she bade him goodbye’。",
+      "Example": "Marilla bade Anne to tidy the parlor before the minister arrived.",
+      "ExampleTranslator": "玛丽拉吩咐安妮在牧师到来前把客厅收拾整齐。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📜 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>bid</strong><br>• bidden = 过去分词（古体，现代多用 bid/bade）<br>✅ 文学用法：<br>- Bid farewell<br>- Bid someone do something<br>🔁 现代替代：ask, tell, instruct<br>💡 记忆：‘Bid = old-fashioned command — think “Marilla’s tone”!’</p>"
+    },
+    {
+      "Word": "cheerful",
+      "Phonetic": "英 [ˈtʃɪəfl]，美 [ˈtʃɪrf l]",
+      "Meaning": "形容词，意为‘愉快的、乐观的’；是安妮性格的核心特征之一。",
+      "Example": "Despite the rain, Anne remained cheerful, imagining the clouds as silver-lined chariots.",
+      "ExampleTranslator": "尽管下雨，安妮依然兴致勃勃，把云朵想象成镶着银边的战车。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌈 <strong>词根 + 小说联想</strong>：<br>• Cheer + -ful → full of cheer<br>✅ 安妮式思维：<br>- Find joy in small things<br>- Turn gloom into wonder<br>🔁 近义：joyful, upbeat, sunny<br>💡 口诀：‘Cheerful = choose joy, like Anne does!’</p>"
+    },
+    {
+      "Word": "apartment",
+      "Phonetic": "英 [əˈpɑːtmənt]，美 [əˈpɑːrtmənt]",
+      "Meaning": "名词，意为‘公寓套房’；在19世纪末加拿大乡村语境中较少见，但可用于对比城乡生活。",
+      "Example": "Rachel Lynde once remarked that city folk lived in tiny apartments with no room for a proper garden.",
+      "ExampleTranslator": "瑞秋·林德曾评论说，城里人住在狭小的公寓里，连个像样的花园都容不下。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🏙️ <strong>文化对比</strong>：<br>• Apartment（美）= Flat（英）<br>✅ 小说背景：<br>- Avonlea = rural, houses with yards<br>- Apartments = urban, modern (to them)<br>🔁 近义：flat, unit, suite<br>💡 联想：‘Green Gables vs. gray apartment — Anne would choose trees!’</p>"
+    },
+    {
+      "Word": "painfully",
+      "Phonetic": "英 [ˈpeɪnfəli]，美 [ˈpeɪnfəli]",
+      "Meaning": "副词，意为‘痛苦地、令人难堪地’；在小说中常描述社交尴尬或情感煎熬。",
+      "Example": "Anne felt painfully shy when asked to recite in front of the entire school.",
+      "ExampleTranslator": "当被要求在全校面前背诵时，安妮感到极度羞怯。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>😳 <strong>情感强化</strong>：<br>• Pain + -ful + -ly → in a way that causes emotional pain<br>✅ 小说场景：<br>- Painfully aware of her red hair<br>- Painfully awkward moments<br>🔁 近义：acutely, excruciatingly, embarrassingly<br>💡 对比：physical pain vs. social pain</p>"
+    },
+    {
+      "Word": "appearance",
+      "Phonetic": "英 [əˈpɪərəns]，美 [əˈpɪrəns]",
+      "Meaning": "名词，意为‘外貌、出现’；在小说中常涉及对安妮“瘦小、雀斑、红发”的外貌评价。",
+      "Example": "Though plain in appearance, Anne’s eyes sparkled with imagination and spirit.",
+      "ExampleTranslator": "尽管相貌平凡，安妮的眼睛却闪烁着想象力与活力。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👀 <strong>词根记忆</strong>：<br>• Appear + -ance → the state of appearing<br>✅ 双重含义：<br>- Physical look<br>- Act of showing up<br>🔁 近义：look, presence, aspect<br>💡 安妮金句：‘Looks aren’t everything — but oh, how I wish for puffed sleeves!’</p>"
+    },
+    {
+      "Word": "unused",
+      "Phonetic": "英 [ʌnˈjuːzd]，美 [ʌnˈjuːzd]",
+      "Meaning": "形容词，意为‘未使用的、不习惯的’；在小说中可指物品或情感状态。",
+      "Example": "The east gable room was unused for years until Marilla decided to give it to Anne.",
+      "ExampleTranslator": "东山墙房间多年来一直空置，直到玛丽拉决定把它给安妮。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🪟 <strong>构词分析</strong>：<br>• Un- + used → not used<br>✅ 小说关键空间：<br>- Unused room = symbol of neglect → becomes Anne’s sanctuary<br>🔁 近义：unoccupied, idle, untouched<br>💡 联想：‘Unused doesn’t mean unlovable — just waiting for imagination!’</p>"
+    },
+    {
+      "Word": "parlor",
+      "Phonetic": "英 [ˈpɑːlə(r)]，美 [ˈpɑːrlər]",
+      "Meaning": "名词，意为‘客厅（尤指正式接待客人的房间）’；在《绿山墙的安妮》中是家庭礼仪的象征空间。",
+      "Example": "Sunday afternoons were spent in the parlor, where visitors sipped tea and discussed church matters.",
+      "ExampleTranslator": "星期天下午，大家在客厅里度过，访客一边喝茶，一边讨论教会事务。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🫖 <strong>历史语境</strong>：<br>• Parlor = formal sitting room (vs. everyday kitchen)<br>✅ 小说细节：<br>- Marilla keeps parlor spotless<br>- Anne fears breaking parlor ornaments<br>🔁 近义：drawing room, sitting room<br>💡 文化提示：‘Parlor = stage for social performance in 19th c.’</p>"
+    },
+    {
+      "Word": "east",
+      "Phonetic": "英 [iːst]，美 [iːst]",
+      "Meaning": "名词/形容词，意为‘东方、东面的’；在小说中常用于描述房间朝向（如 east gable）。",
+      "Example": "Anne loved her east-facing window because it caught the first light of dawn.",
+      "ExampleTranslator": "安妮喜欢她朝东的窗户，因为它能捕捉到黎明的第一缕光。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌅 <strong>方向词 + 情感</strong>：<br>• East = sunrise, hope, new beginnings<br>✅ 小说象征：<br>- East gable = Anne’s dream space<br>- Light = imagination<br>🔁 近义：oriental（少用）, eastern<br>💡 联想：‘East = where dreams begin, like Anne’s life at Green Gables!’</p>"
+    },
+    {
+      "Word": "west",
+      "Phonetic": "英 [west]，美 [west]",
+      "Meaning": "名词/形容词，意为‘西方、西面的’；常与 east 对比，营造空间感。",
+      "Example": "The west orchard bloomed later than the east one, giving Anne two rounds of cherry blossom joy.",
+      "ExampleTranslator": "西边的果园比东边的开得晚些，让安妮享受了两轮樱花盛开的喜悦。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌇 <strong>地理 + 季节</strong>：<br>• West = sunset, maturity, reflection<br>✅ 小说中的自然节奏：<br>- East: morning energy<br>- West: evening calm<br>🔁 近义：western<br>💡 对比记忆：‘East rises, west sets — both beautiful in Avonlea.’</p>"
+    },
+    {
+      "Word": "mellow",
+      "Phonetic": "英 [ˈmeləʊ]，美 [ˈmeloʊ]",
+      "Meaning": "形容词，意为‘柔和的、醇厚的、成熟的’；可形容光线、声音、性格或水果。",
+      "Example": "The mellow afternoon light turned the birch trunks golden, and Anne called it ‘fairy bark.’",
+      "ExampleTranslator": "柔和的午后阳光将白桦树干染成金色，安妮称它为‘仙女树皮’。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍯 <strong>感官联想</strong>：<br>• Mellow = soft, rich, smooth<br>✅ 多场景适用：<br>- Mellow voice<br>- Mellow cheese<br>- Mellow personality (like Matthew)<br>🔁 近义：soft, gentle, ripe<br>💡 谐音：‘Mellow = mel-low → honey-like flow!’</p>"
+    },
+    {
+      "Word": "whence",
+      "Phonetic": "英 [wens]，美 [wens]",
+      "Meaning": "副词，意为‘从何处’（古语/文学用语）；现代英语中多用 ‘from where’。",
+      "Example": "‘Whence comes this sudden joy?’ Marilla asked, watching Anne dance through the kitchen.",
+      "ExampleTranslator": "“这突如其来的喜悦是从哪儿来的？”玛丽拉看着安妮在厨房里跳舞，问道。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📜 <strong>文学保留词</strong>：<br>• Whence = from what place<br>✅ 小说风格匹配：<br>- Used by older characters (Marilla, Rachel)<br>- Adds period authenticity<br>🔁 现代替代：‘Where did this come from?’<br>💡 记忆：‘Whence = whence you came — old-fashioned but poetic!’</p>"
+    },
+    {
+      "Word": "glimpse",
+      "Phonetic": "英 [ɡlɪmps]，美 [ɡlɪmps]",
+      "Meaning": "名词/动词，意为‘一瞥、短暂看见’；常用于捕捉美好瞬间。",
+      "Example": "Through the trees, Anne caught a glimpse of the sea sparkling like scattered diamonds.",
+      "ExampleTranslator": "透过树林，安妮瞥见大海如散落的钻石般闪闪发光。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>✨ <strong>视觉动词</strong>：<br>• Glimpse = quick, partial view<br>✅ 安妮式浪漫：<br>- Glimpse of beauty<br>- Glimpse into someone’s soul<br>🔁 近义：peek, glance, sight<br>💡 构词：‘Glimpse sounds like “glint” — both sparkle briefly!’</p>"
+    },
+    {
+      "Word": "cherry",
+      "Phonetic": "英 [ˈtʃeri]，美 [ˈtʃeri]",
+      "Meaning": "名词，意为‘樱桃’；在小说中是‘The White Way of Delight’（樱桃花道）的核心意象。",
+      "Example": "The cherry trees along the lane were so thick with bloom they looked like snowdrifts kissed by spring.",
+      "ExampleTranslator": "小路两旁的樱桃树花开繁茂，仿佛被春天亲吻过的雪堆。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌸 <strong>象征意义</strong>：<br>• Cherry blossoms = beauty, transience, hope<br>✅ 小说名场景：<br>- Anne names the road ‘The White Way of Delight’<br>- Symbol of her new beginning<br>🔁 近义：blossom, bloom<br>💡 联想：‘Cherry = not just fruit, but poetry in motion!’</p>"
+    },
+    {
+      "Word": "slender",
+      "Phonetic": "英 [ˈslendə(r)]，美 [ˈslendər]",
+      "Meaning": "形容词，意为‘苗条的、纤细的’；常描述安妮的身形或树枝。",
+      "Example": "Anne’s slender figure skipped down the path, her arms full of wildflowers.",
+      "ExampleTranslator": "安妮纤细的身影蹦跳着沿小路前行，怀里抱满了野花。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌿 <strong>形象 + 情感</strong>：<br>• Slender = thin but graceful (positive)<br>✅ 对比：<br>- Skinny = negative<br>- Slender = elegant<br>🔁 近义：graceful, slim, delicate<br>💡 安妮视角：‘Slender like a birch — strong yet bending in the wind!’</p>"
+    },
+    {
+      "Word": "birch",
+      "Phonetic": "英 [bɜːtʃ]，美 [bɜːrtʃ]",
+      "Meaning": "名词，意为‘桦树’；在爱德华王子岛乡村景观中常见，象征纯洁与韧性。",
+      "Example": "The slender birches whispered in the wind, and Anne imagined they were fairy maidens dancing.",
+      "ExampleTranslator": "纤细的桦树在风中低语，安妮想象它们是正在跳舞的仙女。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌳 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>birch</strong><br>• birches = 复数（原文件为 birches，已还原）<br>✅ 自然意象：<br>- White bark = purity<br>- Flexible branches = resilience<br>🔁 近义：aspen, alder<br>💡 联想：‘Birch = nature’s poet — white, whispering, wise.’</p>"
+    },
+    {
+      "Word": "green",
+      "Phonetic": "英 [ɡriːn]，美 [ɡriːn]",
+      "Meaning": "动词，意为‘使变绿、使焕发生机’；也可作形容词（绿色的）。",
+      "Example": "Spring rains greened the fields overnight, and Avonlea seemed to sigh with relief.",
+      "ExampleTranslator": "春雨一夜之间让田野焕发生机，阿冯利仿佛松了一口气。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌱 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>green</strong>（作动词）<br>• greened = 过去式（原文件为 greened，已还原）<br>✅ 动词用法（较少见但诗意）：<br>- The hills greened after rain<br>- Hope greens the heart<br>🔁 形容词更常见：green grass<br>💡 诗歌化表达：‘To green = to bring life!’</p>"
+    },
+    {
+      "Word": "vine",
+      "Phonetic": "英 [vaɪn]，美 [vaɪn]",
+      "Meaning": "名词，意为‘藤蔓’；在绿山墙农舍常攀爬在墙壁或篱笆上。",
+      "Example": "Morning glories twined up the porch vine, their blue trumpets greeting the sun.",
+      "ExampleTranslator": "牵牛花沿着门廊的藤蔓缠绕而上，蓝色的喇叭花迎接着太阳。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍇 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>vine</strong><br>• vines = 复数（原文件为 vines，已还原）<br>✅ 园艺意象：<br>- Grapevine = gossip metaphor<br>- Climbing vines = natural decoration<br>🔁 近义：creeper, tendril<br>💡 联想：‘Vine = nature’s internet — connecting everything!’</p>"
+    },
+    {
+      "Word": "distrustful",
+      "Phonetic": "英 [dɪsˈtrʌstfl]，美 [dɪsˈtrʌstfl]",
+      "Meaning": "形容词，意为‘不信任的、怀疑的’；描述初到绿山墙时安妮或马修的心理状态。",
+      "Example": "At first, Marilla was distrustful of Anne’s fanciful tales, fearing they masked dishonesty.",
+      "ExampleTranslator": "起初，玛丽拉对安妮那些充满幻想的故事心存疑虑，担心那掩盖着不诚实。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👁️ <strong>构词分析</strong>：<br>• Dis- + trust + -ful → full of lack of trust<br>✅ 心理描写：<br>- Distrustful gaze<br>- Distrustful of strangers<br>🔁 近义：suspicious, wary, skeptical<br>💡 对比：trustful（信任的） vs. distrustful</p>"
+    },
+    {
+      "Word": "sunshine",
+      "Phonetic": "英 [ˈsʌnʃaɪn]，美 [ˈsʌnʃaɪn]",
+      "Meaning": "名词，意为‘阳光’；在小说中既是自然现象，也是安妮性格的隐喻。",
+      "Example": "Matthew said little, but his eyes held sunshine whenever Anne entered the room.",
+      "ExampleTranslator": "马修话不多，但每当安妮走进房间，他的眼中便盛满阳光。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>☀️ <strong>双重象征</strong>：<br>• Literal: sunlight<br>• Metaphorical: joy, warmth, hope<br>✅ 安妮效应：<br>- She brings sunshine to Green Gables<br>- Sunshine = antidote to gloom<br>🔁 近义：light, brightness, cheer<br>💡 金句：‘Anne is sunshine with freckles!’</p>"
+    },
+    {
+      "Word": "irresponsible",
+      "Phonetic": "英 [ˌɪrɪˈspɒnsəbl]，美 [ˌɪrɪˈspɑːnsəbl]",
+      "Meaning": "形容词，意为‘不负责任的’；常用于批评行为，如斯宾塞夫人送错孩子。",
+      "Example": "Sending an orphan without proper records was seen as highly irresponsible by Avonlea standards.",
+      "ExampleTranslator": "按照阿冯利的标准，不带完整记录就送来一个孤儿被视为极不负责任的行为。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⚖️ <strong>词根拆解</strong>：<br>• Ir-（否定）+ responsible → not responsible<br>✅ 社会规范关键词：<br>- Irresponsible parenting<br>- Irresponsible promises<br>🔁 近义：careless, reckless, negligent<br>💡 对比：responsible（可靠） vs. irresponsible（不可靠）</p>"
+    },
+    {
+      "Word": "seriously",
+      "Phonetic": "英 [ˈsɪəriəsli]，美 [ˈsɪriəsli]",
+      "Meaning": "副词，意为‘认真地、严重地’；在对话中强调态度或后果。",
+      "Example": "‘You must study seriously if you wish to teach,’ Miss Stacy told Anne firmly.",
+      "ExampleTranslator": "“如果你想当老师，就必须认真学习，”斯塔西小姐坚定地告诉安妮。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📚 <strong>语气强化</strong>：<br>• Serious + -ly → in a serious manner<br>✅ 教育场景：<br>- Take seriously<br>- Speak seriously<br>🔁 近义：earnestly, gravely, intently<br>💡 注意：≠ ‘seriously?’ as slang（表惊讶）</p>"
+    },
+    {
+      "Word": "lay",
+      "Phonetic": "英 [leɪ]，美 [leɪ]",
+      "Meaning": "动词，意为‘放置、铺设’；注意与 lie（躺）区分。",
+      "Example": "Anne carefully laid the embroidered handkerchief on Marilla’s pillow as a gift.",
+      "ExampleTranslator": "安妮小心翼翼地把绣花手帕放在玛丽拉的枕头上作为礼物。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🧺 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>lay</strong>（及物动词）<br>• laid = 过去式/过去分词（原文件为 laid，已还原）<br>✅ 易混点：<br>- Lay (something) down<br>- Lie (oneself) down<br>🔁 近义：place, put, set<br>💡 口诀：‘Lay needs an object — you lay a book, not yourself!’</p>"
+    },
+    {
+      "Word": "fairly",
+      "Phonetic": "英 [ˈfeəli]，美 [ˈferli]",
+      "Meaning": "副词，意为‘相当、公平地’；在小说中既可表程度，也可表公正。",
+      "Example": "The cake was fairly good, though Anne thought it lacked enough cinnamon.",
+      "ExampleTranslator": "蛋糕相当不错，尽管安妮觉得肉桂放得不够。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⚖️ <strong>双义副词</strong>：<br>1. Fairly good = quite good（程度）<br>2. Treat fairly = justly（公正）<br>✅ 语境判断：<br>- Fairly large room<br>- Judge fairly<br>🔁 近义（程度）：quite, reasonably<br>💡 注意：≠ ‘very’ — fairly is weaker</p>"
+    },
+    {
+      "Word": "mental",
+      "Phonetic": "英 [ˈmentl]，美 [ˈmentl]",
+      "Meaning": "形容词，意为‘精神的、智力的’；在小说中可指‘mental pictures’（心理图像）。",
+      "Example": "Anne’s mental pictures were so vivid she often forgot where she was walking.",
+      "ExampleTranslator": "安妮心中的画面如此生动，常常忘了自己走到哪儿了。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🧠 <strong>认知科学关联</strong>：<br>• Mental = of the mind<br>✅ 安妮特质：<br>- Rich mental imagery<br>- Mental escape from reality<br>🔁 近义：intellectual, cognitive, psychological<br>💡 联想：‘Mental = mind’s eye — where Anne lives half the time!’</p>"
+    },
+    {
+      "Word": "plate",
+      "Phonetic": "英 [pleɪt]，美 [pleɪt]",
+      "Meaning": "名词，意为‘盘子’；在日常家务或待客场景中常见。",
+      "Example": "Marilla polished every plate until it shone, preparing for the church picnic.",
+      "ExampleTranslations": "玛丽拉把每个盘子都擦得锃亮，为教会野餐做准备。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍽️ <strong>原形还原说明</strong>：<br>✅ 原形：<strong>plate</strong><br>• plates = 复数（原文件为 plates，已还原）<br>✅ 家务场景：<br>- Set the plates<br>- Stack the plates<br>🔁 近义：dish, platter<br>💡 趣味：‘Plate = stage for food — and for Marilla’s perfectionism!’</p>"
+    },
+    {
+      "Word": "expect",
+      "Phonetic": "英 [ɪkˈspekt]，美 [ɪkˈspekt]",
+      "Meaning": "动词，意为‘期待、预料’；在小说开头，卡思伯特兄妹 expect a boy。",
+      "Example": "Matthew did not expect to find a talkative girl with red braids at the station.",
+      "ExampleTranslator": "马修没想到会在车站遇到一个扎着红辫子、喋喋不休的女孩。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🚂 <strong>原形还原说明</strong>：<br>✅ 原形：<<strong>expect</strong><br>• expecting = 现在分词（原文件为 expecting，已还原）<br>• expected = 过去分词（原文件有 expected，合并处理）<br>✅ 关键情节驱动词：<br>- Expectation vs. reality<br>- Don’t expect, be surprised!<br>🔁 近义：anticipate, look forward to<br>💡 安妮启示：‘Life is sweeter when expectations are shattered by joy.’</p>"
+    },
+    {
+      "Word": "dish",
+      "Phonetic": "英 [dɪʃ]，美 [dɪʃ]",
+      "Meaning": "名词，意为‘碟子、菜肴’；在厨房或聚餐场景中高频出现。",
+      "Example": "Anne offered to wash the dishes after supper, though she’d rather be reading poetry.",
+      "ExampleTranslator": "安妮主动提出晚饭后洗碗，尽管她更想读诗。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🧼 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>dish</strong><br>• dishes = 复数（原文件为 dishes，已还原）<br>✅ 双重含义：<br>- Plate/bowl (container)<br>- Recipe (e.g., a tasty dish)<br>🔁 近义：plate, course<br>💡 谚语：‘Wash the dishes, clear the mind!’</p>"
+    },
+    {
+      "Word": "everyday",
+      "Phonetic": "英 [ˈevrideɪ]，美 [ˈevrideɪ]",
+      "Meaning": "形容词，意为‘日常的、平常的’；注意与副词短语 ‘every day’ 区分。",
+      "Example": "Anne found magic even in everyday chores like sweeping or peeling apples.",
+      "ExampleTranslator": "安妮甚至在扫地或削苹果这样的日常琐事中也能发现魔法。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🧹 <strong>拼写重点</strong>：<br>• Everyday（adj）= ordinary<br>• Every day（adv phrase）= each day<br>✅ 小说主题：<br>- Transform everyday into extraordinary<br>- Magic in the mundane<br>🔁 近义：ordinary, routine, common<br>💡 口诀：‘Everyday magic = Anne’s superpower!’</p>"
+    },
+    {
+      "Word": "crab",
+      "Phonetic": "英 [kræb]，美 [kræb]",
+      "Meaning": "名词，意为‘螃蟹’；也可作形容词‘脾气暴躁的’（crabby），但此处取名词义。",
+      "Example": "During their seaside picnic, the girls squealed as a tiny crab scuttled over their toes.",
+      "ExampleTranslator": "海边野餐时，一只小螃蟹从她们脚趾上横爬而过，女孩们尖叫起来。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🦀 <strong>自然探索</strong>：<br>• Crab = sea creature<br>✅ PEI coastal life：<br>- Tide pools<br>- Beachcombing<br>🔁 近义：crustacean<br>💡 趣味：‘Crab walks sideways — like gossip in Avonlea!’</p>"
+    },
+    {
+      "Word": "apple",
+      "Phonetic": "英 [ˈæpl]，美 [ˈæpl]",
+      "Meaning": "名词，意为‘苹果’；在农舍生活中常见，用于烹饪或保存。",
+      "Example": "Marilla stewed apples from the orchard to make preserves for winter.",
+      "ExampleTranslator": "玛丽拉用果园里的苹果炖煮，做成果酱以备过冬。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍎 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>apple</strong><br>• apples = 复数（原文件为 apple，单数正确）<br>✅ 农家生活：<br>- Apple pie<br>- Apple preserves<br>- Orchard harvest<br>🔁 近义：fruit, pomaceous fruit<br>💡 象征：‘Apple = simple, wholesome, home.’</p>"
+    },
+    {
+      "Word": "preserve",
+      "Phonetic": "英 [prɪˈzɜːv]，美 [prɪˈzɜːrv]",
+      "Meaning": "动词/名词，作名词指‘果酱’；作动词意为‘保存’。",
+      "Example": "The shelves were lined with jars of strawberry and raspberry preserves, gleaming like rubies.",
+      "ExampleTranslator": "架子上摆满了草莓和覆盆子果酱罐，如红宝石般闪亮。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍓 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>preserve</strong>（作名词，常用复数 preserves）<br>• preserves = 果酱（固定用复数）<br>✅ 保存文化：<br>- Preserve summer’s bounty<br>- Preserve memories (metaphor)<br>🔁 动词近义：conserve, keep<br>💡 趣味：‘Preserves = summer in a jar!’</p>"
+    },
+    {
+      "Word": "cake",
+      "Phonetic": "英 [keɪk]，美 [keɪk]",
+      "Meaning": "名词，意为‘蛋糕’；在待客或庆祝场合出现。",
+      "Example": "Anne baked a spice cake for Diana’s birthday, though she accidentally used anise instead of cinnamon.",
+      "ExampleTranslator": "安妮为戴安娜的生日烤了一个香料蛋糕，却不小心用了茴香而不是肉桂。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🎂 <strong>生活失误幽默</strong>：<br>• Cake = celebration + potential disaster<br>✅ 安妮式错误：<br>- Good intention, funny outcome<br>- Still delicious in spirit!<br>🔁 近义：dessert, pastry<br>💡 联想：‘Cake = love made edible — even with anise!’</p>"
+    },
+    {
+      "Word": "particular",
+      "Phonetic": "英 [pəˈtɪkjələ(r)]，美 [pərˈtɪkjələr]",
+      "Meaning": "形容词，意为‘特别的、挑剔的’；玛丽拉常被描述为 particular about cleanliness.",
+      "Example": "Marilla was particular about how the napkins were folded—never a wrinkle allowed!",
+      "ExampleTranslator": "玛丽拉对餐巾的折叠方式非常讲究——绝不允许有一丝褶皱！",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🧺 <strong>性格刻画</strong>：<br>• Particular = fussy, exacting<br>✅ 对比：<br>- Marilla: particular<br>- Anne: imaginative (not particular)<br>🔁 近义：fussy, meticulous, demanding<br>💡 用法：‘Be particular about standards, not people.’</p>"
+    },
+    {
+      "Word": "dizzy",
+      "Phonetic": "英 [ˈdɪzi]，美 [ˈdɪzi]",
+      "Meaning": "形容词，意为‘头晕的、眼花缭乱的’；可描述身体感受或情绪激动。",
+      "Example": "After spinning in the meadow, Anne felt dizzy with laughter and sunlight.",
+      "ExampleTranslator": "在草地上旋转之后，安妮因欢笑和阳光而感到晕眩。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💫 <strong>身心联动</strong>：<br>• Dizzy = head spins<br>✅ 双重体验：<br>- Physical: stood up too fast<br>- Emotional: overwhelmed by joy<br>🔁 近义：lightheaded, giddy, whirl<br>💡 联想：‘Dizzy = world spins, heart soars!’</p>"
+    },
+    {
+      "Word": "mystery",
+      "Phonetic": "英 [ˈmɪstri]，美 [ˈmɪstri]",
+      "Meaning": "名词，意为‘神秘、谜’；安妮常将自然现象赋予神秘色彩。",
+      "Example": "The fog rolling in from the sea was, to Anne, a mystery wrapped in silver veils.",
+      "ExampleTranslator": "对安妮来说，从海上涌来的雾气，是一层裹着银纱的谜团。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌫️ <strong>浪漫化认知</strong>：<br>• Mystery = unknown + wonder<br>✅ 安妮式思维：<br>- Turn ordinary into enigmatic<br>- Find stories in silence<br>🔁 近义：enigma, puzzle, secret<br>💡 联想：‘Mystery isn’t scary — it’s an invitation to imagine!’</p>"
+    },
+  {
+    "Word": "unmysterious",
+    "Phonetic": "英 [ʌnˈmɪstriəs]，美 [ʌnˈmɪstriəs]",
+    "Meaning": "形容词，意为‘不神秘的、一目了然的’；用于强调事物的清晰或平凡。",
+    "Example": "Matthew’s kindness was unmysterious—quiet, steady, and always there when needed.",
+    "ExampleTranslator": "马修的善良毫不神秘——安静、坚定，总在需要时出现。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🕯️ <strong>否定前缀强化</strong>：<br>• Un- + mysterious → clear, plain<br>✅ 对比手法：<br>- Anne: sees mystery everywhere<br>- Matthew: embodies unmysterious love<br>🔁 近义：obvious, straightforward, plain<br>💡 深意：‘The deepest care is often unmysterious — just present.’</p>"
+  },
+  {
+    "Glossary": "Note: 'unmysterious' is rare but valid; used here for literary contrast."
+  },
+  {
+    "Word": "briskly",
+    "Phonetic": "英 [ˈbrɪskli]，美 [ˈbrɪskli]",
+    "Meaning": "副词，意为‘轻快地、活泼地’；常描述步伐或语气，体现干练或活力。",
+    "Example": "Rachel Lynde walked briskly down the lane, ready to deliver both soup and gossip.",
+    "ExampleTranslator": "瑞秋·林德轻快地沿着小路走来，既准备了汤，也备好了八卦。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💨 <strong>节奏感记忆</strong>：<br>• Brisk = quick + energetic<br>✅ 人物刻画：<br>- Brisk walk = no-nonsense attitude<br>- Brisk reply = efficient, maybe sharp<br>🔁 近义：quickly, energetically, smartly<br>💡 联想：‘Briskly = breeze + brisk — like Rachel’s unstoppable pace!’</p>"
+  },
+  {
+    "Word": "lack",
+    "Phonetic": "英 [læk]，美 [læk]",
+    "Meaning": "名词/动词，意为‘缺乏、不足’；在小说中可指情感、物品或机会的缺失。",
+    "Example": "Anne felt no lack of imagination, even when her dress was patched and her shoes worn.",
+    "ExampleTranslator": "即使穿着打补丁的裙子、踏着破旧的鞋子，安妮也从不缺少想象力。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🪡 <strong>抽象 vs. 具体</strong>：<br>• Lack of money (concrete)<br>• Lack of kindness (abstract)<br>✅ 安妮哲学：<br>- Material lack ≠ emotional poverty<br>- Imagination fills gaps<br>🔁 近义：shortage, deficiency, absence<br>💡 句型：‘There is a lack of...’ / ‘She lacks...’</p>"
+  },
+  {
+    "Word": "friendship",
+    "Phonetic": "英 [ˈfrendʃɪp]，美 [ˈfrendʃɪp]",
+    "Meaning": "名词，意为‘友谊’；是《绿山墙的安妮》的核心主题之一，尤其体现在安妮与戴安娜的关系中。",
+    "Example": "Their friendship began with raspberry cordial and grew stronger with every shared secret.",
+    "ExampleTranslator": "她们的友谊始于覆盆子甜酒，并在每一次分享秘密中愈发深厚。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>💞 <strong>情感核心词</strong>：<br>• Friend + -ship → state of being friends<br>✅ 小说高光：<br>- ‘Kindred spirits’<br>- Loyalty through misunderstandings<br>🔁 近义：bond, companionship, alliance<br>💡 金句：‘Friendship is the true magic of Avonlea.’</p>"
+  },
+  {
+    "Word": "exist",
+    "Phonetic": "英 [ɪɡˈzɪst]，美 [ɪɡˈzɪst]",
+    "Meaning": "动词，意为‘存在、生存’；可描述实体或抽象概念（如希望、偏见）的存在。",
+    "Example": "Hope existed in Anne’s heart even on the grayest November days.",
+    "ExampleTranslator": "即使在最阴沉的十一月天，希望也存在于安妮心中。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🕊️ <strong>原形还原说明</strong>：<br>✅ 原形：<strong>exist</strong><br>• existed = 过去式（原文件为 existed，已还原）<br>✅ 抽象主语高频：<br>- Joy exists<br>- Prejudice exists<br>- Magic exists (to Anne!)<br>🔁 近义：be, live, persist<br>💡 哲思：‘To exist is one thing; to live fully is another — Anne does both.’</p>"
+  },
+  {
+    "Word": "spite",
+    "Phonetic": "英 [spaɪt]，美 [spaɪt]",
+    "Meaning": "名词，意为‘恶意、怨恨’；常用于短语 ‘in spite of’（尽管），但本义指负面情绪。",
+    "Example": "Anne held no spite toward Mrs. Lynde, even after the harsh words about her looks.",
+    "ExampleTranslator": "即使林德太太曾严厉批评她的相貌，安妮对她也毫无怨恨。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🕊️ <strong>情感对比</strong>：<br>• Spite = malice, ill will<br>✅ 安妮的成长：<br>- Forgives easily<br>- Chooses joy over resentment<br>🔁 近义：malice, bitterness, grudge<br>💡 注意：‘in spite of’ ≠ spite（前者无恶意）<br>口诀：‘Spite poisons; Anne chooses honey.’</p>"
+  },
+  {
+    "Word": "perhaps",
+    "Phonetic": "英 [pəˈhæps]，美 [pərˈhæps]",
+    "Meaning": "副词，意为‘也许、可能’；在对话中表达委婉或不确定。",
+    "Example": "‘Perhaps,’ said Matthew slowly, ‘she’s not so different from what we hoped for.’",
+    "ExampleTranslator": "“也许吧，”马修缓缓说道，“她和我们期待的并没有那么不同。”",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🤔 <strong>语气软化词</strong>：<br>• Perhaps = maybe, possibly<br>✅ 马修式语言：<br>- Hesitant<br>- Kind<br>- Open-minded<br>🔁 近义：maybe, possibly, conceivably<br>💡 写作建议：‘Use “perhaps” to show gentle doubt or hope.’</p>"
+  },
+  {
+    "Word": "dissimilarity",
+    "Phonetic": "英 [ˌdɪsɪməˈlærəti]，美 [ˌdɪsɪməˈlærəti]",
+    "Meaning": "名词，意为‘差异、不相似’；用于比较两人性格、背景或观点的不同。",
+    "Example": "The dissimilarity between Anne’s fiery imagination and Marilla’s practical nature made their bond all the more remarkable.",
+    "ExampleTranslator": "安妮炽热的想象力与玛丽拉务实的天性之间的差异，反而让她们的纽带更加非凡。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚖️ <strong>学术词汇生活化</strong>：<br>• Dis-（否定）+ similarity → difference<br>✅ 关系张力：<br>- Opposites attract<br>- Growth through contrast<br>🔁 近义：difference, contrast, disparity<br>💡 构词：‘Similar → dissimilar → dissimilarity’</p>"
+  },
+  {
+    "Word": "angle",
+    "Phonetic": "英 [ˈæŋɡl]，美 [ˈæŋɡl]",
+    "Meaning": "名词，意为‘角、角度’；可指数学概念，也可引申为‘视角、立场’。",
+    "Example": "From the east gable window, Anne saw the world from a new angle—one filled with possibility.",
+    "ExampleTranslator": "从东山墙的窗户望去，安妮以一种全新的视角看世界——一个充满可能性的世界。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📐 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>angle</strong><br>• angles = 复数（原文件为 angles，已还原）<br>✅ 双重含义：<br>- Geometric angle<br>- Perspective (journalism: story angle)<br>🔁 近义：viewpoint, perspective, corner<br>💡 隐喻：‘Change your angle, change your world.’</p>"
+  },
+  {
+    "Word": "show",
+    "Phonetic": "英 [ʃəʊ]，美 [ʃoʊ]",
+    "Meaning": "动词，意为‘展示、表明’；在小说中常用于‘show kindness’或‘show the way’。",
+    "Example": "Marilla never said ‘I love you,’ but she showed it in a hundred quiet ways.",
+    "ExampleTranslator": "玛丽拉从不说“我爱你”，但她用上百种安静的方式表达了爱意。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>❤️ <strong>原形还原说明</strong>：<br>✅ 原形：<strong>show</strong><br>• showed = 过去式（原文件为 showed，已还原）<br>✅ 情感表达：<br>- Show, don’t tell<br>- Actions > words<br>🔁 近义：demonstrate, display, reveal<br>💡 金句：‘Love is shown, not announced.’</p>"
+  },
+  {
+    "Word": "gray",
+    "Phonetic": "英 [ɡreɪ]，美 [ɡreɪ]",
+    "Meaning": "形容词/名词，意为‘灰色的’；在小说中常象征单调、年老或忧郁，与安妮的色彩形成对比。",
+    "Example": "The world seemed gray to Marilla until Anne painted it with words and wonder.",
+    "ExampleTranslator": "在安妮用言语和奇思妙想为世界着色之前，玛丽拉眼中的世界一直是灰暗的。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>☁️ <strong>色彩心理学</strong>：<br>• Gray = dullness, age, sobriety<br>✅ 象征对比：<br>- Marilla: gray dresses, gray outlook<br>- Anne: red hair, green trees, blue dreams<br>🔁 近义：drab, muted, ashen<br>💡 隐喻：‘Gray is not absence of color — it’s waiting for someone to add light.’</p>"
+  },
+  {
+    "Word": "streak",
+    "Phonetic": "英 [striːk]，美 [striːk]",
+    "Meaning": "名词，意为‘条纹、 streak（如光线或颜色的痕迹）’；可描述头发、云彩或情绪。",
+    "Example": "Sunlight broke through the clouds in golden streaks, as if heaven were smiling on Green Gables.",
+    "ExampleTranslator": "阳光穿透云层，洒下道道金光，仿佛上天正对绿山墙微笑。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚡ <strong>原形还原说明</strong>：<br>✅ 原形：<strong>streak</strong><br>• streaks = 复数（原文件为 streaks，已还原）<br>✅ 视觉动态：<br>- Streak of lightning<br>- Gray streak in hair<br>- Emotional streak (e.g., stubborn streak)<br>🔁 近义：stripe, line, flash<br>💡 联想：‘A streak is a brushstroke from the universe.’</p>"
+  },
+
+    {
+      "Word": "twist",
+      "Phonetic": "英 [twɪst] 美 [twɪst]",
+      "Meaning": "扭曲；扭动；转折（twisted 是其过去式和过去分词）",
+      "Example": "Anne twisted her hair into a tight bun before starting her chores.",
+      "ExampleTranslator": "安妮把头发紧紧地扭成一个发髻，然后开始做家务。",
+      "AIHelp": "<b>词根联想：</b>twist ← 与“two”相关，想象两股绳子“扭”在一起。<br><b>场景记忆：</b>想象安妮在跳舞时<b>twist</b>她的裙子，像《绿山墙的安妮》里她兴奋时的动作。<br><b>职场造句：</b>The plot <b>twisted</b> unexpectedly in the project requirements.<br><b>形式说明：</b>twisted 是 twist 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "knot",
+      "Phonetic": "英 [nɒt] 美 [nɑːt]",
+      "Meaning": "结；打结；难题",
+      "Example": "Marilla tied a neat knot in the apron strings.",
+      "ExampleTranslator": "玛丽拉在围裙带子上打了一个整齐的结。",
+      "AIHelp": "<b>谐音记忆：</b>“闹” → 绳子打结后“闹”得解不开。<br><b>场景记忆：</b>想象安妮把头发打成乱七八糟的 <b>knot</b>，被玛丽拉训斥。<br><b>职场造句：</b>The team needs to untie this <b>knot</b> in the deployment process.<br><b>近义词对比：</b>knot（结/难题） vs tie（系）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "wire",
+      "Phonetic": "英 [ˈwaɪə(r)] 美 [ˈwaɪər]",
+      "Meaning": "电线；金属丝；电报",
+      "Example": "The old farm house had bare wires hanging from the ceiling.",
+      "ExampleTranslator": "老农舍的天花板上挂着裸露的电线。",
+      "AIHelp": "<b>场景记忆：</b>想象安妮看到电线（<b>wire</b>）时好奇地问：“这是什么魔法？”<br><b>职场造句：</b>We need to upgrade the network <b>wire</b> to support higher bandwidth.<br><b>近义词对比：</b>wire（电线/金属丝） vs cable（电缆，更粗）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "hairpin",
+      "Phonetic": "英 [ˈheəpɪn] 美 [ˈherpɪn]",
+      "Meaning": "发夹；发髻（hairpins 是复数）",
+      "Example": "Anne lost her hairpins while running through the woods.",
+      "ExampleTranslator": "安妮在树林里跑的时候弄丢了她的发夹。",
+      "AIHelp": "<b>场景记忆：</b>安妮的红发总爱散开，玛丽拉给她别上 <b>hairpins</b>。<br><b>职场联想：</b>“hairpin turn” = 急转弯，形容项目突然大变动。<br><b>复数说明：</b>hairpins 是 hairpin 的复数形式。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "aggressively",
+      "Phonetic": "英 [əˈɡresɪvli] 美 [əˈɡresɪvli]",
+      "Meaning": "积极地；咄咄逼人地；侵略性地",
+      "Example": "The salesman pushed the product too aggressively and scared Anne away.",
+      "ExampleTranslator": "那个推销员太咄咄逼人地推销产品，把安妮吓跑了。",
+      "AIHelp": "<b>词根联想：</b>aggress-（攻击） + ive + ly → 攻击性地。<br><b>场景记忆：</b>想象安妮被一个 <b>aggressively</b> 推销的商人吓到。<br><b>职场造句：</b>The company is <b>aggressively</b> recruiting top AI talent.<br><b>近义词对比：</b>aggressively（咄咄逼人） vs assertively（自信地）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "narrow",
+      "Phonetic": "英 [ˈnærəʊ] 美 [ˈnæroʊ]",
+      "Meaning": "狭窄的；有限的；仔细的",
+      "Example": "The path to Green Gables was narrow and lined with wildflowers.",
+      "ExampleTranslator": "通往绿山墙的小路很窄，两旁开满了野花。",
+      "AIHelp": "<b>场景记忆：</b>《绿山墙的安妮》中，安妮常走那条 <b>narrow</b> 的林间小路。<br><b>职场造句：</b>We have a <b>narrow</b> window to fix the bug before the release.<br><b>近义词对比：</b>narrow（狭窄） vs tight（紧的）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "rigid",
+      "Phonetic": "英 [ˈrɪdʒɪd] 美 [ˈrɪdʒɪd]",
+      "Meaning": "僵硬的；严格的；固执的",
+      "Example": "Marilla's rigid rules made Anne feel confined at first.",
+      "ExampleTranslator": "玛丽拉严格的规矩一开始让安妮感到束缚。",
+      "AIHelp": "<b>场景记忆：</b>玛丽拉性格 <b>rigid</b>，但后来被安妮软化。<br><b>职场造句：</b>The old system was too <b>rigid</b> to handle modern workloads.<br><b>近义词对比：</b>rigid（僵硬/严格） vs strict（严格，但更侧重纪律）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "consider",
+      "Phonetic": "英 [kənˈsɪdə(r)] 美 [kənˈsɪdər]",
+      "Meaning": "考虑；认为（considered 是其过去式/过去分词）",
+      "Example": "Marilla considered Anne a handful but grew to love her.",
+      "ExampleTranslator": "玛丽拉最初认为安妮很麻烦，但后来爱上了她。",
+      "AIHelp": "<b>词根联想：</b>consider ← con-（完全） + sider（星星），古人“完全看星星”来思考。<br><b>职场造句：</b>We <b>considered</b> several frameworks before choosing React.<br><b>形式说明：</b>considered 是 consider 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "indicative",
+      "Phonetic": "英 [ɪnˈdɪkətɪv] 美 [ɪnˈdɪkətɪv]",
+      "Meaning": "指示的；表明的",
+      "Example": "Anne's bright eyes were indicative of her lively imagination.",
+      "ExampleTranslator": "安妮明亮的眼睛表明了她活泼的想象力。",
+      "AIHelp": "<b>词根联想：</b>indicate（指示） + ive → 指示性的。<br><b>场景记忆：</b>安妮的表情总是 <b>indicative</b> of her emotions.<br><b>职场造句：</b>High turnover is <b>indicative</b> of poor company culture.<br><b>近义词对比：</b>indicative vs suggestive（暗示的）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "sense",
+      "Phonetic": "英 [sens] 美 [sens]",
+      "Meaning": "感觉；意义；感官",
+      "Example": "Anne had a keen sense of beauty in nature.",
+      "ExampleTranslator": "安妮对自然之美有着敏锐的感觉。",
+      "AIHelp": "<b>场景记忆：</b>安妮常说“This has no <b>sense</b> of romance!”<br><b>职场造句：</b>Common <b>sense</b> tells us not to deploy on Friday afternoons.<br><b>近义词对比：</b>sense（感觉/意义） vs feeling（情感）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "humor",
+      "Phonetic": "英 [ˈhjuːmə(r)] 美 [ˈhuːmər]",
+      "Meaning": "幽默；心情；体液（古医学术语）",
+      "Example": "Anne's sense of humor often lightened the mood at Green Gables.",
+      "ExampleTranslator": "安妮的幽默感常常让绿山墙的气氛轻松起来。",
+      "AIHelp": "<b>场景记忆：</b>安妮用 <b>humor</b>化解尴尬。<br><b>职场造句：</b>Good <b>humor</b> in a team meeting can boost morale.<br><b>近义词对比：</b>humor（幽默） vs wit（机智）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "afraid",
+      "Phonetic": "英 [əˈfreɪd] 美 [əˈfreɪd]",
+      "Meaning": "害怕的；担心的",
+      "Example": "Anne was afraid of being sent back to the orphanage.",
+      "ExampleTranslator": "安妮害怕被送回孤儿院。",
+      "AIHelp": "<b>场景记忆：</b>安妮初到绿山墙时 <b>afraid</b> 会被退回。<br><b>职场造句：</b>I'm <b>afraid</b> we missed the deadline by two days.<br><b>近义词对比：</b>afraid（害怕） vs scared（恐惧） vs fearful（胆怯）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "twitch",
+      "Phonetic": "英 [twɪtʃ] 美 [twɪtʃ]",
+      "Meaning": "抽搐；猛拉（twitched 是其过去式）",
+      "Example": "Marilla's lips twitched with suppressed laughter.",
+      "ExampleTranslator": "玛丽拉的嘴唇因忍住笑而微微抽动。",
+      "AIHelp": "<b>场景记忆：</b>玛丽拉听到安妮胡说八道时，嘴角 <b>twitch</b>。<br><b>职场造句：</b>His eye <b>twitched</b> when he heard the bad news.<br><b>形式说明：</b>twitched 是 twitch 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "understandingly",
+      "Phonetic": "英 [ˌʌndəˈstændɪŋli] 美 [ˌʌndərˈstændɪŋli]",
+      "Meaning": "理解地；体谅地",
+      "Example": "Matthew smiled understandingly when Anne apologized again.",
+      "ExampleTranslator": "安妮再次道歉时，马修理解地笑了笑。",
+      "AIHelp": "<b>场景记忆：</b>马修总是 <b>understandingly</b> 包容安妮。<br><b>职场造句：</b>The manager listened <b>understandingly</b> to the team's concerns.<br><b>近义词对比：</b>understandingly vs sympathetically（同情地）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "jaunt",
+      "Phonetic": "英 [dʒɔːnt] 美 [dʒɔːnt]",
+      "Meaning": "短途旅行；兜风（jaunting 是其现在分词）",
+      "Example": "Anne loved going on jaunting trips with her friends.",
+      "ExampleTranslator": "安妮喜欢和朋友一起去短途旅行。",
+      "AIHelp": "<b>场景记忆：</b>安妮和戴安娜坐马车 <b>jaunting</b> 到镇上。<br><b>职场联想：</b>“team jaunt” = 团队短途出游。<br><b>形式说明：</b>jaunting 是 jaunt 的现在分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "unaccountably",
+      "Phonetic": "英 [ˌʌnəˈkaʊntəbli] 美 [ˌʌnəˈkaʊntəbli]",
+      "Meaning": "无法解释地；莫名其妙地",
+      "Example": "Anne felt unaccountably happy on that beautiful morning.",
+      "ExampleTranslator": "安妮在那美丽的早晨莫名其妙地感到快乐。",
+      "AIHelp": "<b>词根联想：</b>un-（不） + account（解释） + able + ly → 无法解释地。<br><b>场景记忆：</b>安妮常有 <b>unaccountably</b> 的好心情。<br><b>职场造句：</b>The server crashed <b>unaccountably</b> despite no changes.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "curiosity",
+      "Phonetic": "英 [ˌkjʊəriˈɒsəti] 美 [ˌkjʊriˈɑːsəti]",
+      "Meaning": "好奇心；珍品",
+      "Example": "Anne's curiosity led her to explore every corner of the farm.",
+      "ExampleTranslator": "安妮的好奇心让她探索了农场的每个角落。",
+      "AIHelp": "<b>场景记忆：</b>安妮的好奇心（<b>curiosity</b>）总是让她闯祸又带来惊喜。<br><b>职场造句：</b>Curiosity drives innovation in tech companies.<br><b>近义词对比：</b>curiosity vs inquisitiveness（更强调探究精神）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "although",
+      "Phonetic": "英 [ɔːlˈðəʊ] 美 [ɔːlˈðoʊ]",
+      "Meaning": "虽然；尽管",
+      "Example": "Although Anne was talkative, she was also very kind.",
+      "ExampleTranslator": "虽然安妮话很多，但她也很善良。",
+      "AIHelp": "<b>场景记忆：</b>玛丽拉常说“<b>Although</b> you're naughty, I like you.”<br><b>职场造句：</b><b>Although</b> the deadline is tight, we can still deliver quality work.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "headache",
+      "Phonetic": "英 [ˈhedeɪk] 美 [ˈhedeɪk]",
+      "Meaning": "头痛；麻烦事",
+      "Example": "Dealing with Anne's imagination gave Marilla a headache.",
+      "ExampleTranslator": "应对安妮的想象力让玛丽拉头痛。",
+      "AIHelp": "<b>场景记忆：</b>安妮的奇思妙想常让玛丽拉 <b>headache</b>。<br><b>职场造句：</b>Legacy code is always a <b>headache</b> for developers.<br><b>近义词对比：</b>headache（头痛/麻烦） vs pain（痛苦）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "yesterday",
+      "Phonetic": "英 [ˈjestədeɪ] 美 [ˈjestərdeɪ]",
+      "Meaning": "昨天",
+      "Example": "Anne talked about her adventures from yesterday.",
+      "ExampleTranslator": "安妮谈论了她昨天的冒险。",
+      "AIHelp": "<b>谐音记忆：</b>“耶死得” → 昨天已经“死掉”了。<br><b>场景记忆：</b>安妮每天都有新故事，昨天（<b>yesterday</b>）的冒险。<br><b>职场造句：</b>The bug was fixed <b>yesterday</b> evening.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "orphan",
+      "Phonetic": "英 [ˈɔːfən] 美 [ˈɔːrfən]",
+      "Meaning": "孤儿",
+      "Example": "Anne was an orphan before she came to Green Gables.",
+      "ExampleTranslator": "安妮来到绿山墙之前是个孤儿。",
+      "AIHelp": "<b>场景记忆：</b>整部小说的核心：安妮是个 <b>orphan</b>。<br><b>职场联想：</b>“orphan process” = 孤儿进程（计算机术语）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "asylum",
+      "Phonetic": "英 [əˈsaɪləm] 美 [əˈsaɪləm]",
+      "Meaning": "避难所；精神病院",
+      "Example": "Anne feared being sent to an asylum for orphans.",
+      "ExampleTranslator": "安妮害怕被送到孤儿收容所。",
+      "AIHelp": "<b>词根联想：</b>a-（无） + sylum（保护） → 提供保护的地方。<br><b>场景记忆：</b>安妮最怕被送回 <b>asylum</b>。<br><b>近义词对比：</b>asylum（避难所） vs refuge（庇护所）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "train",
+      "Phonetic": "英 [treɪn] 美 [treɪn]",
+      "Meaning": "火车；训练",
+      "Example": "Anne arrived at Bright River station by train.",
+      "ExampleTranslator": "安妮坐火车到达了布莱特河车站。",
+      "AIHelp": "<b>场景记忆：</b>小说开头，安妮坐 <b>train</b> 到岛上。<br><b>职场造句：</b>We need to <b>train</b> new employees on the system.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "stricken",
+      "Phonetic": "英 [ˈstrɪkən] 美 [ˈstrɪkən]",
+      "Meaning": "受打击的；患病的；受惊的",
+      "Example": "Anne was grief-stricken when she thought she had to leave.",
+      "ExampleTranslator": "当安妮以为自己要离开时，她悲痛欲绝。",
+      "AIHelp": "<b>场景记忆：</b>安妮听到要被送走时 <b>stricken</b> with sorrow。<br><b>职场造句：</b>The team was <b>stricken</b> by the sudden resignation of the lead engineer.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "dumb",
+      "Phonetic": "英 [dʌm] 美 [dʌm]",
+      "Meaning": "哑的；愚蠢的；沉默的",
+      "Example": "Anne was struck dumb with joy when she learned she could stay.",
+      "ExampleTranslator": "当安妮得知自己可以留下时，她高兴得说不出话来。",
+      "AIHelp": "<b>场景记忆：</b>安妮激动时会 <b>dumb</b> 得说不出话。<br><b>职场造句：</b>Don't be <b>dumb</b> enough to delete the production database!",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "force",
+      "Phonetic": "英 [fɔːs] 美 [fɔːrs]",
+      "Meaning": "力量；强迫（forced 是其过去式）",
+      "Example": "Marilla forced herself to be stern with Anne.",
+      "ExampleTranslator": "玛丽拉强迫自己对安妮严厉。",
+      "AIHelp": "<b>场景记忆：</b>玛丽拉 <b>forced</b> 自己不笑。<br><b>职场造句：</b>We were <b>forced</b> to refactor the entire module.<br><b>形式说明：</b>forced 是 force 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "earnest",
+      "Phonetic": "英 [ˈɜːnɪst] 美 [ˈɜːrnɪst]",
+      "Meaning": "认真的；诚恳的",
+      "Example": "Anne spoke in earnest about her dreams for the future.",
+      "ExampleTranslator": "安妮认真地谈论她对未来的梦想。",
+      "AIHelp": "<b>场景记忆：</b>安妮总是 <b>earnest</b> 地表达自己的情感。<br><b>职场造句：</b>He made an <b>earnest</b> effort to improve his performance.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "return",
+      "Phonetic": "英 [rɪˈtɜːn] 美 [rɪˈtɜːrn]",
+      "Meaning": "返回；归还（returned 是其过去式）",
+      "Example": "Anne returned to Green Gables with a joyful heart.",
+      "ExampleTranslator": "安妮怀着喜悦的心回到了绿山墙。",
+      "AIHelp": "<b>场景记忆：</b>安妮被允许 <b>return</b> 到绿山墙。<br><b>职场造句：</b>The server <b>returned</b> a 404 error.<br><b>形式说明：</b>returned 是 return 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "boy",
+      "Phonetic": "英 [bɔɪ] 美 [bɔɪ]",
+      "Meaning": "男孩；儿子（boys 是复数）",
+      "Example": "Marilla originally wanted a boy to help on the farm.",
+      "ExampleTranslator": "玛丽拉原本想要一个男孩来帮农活。",
+      "AIHelp": "<b>场景记忆：</b>小说开头，玛丽拉想收养一个 <b>boy</b>。<br><b>职场造句：</b>The <b>boys</b> in the team handled the heavy lifting.<br><b>复数说明：</b>boys 是 boy 的复数形式。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "farm",
+      "Phonetic": "英 [fɑːm] 美 [fɑːrm]",
+      "Meaning": "农场；耕作",
+      "Example": "Green Gables was a beautiful farm on Prince Edward Island.",
+      "ExampleTranslator": "绿山墙是爱德华王子岛上一个美丽的农场。",
+      "AIHelp": "<b>场景记忆：</b>整个故事发生在 <b>farm</b> 上的绿山墙。<br><b>职场联想：</b>“server farm” = 服务器集群。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "unheard",
+      "Phonetic": "英 [ˌʌnˈhɜːd] 美 [ˌʌnˈhɜːrd]",
+      "Meaning": "未被听到的；前所未闻的",
+      "Example": "Anne's wild stories were unheard of in quiet Avonlea.",
+      "ExampleTranslator": "安妮的奇思妙想在安静的艾文利是前所未闻的。",
+      "AIHelp": "<b>场景记忆：</b>安妮的想法总是 <b>unheard</b> of。<br><b>职场造句：</b>The proposal was <b>unheard</b> of until now.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "innovation",
+      "Phonetic": "英 [ˌɪnəˈveɪʃn] 美 [ˌɪnəˈveɪʃn]",
+      "Meaning": "创新；革新",
+      "Example": "Anne's imagination was full of innovation and creativity.",
+      "ExampleTranslator": "安妮的想象力充满了创新和创造力。",
+      "AIHelp": "<b>词根联想：</b>in-（进入） + nova（新） + tion → 引入新事物。<br><b>职场造句：</b>The company encourages <b>innovation</b> in product development.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "receive",
+      "Phonetic": "英 [rɪˈsiːv] 美 [rɪˈsiːv]",
+      "Meaning": "收到；接待（received 是其过去式）",
+      "Example": "Anne received a warm welcome from Matthew.",
+      "ExampleTranslator": "安妮受到了马修的热情欢迎。",
+      "AIHelp": "<b>场景记忆：</b>安妮被 <b>received</b> 进绿山墙。<br><b>职场造句：</b>The server <b>received</b> thousands of requests per second.<br><b>形式说明：</b>received 是 receive 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "severe",
+      "Phonetic": "英 [sɪˈvɪə(r)] 美 [sɪˈvɪr]",
+      "Meaning": "严重的；严厉的",
+      "Example": "Marilla's severe expression softened over time.",
+      "ExampleTranslator": "玛丽拉严厉的表情随着时间变得柔和。",
+      "AIHelp": "<b>场景记忆：</b>玛丽拉最初对安妮很 <b>severe</b>。<br><b>职场造句：</b>The bug caused a <b>severe</b> outage for users.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "exclamation",
+      "Phonetic": "英 [ˌekskləˈmeɪʃn] 美 [ˌekskləˈmeɪʃn]",
+      "Meaning": "感叹；惊呼",
+      "Example": "Anne let out an exclamation of delight when she saw the flowers.",
+      "ExampleTranslator": "安妮看到花朵时发出一声欢快的惊呼。",
+      "AIHelp": "<b>场景记忆：</b>安妮常有 <b>exclamation</b> 如“Oh, how splendid!”<br><b>职场造句：</b>The team let out a collective <b>exclamation</b> when the build succeeded.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "adopt",
+      "Phonetic": "英 [əˈdɒpt] 美 [əˈdɑːpt]",
+      "Meaning": "收养；采用（adopting 是其现在分词）",
+      "Example": "Marilla and Matthew decided to adopt Anne.",
+      "ExampleTranslator": "玛丽拉和马修决定收养安妮。",
+      "AIHelp": "<b>场景记忆：</b>小说核心：他们 <b>adopt</b> 了安妮。<br><b>职场造句：</b>We are <b>adopting</b> a new CI/CD pipeline.<br><b>形式说明：</b>adopting 是 adopt 的现在分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "certainly",
+      "Phonetic": "英 [ˈsɜːtnli] 美 [ˈsɜːrtnli]",
+      "Meaning": "当然；一定",
+      "Example": "Anne certainly knew how to make life interesting.",
+      "ExampleTranslator": "安妮当然知道如何让生活变得有趣。",
+      "AIHelp": "<b>场景记忆：</b>玛丽拉常说“<b>Certainly</b> not!”<br><b>职场造句：</b><b>Certainly</b>, we can schedule a review meeting next week.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "notion",
+      "Phonetic": "英 [ˈnəʊʃn] 美 [ˈnoʊʃn]",
+      "Meaning": "观念；想法；概念",
+      "Example": "Anne had the notion that she was a princess in disguise.",
+      "ExampleTranslator": "安妮有种想法，认为自己是伪装的公主。",
+      "AIHelp": "<b>场景记忆：</b>安妮的浪漫 <b>notion</b> 总是天马行空。<br><b>职场造句：</b>The new <b>notion</b> of microservices changed our architecture.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "disapprovingly",
+      "Phonetic": "英 [ˌdɪsəˈpruːvɪŋli] 美 [ˌdɪsəˈpruːvɪŋli]",
+      "Meaning": "不赞成地；反对地",
+      "Example": "Marilla looked disapprovingly at Anne's messy room.",
+      "ExampleTranslator": "玛丽拉不赞成地看着安妮凌乱的房间。",
+      "AIHelp": "<b>词根联想：</b>dis-（不） + approve（赞成） + ing + ly。<br><b>场景记忆：</b>玛丽拉常 <b>disapprovingly</b> 看安妮。<br><b>职场造句：</b>The manager shook his head <b>disapprovingly</b> at the late submission.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "winter",
+      "Phonetic": "英 [ˈwɪntə(r)] 美 [ˈwɪntər]",
+      "Meaning": "冬天",
+      "Example": "Winter at Green Gables was long and cold.",
+      "ExampleTranslator": "绿山墙的冬天漫长而寒冷。",
+      "AIHelp": "<b>场景记忆：</b>小说中安妮在 <b>winter</b> 里上学、滑冰。<br><b>职场造句：</b>The project will be completed by next <b>winter</b>.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    }
+  ]
+

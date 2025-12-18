@@ -161,7 +161,7 @@ class APITesterGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("🌐 接口批量测试数据生成器")
-        self.root.geometry("800x700")
+        self.root.geometry("800x800")
         self.root.resizable(True, True)
 
         self.config = load_config()

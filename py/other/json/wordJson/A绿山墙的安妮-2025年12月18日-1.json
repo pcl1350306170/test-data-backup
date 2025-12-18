@@ -1,0 +1,1226 @@
+[
+  {
+    "Word": "attend",
+    "Phonetic": "英 [əˈtend]，美 [əˈtend]",
+    "Meaning": "v. 出席；参加；照料；注意",
+    "Example": "All employees are required to attend the quarterly meeting. ",
+    "ExampleTranslator": "所有员工都必须参加季度会议。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：at-（加强）+ tend（伸展），伸展身体去做某事，即“出席、参加”。</p><p><strong>职场场景造句</strong>：She always attends important business negotiations to take notes.（她总是参加重要的商务谈判并做记录。）</p>"
+  },
+  {
+    "Word": "closely",
+    "Phonetic": "英 [ˈkləʊsli]，美 [ˈkloʊsli]",
+    "Meaning": "adv. 紧密地；密切地；仔细地",
+    "Example": "Scientists are closely monitoring the development of the new virus. ",
+    "ExampleTranslator": "科学家们正在密切监测这种新病毒的发展。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：close（近的；密切的）+ -ly（副词后缀），即“紧密地、密切地”。</p><p><strong>科普场景造句</strong>：Astronomers closely observe the movement of stars.（天文学家仔细观察恒星的运动。）</p>"
+  },
+  {
+    "Word": "neighbor",
+    "Phonetic": "英 [ˈneɪbə(r)]，美 [ˈneɪbər]",
+    "Meaning": "n. 邻居；邻人；adj. 邻近的；v. 邻近",
+    "Example": "My neighbor often helps me take care of my pet when I'm away. ",
+    "ExampleTranslator": "我外出时，邻居经常帮我照看宠物。",
+    "AIHelp": "<p><strong>谐音 + 场景记忆</strong>：“内拨儿”，内心想拨弄关系的人，可能是邻居。想象邻居之间互相帮忙的场景，加深记忆。</p><p><strong>日常场景造句</strong>：We often chat with our neighbors in the community garden.（我们经常和邻居在社区花园聊天。）</p>"
+  },
+  {
+    "Word": "dint",
+    "Phonetic": "英 [dɪnt]，美 [dɪnt]",
+    "Meaning": "n. 凹痕；v. 击出凹痕；靠...努力",
+    "Example": "He succeeded by dint of hard work and perseverance. ",
+    "ExampleTranslator": "他凭借努力和毅力取得了成功。",
+    "AIHelp": "<p><strong>对比近义词</strong>：与“by means of”“through”意思相近，都有“通过、凭借”之意。dint 更强调通过自身的努力。</p><p><strong>职场场景造句</strong>：She got the promotion by dint of her excellent performance.（她凭借出色的表现获得了晋升。）</p>"
+  },
+  {
+    "Word": "neglect",
+    "Phonetic": "英 [nɪˈɡlekt]，美 [nɪˈɡlekt]",
+    "Meaning": "v. 忽视；忽略；疏忽；n. 忽视；疏忽",
+    "Example": "Parents should not neglect their children's emotional needs. ",
+    "ExampleTranslator": "父母不应忽视孩子的情感需求。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：neg-（否定）+ lect（选择），不选择去做，即“忽视、忽略”。</p><p><strong>日常场景造句</strong>：If you neglect your health, you'll regret it later.（如果你忽视自己的健康，日后会后悔的。）</p><p><em>注：原单词“neglecting”是“neglect”的现在分词形式</em></p>"
+  },
+  {
+    "Word": "capable",
+    "Phonetic": "英 [ˈkeɪpəbl]，美 [ˈkeɪpəbl]",
+    "Meaning": "adj. 有能力的；能干的；有才华的",
+    "Example": "She is capable of solving complex problems in the workplace. ",
+    "ExampleTranslator": "她有能力解决职场中的复杂问题。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：cap-（拿；抓）+ -able（能...的），能抓住机会或完成任务的，即“有能力的”。</p><p><strong>职场场景对比近义词</strong>：与“competent”相比，capable 更强调潜在的能力，competent 更强调具备胜任工作的技能。如：He is a capable student.（他是个有潜力的学生。）He is a competent engineer.（他是个称职的工程师。）</p>"
+  },
+  {
+    "Word": "creature",
+    "Phonetic": "英 [ˈkriːtʃə(r)]，美 [ˈkriːtʃər]",
+    "Meaning": "n. 生物；动物；人",
+    "Example": "The panda is a lovely creature that lives in China. ",
+    "ExampleTranslator": "熊猫是一种生活在中国的可爱生物。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：cre-（创造）+ -ture（名词后缀），被创造出来的东西，即“生物、动物”。</p><p><strong>科普场景造句</strong>：Scientists have discovered many new deep-sea creatures.（科学家们发现了许多新的深海生物。）</p><p><em>注：原单词“creatures”是“creature”的复数形式</em></p>"
+  },
+  {
+    "Word": "folk",
+    "Phonetic": "英 [fəʊk]，美 [foʊk]",
+    "Meaning": "n. 人们；亲属；adj. 民间的",
+    "Example": "Local folks often gather in the square to celebrate festivals. ",
+    "ExampleTranslator": "当地人经常聚集在广场上庆祝节日。",
+    "AIHelp": "<p><strong>日常场景记忆</strong>：想象一群人（folk）在民间（folk）节日里欢乐聚会的场景，轻松记住意思。</p><p><strong>造句强化</strong>：These folk songs are popular among the elderly.（这些民歌在老年人中很受欢迎。）</p><p><em>注：原单词“folks”是“folk”的复数形式</em></p>"
+  },
+  {
+    "Word": "bargain",
+    "Phonetic": "英 [ˈbɑːɡən]，美 [ˈbɑːrɡən]",
+    "Meaning": "n. 交易；便宜货；v. 讨价还价",
+    "Example": "We made a bargain with the seller to get a 10% discount. ",
+    "ExampleTranslator": "我们和卖家讨价还价，得到了10%的折扣。",
+    "AIHelp": "<p><strong>谐音 + 场景记忆</strong>：“巴甘”，巴望着能甘心买下，那就需要讨价还价（bargain），买到便宜货（bargain）。</p><p><strong>日常场景造句</strong>：She found a great bargain in the supermarket sale.（她在超市促销中找到了一个很棒的便宜货。）</p>"
+  },
+  {
+    "Word": "notable",
+    "Phonetic": "英 [ˈnəʊtəbl]，美 [ˈnoʊtəbl]",
+    "Meaning": "adj. 值得注意的；显著的；著名的；n. 名人；要人",
+    "Example": "The city has made notable progress in environmental protection. ",
+    "ExampleTranslator": "这座城市在环境保护方面取得了显著进展。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：not-（标记；注意）+ -able（能...的），能被标记注意到的，即“值得注意的、显著的”。</p><p><strong>科普场景造句</strong>：This scientist has made notable contributions to medical research.（这位科学家在医学研究方面做出了显著贡献。）</p>"
+  },
+  {
+    "Word": "housewife",
+    "Phonetic": "英 [ˈhaʊswaɪf]，美 [ˈhaʊswaɪf]",
+    "Meaning": "n. 家庭主妇",
+    "Example": "The housewife manages the household chores efficiently every day. ",
+    "ExampleTranslator": "这位家庭主妇每天高效地打理家务。",
+    "AIHelp": "<p><strong>拆分记忆法</strong>：house（房子）+ wife（妻子），在房子里的妻子，即“家庭主妇”。</p><p><strong>日常场景造句</strong>：My mother used to be a housewife before she started working.（我妈妈开始工作前曾是一名家庭主妇。）</p>"
+  },
+  {
+    "Word": "run",
+    "Phonetic": "英 [rʌn]，美 [rʌn]",
+    "Meaning": "v. 跑；奔跑；经营；运转；n. 跑步；奔跑；路程",
+    "Example": "He runs a small coffee shop in the downtown area. ",
+    "ExampleTranslator": "他在市中心经营着一家小咖啡店。",
+    "AIHelp": "<p><strong>多场景记忆</strong>：结合不同场景记忆，如跑步（run）、经营（run a business）、运转（The machine runs well）。</p><p><strong>对比时态</strong>：过去式为 ran，过去分词为 run。如：She ran to the station yesterday.（她昨天跑到了车站。）</p><p><em>注：原单词“ran”是“run”的过去式</em></p>"
+  },
+  {
+    "Word": "sew",
+    "Phonetic": "英 [səʊ]，美 [soʊ]",
+    "Meaning": "v. 缝；缝制；缝合",
+    "Example": "She likes to sew clothes for her children in her spare time. ",
+    "ExampleTranslator": "她喜欢在业余时间给孩子们缝制衣服。",
+    "AIHelp": "<p><strong>谐音记忆法</strong>：“嗖”，缝纫时针线嗖嗖地动，即“缝、缝制”。</p><p><strong>日常场景造句</strong>：My grandmother taught me how to sew a button.（我奶奶教我怎么缝纽扣。）</p><p><em>注：原单词“sewing”是“sew”的现在分词形式</em></p>"
+  },
+  {
+    "Word": "help",
+    "Phonetic": "英 [help]，美 [help]",
+    "Meaning": "v. 帮助；协助；促进；n. 帮助；援助；帮手",
+    "Example": "Could you help me carry these books to the classroom? ",
+    "ExampleTranslator": "你能帮我把这些书搬到教室吗？",
+    "AIHelp": "<p><strong>日常高频词记忆</strong>：在日常交流中高频使用，结合“请求帮助”“提供帮助”等场景记忆，如 Can I help you?（我能帮你吗？）</p><p><strong>对比时态</strong>：过去式和过去分词均为 helped。如：He helped me with my homework last night.（他昨晚帮我做了作业。）</p><p><em>注：原单词“helped”是“help”的过去式和过去分词</em></p>"
+  },
+  {
+    "Word": "Sunday",
+    "Phonetic": "英 [ˈsʌndeɪ]，美 [ˈsʌndeɪ]",
+    "Meaning": "n. 星期日",
+    "Example": "We usually go to the park for a walk on Sunday. ",
+    "ExampleTranslator": "我们通常在星期日去公园散步。",
+    "AIHelp": "<p><strong>文化场景记忆</strong>：作为一周的第一天（部分国家），结合周末活动记忆，如 on Sunday（在星期日）。</p><p><strong>造句强化</strong>：She always does some shopping on Sunday mornings.（她总是在星期日上午去购物。）</p><p><em>注：原单词“sunday”首字母应大写为“Sunday”</em></p>"
+  },
+  {
+    "Word": "strong",
+    "Phonetic": "英 [strɒŋ]，美 [strɔːŋ]",
+    "Meaning": "adj. 强壮的；坚固的；强烈的；有力的",
+    "Example": "Regular exercise can make our bodies strong. ",
+    "ExampleTranslator": "定期锻炼能使我们的身体强壮。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：str-（拉紧；力量），有力量的，即“强壮的、强烈的”。</p><p><strong>对比级和最高级</strong>：比较级为 stronger，最高级为 strongest。如：He is the strongest boy in his class.（他是班里最强壮的男孩。）</p><p><em>注：原单词“strongest”是“strong”的最高级形式</em></p>"
+  },
+  {
+    "Word": "prop",
+    "Phonetic": "英 [prɒp]，美 [prɑːp]",
+    "Meaning": "n. 支柱；支撑物；v. 支撑；维持",
+    "Example": "We used a wooden stick to prop up the broken fence. ",
+    "ExampleTranslator": "我们用一根木棍支撑起破损的栅栏。",
+    "AIHelp": "<p><strong>场景记忆法</strong>：想象用支柱（prop）支撑（prop）快要倒塌的架子的场景，加深记忆。</p><p><strong>日常场景造句</strong>：He propped his head up with his hand while listening.（他听的时候用手撑着头。）</p>"
+  },
+  {
+    "Word": "church",
+    "Phonetic": "英 [tʃɜːtʃ]，美 [tʃɜːrtʃ]",
+    "Meaning": "n. 教堂；教会；礼拜",
+    "Example": "Many people go to church to pray on weekends. ",
+    "ExampleTranslator": "许多人周末去教堂祈祷。",
+    "AIHelp": "<p><strong>文化场景记忆</strong>：结合西方宗教文化，教堂（church）是进行礼拜等活动的场所。</p><p><strong>造句强化</strong>：The old church in our town has a history of 200 years.（我们镇上的老教堂有200年的历史了。）</p>"
+  },
+  {
+    "Word": "aid",
+    "Phonetic": "英 [eɪd]，美 [eɪd]",
+    "Meaning": "n. 援助；帮助；辅助物；v. 援助；帮助",
+    "Example": "The government provided financial aid to the disaster-stricken area. ",
+    "ExampleTranslator": "政府向灾区提供了经济援助。",
+    "AIHelp": "<p><strong>对比近义词</strong>：与“help”相比，aid 更正式，多用于官方或大规模的帮助。如：International aid was sent to the poor country.（国际援助被送往这个贫穷的国家。）</p><p><strong>职场场景造句</strong>：The new software can aid us in completing the task faster.（这款新软件能帮助我们更快地完成任务。）</p>"
+  },
+  {
+    "Word": "society",
+    "Phonetic": "英 [səˈsaɪəti]，美 [səˈsaɪəti]",
+    "Meaning": "n. 社会；社团；协会",
+    "Example": "Modern society is developing at a rapid pace. ",
+    "ExampleTranslator": "现代社会正以快速的速度发展。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：soci-（社会；同伴）+ -ety（名词后缀），即“社会、社团”。</p><p><strong>科普场景造句</strong>：The science society organizes lectures every month.（这个科学协会每月组织讲座。）</p>"
+  },
+  {
+    "Word": "foreign",
+    "Phonetic": "英 [ˈfɒrən]，美 [ˈfɔːrən]",
+    "Meaning": "adj. 外国的；外来的；异质的",
+    "Example": "She dreams of traveling to foreign countries to experience different cultures. ",
+    "ExampleTranslator": "她梦想去外国旅行，体验不同的文化。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：for-（外面）+ -eign（形容词后缀），外面的，即“外国的、外来的”。</p><p><strong>职场场景造句</strong>：Our company has established business relations with many foreign enterprises.（我们公司与许多外国企业建立了业务关系。）</p>"
+  },
+  {
+    "Word": "mission",
+    "Phonetic": "英 [ˈmɪʃn]，美 [ˈmɪʃn]",
+    "Meaning": "n. 使命；任务；代表团；v. 派遣；向...传教",
+    "Example": "The doctor's mission is to save lives and heal the wounded. ",
+    "ExampleTranslator": "医生的使命是救死扶伤。",
+    "AIHelp": "<p><strong>场景记忆法</strong>：想象特工执行重要任务（mission）的场景，加深对“使命、任务”的记忆。</p><p><strong>职场场景造句</strong>：Our team's mission is to complete the project within three months.（我们团队的任务是在三个月内完成这个项目。）</p><p><em>注：原单词“missions”是“mission”的复数形式</em></p>"
+  },
+  {
+    "Word": "auxiliary",
+    "Phonetic": "英 [ɔːɡˈzɪliəri]，美 [ɔːɡˈzɪliəri]",
+    "Meaning": "adj. 辅助的；备用的；n. 辅助人员；辅助设备",
+    "Example": "The auxiliary generator will start working when the main power fails. ",
+    "ExampleTranslator": "当主电源故障时，备用发电机将开始工作。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：auxili-（帮助）+ -ary（形容词/名词后缀），起帮助作用的，即“辅助的、备用的”。</p><p><strong>科普场景造句</strong>：This auxiliary device can improve the efficiency of the machine.（这个辅助设备能提高机器的效率。）</p>"
+  },
+  {
+    "Word": "find",
+    "Phonetic": "英 [faɪnd]，美 [faɪnd]",
+    "Meaning": "v. 找到；发现；认为；n. 发现；发现物",
+    "Example": "I can't find my keys anywhere in the house. ",
+    "ExampleTranslator": "我在房子里到处都找不到我的钥匙。",
+    "AIHelp": "<p><strong>多场景记忆</strong>：结合日常找东西（find keys）、发现新事物（find a new park）等场景记忆。</p><p><strong>对比时态</strong>：过去式和过去分词均为 found。如：She found a wallet on the street yesterday.（她昨天在街上发现了一个钱包。）</p><p><em>注：原单词“found”是“find”的过去式和过去分词</em></p>"
+  },
+  {
+    "Word": "abundant",
+    "Phonetic": "英 [əˈbʌndənt]，美 [əˈbʌndənt]",
+    "Meaning": "adj. 丰富的；充裕的；大量的",
+    "Example": "This area has abundant natural resources, such as coal and oil. ",
+    "ExampleTranslator": "这个地区有丰富的自然资源，如煤和石油。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：ab-（加强）+ und-（波动；溢出）+ -ant（形容词后缀），多得要溢出来，即“丰富的、充裕的”。</p><p><strong>科普场景造句</strong>：The ocean is home to abundant marine life.（海洋是大量海洋生物的家园。）</p>"
+  },
+  {
+    "Word": "window",
+    "Phonetic": "英 [ˈwɪndəʊ]，美 [ˈwɪndoʊ]",
+    "Meaning": "n. 窗户；窗口；橱窗",
+    "Example": "She likes to sit by the window and read books in the afternoon. ",
+    "ExampleTranslator": "她喜欢下午坐在窗边看书。",
+    "AIHelp": "<p><strong>日常场景记忆</strong>：每天都能看到窗户（window），结合开窗通风、从窗户看外面等场景记忆。</p><p><strong>造句强化</strong>：The shop displays its new products in the window.（这家商店在橱窗里展示新产品。）</p>"
+  },
+  {
+    "Word": "knit",
+    "Phonetic": "英 [nɪt]，美 [nɪt]",
+    "Meaning": "v. 编织；针织；结合；n. 编织品；针织品",
+    "Example": "My grandmother likes to knit sweaters for us in winter. ",
+    "ExampleTranslator": "我奶奶喜欢在冬天给我们织毛衣。",
+    "AIHelp": "<p><strong>谐音记忆法</strong>：“尼特”，想象编织（knit）时线穿过针的“尼特”声。</p><p><strong>日常场景造句</strong>：She spent the whole evening knitting a scarf.（她花了一整晚织围巾。）</p><p><em>注：原单词“knitting”是“knit”的现在分词形式</em></p>"
+  },
+  {
+    "Word": "cotton",
+    "Phonetic": "英 [ˈkɒtn]，美 [ˈkɑːtn]",
+    "Meaning": "n. 棉花；棉织物；adj. 棉制的",
+    "Example": "Cotton clothes are very comfortable to wear in summer. ",
+    "ExampleTranslator": "棉质衣服在夏天穿很舒服。",
+    "AIHelp": "<p><strong>科普场景记忆</strong>：棉花（cotton）是一种常见的农作物，可用来制作棉织物（cotton）。</p><p><strong>日常场景造句</strong>：This T - shirt is made of pure cotton.（这件T恤是纯棉的。）</p>"
+  },
+  {
+    "Word": "warp",
+    "Phonetic": "英 [wɔːp]，美 [wɔːrp]",
+    "Meaning": "v. 使变形；使弯曲；歪曲；n. 经纱；弯曲；变形",
+    "Example": "The wood has warped because of the moisture in the air. ",
+    "ExampleTranslator": "由于空气中的湿气，木头已经变形了。",
+    "AIHelp": "<p><strong>场景记忆法</strong>：想象潮湿的木板弯曲变形（warp）的场景，加深记忆。</p><p><strong>科普场景造句</strong>：Extreme heat can cause the metal to warp.（极端高温会使金属变形。）</p>"
+  },
+  {
+    "Word": "quilt",
+    "Phonetic": "英 [kwɪlt]，美 [kwɪlt]",
+    "Meaning": "n. 被子；被褥；v. 缝被子；绗缝",
+    "Example": "My mother made a beautiful quilt with colorful patches. ",
+    "ExampleTranslator": "我妈妈用彩色布块做了一床漂亮的被子。",
+    "AIHelp": "<p><strong>拆分记忆法</strong>：q + uilt，联想 quilt 是用来盖在身上（like a built - in cover）的，即“被子”。</p><p><strong>日常场景造句</strong>：She likes to wrap herself in a warm quilt in winter.（冬天她喜欢裹在温暖的被子里。）</p><p><em>注：原单词“quilts”是“quilt”的复数形式</em></p>"
+  },
+  {
+    "Word": "knit",
+    "Phonetic": "英 [nɪt]，美 [nɪt]",
+    "Meaning": "v. 编织；针织；结合；n. 编织品；针织品",
+    "Example": "She knitted a pair of gloves for her husband as a birthday gift. ",
+    "ExampleTranslator": "她为丈夫织了一副手套作为生日礼物。",
+    "AIHelp": "<p><strong>对比时态</strong>：过去式和过去分词均为 knitted/knit。如：She has knitted many sweaters for her family.（她为家人织了很多毛衣。）</p><p><em>注：原单词“knitted”是“knit”的过去式和过去分词</em></p>"
+  },
+  {
+    "Word": "sixteen",
+    "Phonetic": "英 [ˌsɪksˈtiːn]，美 [ˌsɪksˈtiːn]",
+    "Meaning": "num. 十六；十六个",
+    "Example": "He started learning English when he was sixteen years old. ",
+    "ExampleTranslator": "他十六岁时开始学英语。",
+    "AIHelp": "<p><strong>拆分记忆法</strong>：six（六）+ teen（十几），六加十就是十六（sixteen）。</p><p><strong>日常场景造句</strong>：There are sixteen students in our English class.（我们英语班有十六个学生。）</p>"
+  },
+  {
+    "Word": "housekeeper",
+    "Phonetic": "英 [ˈhaʊskiːpə(r)]，美 [ˈhaʊskiːpər]",
+    "Meaning": "n. 管家；女管家；客房服务员",
+    "Example": "The hotel housekeeper cleans the rooms every morning. ",
+    "ExampleTranslator": "酒店客房服务员每天早上打扫房间。",
+    "AIHelp": "<p><strong>拆分记忆法</strong>：house（房子）+ keep（保持）+ -er（表示人），保持房子整洁的人，即“管家、客房服务员”。</p><p><strong>职场场景造句</strong>：The wealthy family hired a housekeeper to manage the household.（这个富裕的家庭雇了一个管家来管理家务。）</p><p><em>注：原单词“housekeepers”是“housekeeper”的复数形式</em></p>"
+  },
+  {
+    "Word": "wont",
+    "Phonetic": "英 [wəʊnt]，美 [woʊnt]",
+    "Meaning": "adj. 习惯于；n. 习惯；习俗",
+    "Example": "He is wont to take a walk after dinner every day. ",
+    "ExampleTranslator": "他习惯于每天晚饭后散步。",
+    "AIHelp": "<p><strong>对比记忆法</strong>：与“want”（想要）拼写相似，注意区分意思，wont 表示“习惯于、习惯”。</p><p><strong>日常场景造句</strong>：It is his wont to read the newspaper in the morning.（早上读报纸是他的习惯。）</p>"
+  },
+  {
+    "Word": "awe",
+    "Phonetic": "英 [ɔː]，美 [ɔː]",
+    "Meaning": "n. 敬畏；惊叹；v. 使敬畏；使惊叹",
+    "Example": "The magnificent scenery of the mountains filled us with awe. ",
+    "ExampleTranslator": "壮丽的山景让我们心生敬畏。",
+    "AIHelp": "<p><strong>场景记忆法</strong>：面对壮丽的自然景观时产生的那种敬畏（awe）之情，帮助记忆。</p><p><strong>科普场景造句</strong>：People looked at the ancient pyramid in awe.（人们敬畏地看着这座古老的金字塔。）</p><p><em>注：原单词“awed”是“awe”的过去式和过去分词</em></p>"
+  },
+  {
+    "Word": "road",
+    "Phonetic": "英 [rəʊd]，美 [roʊd]",
+    "Meaning": "n. 路；道路；途径；方法",
+    "Example": "We drove along the country road to enjoy the beautiful scenery. ",
+    "ExampleTranslator": "我们沿着乡间小路开车，欣赏美丽的风景。",
+    "AIHelp": "<p><strong>对比近义词</strong>：与“street”相比，road 更侧重于城外的路，street 侧重于城市里的街道。如：There are many trees on both sides of the road.（路的两边有很多树。）</p><p><strong>日常场景造句</strong>：The new road will connect the two villages.（这条新路将连接两个村庄。）</p>"
+  },
+  {
+    "Word": "wind",
+    "Phonetic": "英 [waɪnd]，美 [waɪnd]；英 [wɪnd]，美 [wɪnd]",
+    "Meaning": "v. 缠绕；蜿蜒；上发条；n. 风；气流",
+    "Example": "The river winds through the small town. / The strong wind blew down many trees. ",
+    "ExampleTranslator": "这条河蜿蜒穿过小镇。/ 大风刮倒了许多树。",
+    "AIHelp": "<p><strong>多音多义记忆</strong>：注意其两种发音和意思，[waɪnd] 表示“缠绕、蜿蜒”，[wɪnd] 表示“风”。</p><p><strong>对比时态</strong>：作“缠绕、蜿蜒”讲时，过去式为 wound，过去分词为 wound。如：He wound the rope around the tree.（他把绳子缠绕在树上。）</p><p><em>注：原单词“wound”是“wind”（[waɪnd]）的过去式和过去分词</em></p>"
+  },
+  {
+    "Word": "steep",
+    "Phonetic": "英 [stiːp]，美 [stiːp]",
+    "Meaning": "adj. 陡峭的；急剧的；过高的；v. 浸泡；浸透",
+    "Example": "It's difficult to climb up the steep mountain. ",
+    "ExampleTranslator": "爬上这座陡峭的山很困难。",
+    "AIHelp": "<p><strong>场景记忆法</strong>：想象陡峭的（steep）山坡很难攀爬的场景，加深记忆。</p><p><strong>科普场景造句</strong>：The price of this product has a steep increase recently.（这款产品的价格最近急剧上涨。）</p>"
+  },
+  {
+    "Word": "hill",
+    "Phonetic": "英 [hɪl]，美 [hɪl]",
+    "Meaning": "n. 小山；丘陵；斜坡",
+    "Example": "Children like to roll down the grassy hill in spring. ",
+    "ExampleTranslator": "春天，孩子们喜欢从长满草的小山上滚下来。",
+    "AIHelp": "<p><strong>对比近义词</strong>：与“mountain”相比，hill 指较小的山，mountain 指较大的山。如：There is a small hill behind our village.（我们村后面有一座小山。）</p><p><strong>日常场景造句</strong>：We often have a picnic on the hill at weekends.（我们周末经常在小山上野餐。）</p>"
+  },
+  {
+    "Word": "beyond",
+    "Phonetic": "英 [bɪˈjɒnd]，美 [bɪˈjɑːnd]",
+    "Meaning": "prep. 超出；越过；在...较远的一边；adv. 在更远处；另外",
+    "Example": "The beauty of the sunset is beyond description. ",
+    "ExampleTranslator": "日落之美难以描述。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：be-（加强）+ yond（那边），到那边，即“超出、越过”。</p><p><strong>职场场景造句</strong>：His achievements are beyond our expectations.（他的成就超出了我们的预期。）</p>"
+  },
+  {
+    "Word": "occupy",
+    "Phonetic": "英 [ˈɒkjupaɪ]，美 [ˈɑːkjupaɪ]",
+    "Meaning": "v. 占用；占据；占领；使忙碌",
+    "Example": "The meeting will occupy the whole morning. ",
+    "ExampleTranslator": "这个会议将占用整个上午。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：oc-（加强）+ cupy（抓），抓住并占据，即“占用、占据”。</p><p><strong>职场场景造句</strong>：He is occupied with an important project these days.（这些天他忙于一个重要的项目。）</p><p><em>注：原单词“occupied”是“occupy”的过去式和过去分词</em></p>"
+  },
+  {
+    "Word": "triangular",
+    "Phonetic": "英 [traɪˈæŋɡjələ(r)]，美 [traɪˈæŋɡjələr]",
+    "Meaning": "adj. 三角形的；三角的",
+    "Example": "The children are drawing triangular shapes with their crayons. ",
+    "ExampleTranslator": "孩子们正在用蜡笔画三角形。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：tri-（三）+ angle（角）+ -ar（形容词后缀），有三个角的，即“三角形的”。</p><p><strong>科普场景造句</strong>：This pyramid has a triangular base.（这座金字塔有一个三角形的底。）</p>"
+  },
+  {
+    "Word": "peninsula",
+    "Phonetic": "英 [pəˈnɪnsjələ]，美 [pəˈnɪnsələ]",
+    "Meaning": "n. 半岛",
+    "Example": "The Malay Peninsula is located in Southeast Asia. ",
+    "ExampleTranslator": "马来半岛位于东南亚。",
+    "AIHelp": "<p><strong>词根联想记忆法</strong>：pen-（几乎）+ insula（岛），几乎是岛的地方，即“半岛”。</p><p><strong>科普场景造句</strong>：Many tourists visit the peninsula to enjoy the coastal scenery.（许多游客参观这个半岛，欣赏海岸风光。）</p>"
+  },
+  {
+    "Word": "jut",
+    "Phonetic": "英 [dʒʌt]，美 [dʒʌt]",
+    "Meaning": "v. 突出；伸出；n. 突出部分",
+    "Example": "A rock juts out of the water in the lake. ",
+    "ExampleTranslator": "一块岩石从湖水中突出来。",
+    "AIHelp": "<p><strong>场景记忆法</strong>：想象岩石从水中突出（jut）的样子，加深记忆。</p><p><strong>科普场景造句</strong>：The balcony juts out from the side of the building.（阳台从建筑物的侧面伸出来。）</p><p><em>注：原单词“jutting”是“jut”的现在分词形式</em></p>"
+  },
+  {
+    "Word": "gulf",
+    "Phonetic": "英 [ɡʌlf]，美 [ɡʌlf]",
+    "Meaning": "n. 海湾；深渊；分歧；v. 吞没；卷进",
+    "Example": "The Gulf of Mexico is one of the largest gulfs in the world. ",
+    "ExampleTranslator": "墨西哥湾是世界上最大的海湾之一。",
+    "AIHelp": "<p><strong>科普场景记忆</strong>：结合世界地理知识，如波斯湾（Persian Gulf）、墨西哥湾等，记忆“海湾”的意思。</p><p><strong>造句强化</strong>：There is a wide gulf between their opinions.（他们的意见有很大分歧。）</p>"
+  },
+  {
+    "Word": "anybody",
+    "Phonetic": "英 [ˈenibɒdi]，美 [ˈenibɑːdi]",
+    "Meaning": "pron. 任何人；无论谁；n. 重要人物",
+    "Example": "Is there anybody who can help me solve this problem? ",
+    "ExampleTranslator": "有人能帮我解决这个问题吗？",
+    "AIHelp": "<p><strong>拆分记忆法</strong>：any（任何）+ body（人），即“任何人”。</p><p><strong>日常场景造句</strong>：Anybody who breaks the rules will be punished.（任何违反规则的人都会受到惩罚。）</p>"
+  },
+  {
+    "Word": "go",
+    "Phonetic": "英 [ɡəʊ]，美 [ɡoʊ]",
+    "Meaning": "v. 去；走；离开；变得；n. 尝试；精力；进行",
+    "Example": "We will go to the cinema to watch a new movie tonight. ",
+    "ExampleTranslator": "我们今晚要去电影院看一部新电影。",
+    "AIHelp": "<p><strong>多场景记忆</strong>：日常使用频率极高，结合“去某地”“进行某事”等场景记忆，如 go to school（去上学）、go shopping（去购物）。</p><p><strong>对比时态</strong>：过去式为 went，过去分词为 gone。如：She went to Beijing last week.（她上周去了北京。）</p><p><em>注：原单词“went”是“go”的过去式</em></p>"
+  },
+
+    {
+      "Word": "green",
+      "Phonetic": "英 [ɡriːn] 美 [ɡriːn]",
+      "Meaning": "绿色的；未成熟的；环保的；（指人）缺乏经验的",
+      "Example": "The company launched a green initiative to reduce carbon emissions.",
+      "ExampleTranslator": "公司启动了一项绿色倡议，以减少碳排放。",
+      "AIHelp": "<b>词根联想：</b>green 与“生长”（grow）相关，植物生长时是绿色的。<br><b>场景记忆：</b>想象夏天满眼<b>green</b>的草地，让人感到生机勃勃。<br><b>职场造句：</b>We need to adopt more <b>green</b> technologies in our projects to meet sustainability goals.<br><b>近义词对比：</b>green（环保） vs emerald（祖母绿，强调颜色深浅）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "gables",
+      "Phonetic": "英 [ˈɡeɪblz] 美 [ˈɡeɪblz]",
+      "Meaning": "山墙（房屋屋顶两端的三角形墙面）；（书名）绿山墙（复数形式，base form: gable）",
+      "Example": "The old house had beautiful triangular gables decorated with wooden carvings.",
+      "ExampleTranslator": "这座老房子有漂亮的三角形山墙，用木雕装饰。",
+      "AIHelp": "<b>词根联想：</b>gable 来自古法语，意为屋顶尖端。<br><b>谐音+场景：</b>“盖博” → 盖在房子顶部形成尖尖的“博”形山墙。<br><b>经典场景：</b>《绿山墙的安妮》的英文原名就是 <i>Anne of Green Gables</i>，想象那座标志性的绿色山墙农舍。<br><b>复数说明：</b>gables 是 gable 的复数形式。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "store",
+      "Phonetic": "英 [stɔː(r)] 美 [stɔːr]",
+      "Meaning": "商店；储存；储备",
+      "Example": "We need to store the backup data in a secure cloud service.",
+      "ExampleTranslator": "我们需要将备份数据储存在安全的云服务中。",
+      "AIHelp": "<b>词根联想：</b>store ← restore（恢复储存的东西）。<br><b>场景记忆：</b>想象超市（store）里“储存”了各种商品。<br><b>职场造句：</b>The database will <b>store</b> millions of user records efficiently.<br><b>近义词对比：</b>store（储存数据） vs shop（购物场所）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "meant",
+      "Phonetic": "英 [ment] 美 [ment]",
+      "Meaning": "意思是；打算（mean 的过去式和过去分词）",
+      "Example": "I meant to submit the report yesterday, but I got delayed.",
+      "ExampleTranslator": "我本来打算昨天提交报告的，但被耽搁了。",
+      "AIHelp": "<b>词根联想：</b>mean → meant，意为“心意所向”。<br><b>场景记忆：</b>开会时说“Sorry, that's not what I <b>meant</b>.”（对不起，我不是那个意思）。<br><b>职场造句：</b>The deadline <b>meant</b> we had to work overtime this week.<br><b>形式说明：</b>meant 是 mean 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "sow",
+      "Phonetic": "英 [səʊ] 美 [soʊ]",
+      "Meaning": "播种；母猪",
+      "Example": "If you sow good habits early, you will reap success later.",
+      "ExampleTranslator": "如果你早早播下好习惯，以后就会收获成功。",
+      "AIHelp": "<b>谐音记忆：</b>“骚” → 春天农民在地里“骚动”忙着播种。<br><b>场景记忆：</b>“You reap what you <b>sow</b>.”（种瓜得瓜，种豆得豆）。<br><b>职场联想：</b>Early investment in learning will <b>sow</b> the seeds for career growth.<br><b>近义词对比：</b>sow（播种） vs plant（种植具体植物）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "ask",
+      "Phonetic": "英 [ɑːsk] 美 [æsk]",
+      "Meaning": "问；要求；邀请（asked 是其过去式）",
+      "Example": "Don't hesitate to ask questions during the technical interview.",
+      "ExampleTranslator": "在技术面试中不要犹豫提问。",
+      "AIHelp": "<b>场景记忆：</b>课堂上举手“<b>ask</b> the teacher”。<br><b>职场造句：</b>Always <b>ask</b> for clarification if the requirements are unclear.<br><b>谐音：</b>“爱死可” → 爱死可（问题）了，就去<b>ask</b>。<br><b>形式说明：</b>asked 是 ask 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "volunteer",
+      "Phonetic": "英 [ˌvɒlənˈtɪə(r)] 美 [ˌvɑːlənˈtɪr]",
+      "Meaning": "志愿者；自愿做",
+      "Example": "She decided to volunteer for the open-source project on GitHub.",
+      "ExampleTranslator": "她决定自愿为 GitHub 上的开源项目贡献代码。",
+      "AIHelp": "<b>词根联想：</b>volunt- 来自拉丁语 voluntas（意愿），自愿。<br><b>场景记忆：</b>公司团建时，有人主动说“I’ll <b>volunteer</b> to organize it.”<br><b>职场造句：</b>Many employees <b>volunteer</b> to mentor new hires.<br><b>近义词对比：</b>volunteer（自愿无偿） vs offer（主动提供）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "placidly",
+      "Phonetic": "英 [ˈplæsɪdli] 美 [ˈplæsɪdli]",
+      "Meaning": "平静地；安详地",
+      "Example": "The server was running placidly with no errors in the logs.",
+      "ExampleTranslator": "服务器平静地运行着，日志中没有任何错误。",
+      "AIHelp": "<b>词根联想：</b>plac- 来自 peace（平静），如 placate（安抚）。<br><b>场景记忆：</b>湖面平静（placid），小船<b>placidly</b>漂浮。<br><b>日常造句：</b>He accepted the criticism <b>placidly</b> and improved his work.<br><b>近义词对比：</b>placidly vs calmly（冷静地，更强调情绪控制）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "moreover",
+      "Phonetic": "英 [mɔːrˈəʊvə(r)] 美 [mɔːrˈoʊvər]",
+      "Meaning": "而且；此外",
+      "Example": "The new feature is efficient; moreover, it improves security.",
+      "ExampleTranslator": "新功能很高效；而且，它还提升了安全性。",
+      "AIHelp": "<b>场景记忆：</b>写论文或报告时，用 <b>moreover</b> 增加论点。<br><b>职场造句：</b>The budget was reduced; <b>moreover</b>, the deadline was brought forward.<br><b>近义词对比：</b>moreover（更正式） vs besides（更口语） vs furthermore（同样正式）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "wear",
+      "Phonetic": "英 [weə(r)] 美 [wer]",
+      "Meaning": "穿；戴；磨损（wore 是其过去式）",
+      "Example": "Developers often wear headphones to focus in open offices.",
+      "ExampleTranslator": "开发者在开放式办公室里经常戴耳机来集中注意力。",
+      "AIHelp": "<b>词根联想：</b>wear → wore → worn，磨损、穿着。<br><b>场景记忆：</b>衣服穿久了会<b>wear</b> out（磨损）。<br><b>职场造句：</b>Casual Friday allows employees to <b>wear</b> jeans.<br><b>形式说明：</b>wore 是 wear 的过去式。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "collar",
+      "Phonetic": "英 [ˈkɒlə(r)] 美 [ˈkɑːlər]",
+      "Meaning": "衣领；领子；（动物）颈圈",
+      "Example": "White-collar workers typically work in office environments.",
+      "ExampleTranslator": "白领工作者通常在办公室环境中工作。",
+      "AIHelp": "<b>场景记忆：</b>白领（white-<b>collar</b>） vs 蓝领（blue-<b>collar</b>）。<br><b>职场经典：</b>He got a great job offer and landed a white-<b>collar</b> position.<br><b>谐音：</b>“考拉” → 考拉脖子上套个<b>collar</b>。<br><b>近义词对比：</b>collar vs neckline（领口线条）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "suit",
+      "Phonetic": "英 [suːt] 美 [suːt]",
+      "Meaning": "西装；套装；适合；诉讼",
+      "Example": "This solution perfectly suits our current needs.",
+      "ExampleTranslator": "这个解决方案完全适合我们当前的需求。",
+      "AIHelp": "<b>场景记忆：</b>穿西装（<b>suit</b>）去面试；“<b>suit</b> yourself”（随你便）。<br><b>职场造句：</b>The new framework <b>suits</b> large-scale applications better.<br><b>近义词对比：</b>suit（适合） vs fit（尺寸合适）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "plain",
+      "Phonetic": "英 [pleɪn] 美 [pleɪn]",
+      "Meaning": "平原；朴素的；清楚的；普通的",
+      "Example": "Please speak in plain English so everyone can understand.",
+      "ExampleTranslator": "请用通俗易懂的英语说话，让大家都听得懂。",
+      "AIHelp": "<b>场景记忆：</b>说明文档要写得<b>plain</b> and simple。<br><b>职场造句：</b>The error message should be <b>plain</b> and actionable.<br><b>近义词对比：</b>plain（朴素/清楚） vs simple（简单） vs clear（清晰）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "buggy",
+      "Phonetic": "英 [ˈbʌɡi] 美 [ˈbʌɡi]",
+      "Meaning": "轻便马车；（软件）有大量 bug 的",
+      "Example": "The new release is still buggy; we need more testing.",
+      "ExampleTranslator": "新版本还有很多 bug，需要更多测试。",
+      "AIHelp": "<b>场景记忆：</b>程序员最怕听到“This app is <b>buggy</b>.”<br><b>职场造句：</b>The beta version was quite <b>buggy</b>, but it's stable now.<br><b>谐音：</b>“八哥” → 程序里八哥（bug）太多，<b>buggy</b>。<br><b>近义词对比：</b>buggy vs unstable（不稳定）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "mare",
+      "Phonetic": "英 [meə(r)] 美 [mer]",
+      "Meaning": "母马",
+      "Example": "The mare and her foal were grazing peacefully in the field.",
+      "ExampleTranslator": "母马和小马驹在田野里安静地吃草。",
+      "AIHelp": "<b>场景记忆：</b>night<b>mare</b>（噩梦）原本是“夜间的母马”，民间传说中带来恶梦的精灵。<br><b>联想扩展：</b>记住 nightmare 就能记住 <b>mare</b> = 母马。<br><b>日常造句：</b>The old <b>mare</b> still runs faster than many younger horses.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "considerable",
+      "Phonetic": "英 [kənˈsɪdərəbl] 美 [kənˈsɪdərəbl]",
+      "Meaning": "相当大的；值得考虑的",
+      "Example": "Deploying this feature will require considerable development effort.",
+      "ExampleTranslator": "部署这个功能需要相当大的开发工作量。",
+      "AIHelp": "<b>词根联想：</b>consider（考虑） + able → 值得好好考虑的量 → 相当大。<br><b>职场造句：</b>There has been <b>considerable</b> improvement in performance after optimization.<br><b>近义词对比：</b>considerable vs significant（显著的） vs substantial（实质性的）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "deftly",
+      "Phonetic": "英 [ˈdeftli] 美 [ˈdeftli]",
+      "Meaning": "熟练地；灵巧地",
+      "Example": "She deftly refactored the legacy code without breaking anything.",
+      "ExampleTranslator": "她熟练地重构了旧代码，没有破坏任何功能。",
+      "AIHelp": "<b>词根联想：</b>deft → 灵巧的（类似 deft hands）。<br><b>场景记忆：</b>程序员<b>deftly</b>敲键盘，代码行云流水。<br><b>职场造句：</b>He <b>deftly</b> handled the difficult client questions during the meeting.<br><b>近义词对比：</b>deftly vs skillfully（技术娴熟地）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "question",
+      "Phonetic": "英 [ˈkwestʃən] 美 [ˈkwestʃən]",
+      "Meaning": "问题；疑问（questions 是其复数形式）",
+      "Example": "If you have any questions about the API, feel free to ask.",
+      "ExampleTranslator": "如果你对 API 有任何问题，随时可以问。",
+      "AIHelp": "<b>词根联想：</b>quest（寻求） + ion → 寻求答案的过程。<br><b>职场场景：</b>面试结束时常问“Do you have any <b>questions</b>?”<br><b>复数说明：</b>questions 是 question 的复数形式。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "rarely",
+      "Phonetic": "英 [ˈreəli] 美 [ˈrerli]",
+      "Meaning": "很少；罕见地",
+      "Example": "Bugs in this module occur rarely after the recent fixes.",
+      "ExampleTranslator": "最近修复后，这个模块的 bug 很少出现。",
+      "AIHelp": "<b>词根联想：</b>rare（稀有） + ly。<br><b>场景记忆：</b><b>Rarely</b> do we see such elegant code.<br><b>职场造句：</b>She <b>rarely</b> misses deadlines.<br><b>近义词对比：</b>rarely vs seldom（书面） vs hardly ever（更强调几乎不）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "unusual",
+      "Phonetic": "英 [ʌnˈjuːʒuəl] 美 [ʌnˈjuːʒuəl]",
+      "Meaning": "不寻常的；罕见的",
+      "Example": "It's unusual for the server to be down during business hours.",
+      "ExampleTranslator": "服务器在工作时间宕机是不寻常的。",
+      "AIHelp": "<b>词根联想：</b>un-（不） + usual（平常的）。<br><b>场景记忆：</b>遇到奇怪 bug 时说“This behavior is <b>unusual</b>.”<br><b>职场造句：</b>The client requested an <b>unusual</b> customization that required extra work.<br><b>近义词对比：</b>unusual vs rare（更少见） vs strange（奇怪）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "hate",
+      "Phonetic": "英 [heɪt] 美 [heɪt]",
+      "Meaning": "讨厌；憎恨（hated 是其过去式）",
+      "Example": "Many developers hate writing documentation, but it's necessary.",
+      "ExampleTranslator": "很多开发者讨厌写文档，但这是必要的。",
+      "AIHelp": "<b>场景记忆：</b>程序员经典句“I <b>hate</b> Mondays.”<br><b>职场造句：</b>Users <b>hate</b> it when the app crashes frequently.<br><b>形式说明：</b>hated 是 hate 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "stranger",
+      "Phonetic": "英 [ˈstreɪndʒə(r)] 美 [ˈstreɪndʒər]",
+      "Meaning": "陌生人；外地人（strangers 是其复数形式）",
+      "Example": "Never share your password with strangers online.",
+      "ExampleTranslator": "永远不要在网上把密码告诉陌生人。",
+      "AIHelp": "<b>词根联想：</b>strange（奇怪） + er → 奇怪的人 → 陌生人。<br><b>场景记忆：</b>网络安全教育：Don't talk to <b>strangers</b>.<br><b>复数说明：</b>strangers 是 stranger 的复数形式。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "talk",
+      "Phonetic": "英 [tɔːk] 美 [tɔːk]",
+      "Meaning": "谈话；说话；演讲",
+      "Example": "Let's have a quick talk about the project timeline.",
+      "ExampleTranslator": "我们来快速谈一下项目时间线。",
+      "AIHelp": "<b>场景记忆：</b>每天 stand-up meeting 就是<b>talk</b> progress。<br><b>职场造句：</b>Can we <b>talk</b> after the meeting about your concerns?<br><b>近义词对比：</b>talk vs speak（更正式） vs chat（闲聊）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "happen",
+      "Phonetic": "英 [ˈhæpən] 美 [ˈhæpən]",
+      "Meaning": "发生；碰巧",
+      "Example": "If any errors happen, the system will log them automatically.",
+      "ExampleTranslator": "如果发生任何错误，系统会自动记录日志。",
+      "AIHelp": "<b>场景记忆：</b>意外时说“What <b>happened</b>?”<br><b>职场造句：</b>Outages <b>happen</b>; that's why we have monitoring in place.<br><b>谐音：</b>“海喷” → 海喷水，事情突然<b>happen</b>了。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "ponder",
+      "Phonetic": "英 [ˈpɒndə(r)] 美 [ˈpɑːndər]",
+      "Meaning": "沉思；考虑",
+      "Example": "I need some time to ponder the architecture design choices.",
+      "ExampleTranslator": "我需要一些时间来考虑架构设计的选择。",
+      "AIHelp": "<b>词根联想：</b>pond- 来自拉丁语 ponderare（称重），深思熟虑像称重量。<br><b>场景记忆：</b>坐在湖边（pond）<b>ponder</b>人生。<br><b>职场造句：</b>Let's <b>ponder</b> whether microservices are necessary here.<br><b>近义词对比：</b>ponder vs think（一般） vs contemplate（更深沉）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "enjoyment",
+      "Phonetic": "英 [ɪnˈdʒɔɪmənt] 美 [ɪnˈdʒɔɪmənt]",
+      "Meaning": "享受；乐趣",
+      "Example": "Coding can bring great enjoyment when things work smoothly.",
+      "ExampleTranslator": "当一切顺利时，写代码能带来极大的乐趣。",
+      "AIHelp": "<b>词根联想：</b>enjoy + ment → 享受的状态。<br><b>场景记忆：</b>完成一个难题后那种<b>enjoyment</b>。<br><b>职场造句：</b>Finding <b>enjoyment</b> in your work leads to better productivity.",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "spoil",
+      "Phonetic": "英 [spɔɪl] 美 [spɔɪl]",
+      "Meaning": "宠坏；破坏；变质（spoiled 是其过去式）",
+      "Example": "Don't let one bad review spoil your enjoyment of the product.",
+      "ExampleTranslator": "别让一个差评破坏你对产品的享受。",
+      "AIHelp": "<b>场景记忆：</b>食物<b>spoil</b>（变质）；孩子被<b>spoil</b>（宠坏）。<br><b>职场造句：</b>A toxic team member can <b>spoil</b> the whole atmosphere.<br><b>形式说明：</b>spoiled 是 spoil 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "tea",
+      "Phonetic": "英 [tiː] 美 [tiː]",
+      "Meaning": "茶；下午茶",
+      "Example": "Let's grab a cup of tea and discuss the requirements.",
+      "ExampleTranslator": "我们喝杯茶，顺便讨论一下需求吧。",
+      "AIHelp": "<b>场景记忆：</b>英国人下午喝<b>tea</b>，程序员喝<b>tea</b>提神。<br><b>职场文化：</b>“Tea break” = 小憩聊天时间。<br><b>近义词对比：</b>tea vs coffee（程序员两大阵营）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "worthy",
+      "Phonetic": "英 [ˈwɜːði] 美 [ˈwɜːrði]",
+      "Meaning": "值得的；有价值的",
+      "Example": "This open-source library is worthy of inclusion in our project.",
+      "ExampleTranslator": "这个开源库值得纳入我们的项目。",
+      "AIHelp": "<b>词根联想：</b>worth（价值） + y。<br><b>场景记忆：</b>“<b>worthy</b> of attention” = 值得关注。<br><b>职场造句：</b>The candidate is <b>worthy</b> of a senior position.<br><b>近义词对比：</b>worthy vs deserving（应得的）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "conclude",
+      "Phonetic": "英 [kənˈkluːd] 美 [kənˈkluːd]",
+      "Meaning": "结束；得出结论（concluded 是其过去式）",
+      "Example": "To conclude, the new approach saves 30% in costs.",
+      "ExampleTranslator": "总之，新方法节省了30%的成本。",
+      "AIHelp": "<b>词根联想：</b>con-（完全） + clude（关闭） → 完全关闭 → 结束、结论。<br><b>场景记忆：</b>演讲最后说“In conclusion...”或“To <b>conclude</b>...”<br><b>形式说明：</b>concluded 是 conclude 的过去式和过去分词。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "town",
+      "Phonetic": "英 [taʊn] 美 [taʊn]",
+      "Meaning": "城镇；市区",
+      "Example": "The tech conference is held in town this weekend.",
+      "ExampleTranslator": "科技大会这个周末在市区举行。",
+      "AIHelp": "<b>场景记忆：</b>“go to <b>town</b>” = 进城；“downtown” = 市中心。<br><b>职场联想：</b>Many startups are located in the tech <b>town</b> area.<br><b>近义词对比：</b>town vs city（更大）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "visit",
+      "Phonetic": "英 [ˈvɪzɪt] 美 [ˈvɪzɪt]",
+      "Meaning": "访问；参观；拜访（visits 是其复数或第三人称单数）",
+      "Example": "The client will visit our office next week for a demo.",
+      "ExampleTranslator": "客户下周将访问我们办公室进行演示。",
+      "AIHelp": "<b>词根联想：</b>vis-（看） → 去看别人。<br><b>职场场景：</b>site <b>visit</b>、customer <b>visit</b>。<br><b>复数说明：</b>visits 可为 visit 的复数或第三人称单数形式。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "doctor",
+      "Phonetic": "英 [ˈdɒktə(r)] 美 [ˈdɑːktər]",
+      "Meaning": "医生；博士",
+      "Example": "She earned her PhD and is now addressed as Doctor Smith.",
+      "ExampleTranslator": "她获得了博士学位，现在被称为史密斯博士。",
+      "AIHelp": "<b>场景记忆：</b>学术界称 PhD 为 <b>doctor</b>。<br><b>职场联想：</b>Many AI researchers hold a <b>doctor</b>ate degree.<br><b>近义词对比：</b>doctor（医生/博士） vs physician（专指内科医生）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "puzzle",
+      "Phonetic": "英 [ˈpʌzl] 美 [ˈpʌzl]",
+      "Meaning": "使困惑；谜题（puzzled 是其过去分词）",
+      "Example": "The strange error message puzzled the entire team.",
+      "ExampleTranslator": "奇怪的错误信息让整个团队感到困惑。",
+      "AIHelp": "<b>场景记忆：</b>debug 时常感到<b>puzzled</b>。<br><b>职场造句：</b>The unexpected behavior <b>puzzled</b> even senior engineers.<br><b>形式说明：</b>puzzled 是 puzzle 的过去分词，常作形容词（感到困惑的）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "minute",
+      "Phonetic": "英 [ˈmɪnɪt] 美 [ˈmɪnɪt]",
+      "Meaning": "分钟；片刻；会议记录",
+      "Example": "I'll be ready in a minute—just finishing this email.",
+      "ExampleTranslator": "我马上就好——刚在完成这封邮件。",
+      "AIHelp": "<b>场景记忆：</b>会议结束后要写 meeting <b>minutes</b>（会议记录）。<br><b>职场造句：</b>Please review the <b>minutes</b> from last week's meeting.<br><b>谐音：</b>“美腻特” → 等我美腻特（一分钟）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+    {
+      "Word": "peace",
+      "Phonetic": "英 [piːs] 美 [piːs]",
+      "Meaning": "和平；平静",
+      "Example": "After deploying the fix, we finally had some peace.",
+      "ExampleTranslator": "部署修复后，我们终于平静下来了。",
+      "AIHelp": "<b>场景记忆：</b>服务器稳定时“at <b>peace</b>”。<br><b>职场联想：</b>“Leave me in <b>peace</b>” = 别打扰我写代码。<br><b>近义词对比：</b>peace vs quiet（安静） vs calm（平静）。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "imgExample": ""
+    },
+
+    {
+      "Word": "unseen",
+      "Phonetic": "英 [ʌnˈsiːn]，美 [ʌnˈsiːn]",
+      "Meaning": "形容词，意为‘未被看见的、无形的’；常用于描述隐藏的风险、潜在用户需求或后台运行的进程。",
+      "Example": "The app’s success relied on handling unseen edge cases in user input validation.",
+      "ExampleTranslator": "这款应用的成功依赖于处理用户输入验证中那些未被预见的边界情况。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👁️‍🗨️ <strong>词根拆解</strong>：<br>• un-（否定）+ seen（see 的过去分词）→ 未被看到的<br>✅ 职场/技术场景：<br>- Unseen bugs<br>- Unseen dependencies<br>- Invisible but critical<br>🔁 近义：hidden, invisible, undetected<br>💡 记忆口诀：‘Unseen ≠ unimportant — it’s often the silent killer!’</p>"
+    },
+    {
+      "Word": "gauntlet",
+      "Phonetic": "英 [ˈɡɔːntlət]，美 [ˈɡɑːntlət]",
+      "Meaning": "名词，原指‘金属手套’，引申为‘严峻考验’（run the gauntlet = 经受连番挑战）；在项目管理中可比喻为‘密集评审期’。",
+      "Example": "After the product launch, the dev team had to run the gauntlet of QA, security audits, and legal reviews.",
+      "ExampleTranslator": "产品上线后，开发团队不得不经受 QA、安全审计和法务审查的连番考验。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🛡️ <strong>历史 + 隐喻记忆</strong>：<br>• 中世纪骑士戴 gauntlet 手套<br>• ‘Run the gauntlet’ = 被两排人夹击（引申为多重压力）<br>✅ 职场用法：<br>- Survive the gauntlet of sprint planning<br>- Post-launch gauntlet<br>🔁 近义：ordeal, trial by fire<br>💡 联想：‘Gauntlet = gloves on for battle!’</p>"
+    },
+    {
+      "Word": "chapter",
+      "Phonetic": "英 [ˈtʃæptə(r)]，美 [ˈtʃæptər]",
+      "Meaning": "名词，意为‘章节、人生阶段、组织分会’；在文档协作或产品路线图中常用（如 ‘Chapter 3: User Onboarding’）。",
+      "Example": "Each feature release is treated as a new chapter in our product’s evolution story.",
+      "ExampleTranslator": "每次功能发布都被视为我们产品演进故事中的新篇章。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📖 <strong>多义联想</strong>：<br>• Book chapter<br>• Life chapter (metaphor)<br>• GitHub org → ‘Chapters’ for regional teams<br>✅ 技术文档高频词<br>🔁 近义（阶段）：phase, section, milestone<br>💡 口诀：‘Every sprint ends a chapter — start the next!’</p>"
+    },
+    {
+      "Word": "surprise",
+      "Phonetic": "英 [səˈpraɪz]，美 [sərˈpraɪz]",
+      "Meaning": "动词/名词，意为‘使惊讶、意外之事’；在用户体验中指‘delightful surprise’（惊喜式交互）。",
+      "Example": "The app greeted returning users with a personalized surprise animation on their birthday.",
+      "ExampleTranslator": "该应用在用户生日当天用个性化的惊喜动画欢迎回访用户。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🎉 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>surprise</strong>（非过去分词）<br>• 注意：surprised 是形容词（感到惊讶的）<br>✅ UX 设计术语：<br>- Positive surprise = emotional engagement<br>- Avoid negative surprises (e.g., hidden fees)<br>🔁 近义：astonish, delight, catch off guard<br>💡 设计原则：‘Surprise users with joy, not confusion!’</p>"
+    },
+    {
+      "Word": "live",
+      "Phonetic": "英 [lɪv]，美 [lɪv]",
+      "Meaning": "动词，意为‘居住、生活’；在技术中也指‘实时的’（live stream, live data）。",
+      "Example": "Our dashboard displays live user activity from across all regions in real time.",
+      "ExampleTranslator": "我们的仪表盘实时显示来自所有地区的用户活动数据。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌍 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>live</strong>（动词）<br>• lived 是过去式/过去分词<br>✅ 多音多义：<br>- /lɪv/（动词）：to reside<br>- /laɪv/（形容词）：real-time<br>🔁 技术高频：<br>- Live reload<br>- Live environment<br>💡 区分口诀：‘Live where you work, stream what you build!’</p>"
+    },
+    {
+      "Dipped": {
+        "Original": "dipped",
+        "Replacement": "dip"
+      }
+    },
+    {
+      "Word": "dip",
+      "Phonetic": "英 [dɪp]，美 [dɪp]",
+      "Meaning": "动词，意为‘蘸、下降、短暂访问’；在数据分析中指‘指标短暂下跌’（a dip in traffic）。",
+      "Example": "We observed a temporary dip in API response rates during the cloud region failover.",
+      "ExampleTranslator": "在云区域故障切换期间，我们观察到 API 响应率出现了短暂下降。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📉 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>dip</strong><br>• dipped = 过去式/过去分词<br>✅ 技术场景：<br>- Market dip<br>- Signal dip<br>- Quick dip into logs<br>🔁 近义：drop, decline, fall (temporary)<br>💡 记忆：‘Dip = short drop, not crash!’</p>"
+    },
+    {
+      "Word": "fringe",
+      "Phonetic": "英 [frɪndʒ]，美 [frɪndʒ]",
+      "Meaning": "名词/动词，作名词指‘边缘、刘海、次要部分’；在技术中常指‘边缘计算’（edge/fringe computing）或‘小众功能’。",
+      "Example": "The feature was moved to the fringe of the roadmap due to low user demand.",
+      "ExampleTranslator": "由于用户需求较低，该功能被移至产品路线图的边缘位置。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💇‍♀️ <strong>原形还原说明</strong>：<br>✅ 原形：<strong>fringe</strong><br>• fringed = 过去分词/形容词（已还原）<br>✅ 双关用法：<br>- Hair fringe（刘海）<br>- Tech fringe（边缘技术）<br>🔁 近义（边缘）：periphery, margin, outlier<br>💡 联想：‘Fringe ideas today → mainstream tomorrow!’</p>"
+    },
+    {
+      "Word": "alder",
+      "Phonetic": "英 [ˈɔːldə(r)]，美 [ˈɔːldər]",
+      "Meaning": "名词，意为‘赤杨树’；属植物学术语，在环境科技或生态建模中可能出现。",
+      "Example": "The ecological simulation included alder trees because of their nitrogen-fixing properties.",
+      "ExampleTranslator": "该生态模拟包含了赤杨树，因为它们具有固氮特性。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌳 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>alder</strong><br>• alders = 复数形式（原文件为复数，已还原）<br>✅ 科普场景：<br>- Riparian buffer zones<br>- Soil enrichment species<br>🔁 近义：birch, willow（同为河岸树种）<br>💡 记忆：‘Alder = ally for healthy soil!’</p>"
+    },
+    {
+      "Word": "eardrop",
+      "Phonetic": "英 [ˈɪədrɒp]，美 [ˈɪrdɑːp]",
+      "Meaning": "名词，意为‘耳坠、滴耳液’；在可穿戴设备或健康 App 中可能涉及（如 smart eardrops for hearing aid calibration）。",
+      "Example": "The health app reminds users when it’s time to apply medicated eardrops for ear infection treatment.",
+      "ExampleTranslator": "健康应用会在用户需要使用药物滴耳液治疗耳部感染时发出提醒。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👂 <strong>复合词解析</strong>：<br>• ear + drop → eardrop<br>✅ 两种含义：<br>- Jewelry（耳坠）<br>- Medicine（滴耳液）<br>💡 注意语境区分<br>🔁 近义（医疗）：ear drops（常以复数出现）<br>⚠️ 原文件为复数 eardrops，但作为不可数药液时常用复数，此处保留单数形式更规范</p>"
+    },
+    {
+      "Word": "traverse",
+      "Phonetic": "英 [trəˈvɜːs]，美 [trəˈvɜːrs]",
+      "Meaning": "动词，意为‘横穿、遍历’；在编程中特指‘遍历数据结构’（如 traverse a tree）。",
+      "Example": "The algorithm recursively traverses the binary search tree to find the target node.",
+      "ExampleTranslator": "该算法递归地遍历二叉搜索树以查找目标节点。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🔍 <strong>词根记忆</strong>：<br>• trans-（across）+ vers（turn）→ turn across → traverse<br>✅ 技术核心动词：<br>- Traverse DOM<br>- Traverse graph<br>- File system traversal<br>🔁 近义：navigate, cross, iterate through<br>💡 口诀：‘To traverse is to visit every node — no skipping!’</p>"
+    },
+    {
+      "Word": "brook",
+      "Phonetic": "英 [brʊk]，美 [brʊk]",
+      "Meaning": "名词，意为‘小溪’；在地理信息系统（GIS）或环境监测项目中常见。",
+      "Example": "The sensor network monitors water quality in the brook that runs through the campus park.",
+      "ExampleTranslator": "传感器网络监测流经校园公园的小溪水质。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💧 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>brook</strong><br>• brooks = 复数（原文件含 brooks，已合并）<br>✅ 自然 vs 技术：<br>- Poetic: babbling brook<br>- Scientific: hydrological brook monitoring<br>🔁 近义：stream, creek（creek 更小）<br>💡 联想：‘Brook = small but vital water flow!’</p>"
+    },
+    {
+      "Word": "wood",
+      "Phonetic": "英 [wʊd]，美 [wʊd]",
+      "Meaning": "名词，意为‘木材、树林’；在可持续科技中涉及‘wood-based biodegradable materials’。",
+      "Example": "The startup developed packaging made from compressed wood fibers that decompose in 90 days.",
+      "ExampleTranslator": "这家初创公司开发了一种由压缩木纤维制成的包装材料，可在90天内分解。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌲 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>wood</strong><br>• woods = 复数，通常指‘树林’（not timber）<br>✅ 用法区别：<br>- Wood（material）<br>- The woods（forest area）<br>🔁 近义：timber（加工木材）, forest（大片林地）<br>💡 记忆：‘Wood = material; woods = place to hike!’</p>"
+    },
+    {
+      "Word": "place",
+      "Phonetic": "英 [pleɪs]，美 [pleɪs]",
+      "Meaning": "名词/动词，意为‘地方、放置’；在 UI/UX 中指‘place an order’、‘place cursor’等。",
+      "Example": "Users can place a support ticket directly from the settings menu without leaving the app.",
+      "ExampleTranslator": "用户可以直接从设置菜单提交支持工单，无需离开应用。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📍 <strong>高频职场动词</strong>：<br>• Place an order<br>• Place trust in<br>• Place value on<br>✅ 技术场景：<br>- Place breakpoint<br>- Place widget<br>🔁 近义（放置）：put, set, position<br>💡 口诀：‘Place it right — or users take flight!’</p>"
+    },
+    {
+      "Word": "repute",
+      "Phonetic": "英 [rɪˈpjuːt]，美 [rɪˈpjuːt]",
+      "Meaning": "名词，意为‘名声、声誉’；常用于‘of good repute’（声誉良好）。",
+      "Example": "Only vendors of good repute are allowed in our enterprise procurement system.",
+      "ExampleTranslator": "只有声誉良好的供应商才被允许进入我们的企业采购系统。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🏅 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>repute</strong><br>• reputed = 形容词（据称的），但本词为名词<br>✅ 固定搭配：<br>- Of good/bad repute<br>- Hold in high repute<br>🔁 近义：reputation, standing, credibility<br>💡 注意：repute 较正式，日常多用 reputation</p>"
+    },
+    {
+      "Word": "intricate",
+      "Phonetic": "英 [ˈɪntrɪkət]，美 [ˈɪntrɪkət]",
+      "Meaning": "形容词，意为‘复杂的、错综的’；用于描述系统架构、算法逻辑或用户流程。",
+      "Example": "The authentication flow has become too intricate—let’s simplify it for better UX.",
+      "ExampleTranslator": "当前的身份验证流程过于复杂——让我们简化它以提升用户体验。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🧩 <strong>词根联想</strong>：<br>• in-（in）+ tric（trick? twist）→ full of twists<br>✅ 技术描述高频词：<br>- Intricate dependency graph<br>- Intricate state machine<br>🔁 近义：complex, elaborate, convoluted<br>💡 对比：intricate（精美复杂）vs complicated（混乱复杂）</p>"
+    },
+    {
+      "Word": "headlong",
+      "Phonetic": "英 [ˈhedlɒŋ]，美 [ˈhedlɔːŋ]",
+      "Meaning": "副词/形容词，意为‘头向前地、鲁莽地’；在项目管理中警告‘don’t dive headlong into coding’。",
+      "Example": "Don’t go headlong into refactoring without writing tests first.",
+      "ExampleTranslator": "不要在未编写测试的情况下就贸然开始重构。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⚠️ <strong>形象记忆</strong>：<br>• Head + long → head first, no looking back<br>✅ 职场警示语：<br>- Headlong rush = tech debt<br>- Measured pace > headlong speed<br>🔁 近义：recklessly, impulsively, rashly<br>💡 口诀：‘Headlong feels fast — but tests come first!’</p>"
+    },
+    {
+      "Word": "secret",
+      "Phonetic": "英 [ˈsiːkrət]，美 [ˈsiːkrət]",
+      "Meaning": "名词/形容词，意为‘秘密、机密的’；在安全工程中指‘API secrets, encryption keys’。",
+      "Example": "Never hardcode secrets in your source code—use a secure vault instead.",
+      "ExampleTranslator": "切勿将密钥硬编码在源代码中——请使用安全的密钥保管库。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🔐 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>secret</strong><br>• secrets = 复数（原文件为复数，已还原）<br>✅ 安全最佳实践：<br>- Rotate secrets regularly<br>- Secrets ≠ passwords<br>🔁 近义：confidential info, credentials<br>💡 黄金法则：‘If it’s a secret, it doesn’t belong in Git!’</p>"
+    },
+    {
+      "Word": "cascade",
+      "Phonetic": "英 [kæˈskeɪd]，美 [kæˈskeɪd]",
+      "Meaning": "名词/动词，意为‘瀑布、连锁反应’；在 CSS 中指‘层叠（Cascading Style Sheets）’，在系统中指‘级联故障’。",
+      "Example": "A minor database timeout triggered a cascade of service failures across the microservices.",
+      "ExampleTranslator": "一次轻微的数据库超时引发了微服务之间的连锁故障。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🌊 <strong>技术双关</strong>：<br>• Natural: waterfall cascade<br>• Tech: CSS cascade, failure cascade<br>✅ 架构关键词：<br>- Cascading delete<br>- Cascade effect in distributed systems<br>🔁 近义：chain reaction, domino effect<br>💡 警示：‘Design to break the cascade!’</p>"
+    },
+    {
+      "Word": "regard",
+      "Phonetic": "英 [rɪˈɡɑːd]，美 [rɪˈɡɑːrd]",
+      "Meaning": "名词/动词，意为‘尊重、考虑、关于’；固定搭配‘in regard to’（关于）常用于邮件开头。",
+      "Example": "In regard to your request, we’ve updated the API documentation with new rate limit details.",
+      "ExampleTranslator": "关于您的请求，我们已在 API 文档中更新了新的速率限制详情。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📧 <strong>职场邮件高频</strong>：<br>• In regard to = regarding（更简洁）<br>• With regard to<br>✅ 注意：不写成 ‘in regards to’（错误！）<br>🔁 正确替代表达：<br>- Regarding<br>- Concerning<br>- As for<br>💡 口诀：‘One regard, not two — keep it professional!’</p>"
+    },
+    {
+      "Word": "decency",
+      "Phonetic": "英 [ˈdiːsnsi]，美 [ˈdiːsnsi]",
+      "Meaning": "名词，意为‘得体、正派、基本礼仪’；在社区准则或内容审核中强调‘maintain decency’。",
+      "Example": "All user-generated content must meet basic standards of decency before being published.",
+      "ExampleTranslator": "所有用户生成的内容在发布前必须符合基本的得体标准。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⚖️ <strong>抽象名词记忆</strong>：<br>• From decent（得体的）→ decency<br>✅ 社区治理关键词：<br>- Decency policy<br>- Online decency standards<br>🔁 近义：propriety, respectability, civility<br>💡 联想：‘Decency = minimum social contract online!’</p>"
+    },
+    {
+      "Word": "decorum",
+      "Phonetic": "英 [dɪˈkɔːrəm]，美 [dɪˈkɔːrəm]",
+      "Meaning": "名词，意为‘礼节、端庄’；在会议或远程协作中强调‘maintain meeting decorum’。",
+      "Example": "Please mute yourself when not speaking to maintain virtual meeting decorum.",
+      "ExampleTranslator": "发言时请静音，以维持线上会议的基本礼节。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👔 <strong>拉丁词源</strong>：<br>• From Latin ‘decorus’ = seemly, proper<br>✅ 正式场合用词：<br>- Courtroom decorum<br>- Boardroom decorum<br>🔁 近义：etiquette, protocol, manners<br>💡 对比：decency（道德底线） vs decorum（行为规范）</p>"
+    },
+    {
+      "Word": "pass",
+      "Phonetic": "英 [pɑːs]，美 [pæs]",
+      "Meaning": "动词，意为‘通过、传递、经过’；在测试中指‘test passes’，在代码审查中指‘PR passed review’。",
+      "Example": "The CI pipeline will only deploy if all unit tests pass successfully.",
+      "ExampleTranslator": "只有当所有单元测试成功通过后，CI 流水线才会部署。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>✅ <strong>原形还原说明</strong>：<br>✅ 原形：<strong>pass</strong><br>• passed = 过去式/过去分词（原文件为 passed，已还原）<br>✅ 技术高频：<br>- Test passes/fails<br>- Pass props in React<br>- Pass by reference/value<br>💡 口诀：‘Pass the test, pass the build, pass the review!’</p>"
+    },
+    {
+      "Word": "child",
+      "Phonetic": "英 [tʃaɪld]，美 [tʃaɪld]",
+      "Meaning": "名词，意为‘孩子’；在 UI 层级结构中指‘子元素’（child component, child node）。",
+      "Example": "In React, a parent component can pass data down to its child components via props.",
+      "ExampleTranslator": "在 React 中，父组件可以通过 props 将数据传递给子组件。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👶 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>child</strong><br>• children = 复数（原文件为 children，已还原）<br>✅ 技术隐喻：<br>- Parent/child relationship<br>- DOM tree children<br>🔁 近义（层级）：descendant, sub-element<br>💡 记忆：‘Every child needs a parent — even in code!’</p>"
+    },
+    {
+      "Word": "notice",
+      "Phonetic": "英 [ˈnəʊtɪs]，美 [ˈnoʊtɪs]",
+      "Meaning": "动词/名词，意为‘注意到、通知’；在法律或系统中指‘privacy notice’, ‘update notice’。",
+      "Example": "Users must acknowledge the cookie notice before accessing personalized features.",
+      "ExampleTranslator": "用户必须确认 Cookie 通知后才能使用个性化功能。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📢 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>notice</strong><br>• noticed = 过去式（原文件为 noticed，已还原）<br>✅ 合规关键词：<br>- Privacy notice<br>- Service notice<br>- Notice period<br>🔁 近义（动词）：observe, detect, spot<br>💡 法律提示：‘Notice = legal awareness trigger!’</p>"
+    },
+    {
+      "Word": "odd",
+      "Phonetic": "英 [ɒd]，美 [ɑːd]",
+      "Meaning": "形容词，意为‘奇怪的、不成对的、奇数的’；在调试中常说‘an odd behavior’（异常行为）。",
+      "Example": "The server returned an odd HTTP status code that wasn’t documented anywhere.",
+      "ExampleTranslator": "服务器返回了一个奇怪的 HTTP 状态码，文档中没有任何说明。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🔢 <strong>多义区分</strong>：<br>• Odd number（奇数）<br>• Odd behavior（异常）<br>• Odds and ends（零碎）<br>✅ 调试常用：<br>- That’s odd…<br>- Odd edge case<br>🔁 近义：strange, unusual, unexpected<br>💡 口诀：‘When it’s odd, log it — it might be a bug!’</p>"
+    },
+    {
+      "Word": "ferret",
+      "Phonetic": "英 [ˈferɪt]，美 [ˈferɪt]",
+      "Meaning": "动词，意为‘搜寻、打探’；常与 out 搭配（ferret out = 彻底查出）。",
+      "Example": "The security team ferreted out a hidden backdoor in the legacy authentication module.",
+      "ExampleTranslator": "安全团队在旧版身份验证模块中彻底查出了一个隐藏的后门。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🕵️ <strong>动物隐喻</strong>：<br>• Ferret（雪貂）擅长钻洞抓鼠 → 引申为‘深入挖掘’<br>✅ 固定搭配：<br>- Ferret out the truth<br>- Ferret through logs<br>🔁 近义：uncover, dig up, root out<br>💡 联想：‘Ferret = furry detective of secrets!’</p>"
+    },
+    {
+      "Word": "why",
+      "Phonetic": "英 [waɪ]，美 [waɪ]",
+      "Meaning": "疑问副词，意为‘为什么’；在问题分析中强调‘ask why five times’（5 Whys 根本原因分析法）。",
+      "Example": "During the postmortem, we used the 5 Whys technique to uncover the root cause of the outage.",
+      "ExampleTranslator": "在事故复盘中，我们使用了‘5个为什么’方法来找出宕机的根本原因。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>❓ <strong>原形还原说明</strong>：<br>✅ 原形：<strong>why</strong><br>• whys = 复数化用法（如 ‘the whys and hows’），但标准形式为 why<br>✅ 工程方法论：<br>- 5 Whys<br>- Ask why before how<br>💡 哲学提醒：‘Why drives innovation — how just implements it.’</p>"
+    },
+    {
+      "Word": "wherefore",
+      "Phonetic": "英 [ˈweəfɔː(r)]，美 [ˈwerfɔːr]",
+      "Meaning": "副词，意为‘为什么、为何’（古语/文学用语）；现代英语中极少使用，常被误认为‘where’。",
+      "Example": "In technical documentation, avoid archaic terms like ‘wherefore’—use ‘why’ instead for clarity.",
+      "ExampleTranslator": "在技术文档中，应避免使用‘wherefore’等古语，改用‘why’以确保清晰。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📜 <strong>语言演变提醒</strong>：<br>• Wherefore = why（NOT ‘where’）<br>• Famous line: ‘Wherefore art thou Romeo?’ = ‘Why are you Romeo?’<br>✅ 现代建议：<br>- Use ‘why’ in all professional contexts<br>- Reserve ‘wherefore’ for Shakespeare<br>💡 记忆：‘Wherefore = old-school why — skip it in code!’</p>"
+    },
+    {
+      "Word": "thereof",
+      "Phonetic": "英 [ˌðeərˈɒv]，美 [ˌðerˈʌv]",
+      "Meaning": "副词，意为‘其中、它的’（正式/法律用语）；现代英语中可用‘of it’替代。",
+      "Example": "The license grants rights to use the software and any updates thereof.",
+      "ExampleTranslator": "该许可证授予使用该软件及其任何更新版本的权利。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>⚖️ <strong>法律英语残留</strong>：<br>• Thereof = of that / of it<br>✅ 常见于：<br>- Contracts<br>- Patents<br>- EULAs<br>🔁 现代替代：<br>- ‘and its updates’<br>- ‘including those’<br>💡 建议：理解即可，写作中优先用 plain English</p>"
+    },
+    {
+      "Word": "June",
+      "Phonetic": "英 [dʒuːn]，美 [dʒuːn]",
+      "Meaning": "名词，意为‘六月’；属专有名词（月份），按规则应删除。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": ""
+    },
+    {
+      "Word": "orchard",
+      "Phonetic": "英 [ˈɔːtʃəd]，美 [ˈɔːrtʃərd]",
+      "Meaning": "名词，意为‘果园’；在农业科技或 IoT 项目中可能出现（如 smart orchard monitoring）。",
+      "Example": "The agri-tech startup installed soil sensors across the apple orchard to optimize irrigation.",
+      "ExampleTranslator": "这家农业技术初创公司在苹果园中安装了土壤传感器，以优化灌溉。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>🍎 <strong>科普场景</strong>：<br>• Fruit orchard<br>• Data-driven farming<br>✅ 构词：<br>- Orchard = enclosed garden for fruit trees<br>🔁 近义：grove（较小，无围栏）<br>💡 联想：‘Orchard = where data meets harvest!’</p>"
+    },
+    {
+      "Word": "slope",
+      "Phonetic": "英 [sləʊp]，美 [sloʊp]",
+      "Meaning": "名词/动词，意为‘斜坡、倾斜’；在数据分析中指‘slope of a trend line’（趋势线斜率）。",
+      "Example": "The slope of the user growth curve flattened after the marketing campaign ended.",
+      "ExampleTranslator": "营销活动结束后，用户增长曲线的斜率趋于平缓。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>📈 <strong>数学 + 地理双关</strong>：<br>• Mountain slope<br>• Linear regression slope<br>✅ 技术场景：<br>- Gradient descent (slope matters!)<br>- Slope = rate of change<br>🔁 近义：gradient, incline, tilt<br>💡 公式联想：y = mx + b → m = slope</p>"
+    },
+    {
+      "Word": "bridal",
+      "Phonetic": "英 [ˈbraɪdl]，美 [ˈbraɪdl]",
+      "Meaning": "形容词，意为‘新娘的、婚礼的’；在电商或活动策划 SaaS 中常见（如 bridal package）。",
+      "Example": "The event platform offers customizable bridal checklists and vendor coordination tools.",
+      "ExampleTranslator": "该活动平台提供可定制的新娘清单和供应商协调工具。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>👰 <strong>词源记忆</strong>：<br>• From ‘bride’ + -al → bridal<br>✅ 商业场景：<br>- Bridal suite<br>- Bridal shower app<br>🔁 近义：wedding-related, nuptial<br>💡 注意：不是 ‘bridle’（马勒）！拼写易混</p>"
+    },
+    {
+      "Word": "pink",
+      "Phonetic": "英 [pɪŋk]，美 [pɪŋk]",
+      "Meaning": "形容词/名词，意为‘粉红色的、极致的’；短语 ‘in the pink’ 表示‘健康极佳’（古语）。",
+      "Example": "After the refactor, the system performance is back in the pink—stable and fast.",
+      "ExampleTranslator": "重构之后，系统性能恢复到了最佳状态——稳定且快速。",
+      "Audio": "",
+      "ExampleAudio": "",
+      "AIHelp": "<p>💖 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>pink</strong><br>• pinky = 小指/俚语（非 pink 的变体），但原文件 likely meant ‘pink’<br>✅ 习语：<br>- In the pink = in excellent health<br>🔁 近义（颜色）：rose, blush<br>💡 趣味：‘Not just a color — a state of peak condition!’</p>"
+    },
+  {
+    "Word": "bee",
+    "Phonetic": "英 [biː]，美 [biː]",
+    "Meaning": "名词，意为‘蜜蜂’；在技术社区中也指‘拼写比赛（spelling bee）’或‘黑客松（hackathon bee）’的趣味用法。",
+    "Example": "The company hosted a ‘coding bee’ where junior developers competed to solve algorithm challenges.",
+    "ExampleTranslator": "公司举办了一场“编程擂台赛”，初级开发者竞相解决算法挑战题。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🐝 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>bee</strong><br>• bees = 复数（原文件为 bees，已还原）<br>✅ 引申用法：<br>- Spelling bee（拼字比赛）<br>- Coding bee / Debugging bee（趣味竞赛）<br>🔁 近义（昆虫）：insect, pollinator<br>💡 联想：‘Busy as a bee — productive and collaborative!’</p>"
+  },
+  {
+    "Word": "Thomas",
+    "Phonetic": "英 [ˈtɒməs]，美 [ˈtɑːməs]",
+    "Meaning": "人名，按规则删除。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": ""
+  },
+  {
+    "Word": "meek",
+    "Phonetic": "英 [miːk]，美 [miːk]",
+    "Meaning": "形容词，意为‘温顺的、谦逊的’；在团队协作中可描述‘meek contributor’（不敢发声的成员），需鼓励参与。",
+    "Example": "We need to create psychological safety so meek team members feel comfortable sharing ideas.",
+    "ExampleTranslator": "我们需要营造心理安全感，让性格内向的团队成员也能自在地分享想法。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🕊️ <strong>语义辨析</strong>：<br>• Meek ≠ weak → it’s about humility, not inability<br>✅ 职场软技能：<br>- Meek voice in meetings<br>- Quiet leadership<br>🔁 近义：humble, gentle, unassuming<br>💡 名言联想：‘Blessed are the meek’ — but in tech, speak up too!</p>"
+  },
+  {
+    "Word": "whom",
+    "Phonetic": "英 [huːm]，美 [huːm]",
+    "Meaning": "关系代词，宾格形式，意为‘谁（作宾语）’；现代英语中多被 who 替代，但在正式写作或法律文本中仍见。",
+    "Example": "The user whom we contacted yesterday has confirmed their participation in the beta test.",
+    "ExampleTranslator": "我们昨天联系的那位用户已确认参加 Beta 测试。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📝 <strong>语法精要</strong>：<br>• Whom = 宾格（he → him → whom）<br>✅ 判断技巧：<br>- If you can replace with ‘him/her’, use ‘whom’<br>❌ 日常口语中常省略或用 who<br>💡 写作建议：‘Use “who” unless writing legal/docs — clarity > formality.’</p>"
+  },
+  {
+    "Word": "sow",
+    "Phonetic": "英 [səʊ]，美 [soʊ]",
+    "Meaning": "动词，意为‘播种’；引申为‘播下（思想、问题等）’（sow doubt, sow innovation）。",
+    "Example": "Early user feedback helped us sow the seeds of a more intuitive onboarding flow.",
+    "ExampleTranslator": "早期用户反馈帮助我们播下了更直观引导流程的种子。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🌱 <strong>原形还原说明</strong>：<br>✅ 原形：<strong>sow</strong><br>• sowing = 现在分词（原文件为 sowing，已还原）<br>✅ 隐喻高频：<br>- Sow ideas<br>- Sow trust<br>- Sow chaos (negative)<br>🔁 近义：plant, instill, initiate<br>💡 口诀：‘Sow early, reap late — but always harvest learning!’</p>"
+  },
+  {
+    "Word": "late",
+    "Phonetic": "英 [leɪt]，美 [leɪt]",
+    "Meaning": "形容词/副词，意为‘晚的、已故的’；在项目管理中常指‘delivery is late’或‘late-stage debugging’。",
+    "Example": "Late integration of third-party APIs often leads to unexpected compatibility issues.",
+    "ExampleTranslator": "第三方 API 的晚期集成常常导致意外的兼容性问题。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⏰ <strong>多义场景</strong>：<br>• Late = delayed（迟到）<br>• Late = deceased（已故，如 ‘the late Steve Jobs’）<br>• Late-stage = 后期（如 startup, disease）<br>🔁 近义（时间）：delayed, overdue, behind schedule<br>💡 警示：‘Late changes = high risk. Integrate early!’</p>"
+  },
+  {
+    "Word": "turnip",
+    "Phonetic": "英 [ˈtɜːnɪp]，美 [ˈtɜːrnɪp]",
+    "Meaning": "名词，意为‘芜菁’；属具体农作物名词，在农业科技或营养 App 中可能出现。",
+    "Example": "The farm-to-table app includes seasonal recipes featuring root vegetables like turnips and parsnips.",
+    "ExampleTranslator": "这款从农场到餐桌的应用包含了以芜菁和欧洲防风草等根茎类蔬菜为主的时令食谱。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🥕 <strong>科普记忆</strong>：<br>• Root vegetable, not a radish!<br>✅ 农业科技场景：<br>- Soil pH for turnips<br>- Crop rotation planning<br>🔁 近义：rutabaga（大头芜菁）, radish<br>💡 趣味：‘Turnip = humble but nutritious backend of the veggie world!’</p>"
+  },
+  {
+    "Word": "field",
+    "Phonetic": "英 [fiːld]，美 [fiːld]",
+    "Meaning": "名词/动词，意为‘田野、领域、字段’；在数据库中是‘field’，在科研中是‘research field’。",
+    "Example": "The JSON response includes a ‘timestamp’ field that must be parsed before display.",
+    "ExampleTranslator": "该 JSON 响应包含一个 ‘timestamp’ 字段，显示前必须先解析。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>📡 <strong>技术三重义</strong>：<br>1. Agriculture: wheat field<br>2. Science: field of AI<br>3. Tech: database field<br>✅ 编程高频：<br>- Form fields<br>- Object fields<br>- Field validation<br>💡 口诀：‘Same word, different worlds — context is king!’</p>"
+  },
+  {
+    "Word": "barn",
+    "Phonetic": "英 [bɑːn]，美 [bɑːrn]",
+    "Meaning": "名词，意为‘谷仓’；在边缘计算或 IoT 中可能用于命名（如 ‘Barn Camera System’ for farms）。",
+    "Example": "The smart barn system monitors temperature, humidity, and livestock movement in real time.",
+    "ExampleTranslator": "智能谷仓系统实时监测温度、湿度和牲畜活动。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>🚜 <strong>农业科技联想</strong>：<br>• Traditional barn → Smart barn<br>✅ 物联网应用：<br>- Barn sensors<br>- Automated feeding triggered by barn data<br>🔁 近义：shed, silo（用途不同）<br>💡 趋势：‘Old barns meet new tech — agri-innovation!’</p>"
+  },
+  {
+    "Word": "Matthew",
+    "Phonetic": "英 [ˈmætjuː]，美 [ˈmæθjuː]",
+    "Meaning": "人名，按规则删除。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": ""
+  },
+  {
+    "Word": "ought",
+    "Phonetic": "英 [ɔːt]，美 [ɔːt]",
+    "Meaning": "情态动词，意为‘应该’（较正式）；常用于道德或责任语境（You ought to test your code）。",
+    "Example": "Developers ought to document their APIs thoroughly to avoid confusion among consumers.",
+    "ExampleTranslator": "开发者应当详尽地编写 API 文档，以免使用者产生困惑。",
+    "Audio": "",
+    "ExampleAudio": "",
+    "AIHelp": "<p>⚖️ <strong>语气对比</strong>：<br>• Ought to = should（但更正式/道德感更强）<br>✅ 技术伦理场景：<br>- You ought to respect user privacy<br>- We ought to open-source this tool<br>🔁 近义：should, must (weaker than must)<br>💡 注意：后接 to + 动词原形，无时态变化</p>"
+  }
+]

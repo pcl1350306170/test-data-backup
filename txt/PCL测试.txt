@@ -620,6 +620,8 @@ https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main
 
 https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/icon/手表.png
 
+https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/Chrome/门诊web调试页面加载 Chrome 扩展.zip
+
 
 
 [密码jd]
@@ -650,3 +652,6 @@ C:\www\test\py\craw\downloadv33img.py
 
 
 
+https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/md/Snipaste_2025-12-17_10-57-29.png
+
+![开启开发者模式](screenshots/Snipaste_2025-12-06_12-52-42.png)
