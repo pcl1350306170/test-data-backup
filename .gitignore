@@ -25,6 +25,7 @@ yarn-error.log*
 *.sw?
 *.log
 *.exe
+*.zip
 .env.dev
 public/version.md
 .env.prod.copy
