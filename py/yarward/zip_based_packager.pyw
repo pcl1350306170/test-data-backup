@@ -451,7 +451,7 @@ class ZipBasedPackagerApp:
 
         version_frame = ttk.LabelFrame(main_frame, text="🔄 项目版本", padding="5")
         version_frame.pack(fill=tk.X, pady=5)
-        versions = ["1.5.0", "1.5.1", "1.5.2", "1.5.3"]
+        versions = ["1.5.0", "1.5.1", "1.5.2", "1.5.3", "1.5.4"]
         version_combo = ttk.Combobox(
             version_frame,
             textvariable=self.project_version,
