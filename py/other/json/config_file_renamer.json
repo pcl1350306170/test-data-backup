@@ -1,9 +1,9 @@
 {
-  "mode": "prefix",
+  "mode": "replace",
   "content": "VOA Learning English-",
   "replace_from": "×",
   "replace_to": "-",
   "input_type": "directory",
   "last_files": [],
-  "last_directory": "D:/附件/YouTube/Little Baby Bum"
+  "last_directory": "C:/www/down/新猫和老鼠 第三季"
 }
