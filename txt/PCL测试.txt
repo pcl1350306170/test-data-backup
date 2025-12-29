@@ -1,4 +1,39 @@
 
+function exportLocalStorageAndToken() {
+  var script = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var key = localStorage.key(i);
+    var value = localStorage.getItem(key);
+    script.push(`localStorage.setItem('${key}', ${JSON.stringify(value)});`);
+  }
+  var token = localStorage.getItem("token");
+  if (token) {
+    script.push(`document.cookie = "token=${token}; path=/";`);
+  }
+  var output = script.join('\n');
+  console.log(output); // 仍然会输出
+  copy(output);        // 👈 自动复制到剪贴板（Chrome/Firefox 支持）
+  console.log('✅ 脚本已复制到剪贴板！');
+}
+exportLocalStorageAndToken();
+
+
+帮我记忆单词【 accurate 】
+需要解释含义
+拆分词根分析并解释
+然后列出相同词根的单词，并提供音标和解释（没有就算了）
+
+使用“ course ”造3个例句，长度分别是2-4句话，
+可以使用这个单词的不同含义造句。
+仅返回英文。
+场景贴近技术、工作、生活等
+
+
+
+
+给我翻译上面的例句。
+
+简单分析单词【 desperation 】的组成
 
 来鸡蛋夯拷，贼分羹，讼薄厚
 无暇赐教您迎面，谢大讲，求师兄
@@ -92,44 +127,6 @@ http://localhost:8080/#/tempView?modelId=1962715079420493825
 奥妹
 xlws
 
-//=====================================
-function exportLocalStorageAndToken() {
-  var script = [];
-  // 遍历localStorage并生成对应的setItem语句
-  for (var i = 0; i < localStorage.length; i++) {
-    var key = localStorage.key(i);
-    var value = localStorage.getItem(key);
-    script.push(`localStorage.setItem('${key}', ${JSON.stringify(value)});`);
-  }
-
-  // 获取token并生成设置cookie的语句
-  var token = localStorage.getItem("token");
-  if (token) {
-    script.push(`document.cookie = "token=${token}; path=/";`);
-  }
-
-  // 拼接所有脚本语句
-  const scriptContent = script.join('\n');
-
-  // 将内容复制到剪贴板
-  navigator.clipboard.writeText(scriptContent)
-    .then(() => {
-      console.log('内容已成功复制到剪贴板');
-      alert('localStorage和token信息已复制到剪贴板');
-    })
-    .catch(err => {
-      console.error('复制失败:', err);
-      alert('复制失败，请手动复制控制台内容');
-      // 仍然在控制台输出，作为备选方案
-      console.log(scriptContent);
-    });
-}
-
-// 调用函数执行复制
-exportLocalStorageAndToken();
-
-
-//=====================================
 
 function exportLocalStorageAndToken() {
   var script = [];
@@ -151,6 +148,8 @@ function exportLocalStorageAndToken() {
 
 // 调用函数输出脚本
 exportLocalStorageAndToken();
+
+
 
 
 在 **Windows CMD** 中，你可以使用以下命令删除 `node_modules` 目录：

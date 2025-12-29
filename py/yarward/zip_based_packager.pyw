@@ -56,7 +56,7 @@ class ZipBasedPackagerApp:
         self.root = root
         self.root.title("📦 基于压缩包的打包工具")
         self.root.geometry("900x750")
-        self.root.minsize(800, 650)
+        self.root.minsize(800, 750)
 
         # 初始化变量
         self.project_dir = tk.StringVar()
