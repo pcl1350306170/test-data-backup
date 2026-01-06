@@ -18,12 +18,13 @@ function exportLocalStorageAndToken() {
 exportLocalStorageAndToken();
 
 
-帮我记忆单词【 accurate 】
+帮我记忆单词【 pretend 】
 需要解释含义
 拆分词根分析并解释
 然后列出相同词根的单词，并提供音标和解释（没有就算了）
+如果你的回复里面有表格，表格不能多于3列。
 
-使用“ undying ”造3个例句，长度是1-4句话，
+使用“ consistency ”造3个例句，长度是1-4句话，
 可以使用这个单词的不同含义造句。
 仅返回英文。
 场景贴近技术、工作、生活等
@@ -38,7 +39,9 @@ exportLocalStorageAndToken();
 蛙滑牙快软大光，特约未遂，颇困卧桌
 
 {"status":200,"desc":"操作成功","data":{"deptName":"内分泌二科","orgName":"榆林市中医医院1","orgImage":"/resource/img/20251020/8e70c51033424c258183e9db29f5fbb7.png","orgCode":2,"deptId":"31f4c01e6b344f73b3ae6fe44369c5cd","orgId":"f43235a19a7e4594a737ad1fe6c820d0"}}
-
+鸟人
+pcl13***70
+PxNu5Coy0
 
 http://localhost:89/test/img/ll/tx.png
 
