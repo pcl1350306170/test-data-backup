@@ -1,15 +1,15 @@
 import os
-import json
-import zipfile
-import tempfile
-import shutil
-import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
-import sqlite3
-import pymysql
-from PIL import Image, ImageTk
 import re
+import shutil
+import tempfile
+import tkinter as tk
+import zipfile
 from pathlib import Path
+from tkinter import filedialog, messagebox, ttk
+
+from PIL import ImageTk
+
+import json
 
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
 SCRIPT_NAME = "epub_replace_txt_cover"

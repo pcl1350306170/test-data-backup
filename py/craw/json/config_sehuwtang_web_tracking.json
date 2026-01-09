@@ -1,0 +1,5 @@
+{
+  "close_after_seconds": 5,
+  "open_batch_size": 2,
+  "batch_interval_seconds": 10
+}

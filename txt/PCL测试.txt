@@ -18,11 +18,11 @@ function exportLocalStorageAndToken() {
 exportLocalStorageAndToken();
 
 
-帮我记忆单词【 pretend 】
+帮我记忆单词【 pristine 】
 需要解释含义
 拆分词根分析并解释
-然后列出相同词根的单词，并提供音标和解释（没有就算了）
-如果你的回复里面有表格，表格不能多于3列。
+然后列出相同词根的单词，尽量全面，并提供音标和解释（没有就算了）
+
 
 使用“ consistency ”造3个例句，长度是1-4句话，
 可以使用这个单词的不同含义造句。
