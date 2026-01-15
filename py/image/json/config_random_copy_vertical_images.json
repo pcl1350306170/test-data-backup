@@ -1,7 +1,7 @@
 {
-  "source_dir": "H:/IMAGE/V33/AI",
+  "source_dir": "D:\\book\\V33-AI_batch_001",
   "target_dir": "D:/book/封面",
-  "copy_count": 200,
+  "copy_count": 600,
   "random_skip_rate": 0.5,
-  "max_per_subdir": 2
+  "max_per_subdir": 600
 }

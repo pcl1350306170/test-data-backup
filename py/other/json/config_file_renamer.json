@@ -1,9 +1,9 @@
 {
-  "mode": "split_dash",
+  "mode": "replace",
   "content": "VOA Learning English-",
   "replace_from": "×",
   "replace_to": "-",
   "input_type": "directory",
   "last_files": [],
-  "last_directory": "C:/www/down"
+  "last_directory": "D:/附件/AI播客"
 }
