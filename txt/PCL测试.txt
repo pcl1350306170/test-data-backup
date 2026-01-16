@@ -18,11 +18,11 @@ function exportLocalStorageAndToken() {
 exportLocalStorageAndToken();
 
 
-帮我记忆单词【 fluid 】
+帮我记忆单词【 ridiculous 】
 需要解释含义
 拆分词根分析并解释
 然后列出相同词根的单词，尽量全面，并提供音标和解释（没有就算了）
-提供2个例句，贴近程序员，互联网技术
+提供3个例句，贴近程序员，互联网技术，获取当下时事新闻介绍等
 
 
 使用“ consistency ”造3个例句，长度是1-4句话，

@@ -37,7 +37,8 @@ logger = logging.getLogger()
 # 默认配置
 DEFAULT_CONFIG = {
     "target_commit": "710548f5ed90a1d60123af04b45c061c642bee5f",
-    "branch_keyword": "1.5.1"
+    "branch_keyword": "1.5.1",
+    "repo_path": str(Path.cwd())  # 添加项目目录配置
 }
 
 # ==============================
@@ -89,6 +90,10 @@ def cherry_pick_to_branch(target_branch, commit_hash, cwd=None):
     temp_branch = f"temp_cherry_{target_branch.replace('/', '_').replace('.', '_')}"
 
     try:
+        # 🔧 新增：清理可能的合并/变基状态
+        run_git_command(["merge", "--abort"], cwd=cwd, check=False)  # 忽略错误
+        run_git_command(["cherry-pick", "--abort"], cwd=cwd, check=False)
+
         # 1. 获取最新远程信息
         run_git_command(["fetch", "origin"], cwd=cwd, check=True)
 
@@ -98,7 +103,12 @@ def cherry_pick_to_branch(target_branch, commit_hash, cwd=None):
         # 3. 执行 cherry-pick
         success, output = run_git_command(["cherry-pick", commit_hash], cwd=cwd)
         if not success:
-            if "conflict" in output.lower() or "CONFLICT" in output:
+            # 检查是否是空提交提示
+            if "empty" in output.lower() or "cherry-pick is now empty" in output:
+                # 遇到空提交，自动跳过
+                run_git_command(["cherry-pick", "--skip"], cwd=cwd, check=True)
+                return True, "推送成功（原提交已存在，自动跳过）"
+            elif "conflict" in output.lower() or "CONFLICT" in output:
                 raise RuntimeError(f"Cherry-pick 冲突，请手动解决后继续。错误:\n{output}")
             else:
                 raise RuntimeError(f"Cherry-pick 失败: {output}")
@@ -126,7 +136,7 @@ class GitCherryPickGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("🍒 Git 安全 Cherry-Pick 推送工具")
-        self.root.geometry("580x380")
+        self.root.geometry("580x480")
         self.root.resizable(False, False)
 
         self.config = self.load_config()
@@ -145,9 +155,10 @@ class GitCherryPickGUI:
                 logger.error(f"加载配置失败: {e}")
         return DEFAULT_CONFIG.copy()
 
-    def save_config(self, commit, keyword):
+    def save_config(self, commit, keyword, repo_path):
         self.config["target_commit"] = commit.strip()
         self.config["branch_keyword"] = keyword.strip()
+        self.config["repo_path"] = repo_path.strip()
         try:
             with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
                 json.dump(self.config, f, ensure_ascii=False, indent=2)
@@ -158,7 +169,7 @@ class GitCherryPickGUI:
     def setup_ui(self):
         frame_repo = LabelFrame(self.root, text="📂 Git 仓库路径", padx=10, pady=8)
         frame_repo.pack(fill=X, padx=10, pady=5)
-        self.repo_path_var = StringVar(value=str(Path.cwd()))
+        self.repo_path_var = StringVar(value=self.config.get("repo_path", str(Path.cwd())))
         Entry(frame_repo, textvariable=self.repo_path_var, font=("Consolas", 9), state='readonly').pack(fill=X)
         Button(frame_repo, text="📁 选择仓库", command=self.select_repo).pack(pady=(5,0))
 
@@ -204,10 +215,11 @@ class GitCherryPickGUI:
     def save_config_action(self):
         commit = self.commit_var.get().strip()
         keyword = self.keyword_var.get().strip()
-        if not commit or not keyword:
-            messagebox.showwarning("输入错误", "Commit 和分支关键词不能为空！")
+        repo_path = self.repo_path_var.get().strip()
+        if not commit or not keyword or not repo_path:
+            messagebox.showwarning("输入错误", "Commit、分支关键词和仓库路径都不能为空！")
             return
-        self.save_config(commit, keyword)
+        self.save_config(commit, keyword, repo_path)
         self.log_msg("✅ 配置已保存")
 
     def execute_cherry_pick(self):
@@ -225,7 +237,7 @@ class GitCherryPickGUI:
             messagebox.showerror("错误", "分支关键词不能为空！")
             return
 
-        self.save_config(commit, keyword)
+        self.save_config(commit, keyword, repo_path)
 
         self.exec_btn.config(state=DISABLED)
         self.log_msg("开始执行 Cherry-Pick 推送...")
@@ -242,13 +254,19 @@ class GitCherryPickGUI:
                 self.log_msg(f"  - {b}")
 
             failed_branches = []
+            skipped_branches = []  # 记录跳过的分支
+
             for branch in remote_branches:
                 self.status_var.set(f"处理 {branch} ...")
                 self.log_msg(f"➡️ 开始处理 {branch}")
                 try:
                     success, msg = cherry_pick_to_branch(branch, commit, cwd=repo_path)
                     if success:
-                        self.log_msg(f"✅ {branch} 更新成功")
+                        if "自动跳过" in msg:
+                            self.log_msg(f"⚠️ {branch} 更新成功（{msg}）")
+                            skipped_branches.append((branch, msg))
+                        else:
+                            self.log_msg(f"✅ {branch} 更新成功")
                     else:
                         raise RuntimeError(msg)
                 except Exception as e:
@@ -256,10 +274,16 @@ class GitCherryPickGUI:
                     self.log_msg(err_msg)
                     failed_branches.append(branch)
 
+            if skipped_branches:
+                self.log_msg(f"📝 以下分支的提交已存在，被自动跳过: {[branch for branch, _ in skipped_branches]}")
+
             if failed_branches:
                 messagebox.showerror("部分失败", f"以下分支处理失败:\n{', '.join(failed_branches)}\n\n详情见日志。")
             else:
-                messagebox.showinfo("成功", f"✅ 所有匹配分支已成功应用提交 {commit[:8]}！")
+                success_msg = f"✅ 所有匹配分支已成功应用提交 {commit[:8]}！"
+                if skipped_branches:
+                    success_msg += f"\n📝 其中 {len(skipped_branches)} 个分支因提交已存在被跳过。"
+                messagebox.showinfo("成功", success_msg)
 
         except Exception as e:
             self.log_msg(f"💥 全局错误: {e}")
