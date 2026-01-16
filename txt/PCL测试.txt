@@ -18,7 +18,7 @@ function exportLocalStorageAndToken() {
 exportLocalStorageAndToken();
 
 
-帮我记忆单词【 ridiculous 】
+帮我记忆单词【 threaten 】
 需要解释含义
 拆分词根分析并解释
 然后列出相同词根的单词，尽量全面，并提供音标和解释（没有就算了）
