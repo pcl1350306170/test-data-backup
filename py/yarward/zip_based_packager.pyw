@@ -335,7 +335,7 @@ class ZipBasedPackagerApp:
                 result = ''.join(initials).upper()
                 # 只保留字母
                 result = ''.join(c for c in result if c.isalpha())
-                return result[:10] or 'UNKNOWN'
+                return result or 'UNKNOWN'
             except Exception as e:
                 self._log(f"pypinyin 处理失败，回退到简化逻辑: {e}", logging.WARNING)
 
@@ -353,7 +353,7 @@ class ZipBasedPackagerApp:
             else:
                 result.append(char)
         letters = [c for c in result if c.isalpha()]
-        fallback = ''.join(letters).upper()[:10]
+        fallback = ''.join(letters).upper()
         self._log(f"⚠️ 使用简化拼音逻辑生成医院首字母: {fallback}", logging.WARNING)
         return fallback or 'UNKNOWN'
 
