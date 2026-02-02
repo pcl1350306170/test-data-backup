@@ -4,6 +4,7 @@ import os
 import json
 import logging
 import subprocess
+import threading
 from pathlib import Path
 from tkinter import *
 from tkinter import messagebox, filedialog, ttk
@@ -82,7 +83,7 @@ def run_ffmpeg(ffmpeg_path, image_path, audio_path, output_path):
         "-c:v", "libx264",
         "-c:a", "aac",
         "-b:a", "192k",
-        "-y",  # 覆盖输出文件
+        "-y",
         str(output_path)
     ]
 
@@ -95,7 +96,7 @@ def run_ffmpeg(ffmpeg_path, image_path, audio_path, output_path):
             text=True,
             encoding='utf-8',
             errors='replace',
-            timeout=3600  # 最长1小时
+            timeout=3600
         )
         if result.returncode != 0:
             error_msg = result.stderr.strip() if result.stderr else "Unknown FFmpeg error"
@@ -107,6 +108,37 @@ def run_ffmpeg(ffmpeg_path, image_path, audio_path, output_path):
         raise RuntimeError("FFmpeg 未找到，请检查路径是否正确")
     except Exception as e:
         raise RuntimeError(f"执行 FFmpeg 时发生错误: {e}")
+
+# ==============================
+# 成功弹窗（带“打开文件夹”按钮）
+# ==============================
+class SuccessDialog(Toplevel):
+    def __init__(self, parent, output_path):
+        super().__init__(parent)
+        self.output_path = Path(output_path)
+        self.title("✅ 转换完成")
+        self.geometry("400x160")
+        self.resizable(False, False)
+        self.transient(parent)
+        self.grab_set()
+
+        # 居中
+        self.update_idletasks()
+        x = parent.winfo_rootx() + (parent.winfo_width() // 2) - (self.winfo_width() // 2)
+        y = parent.winfo_rooty() + (parent.winfo_height() // 2) - (self.winfo_height() // 2)
+        self.geometry(f"+{x}+{y}")
+
+        Label(self, text="🎉 视频已成功生成！", font=("微软雅黑", 12, "bold"), fg="#2E7D32").pack(pady=(15, 5))
+        Label(self, text=str(self.output_path), wraplength=380, justify=CENTER).pack(pady=5)
+
+        btn_frame = Frame(self)
+        btn_frame.pack(pady=15)
+        Button(btn_frame, text="📂 打开文件夹", command=self.open_folder, bg="#1976D2", fg="white", width=12).pack(side=LEFT, padx=5)
+        Button(btn_frame, text="✔️ 确定", command=self.destroy, width=12).pack(side=LEFT, padx=5)
+
+    def open_folder(self):
+        os.startfile(self.output_path.parent)
+        self.destroy()
 
 # ==============================
 # GUI 主类
@@ -190,7 +222,6 @@ class AudioToVideoGUI:
         )
         if path:
             self.audio_var.set(path)
-            # 自动填充输出文件名（不含扩展名）
             if not self.filename_var.get():
                 stem = Path(path).stem
                 self.filename_var.set(stem)
@@ -213,7 +244,6 @@ class AudioToVideoGUI:
             self.output_dir_var.set(folder)
 
     def validate_inputs(self):
-        """验证所有输入"""
         ffmpeg_path = self.ffmpeg_var.get().strip()
         audio_file = self.audio_var.get().strip()
         image_file = self.image_var.get().strip()
@@ -244,14 +274,23 @@ class AudioToVideoGUI:
 
         return ffmpeg_path, audio_file, image_file, output_dir, filename
 
+    def conversion_worker(self, ffmpeg_path, audio_file, image_file, output_path):
+        """在后台线程中执行转换"""
+        try:
+            run_ffmpeg(ffmpeg_path, image_file, audio_file, output_path)
+            # 成功后回到主线程显示弹窗
+            self.root.after(0, lambda: self.on_success(output_path))
+        except Exception as e:
+            error_msg = str(e)
+            self.root.after(0, lambda: self.on_error(error_msg))
+        finally:
+            self.root.after(0, self.restore_ui)
+
     def start_conversion(self):
         try:
             ffmpeg_path, audio_file, image_file, output_dir, filename = self.validate_inputs()
-
-            # 构建输出路径
             output_path = Path(output_dir) / f"{filename}.mp4"
 
-            # 保存配置
             current_config = {
                 "ffmpeg_path": ffmpeg_path,
                 "audio_file": audio_file,
@@ -261,41 +300,47 @@ class AudioToVideoGUI:
             }
             save_config(current_config)
 
-            # 更新状态
-            self.convert_btn.config(state=DISABLED)
-            self.status_var.set("🔄 正在转换...")
+            # 禁用按钮，更新状态
+            self.convert_btn.config(state=DISABLED, text="🔄 正在处理...")
+            self.status_var.set("🔄 转换中，请稍候...")
             self.root.update()
 
-            # 执行转换
-            run_ffmpeg(ffmpeg_path, image_file, audio_file, output_path)
-
-            # 转换成功
-            self.status_var.set("✅ 转换成功！")
-            logger.info(f"转换完成: {output_path}")
-
-            # 弹出提示
-            if messagebox.askyesno("成功", f"视频已生成！\n\n{output_path}\n\n是否打开所在文件夹？"):
-                os.startfile(output_path.parent)
+            # 启动后台线程
+            thread = threading.Thread(
+                target=self.conversion_worker,
+                args=(ffmpeg_path, audio_file, image_file, output_path),
+                daemon=True
+            )
+            thread.start()
 
         except Exception as e:
-            error_msg = str(e)
-            self.status_var.set("❌ 转换失败")
-            logger.error(f"转换失败: {error_msg}")
-            messagebox.showerror("错误", error_msg)
-        finally:
-            self.convert_btn.config(state=NORMAL)
+            self.status_var.set("❌ 输入验证失败")
+            messagebox.showerror("输入错误", str(e))
+
+    def on_success(self, output_path):
+        self.status_var.set("✅ 转换成功！")
+        logger.info(f"转换完成: {output_path}")
+        # 显示自定义成功弹窗
+        SuccessDialog(self.root, output_path)
+
+    def on_error(self, error_msg):
+        self.status_var.set("❌ 转换失败")
+        logger.error(f"转换失败: {error_msg}")
+        messagebox.showerror("转换错误", error_msg)
+
+    def restore_ui(self):
+        self.convert_btn.config(state=NORMAL, text="🎬 开始转换")
 
 # ==============================
 # 主程序入口
 # ==============================
 if __name__ == "__main__":
-    # 按要求引入 DB_CONFIG（即使不用）
     if DB_CONFIG_PATH.exists():
         try:
             with open(DB_CONFIG_PATH, 'r', encoding='utf-8') as f:
                 _ = json.load(f)
-        except Exception as e:
-            pass  # 忽略 DB 加载错误
+        except:
+            pass
 
     root = Tk()
     app = AudioToVideoGUI(root)
