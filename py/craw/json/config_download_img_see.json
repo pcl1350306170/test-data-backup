@@ -1,5 +1,5 @@
 {
-  "SAVE_DIR": "G:/图片/v33/直接爬取",
+  "SAVE_DIR": "D:/FILES/download",
   "THREAD_COUNT": 5,
   "RETRY_COUNT": 3,
   "SAVE_LOG_FILE": true

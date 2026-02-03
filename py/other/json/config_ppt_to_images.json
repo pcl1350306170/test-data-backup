@@ -1,0 +1,15 @@
+{
+  "input_files": [
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\《点》-_彼得·雷诺兹.pps",
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\《切洛努普的狐狸》.ppt",
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\1只小猪和100只狼.ppt",
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\阿文的小毯子.pps",
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\爱花的牛.ppt",
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\安娜的新大衣.pps",
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\巴巴爸爸回到地球.pps",
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\不要再笑了，裘裘.ppt",
+    "D:\\BaiduNetdiskDownload\\100本儿童电子绘本\\吃掉黑暗的怪兽.pps"
+  ],
+  "output_dir": "D:\\FILES\\test",
+  "max_workers": 1
+}
