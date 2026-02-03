@@ -1,0 +1,11 @@
+{
+  "input_files": [
+    "D:\\FILES\\绘本\\pdf\\Goodnight Moon.pdf",
+    "D:\\FILES\\绘本\\pdf\\i an a bunny.pdf",
+    "D:\\FILES\\绘本\\pdf\\彩虹的尽头.pdf",
+    "D:\\FILES\\绘本\\pdf\\鳄鱼哇尼.pdf",
+    "D:\\FILES\\绘本\\pdf\\弗洛拉的小毯子.pdf",
+    "D:\\FILES\\绘本\\pdf\\该睡觉了,小宝贝.pdf"
+  ],
+  "output_dir": "D:\\FILES\\test"
+}

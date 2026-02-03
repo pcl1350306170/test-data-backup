@@ -1,4 +1,5 @@
 {
-  "input_dir": "D:\\FILES\\test",
-  "output_dir": "D:\\FILES\\test2"
+  "input_dir": "D:\\FILES\\绘本\\img",
+  "output_dir": "D:\\FILES\\绘本\\pdf",
+  "include_cover": false
 }

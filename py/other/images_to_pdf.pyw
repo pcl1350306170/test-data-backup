@@ -41,6 +41,7 @@ logger = logging.getLogger()
 DEFAULT_CONFIG = {
     "input_dir": "",
     "output_dir": str(Path.home() / "Documents"),
+    "include_cover": True  # 新增：是否包含封面
 }
 
 # 支持的图片格式
@@ -82,7 +83,8 @@ def create_cover_image(title: str, size=(1240, 1754), bg_color=(255, 255, 255), 
 # ==============================
 # 核心转换函数
 # ==============================
-def process_story_folder(story_dir: Path, output_dir: Path):
+
+def process_story_folder(story_dir: Path, output_dir: Path, include_cover: bool = True):
     """处理单个故事子目录：生成封面 + 合并图片为 PDF"""
     try:
         if not story_dir.is_dir():
@@ -105,11 +107,14 @@ def process_story_folder(story_dir: Path, output_dir: Path):
         image_files.sort(key=lambda x: x[0])
         sorted_paths = [f for _, f in image_files]
 
-        # 创建封面
-        cover_img = create_cover_image(story_dir.name)
+        # 创建封面（如果需要）
+        pdf_images = []
+        cover_img = None
+        if include_cover:
+            cover_img = create_cover_image(story_dir.name)
+            pdf_images.append(cover_img)
 
         # 转换所有图片为 RGB（严格处理）
-        pdf_images = [cover_img]
         for img_path in sorted_paths:
             try:
                 with Image.open(img_path) as img:
@@ -133,8 +138,8 @@ def process_story_folder(story_dir: Path, output_dir: Path):
                 logger.warning(f"跳过无效图片 {img_path}: {img_err}")
                 continue
 
-        if len(pdf_images) <= 1:
-            return False, "无有效图片可生成 PDF（封面除外）"
+        if len(pdf_images) == 0:  # 如果不需要封面且没有有效图片
+            return False, "无有效图片可生成 PDF"
 
         # 保存 PDF
         output_pdf = output_dir / f"{story_dir.name}.pdf"
@@ -145,11 +150,15 @@ def process_story_folder(story_dir: Path, output_dir: Path):
             dpi=(150, 150),
             quality=95
         )
-        return True, f"成功生成 PDF，共 {len(pdf_images)} 页（含封面）"
+        pages = len(pdf_images)
+        if include_cover:
+            pages_info = f"共 {pages} 页（含封面）"
+        else:
+            pages_info = f"共 {pages} 页"
+
+        return True, f"成功生成 PDF，{pages_info}"
 
     except Exception as e:
-        # 👇 关键：打印完整 traceback 到日志！
-
         error_detail = traceback.format_exc()
         logger.error(f"处理 {story_dir} 时发生异常:\n{error_detail}")
         return False, str(e)
@@ -182,6 +191,14 @@ class ImagesToPdfGUI:
         self.output_dir_var = StringVar(value=self.config["output_dir"])
         Entry(output_frame, textvariable=self.output_dir_var, font=("Consolas", 9)).pack(side=LEFT, fill=X, expand=True)
         Button(output_frame, text="📁 浏览", command=self.browse_output_dir).pack(side=RIGHT, padx=(5, 0))
+
+        # 封面选项（新增）
+        cover_frame = LabelFrame(self.root, text="📄 封面选项", padx=10, pady=8)
+        cover_frame.pack(fill=X, padx=10, pady=5)
+        self.include_cover_var = BooleanVar(value=self.config.get("include_cover", True))
+        Checkbutton(cover_frame, text="生成封面页（使用文件夹名称作为标题）",
+                    variable=self.include_cover_var).pack(anchor=W)
+
 
         # 控制按钮
         control_frame = Frame(self.root)
@@ -245,6 +262,7 @@ class ImagesToPdfGUI:
         current_config = {
             "input_dir": str(input_dir),
             "output_dir": str(output_dir),
+            "include_cover": self.include_cover_var.get()
         }
         save_config(current_config)
 
@@ -280,7 +298,7 @@ class ImagesToPdfGUI:
             if stop_event.is_set():
                 break
 
-            success, msg = process_story_folder(story_dir, output_dir)
+            success, msg = process_story_folder(story_dir, output_dir, self.include_cover_var.get())
             self.completed_count += 1
             prefix = "✅ 成功" if success else "❌ 失败"
             self.root.after(0, lambda m=f"{prefix}: {story_dir.name} | {msg}": self.log_message(m))
