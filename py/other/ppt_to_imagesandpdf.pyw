@@ -1,11 +1,11 @@
-# ppt_to_images.pyw
-
+# ppt_to_images.pyw （修复中文路径问题版）
 import os
 import json
 import logging
 import threading
 import queue
 import time
+import tempfile
 from pathlib import Path
 from tkinter import *
 from tkinter import messagebox, filedialog, ttk
@@ -14,7 +14,7 @@ from tkinter import messagebox, filedialog, ttk
 # 配置与常量
 # ==============================
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
-SCRIPT_NAME = "ppt_to_images"
+SCRIPT_NAME = "ppt_to_imagesandpdf"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 LOGS_DIR = CONFIG_DIR / "logs"
@@ -39,7 +39,9 @@ logger = logging.getLogger()
 DEFAULT_CONFIG = {
     "input_files": [],
     "output_dir": str(Path.home() / "Documents"),
-    "max_workers": 3
+    "max_workers": 3,
+    "convert_to_pdf": False,
+    "pdf_output_dir": ""
 }
 
 # 支持的文件类型
@@ -96,6 +98,70 @@ def ppt_to_images(ppt_path: Path, base_output_dir: Path):
         return False, error_msg
 
 # ==============================
+# 图片转PDF函数（修复中文路径问题）
+# ==============================
+def images_to_pdf(image_dir: Path, pdf_path: Path):
+    """将 image_dir 目录下的 1.PNG, 2.PNG... 合并为 PDF"""
+    try:
+        from PIL import Image
+
+        # 获取所有图片文件（按数字顺序排序）
+        image_files = []
+        for f in sorted(image_dir.iterdir(), key=lambda x: int(x.stem) if x.stem.isdigit() else float('inf')):
+            if f.suffix.lower() in ['.png', '.jpg', '.jpeg']:
+                image_files.append(f)
+
+        if not image_files:
+            return False, "未找到任何图片文件"
+
+        # 打开第一张图作为基础（获取尺寸）
+        first_img = Image.open(image_files[0])
+        # 转换为RGB（某些PNG可能有透明通道，PDF不支持）
+        first_img = first_img.convert("RGB")
+
+        # 打开其余图片并转换为RGB
+        other_imgs = []
+        for img_path in image_files[1:]:
+            img = Image.open(img_path)
+            img = img.convert("RGB")
+            other_imgs.append(img)
+
+        # 创建临时PDF文件（避免中文路径问题）
+        with tempfile.NamedTemporaryFile(suffix='.pdf', delete=False) as tmp_file:
+            temp_pdf_path = tmp_file.name
+
+        try:
+            # 保存为临时PDF
+            first_img.save(
+                temp_pdf_path,
+                "PDF",
+                resolution=100.0,
+                save_all=True,
+                append_images=other_imgs,
+                append=True
+            )
+
+            # 将临时文件移动到目标位置
+            import shutil
+            pdf_path.parent.mkdir(parents=True, exist_ok=True)  # 确保目标目录存在
+            shutil.move(temp_pdf_path, pdf_path)
+
+            return True, f"成功生成PDF: {pdf_path.name}"
+
+        except Exception as e:
+            # 清理临时文件
+            try:
+                os.unlink(temp_pdf_path)
+            except:
+                pass
+            raise e
+
+    except Exception as e:
+        error_msg = str(e)
+        logger.error(f"生成PDF失败 {pdf_path}: {error_msg}")
+        return False, error_msg
+
+# ==============================
 # 多线程工作队列处理器
 # ==============================
 def worker(task_queue, result_callback):
@@ -129,7 +195,7 @@ class PptToImagesGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("🖼️ 演示文稿转图片工具")
-        self.root.geometry("720x520")
+        self.root.geometry("720x580")
         self.root.resizable(True, True)
 
         self.config = load_config()
@@ -169,6 +235,25 @@ class PptToImagesGUI:
         Spinbox(thread_frame, from_=1, to=10, textvariable=self.thread_var, width=5).pack(side=LEFT)
         Label(thread_frame, text="（建议 1～5）").pack(side=LEFT, padx=(10, 0))
 
+        # PDF 选项
+        pdf_frame = LabelFrame(self.root, text="📄 PDF 选项", padx=10, pady=8)
+        pdf_frame.pack(fill=X, padx=10, pady=5)
+
+        self.convert_pdf_var = BooleanVar(value=self.config.get("convert_to_pdf", False))
+        self.convert_pdf_check = Checkbutton(pdf_frame, text="同时将图片合并为 PDF（每个PPT生成一个PDF）",
+                                             variable=self.convert_pdf_var, command=self.toggle_pdf_options)
+        self.convert_pdf_check.pack(anchor=W)
+
+        pdf_output_frame = Frame(pdf_frame)
+        pdf_output_frame.pack(fill=X, pady=5)
+        self.pdf_output_dir_var = StringVar(value=self.config.get("pdf_output_dir", ""))
+        self.pdf_output_label = Label(pdf_output_frame, text="PDF 输出目录:", width=15, anchor=W)
+        self.pdf_output_entry = Entry(pdf_output_frame, textvariable=self.pdf_output_dir_var, font=("Consolas", 9))
+        self.pdf_output_browse_btn = Button(pdf_output_frame, text="📁 浏览", command=self.browse_pdf_output_dir)
+
+        # 默认隐藏PDF选项
+        self.toggle_pdf_options()
+
         # 控制按钮
         control_frame = Frame(self.root)
         control_frame.pack(pady=10)
@@ -198,6 +283,27 @@ class PptToImagesGUI:
             if Path(f).exists():
                 self.input_listbox.insert(END, f)
 
+    def toggle_pdf_options(self):
+        """根据复选框状态显示/隐藏PDF相关控件"""
+        if self.convert_pdf_var.get():
+            self.pdf_output_label.pack(side=LEFT)
+            self.pdf_output_entry.pack(side=LEFT, fill=X, expand=True, padx=(5, 0))
+            self.pdf_output_browse_btn.pack(side=RIGHT)
+        else:
+            self.pdf_output_label.pack_forget()
+            self.pdf_output_entry.pack_forget()
+            self.pdf_output_browse_btn.pack_forget()
+
+    def browse_output_dir(self):
+        folder = filedialog.askdirectory(title="选择基础输出目录", initialdir=self.output_dir_var.get())
+        if folder:
+            self.output_dir_var.set(folder)
+
+    def browse_pdf_output_dir(self):
+        folder = filedialog.askdirectory(title="选择PDF输出目录", initialdir=self.pdf_output_dir_var.get())
+        if folder:
+            self.pdf_output_dir_var.set(folder)
+
     def add_files(self):
         files = filedialog.askopenfilenames(
             title="选择 PPT/PPS 文件",
@@ -213,11 +319,6 @@ class PptToImagesGUI:
 
     def clear_files(self):
         self.input_listbox.delete(0, END)
-
-    def browse_output_dir(self):
-        folder = filedialog.askdirectory(title="选择基础输出目录", initialdir=self.output_dir_var.get())
-        if folder:
-            self.output_dir_var.set(folder)
 
     def log_message(self, msg):
         self.log_text.config(state=NORMAL)
@@ -245,11 +346,13 @@ class PptToImagesGUI:
             messagebox.showerror("错误", f"以下文件不存在：\n" + "\n".join(str(f) for f in missing))
             return
 
-        # 保存配置
+        # 保存配置（包含新增字段）
         current_config = {
             "input_files": [str(f) for f in files],
             "output_dir": str(output_dir),
-            "max_workers": max_workers
+            "max_workers": max_workers,
+            "convert_to_pdf": self.convert_pdf_var.get(),
+            "pdf_output_dir": self.pdf_output_dir_var.get()
         }
         save_config(current_config)
 
@@ -297,7 +400,37 @@ class PptToImagesGUI:
         self.completed_count += 1
         prefix = "✅ 成功" if success else "❌ 失败"
         self.root.after(0, lambda m=f"{prefix}: {ppt_file.name} | {msg}": self.log_message(m))
+
+        # ✅ 如果原任务成功 且 用户勾选了转PDF，则执行PDF转换
+        if success and self.convert_pdf_var.get():
+            output_base_dir = Path(self.output_dir_var.get())
+            image_subdir = output_base_dir / ppt_file.stem
+
+            if image_subdir.exists():
+                # PDF输出目录
+                pdf_output_dir_str = self.pdf_output_dir_var.get().strip()
+                pdf_output_dir = Path(pdf_output_dir_str) if pdf_output_dir_str else output_base_dir
+                pdf_output_dir.mkdir(parents=True, exist_ok=True)
+
+                pdf_path = pdf_output_dir / f"{ppt_file.stem}.pdf"
+
+                # 在后台线程中执行PDF转换，避免阻塞GUI
+                pdf_thread = threading.Thread(
+                    target=self.run_pdf_conversion,
+                    args=(image_subdir, pdf_path, ppt_file.name),
+                    daemon=True
+                )
+                pdf_thread.start()
+            else:
+                self.root.after(0, lambda: self.log_message(f"⚠️ 警告: 图片目录不存在，无法生成PDF: {image_subdir}"))
+
         self.root.after(0, lambda: self.status_var.set(f"进度: {self.completed_count}/{self.total_count}"))
+
+    def run_pdf_conversion(self, image_dir, pdf_path, ppt_name):
+        """在后台线程中执行PDF转换"""
+        success, msg = images_to_pdf(image_dir, pdf_path)
+        prefix = "📄 PDF" if success else "❌ PDF"
+        self.root.after(0, lambda m=f"{prefix}: {ppt_name} | {msg}": self.log_message(m))
 
     def finalize_conversion(self):
         """所有任务完成后自动清理和提示"""
