@@ -1,11 +1,25 @@
 {
   "input_files": [
-    "D:\\FILES\\绘本\\pdf\\Goodnight Moon.pdf",
-    "D:\\FILES\\绘本\\pdf\\i an a bunny.pdf",
-    "D:\\FILES\\绘本\\pdf\\彩虹的尽头.pdf",
-    "D:\\FILES\\绘本\\pdf\\鳄鱼哇尼.pdf",
-    "D:\\FILES\\绘本\\pdf\\弗洛拉的小毯子.pdf",
-    "D:\\FILES\\绘本\\pdf\\该睡觉了,小宝贝.pdf"
+    "D:\\FILES\\绘本\\图片转pdf\\彩色的乌鸦.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\打瞌睡的小房子.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\大脚丫跳芭蕾.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\好饿的小白熊.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\灰袍奶奶和草莓盗贼.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\巨人和春天.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\看，火车来了（中文）.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\快睡吧,小田鼠！.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\两列小火车.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\迷宫游戏.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\你看起来好像很好吃.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\亲爱的小鱼.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\我的朋友好好吃.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\我就是喜欢我.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\我绝对绝对不吃番茄.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\我能打败怪兽.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\我喜欢你.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\我喜欢自己.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\我最佩服的火车司机.pdf",
+    "D:\\FILES\\绘本\\图片转pdf\\小怪兽.pdf"
   ],
-  "output_dir": "D:\\FILES\\test"
+  "output_dir": "D:\\FILES\\绘本\\PDF合并"
 }
