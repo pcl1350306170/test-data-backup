@@ -1,10 +1,10 @@
 {
-  "source_dir": "C:/www/down",
-  "output_dir": "G:/电子书/HS/98糖",
+  "source_dir": "D:/FILES/download/V33-IMG-鸥媚",
+  "output_dir": "D:/FILES/download/zip",
   "archive_format": "zip",
   "enable_password": true,
   "password": "1350306170",
   "files_per_archive": 3600,
-  "archive_prefix": "98糖2026-",
-  "seven_zip_path": "D:/tools/7-Zip/7z.exe"
+  "archive_prefix": "v33-鸥媚-",
+  "seven_zip_path": "D:/TOOLS/7-Zip/7z.exe"
 }

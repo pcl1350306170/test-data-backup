@@ -9,6 +9,9 @@ import zipfile
 import tempfile
 from datetime import datetime
 from pathlib import Path
+# 确保中文显示正常
+import matplotlib
+
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QLabel, QPushButton, QFileDialog, QListWidget, QCheckBox, QLineEdit,
                              QProgressBar, QTextEdit, QMessageBox, QGroupBox, QRadioButton,
@@ -1201,8 +1204,7 @@ class EPubConverter(QMainWindow):
 
 
 if __name__ == "__main__":
-    # 确保中文显示正常
-    import matplotlib
+
 
     matplotlib.rcParams["font.family"] = ["SimHei", "WenQuanYi Micro Hei", "Heiti TC"]
 
