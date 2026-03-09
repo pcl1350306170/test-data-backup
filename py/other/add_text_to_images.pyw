@@ -40,44 +40,42 @@ DEFAULT_CONFIG = {
     "text_position": "右下",
     "font_size": 25,
     "font_color": "#000000",
-    "font_path": "msyh.ttc",  # 微软雅黑
+    "font_path": "msyh.ttc",
     "opacity": 1.0,
     "auto_blank_area": False,
-    "texts_per_file": {},  # {"1.jpg": "Hello", "2.png": ""}
+    "use_blank_block": False,          # 新增：是否使用右下角空白块
+    "blank_block_width_pct": 10,       # 宽度百分比
+    "blank_block_height_pct": 15,      # 高度百分比
+    "texts_per_file": {},
 }
 
 # 支持的图片格式
 IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.bmp', '.tiff'}
 
-# 位置映射
+# 位置映射（使用极小负数触发右/下对齐，int()后为0）
 POSITION_MAP = {
-    "左上": (10, 10),
-    "中上": ("center", 10),
-    "右上": (-10, 10),
-    "左中": (10, "center"),
+    "左上": (0, 0),
+    "中上": ("center", 0),
+    "右上": (-0.1, 0),
+    "左中": (0, "center"),
     "居中": ("center", "center"),
-    "右中": (-10, "center"),
-    "左下": (10, -10),
-    "中下": ("center", -10),
-    "右下": (-20, -20),
+    "右中": (-0.1, "center"),
+    "左下": (0, -0.1),
+    "中下": ("center", -0.1),
+    "右下": (-0.1, -0.1),
 }
 
 # ==============================
 # 工具函数：智能空白区域检测（简化版）
 # ==============================
 def find_blank_area(img, text_w, text_h, margin=20):
-    """简单策略：从右下角开始扫描，找一个不包含太多非白像素的区域"""
     try:
         w, h = img.size
-        # 转为灰度图
         gray = img.convert("L")
         pixels = gray.load()
-
-        # 从右下角开始，步进扫描
         step = max(10, min(w, h) // 20)
         for y in range(h - text_h - margin, margin, -step):
             for x in range(w - text_w - margin, margin, -step):
-                # 检查该区域是否“空白”（平均亮度 > 200）
                 total = 0
                 count = 0
                 for dy in range(text_h):
@@ -85,18 +83,38 @@ def find_blank_area(img, text_w, text_h, margin=20):
                         if x+dx < w and y+dy < h:
                             total += pixels[x+dx, y+dy]
                             count += 1
-                if count > 0 and total / count > 200:  # 较亮区域视为“空白”
+                if count > 0 and total / count > 200:
                     return (x, y)
-        # 如果没找到，返回默认右下
         return (w - text_w - margin, h - text_h - margin)
     except:
         return (img.width - text_w - 20, img.height - text_h - 20)
 
 # ==============================
+# 自动换行文本工具
+# ==============================
+def wrap_text(draw, text, font, max_width):
+    """将文本按最大宽度自动换行"""
+    lines = []
+    words = text.split(' ')
+    current_line = ""
+    for word in words:
+        test_line = current_line + " " + word if current_line else word
+        bbox = draw.textbbox((0, 0), test_line, font=font)
+        line_width = bbox[2] - bbox[0]
+        if line_width <= max_width:
+            current_line = test_line
+        else:
+            if current_line:
+                lines.append(current_line)
+            current_line = word
+    if current_line:
+        lines.append(current_line)
+    return lines
+
+# ==============================
 # 核心处理函数
 # ==============================
 def process_image_with_text(image_path: Path, output_path: Path, text: str, config: dict):
-    """给单张图片添加文案"""
     if not text.strip():
         return False, "文案为空，跳过"
 
@@ -104,10 +122,6 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
         with Image.open(image_path) as img:
             if img.mode != "RGBA":
                 img = img.convert("RGBA")
-
-            # 准备绘图
-            txt_layer = Image.new("RGBA", img.size, (255, 255, 255, 0))
-            draw = ImageDraw.Draw(txt_layer)
 
             # 加载字体
             font_size = config.get("font_size", 25)
@@ -120,45 +134,90 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
                 except:
                     font = ImageFont.load_default()
 
-            # 获取文本尺寸
-            bbox = draw.textbbox((0, 0), text, font=font)
-            text_w = bbox[2] - bbox[0]
-            text_h = bbox[3] - bbox[1]
+            # 准备绘图层
+            txt_layer = Image.new("RGBA", img.size, (255, 255, 255, 0))
+            draw = ImageDraw.Draw(txt_layer)
 
-            # 确定位置
-            if config.get("auto_blank_area", False):
-                pos = find_blank_area(img, text_w, text_h)
+            use_blank_block = config.get("use_blank_block", False)
+            if use_blank_block:
+                # === 使用右下角空白块 ===
+                w, h = img.size
+                block_w = int(w * config.get("blank_block_width_pct", 10) / 100)
+                block_h = int(h * config.get("blank_block_height_pct", 15) / 100)
+
+                # 计算文本所需尺寸（带换行）
+                margin = 10
+                max_text_width = block_w - 2 * margin
+                lines = wrap_text(draw, text, font, max_text_width)
+                line_height = font_size + 4
+                text_total_h = len(lines) * line_height
+
+                # 撑开高度（但不低于配置高度）
+                actual_block_h = max(block_h, text_total_h + 2 * margin)
+                actual_block_w = block_w
+
+                # 确保不超出图片
+                actual_block_w = min(actual_block_w, w)
+                actual_block_h = min(actual_block_h, h)
+
+                # 右下角坐标
+                x0 = w - actual_block_w
+                y0 = h - actual_block_h
+                x1 = w
+                y1 = h
+
+                # 绘制半透明白色背景块
+                alpha = int(255 * 0.7)  # 背景透明度
+                draw.rectangle([x0, y0, x1, y1], fill=(255, 255, 255, alpha))
+
+                # 绘制文字（居中或左对齐）
+                text_y = y0 + margin
+                for line in lines:
+                    bbox = draw.textbbox((0, 0), line, font=font)
+                    text_w = bbox[2] - bbox[0]
+                    text_x = x0 + margin  # 左对齐
+                    # 或居中: text_x = x0 + (actual_block_w - text_w) // 2
+                    draw.text((text_x, text_y), line, fill=(0, 0, 0, 255), font=font)
+                    text_y += line_height
+
+                pos = None  # 不再使用外部位置
             else:
-                pos_key = config.get("text_position", "右下")
-                default_pos = POSITION_MAP.get(pos_key, (-10, -10))
-                x_offset, y_offset = default_pos
+                # === 原有逻辑：直接绘制文字 ===
+                bbox = draw.textbbox((0, 0), text, font=font)
+                text_w = bbox[2] - bbox[0]
+                text_h = bbox[3] - bbox[1]
 
-                if x_offset == "center":
-                    x = (img.width - text_w) // 2
-                elif x_offset < 0:
-                    x = img.width - text_w + x_offset
+                if config.get("auto_blank_area", False):
+                    pos = find_blank_area(img, text_w, text_h)
                 else:
-                    x = x_offset
+                    pos_key = config.get("text_position", "右下")
+                    default_pos = POSITION_MAP.get(pos_key, (-0.1, -0.1))
+                    x_offset, y_offset = default_pos
 
-                if y_offset == "center":
-                    y = (img.height - text_h) // 2
-                elif y_offset < 0:
-                    y = img.height - text_h + y_offset
-                else:
-                    y = y_offset
+                    if x_offset == "center":
+                        x = (img.width - text_w) // 2
+                    elif isinstance(x_offset, (int, float)) and x_offset < 0:
+                        x = img.width - text_w + int(x_offset)
+                    else:
+                        x = int(x_offset) if isinstance(x_offset, (int, float)) else 0
 
-                pos = (x, y)
+                    if y_offset == "center":
+                        y = (img.height - text_h) // 2
+                    elif isinstance(y_offset, (int, float)) and y_offset < 0:
+                        y = img.height - text_h + int(y_offset)
+                    else:
+                        y = int(y_offset) if isinstance(y_offset, (int, float)) else 0
 
-            # 设置颜色和透明度
-            color_hex = config.get("font_color", "#000000")
-            opacity = float(config.get("opacity", 1.0))
-            r = int(color_hex[1:3], 16)
-            g = int(color_hex[3:5], 16)
-            b = int(color_hex[5:7], 16)
-            a = int(255 * opacity)
+                    pos = (x, y)
 
-            # 绘制文字
-            draw.text(pos, text, fill=(r, g, b, a), font=font)
+                # 设置颜色和透明度
+                color_hex = config.get("font_color", "#000000")
+                opacity = float(config.get("opacity", 1.0))
+                r = int(color_hex[1:3], 16)
+                g = int(color_hex[3:5], 16)
+                b = int(color_hex[5:7], 16)
+                a = int(255 * opacity)
+                draw.text(pos, text, fill=(r, g, b, a), font=font)
 
             # 合并图层
             combined = Image.alpha_composite(img, txt_layer)
@@ -177,12 +236,12 @@ class AddTextToImagesGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("🖼️ 批量给图片加文案")
-        self.root.geometry("800x600")
+        self.root.geometry("850x650")
         self.root.resizable(True, True)
 
         self.config = load_config()
         self.image_files = []
-        self.text_entries = {}  # {filename: Entry}
+        self.text_entries = {}
         self.setup_ui()
 
     def setup_ui(self):
@@ -192,66 +251,86 @@ class AddTextToImagesGUI:
         self.input_dir_var = StringVar(value=self.config["input_dir"])
         Entry(dir_frame, textvariable=self.input_dir_var, font=("Consolas", 9)).pack(side=LEFT, fill=X, expand=True)
         Button(dir_frame, text="📁 浏览", command=self.browse_input_dir).pack(side=RIGHT, padx=(5, 0))
-
-        # 刷新按钮
-        Button(dir_frame, text="🔄 刷新图片列表", command=self.load_images).pack(side=RIGHT, padx=(5, 0))
+        Button(dir_frame, text="🔄 刷新", command=self.load_images).pack(side=RIGHT, padx=(5, 0))
 
         # 文案设置
         settings_frame = LabelFrame(self.root, text="⚙️ 文案设置", padx=10, pady=8)
         settings_frame.pack(fill=X, padx=10, pady=5)
 
-        # 位置
-        Label(settings_frame, text="位置:").grid(row=0, column=0, sticky=W)
+        row = 0
+        # 位置 & 空白块开关
+        Label(settings_frame, text="位置:").grid(row=row, column=0, sticky=W)
         self.pos_var = StringVar(value=self.config.get("text_position", "右下"))
         pos_combo = ttk.Combobox(settings_frame, textvariable=self.pos_var, values=list(POSITION_MAP.keys()), width=8)
-        pos_combo.grid(row=0, column=1, padx=5)
+        pos_combo.grid(row=row, column=1, padx=5)
 
-        # 字体大小
-        Label(settings_frame, text="字体大小:").grid(row=0, column=2, sticky=W)
+        self.use_blank_var = BooleanVar(value=self.config.get("use_blank_block", False))
+        blank_check = Checkbutton(settings_frame, text="在右下角添加空白区域显示文案", variable=self.use_blank_var, command=self.toggle_blank_settings)
+        blank_check.grid(row=row, column=2, columnspan=3, sticky=W, padx=(10, 0))
+
+        row += 1
+        # 空白块尺寸（默认隐藏）
+        self.blank_size_frame = Frame(settings_frame)
+        self.blank_size_frame.grid(row=row, column=0, columnspan=6, sticky=W, pady=(5,0))
+        Label(self.blank_size_frame, text="空白区宽(%):").pack(side=LEFT)
+        self.blank_w_var = StringVar(value=str(self.config.get("blank_block_width_pct", 10)))
+        Entry(self.blank_size_frame, textvariable=self.blank_w_var, width=5).pack(side=LEFT, padx=(5,0))
+        Label(self.blank_size_frame, text="高(%):").pack(side=LEFT, padx=(10,0))
+        self.blank_h_var = StringVar(value=str(self.config.get("blank_block_height_pct", 15)))
+        Entry(self.blank_size_frame, textvariable=self.blank_h_var, width=5).pack(side=LEFT, padx=(5,0))
+
+        self.toggle_blank_settings()  # 初始化显示状态
+
+        row += 1
+        # 字体大小、颜色、透明度
+        Label(settings_frame, text="字体大小:").grid(row=row, column=0, sticky=W, pady=(5,0))
         self.size_var = StringVar(value=str(self.config.get("font_size", 25)))
         size_entry = Entry(settings_frame, textvariable=self.size_var, width=6)
-        size_entry.grid(row=0, column=3, padx=5)
+        size_entry.grid(row=row, column=1, padx=5, pady=(5,0))
 
-        # 颜色
-        Label(settings_frame, text="颜色:").grid(row=0, column=4, sticky=W)
+        Label(settings_frame, text="颜色:").grid(row=row, column=2, sticky=W, pady=(5,0))
         self.color_var = StringVar(value=self.config.get("font_color", "#000000"))
         color_btn = Button(settings_frame, text="🎨 选择", command=self.choose_color, width=6)
-        color_btn.grid(row=0, column=5, padx=5)
-        color_preview = Label(settings_frame, bg=self.color_var.get(), width=2, relief=SUNKEN)
-        color_preview.grid(row=0, column=6, padx=(0, 10))
-        self.color_preview = color_preview
+        color_btn.grid(row=row, column=3, padx=5, pady=(5,0))
+        self.color_preview = Label(settings_frame, bg=self.color_var.get(), width=2, relief=SUNKEN)
+        self.color_preview.grid(row=row, column=4, padx=(0, 10), pady=(5,0))
 
-        # 透明度
-        Label(settings_frame, text="透明度 (0~1):").grid(row=1, column=0, sticky=W, pady=(5,0))
+        Label(settings_frame, text="透明度 (0~1):").grid(row=row, column=5, sticky=W, pady=(5,0))
         self.opacity_var = StringVar(value=str(self.config.get("opacity", 1.0)))
         opa_entry = Entry(settings_frame, textvariable=self.opacity_var, width=6)
-        opa_entry.grid(row=1, column=1, padx=5, pady=(5,0))
+        opa_entry.grid(row=row, column=6, padx=5, pady=(5,0))
 
+        row += 1
         # 自动空白区域
         self.auto_blank_var = BooleanVar(value=self.config.get("auto_blank_area", False))
         auto_check = Checkbutton(settings_frame, text="自动放置在空白区域（避开主体）", variable=self.auto_blank_var)
-        auto_check.grid(row=1, column=2, columnspan=3, sticky=W, pady=(5,0))
+        auto_check.grid(row=row, column=0, columnspan=4, sticky=W, pady=(5,0))
 
-        # 图片与文案列表
+        # 图片与文案列表（带滚轮）
         list_frame = LabelFrame(self.root, text="📝 为每张图片输入文案", padx=10, pady=8)
         list_frame.pack(fill=BOTH, expand=True, padx=10, pady=5)
 
-        canvas = Canvas(list_frame)
-        scrollbar = Scrollbar(list_frame, orient=VERTICAL, command=canvas.yview)
-        scrollable_frame = Frame(canvas)
+        # 使用 Canvas + Frame 实现滚动
+        self.canvas = Canvas(list_frame)
+        scrollbar = Scrollbar(list_frame, orient=VERTICAL, command=self.canvas.yview)
+        self.scrollable_frame = Frame(self.canvas)
 
-        scrollable_frame.bind(
+        self.scrollable_frame.bind(
             "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=scrollbar.set)
 
-        canvas.pack(side=LEFT, fill=BOTH, expand=True)
+        # 绑定鼠标滚轮
+        def _on_mousewheel(event):
+            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        self.canvas.bind("<MouseWheel>", _on_mousewheel)
+        self.scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
+        list_frame.bind("<MouseWheel>", _on_mousewheel)
+
+        self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
         scrollbar.pack(side=RIGHT, fill=Y)
-
-        self.scrollable_frame = scrollable_frame
-        self.canvas = canvas
 
         # 控制按钮
         btn_frame = Frame(self.root)
@@ -264,8 +343,13 @@ class AddTextToImagesGUI:
         status_label = Label(self.root, textvariable=self.status_var, bd=1, relief=SUNKEN, anchor=W, fg="blue")
         status_label.pack(side=BOTTOM, fill=X)
 
-        # 初始加载
         self.load_images()
+
+    def toggle_blank_settings(self):
+        if self.use_blank_var.get():
+            self.blank_size_frame.grid()
+        else:
+            self.blank_size_frame.grid_remove()
 
     def browse_input_dir(self):
         folder = filedialog.askdirectory(title="选择图片目录", initialdir=self.input_dir_var.get())
@@ -281,15 +365,13 @@ class AddTextToImagesGUI:
 
     def load_images(self):
         input_dir = Path(self.input_dir_var.get().strip())
-        if not input_dir.exists():
-            return
-
-        # 清空旧列表
         for widget in self.scrollable_frame.winfo_children():
             widget.destroy()
         self.text_entries.clear()
 
-        # 获取图片
+        if not input_dir.exists():
+            return
+
         self.image_files = sorted([
             f for f in input_dir.iterdir()
             if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS
@@ -299,14 +381,13 @@ class AddTextToImagesGUI:
             Label(self.scrollable_frame, text="⚠️ 该目录下无图片文件", fg="red").pack(pady=10)
             return
 
-        # 创建输入框
         saved_texts = self.config.get("texts_per_file", {})
         for img_path in self.image_files:
             frame = Frame(self.scrollable_frame)
             frame.pack(fill=X, pady=2)
             Label(frame, text=img_path.name, width=30, anchor=W).pack(side=LEFT)
             text_var = StringVar(value=saved_texts.get(img_path.name, ""))
-            entry = Entry(frame, textvariable=text_var, width=50)
+            entry = Entry(frame, textvariable=text_var, width=60)
             entry.pack(side=LEFT, fill=X, expand=True, padx=(10, 0))
             self.text_entries[img_path.name] = text_var
 
@@ -319,17 +400,20 @@ class AddTextToImagesGUI:
             messagebox.showwarning("警告", "没有可处理的图片！")
             return
 
-        # 收集配置
         try:
             font_size = int(self.size_var.get())
             opacity = float(self.opacity_var.get())
             if not (0 <= opacity <= 1):
                 raise ValueError("透明度必须在 0~1 之间")
+            if self.use_blank_var.get():
+                w_pct = float(self.blank_w_var.get())
+                h_pct = float(self.blank_h_var.get())
+                if not (1 <= w_pct <= 100) or not (1 <= h_pct <= 100):
+                    raise ValueError("空白区域宽高百分比应在 1~100 之间")
         except ValueError as e:
             messagebox.showerror("输入错误", f"参数错误：{e}")
             return
 
-        # 保存配置
         current_texts = {name: var.get() for name, var in self.text_entries.items()}
         current_config = {
             "input_dir": str(input_dir),
@@ -339,11 +423,13 @@ class AddTextToImagesGUI:
             "font_path": "msyh.ttc",
             "opacity": opacity,
             "auto_blank_area": self.auto_blank_var.get(),
+            "use_blank_block": self.use_blank_var.get(),
+            "blank_block_width_pct": float(self.blank_w_var.get()) if self.use_blank_var.get() else 10,
+            "blank_block_height_pct": float(self.blank_h_var.get()) if self.use_blank_var.get() else 15,
             "texts_per_file": current_texts,
         }
         save_config(current_config)
 
-        # 启动后台线程
         self.start_btn.config(state=DISABLED, text="🔄 处理中...")
         self.status_var.set("正在处理...")
         thread = threading.Thread(target=self.run_processing, args=(current_config,), daemon=True)
@@ -404,7 +490,6 @@ def save_config(config):
 # 主程序入口
 # ==============================
 if __name__ == "__main__":
-    # 按要求引入 DB_CONFIG（即使不用）
     if DB_CONFIG_PATH.exists():
         try:
             with open(DB_CONFIG_PATH, 'r', encoding='utf-8') as f:
@@ -412,7 +497,6 @@ if __name__ == "__main__":
         except:
             pass
 
-    # 检查依赖
     try:
         from PIL import Image
     except ImportError:
