@@ -93,20 +93,22 @@ def find_blank_area(img, text_w, text_h, margin=20):
 # 自动换行文本工具
 # ==============================
 def wrap_text(draw, text, font, max_width):
-    """将文本按最大宽度自动换行"""
+    """按字符逐个测量，实现真正的自动换行（支持中英文、长URL等）"""
     lines = []
-    words = text.split(' ')
     current_line = ""
-    for word in words:
-        test_line = current_line + " " + word if current_line else word
-        bbox = draw.textbbox((0, 0), test_line, font=font)
-        line_width = bbox[2] - bbox[0]
+    for char in text:
+        test_line = current_line + char
+        try:
+            bbox = draw.textbbox((0, 0), test_line, font=font)
+            line_width = bbox[2] - bbox[0]
+        except:
+            line_width = 0
         if line_width <= max_width:
             current_line = test_line
         else:
             if current_line:
                 lines.append(current_line)
-            current_line = word
+            current_line = char  # 即使单个字符超宽也保留
     if current_line:
         lines.append(current_line)
     return lines
