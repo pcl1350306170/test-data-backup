@@ -27,7 +27,11 @@
 
             const queryString = params.toString();
             const targetUrl = `http://${config.targetHost}:${config.targetPort}/#/iframeIndex${queryString ? '?' + queryString : ''}`;
-            window.location.replace(targetUrl);
+            // 增加确认提示
+            const confirmMessage = `是否打开 ${config.targetHost}:${config.targetPort} 的调试页面？\n\n目标地址：${targetUrl}`;
+            if (confirm(confirmMessage)) {
+                window.location.replace(targetUrl);
+            }
             return;
         }
 
@@ -88,7 +92,9 @@
                 return;
             }
 
-            const debugUrl = `http://${config.targetHost}:${config.targetPort}${config.debugPath}`;
+            // 保持当前页面的 host 和 port，只拼接配置的 debugPath
+            const currentHost = url.host; // 包括端口，如 "192.168.18.228:7000"
+            const debugUrl = `${url.protocol}//${currentHost}${config.debugPath}`;
             window.open(debugUrl, '_blank');
         });
 
