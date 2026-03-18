@@ -5,7 +5,7 @@
     if (url.port !== '7000') return;
 
     // ===== 条件2：如果是 iframeIndex2.html 页面，自动跳转 =====
-	
+
     // ===== 条件2：匹配 iframeIndex 相关页面，自动跳转 =====
 	if (
 	  url.pathname === '/tpleditor/resource/html/iframeIndex2.html' ||
@@ -38,6 +38,48 @@
     const debugButton = document.createElement('div');
     debugButton.id = 'tple-debug-button';
     debugButton.textContent = '打开调试页面';
+
+    // 拖拽功能变量
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+    let hasMoved = false;
+
+    debugButton.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        hasMoved = false;
+        startX = e.clientX;
+        startY = e.clientY;
+
+        const rect = debugButton.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+
+        debugButton.classList.add('dragging');
+        debugButton.style.transition = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        const deltaX = e.clientX - startX;
+        const deltaY = e.clientY - startY;
+
+        if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
+            hasMoved = true;
+        }
+
+        debugButton.style.left = `${initialLeft + deltaX}px`;
+        debugButton.style.top = `${initialTop + deltaY}px`;
+        debugButton.style.right = 'auto';
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            isDragging = false;
+            debugButton.classList.remove('dragging');
+            debugButton.style.transition = '';
+        }
+    });
 
     debugButton.addEventListener('click', () => {
         const debugUrl = `http://${url.hostname}:7000/tpleditor/resource/triagetable/#/sbIndex`;
