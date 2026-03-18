@@ -1,0 +1,518 @@
+# batch_add_text_to_images.pyw
+
+import os
+import json
+import logging
+from pathlib import Path
+from tkinter import *
+from tkinter import messagebox, filedialog, ttk, colorchooser
+from PIL import Image, ImageDraw, ImageFont
+import threading
+
+# ==============================
+# 配置与常量
+# ==============================
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "batch_add_text_to_images"
+CONFIG_DIR = SCRIPT_DIR / "json"
+CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
+LOGS_DIR = CONFIG_DIR / "logs"
+PROCESS_LOG_FILE = LOGS_DIR / f"log_{SCRIPT_NAME}.log"
+DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
+
+# 创建目录
+CONFIG_DIR.mkdir(exist_ok=True)
+LOGS_DIR.mkdir(exist_ok=True)
+
+# 日志配置
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler(PROCESS_LOG_FILE, encoding='utf-8'),
+    ]
+)
+logger = logging.getLogger()
+
+# 默认配置
+DEFAULT_CONFIG = {
+    "input_dir": "",
+    "font_size": 25,
+    "font_color": "#000000",
+    "bg_color": "#FFFFFF",
+    "font_path": "msyh.ttc",  # 微软雅黑
+    "opacity": 1.0,
+    "bottom_area_height": 150,
+    "use_bottom_area": True,      # 默认使用底部扩展
+    "use_blank_block": False,     # 右下角空白块
+    "blank_block_width_pct": 10,
+    "blank_block_height_pct": 15,
+    "texts_per_file": {},
+}
+
+# 支持的图片格式
+IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.bmp', '.tiff'}
+
+# ==============================
+# 工具函数：按字符自动换行（支持中英文/长词）
+# ==============================
+def wrap_text(draw, text, font, max_width):
+    lines = []
+    current_line = ""
+    for char in text:
+        test_line = current_line + char
+        try:
+            bbox = draw.textbbox((0, 0), test_line, font=font)
+            line_width = bbox[2] - bbox[0]
+        except:
+            line_width = 0
+        if line_width <= max_width:
+            current_line = test_line
+        else:
+            if current_line:
+                lines.append(current_line)
+            current_line = char
+    if current_line:
+        lines.append(current_line)
+    return lines
+
+# ==============================
+# 核心处理函数
+# ==============================
+def process_image_with_text(image_path: Path, output_path: Path, text: str, config: dict):
+    if not text.strip():
+        return False, "文案为空，跳过"
+
+    try:
+        with Image.open(image_path) as img:
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            orig_w, orig_h = img.size
+
+            use_bottom = config.get("use_bottom_area", True)
+            use_block = config.get("use_blank_block", False)
+
+            # === 方案1：底部扩展区域 ===
+            if use_bottom and not use_block:
+                new_h = orig_h + int(config.get("bottom_area_height", 150))
+                new_img = Image.new("RGB", (orig_w, new_h), color=tuple(int(config["bg_color"].lstrip('#')[i:i+2], 16) for i in (0, 2, 4)))
+                new_img.paste(img, (0, 0))
+
+                # 绘制文字
+                draw = ImageDraw.Draw(new_img)
+                font_size = config.get("font_size", 25)
+                font_path = config.get("font_path", "msyh.ttc")
+                try:
+                    font = ImageFont.truetype(font_path, font_size)
+                except:
+                    try:
+                        font = ImageFont.truetype("simhei.ttf", font_size)
+                    except:
+                        font = ImageFont.load_default()
+
+                # 文字颜色与透明度（此处不支持透明，因背景为纯色）
+                color_hex = config.get("font_color", "#000000")
+                r = int(color_hex[1:3], 16)
+                g = int(color_hex[3:5], 16)
+                b = int(color_hex[5:7], 16)
+
+                # 居中绘制（可多行）
+                margin = 10
+                max_text_width = orig_w - 2 * margin
+                lines = wrap_text(draw, text, font, max_text_width)
+                line_height = font_size + 6
+                total_text_h = len(lines) * line_height
+                start_y = orig_h + (int(config["bottom_area_height"]) - total_text_h) // 2
+                y = max(start_y, orig_h + margin)
+                for line in lines:
+                    bbox = draw.textbbox((0, 0), line, font=font)
+                    text_w = bbox[2] - bbox[0]
+                    x = (orig_w - text_w) // 2
+                    draw.text((x, y), line, fill=(r, g, b), font=font)
+                    y += line_height
+
+                new_img.save(output_path, quality=95)
+                return True, "成功添加底部文案"
+
+            # === 方案2：右下角空白块（覆盖式）===
+            elif use_block:
+                # 加载字体
+                font_size = config.get("font_size", 25)
+                font_path = config.get("font_path", "msyh.ttc")
+                try:
+                    font = ImageFont.truetype(font_path, font_size)
+                except:
+                    try:
+                        font = ImageFont.truetype("simhei.ttf", font_size)
+                    except:
+                        font = ImageFont.load_default()
+
+                # 创建带透明通道的图层
+                txt_layer = Image.new("RGBA", (orig_w, orig_h), (0, 0, 0, 0))
+                draw = ImageDraw.Draw(txt_layer)
+
+                # 计算空白块尺寸
+                block_w = int(orig_w * config.get("blank_block_width_pct", 10) / 100)
+                block_h = int(orig_h * config.get("blank_block_height_pct", 15) / 100)
+                margin = 10
+                max_text_width = block_w - 2 * margin
+
+                # 自动换行
+                lines = wrap_text(draw, text, font, max_text_width)
+                line_height = font_size + 4
+                text_total_h = len(lines) * line_height
+                actual_block_h = max(block_h, text_total_h + 2 * margin)
+                actual_block_w = block_w
+
+                # 确保不超出图片
+                actual_block_w = min(actual_block_w, orig_w)
+                actual_block_h = min(actual_block_h, orig_h)
+
+                x0 = orig_w - actual_block_w
+                y0 = orig_h - actual_block_h
+                x1 = orig_w
+                y1 = orig_h
+
+                # 背景颜色（带透明度）
+                bg_hex = config.get("bg_color", "#FFFFFF")
+                br = int(bg_hex[1:3], 16)
+                bg = int(bg_hex[3:5], 16)
+                bb = int(bg_hex[5:7], 16)
+                opacity = float(config.get("opacity", 1.0))
+                alpha = int(255 * opacity)
+                draw.rectangle([x0, y0, x1, y1], fill=(br, bg, bb, alpha))
+
+                # 文字颜色
+                color_hex = config.get("font_color", "#000000")
+                r = int(color_hex[1:3], 16)
+                g = int(color_hex[3:5], 16)
+                b = int(color_hex[5:7], 16)
+
+                # 绘制文字（左对齐）
+                text_y = y0 + margin
+                for line in lines:
+                    draw.text((x0 + margin, text_y), line, fill=(r, g, b, 255), font=font)
+                    text_y += line_height
+
+                # 合并图层
+                img_rgba = img.convert("RGBA")
+                combined = Image.alpha_composite(img_rgba, txt_layer)
+                if combined.mode != "RGB":
+                    combined = combined.convert("RGB")
+                combined.save(output_path, quality=95)
+                return True, "成功添加右下角文案"
+
+            else:
+                return False, "未启用任何文案模式"
+
+    except Exception as e:
+        logger.error(f"处理 {image_path.name} 失败: {e}")
+        return False, str(e)
+
+# ==============================
+# GUI 主类
+# ==============================
+class BatchAddTextGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("🖼️ 批量给图片加文案")
+        self.root.geometry("850x680")
+        self.root.resizable(True, True)
+
+        self.config = self.load_config()
+        self.image_files = []
+        self.text_entries = {}
+        self.setup_ui()
+
+    def setup_ui(self):
+        # 输入目录
+        dir_frame = LabelFrame(self.root, text="📂 图片目录", padx=10, pady=8)
+        dir_frame.pack(fill=X, padx=10, pady=5)
+        self.input_dir_var = StringVar(value=self.config["input_dir"])
+        Entry(dir_frame, textvariable=self.input_dir_var, font=("Consolas", 9)).pack(side=LEFT, fill=X, expand=True)
+        Button(dir_frame, text="📁 浏览", command=self.browse_input_dir).pack(side=RIGHT, padx=(5, 0))
+        Button(dir_frame, text="🔄 刷新", command=self.load_images).pack(side=RIGHT, padx=(5, 0))
+
+        # 模式选择
+        mode_frame = LabelFrame(self.root, text="🎨 显示模式", padx=10, pady=8)
+        mode_frame.pack(fill=X, padx=10, pady=5)
+
+        self.use_bottom_var = BooleanVar(value=self.config.get("use_bottom_area", True))
+        self.use_block_var = BooleanVar(value=self.config.get("use_blank_block", False))
+
+        def toggle_mode():
+            self.use_bottom_var.set(not self.use_block_var.get())
+            self.use_block_var.set(not self.use_bottom_var.get())
+            self.toggle_settings()
+
+        Checkbutton(mode_frame, text="在图片下方扩展区域显示文案", variable=self.use_bottom_var, command=toggle_mode).pack(side=LEFT)
+        Checkbutton(mode_frame, text="在右下角叠加空白块显示文案", variable=self.use_block_var, command=toggle_mode).pack(side=LEFT, padx=(20, 0))
+
+        # 底部区域设置（默认显示）
+        self.bottom_frame = LabelFrame(self.root, text="🔽 底部扩展区域设置", padx=10, pady=8)
+        self.bottom_frame.pack(fill=X, padx=10, pady=5)
+
+        Label(self.bottom_frame, text="高度(px):").grid(row=0, column=0, sticky=W)
+        self.bottom_h_var = StringVar(value=str(self.config.get("bottom_area_height", 150)))
+        Entry(self.bottom_frame, textvariable=self.bottom_h_var, width=8).grid(row=0, column=1, padx=5)
+
+        # 空白块设置（默认隐藏）
+        self.block_frame = LabelFrame(self.root, text="🔷 右下角空白块设置", padx=10, pady=8)
+        self.block_frame.pack(fill=X, padx=10, pady=5)
+
+        Label(self.block_frame, text="宽度(%):").grid(row=0, column=0, sticky=W)
+        self.blank_w_var = StringVar(value=str(self.config.get("blank_block_width_pct", 10)))
+        Entry(self.block_frame, textvariable=self.blank_w_var, width=6).grid(row=0, column=1, padx=5)
+
+        Label(self.block_frame, text="高度(%):").grid(row=0, column=2, sticky=W, padx=(10,0))
+        self.blank_h_var = StringVar(value=str(self.config.get("blank_block_height_pct", 15)))
+        Entry(self.block_frame, textvariable=self.blank_h_var, width=6).grid(row=0, column=3, padx=5)
+
+        self.toggle_settings()
+
+        # 字体设置
+        font_frame = LabelFrame(self.root, text="🔤 字体设置", padx=10, pady=8)
+        font_frame.pack(fill=X, padx=10, pady=5)
+
+        row = 0
+        Label(font_frame, text="字体大小:").grid(row=row, column=0, sticky=W)
+        self.size_var = StringVar(value=str(self.config.get("font_size", 25)))
+        Entry(font_frame, textvariable=self.size_var, width=6).grid(row=row, column=1, padx=5)
+
+        Label(font_frame, text="字体颜色:").grid(row=row, column=2, sticky=W, padx=(10,0))
+        self.color_var = StringVar(value=self.config.get("font_color", "#000000"))
+        color_btn = Button(font_frame, text="🎨 选择", command=self.choose_font_color, width=6)
+        color_btn.grid(row=row, column=3, padx=5)
+        self.font_color_preview = Label(font_frame, bg=self.color_var.get(), width=2, relief=SUNKEN)
+        self.font_color_preview.grid(row=row, column=4, padx=(0,10))
+
+        Label(font_frame, text="背景颜色:").grid(row=row, column=5, sticky=W, padx=(10,0))
+        self.bg_color_var = StringVar(value=self.config.get("bg_color", "#FFFFFF"))
+        bg_btn = Button(font_frame, text="🎨 选择", command=self.choose_bg_color, width=6)
+        bg_btn.grid(row=row, column=6, padx=5)
+        self.bg_color_preview = Label(font_frame, bg=self.bg_color_var.get(), width=2, relief=SUNKEN)
+        self.bg_color_preview.grid(row=row, column=7, padx=(0,10))
+
+        row += 1
+        Label(font_frame, text="透明度(0~1):").grid(row=row, column=0, sticky=W, pady=(5,0))
+        self.opacity_var = StringVar(value=str(self.config.get("opacity", 1.0)))
+        Entry(font_frame, textvariable=self.opacity_var, width=6).grid(row=row, column=1, padx=5, pady=(5,0))
+
+        Label(font_frame, text="字体文件:").grid(row=row, column=2, sticky=W, padx=(10,0), pady=(5,0))
+        self.font_path_var = StringVar(value=self.config.get("font_path", "msyh.ttc"))
+        font_entry = Entry(font_frame, textvariable=self.font_path_var, width=20)
+        font_entry.grid(row=row, column=3, columnspan=3, padx=5, pady=(5,0))
+
+        # 图片与文案列表（带滚轮）
+        list_frame = LabelFrame(self.root, text="📝 为每张图片输入文案", padx=10, pady=8)
+        list_frame.pack(fill=BOTH, expand=True, padx=10, pady=5)
+
+        self.canvas = Canvas(list_frame)
+        scrollbar = Scrollbar(list_frame, orient=VERTICAL, command=self.canvas.yview)
+        self.scrollable_frame = Frame(self.canvas)
+
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        )
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+
+        # 绑定鼠标滚轮（Windows）
+        def _on_mousewheel(event):
+            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        self.canvas.bind("<MouseWheel>", _on_mousewheel)
+        self.scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
+        list_frame.bind("<MouseWheel>", _on_mousewheel)
+
+        self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
+        scrollbar.pack(side=RIGHT, fill=Y)
+
+        # 控制按钮
+        btn_frame = Frame(self.root)
+        btn_frame.pack(pady=10)
+        self.start_btn = Button(btn_frame, text="▶️ 开始处理", command=self.start_processing, bg="#4CAF50", fg="white", width=15)
+        self.start_btn.pack()
+
+        # 状态栏
+        self.status_var = StringVar(value="就绪")
+        status_label = Label(self.root, textvariable=self.status_var, bd=1, relief=SUNKEN, anchor=W, fg="blue")
+        status_label.pack(side=BOTTOM, fill=X)
+
+        self.load_images()
+
+    def toggle_settings(self):
+        if self.use_bottom_var.get():
+            self.bottom_frame.pack()
+            self.block_frame.pack_forget()
+        else:
+            self.bottom_frame.pack_forget()
+            self.block_frame.pack()
+
+    def browse_input_dir(self):
+        folder = filedialog.askdirectory(title="选择图片目录", initialdir=self.input_dir_var.get())
+        if folder:
+            self.input_dir_var.set(folder)
+            self.load_images()
+
+    def choose_font_color(self):
+        color_code = colorchooser.askcolor(title="选择字体颜色", color=self.color_var.get())[1]
+        if color_code:
+            self.color_var.set(color_code)
+            self.font_color_preview.config(bg=color_code)
+
+    def choose_bg_color(self):
+        color_code = colorchooser.askcolor(title="选择背景颜色", color=self.bg_color_var.get())[1]
+        if color_code:
+            self.bg_color_var.set(color_code)
+            self.bg_color_preview.config(bg=color_code)
+
+    def load_images(self):
+        input_dir = Path(self.input_dir_var.get().strip())
+        for widget in self.scrollable_frame.winfo_children():
+            widget.destroy()
+        self.text_entries.clear()
+
+        if not input_dir.exists():
+            return
+
+        self.image_files = sorted([
+            f for f in input_dir.iterdir()
+            if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS
+        ], key=lambda x: x.name)
+
+        if not self.image_files:
+            Label(self.scrollable_frame, text="⚠️ 该目录下无图片文件", fg="red").pack(pady=10)
+            return
+
+        saved_texts = self.config.get("texts_per_file", {})
+        for img_path in self.image_files:
+            frame = Frame(self.scrollable_frame)
+            frame.pack(fill=X, pady=2)
+            Label(frame, text=img_path.name, width=30, anchor=W).pack(side=LEFT)
+            text_var = StringVar(value=saved_texts.get(img_path.name, ""))
+            entry = Entry(frame, textvariable=text_var, width=60)
+            entry.pack(side=LEFT, fill=X, expand=True, padx=(10, 0))
+            self.text_entries[img_path.name] = text_var
+
+    def start_processing(self):
+        input_dir = Path(self.input_dir_var.get().strip())
+        if not input_dir.exists():
+            messagebox.showwarning("警告", "请选择有效的图片目录！")
+            return
+        if not self.image_files:
+            messagebox.showwarning("警告", "没有可处理的图片！")
+            return
+
+        try:
+            font_size = int(self.size_var.get())
+            opacity = float(self.opacity_var.get())
+            if not (0 <= opacity <= 1):
+                raise ValueError("透明度必须在 0~1 之间")
+
+            if self.use_bottom_var.get():
+                bottom_h = int(self.bottom_h_var.get())
+                if bottom_h < 10:
+                    raise ValueError("底部高度至少10px")
+            else:
+                w_pct = float(self.blank_w_var.get())
+                h_pct = float(self.blank_h_var.get())
+                if not (1 <= w_pct <= 100) or not (1 <= h_pct <= 100):
+                    raise ValueError("空白块宽高百分比应在1~100之间")
+        except ValueError as e:
+            messagebox.showerror("输入错误", f"参数错误：{e}")
+            return
+
+        current_texts = {name: var.get() for name, var in self.text_entries.items()}
+        current_config = {
+            "input_dir": str(input_dir),
+            "font_size": font_size,
+            "font_color": self.color_var.get(),
+            "bg_color": self.bg_color_var.get(),
+            "font_path": self.font_path_var.get(),
+            "opacity": opacity,
+            "bottom_area_height": int(self.bottom_h_var.get()) if self.use_bottom_var.get() else 150,
+            "use_bottom_area": self.use_bottom_var.get(),
+            "use_blank_block": self.use_block_var.get(),
+            "blank_block_width_pct": float(self.blank_w_var.get()) if self.use_block_var.get() else 10,
+            "blank_block_height_pct": float(self.blank_h_var.get()) if self.use_block_var.get() else 15,
+            "texts_per_file": current_texts,
+        }
+        self.save_config(current_config)
+
+        self.start_btn.config(state=DISABLED, text="🔄 处理中...")
+        self.status_var.set("正在处理...")
+        thread = threading.Thread(target=self.run_processing, args=(current_config,), daemon=True)
+        thread.start()
+
+    def run_processing(self, config):
+        input_dir = Path(config["input_dir"])
+        success_count = 0
+        total = len(self.image_files)
+
+        for i, img_path in enumerate(self.image_files, 1):
+            text = config["texts_per_file"].get(img_path.name, "")
+            if not text.strip():
+                logger.info(f"跳过 {img_path.name}（无文案）")
+                continue
+
+            output_path = input_dir / f"{img_path.stem}_with_text{img_path.suffix}"
+            success, msg = process_image_with_text(img_path, output_path, text, config)
+            if success:
+                success_count += 1
+                logger.info(f"✅ {img_path.name} → {output_path.name}")
+            else:
+                logger.error(f"❌ {img_path.name}: {msg}")
+
+        self.root.after(0, self.on_complete, success_count, total)
+
+    def on_complete(self, success_count, total):
+        self.start_btn.config(state=NORMAL, text="▶️ 开始处理")
+        msg = f"处理完成！成功 {success_count}/{total} 张图片。输出文件已添加 '_with_text' 后缀。"
+        self.status_var.set("✅ " + msg)
+        messagebox.showinfo("完成", msg)
+
+    def load_config(self):
+        if CONFIG_PATH.exists():
+            try:
+                with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+                    cfg = json.load(f)
+                    for k, v in DEFAULT_CONFIG.items():
+                        if k not in cfg:
+                            cfg[k] = v
+                    return cfg
+            except Exception as e:
+                logger.error(f"加载配置失败: {e}")
+        return DEFAULT_CONFIG.copy()
+
+    def save_config(self, config):
+        try:
+            with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
+            logger.info("配置已保存")
+        except Exception as e:
+            logger.error(f"保存配置失败: {e}")
+
+
+# ==============================
+# 主程序入口
+# ==============================
+if __name__ == "__main__":
+    # 尝试加载 DB_CONFIG（即使不用也按规范引入）
+    if DB_CONFIG_PATH.exists():
+        try:
+            with open(DB_CONFIG_PATH, 'r', encoding='utf-8') as f:
+                db_cfg = json.load(f)
+                # 此处不使用数据库，仅验证存在性
+        except Exception as e:
+            logger.warning(f"DB_CONFIG 加载失败: {e}")
+
+    try:
+        from PIL import Image
+    except ImportError:
+        messagebox.showerror("依赖缺失", "请先安装 Pillow:\npip install Pillow")
+        exit(1)
+
+    root = Tk()
+    app = BatchAddTextGUI(root)
+    root.mainloop()

@@ -1,9 +1,9 @@
 {
   "mode": "replace",
   "content": "VOA Learning English-",
-  "replace_from": "_with_text",
-  "replace_to": "",
+  "replace_from": "×",
+  "replace_to": "-",
   "input_type": "directory",
   "last_files": [],
-  "last_directory": "D:/FILES/绘本/AI绘本/泰山之旅-剧情版"
+  "last_directory": "D:/CODE/Yarward/门诊/template1.5.2/src/components/assets/images/design/sivlerMedical"
 }
