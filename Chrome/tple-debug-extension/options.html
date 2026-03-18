@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调试扩展配置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group input {
+            flex: 1;
+        }
+
+        .input-group span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔧 调试扩展配置</h1>
+    <p class="subtitle">自定义调试页面的主机和端口配置</p>
+
+    <form id="configForm">
+        <div class="form-group">
+            <label for="debugPort">源端口（检测的页面端口）</label>
+            <input type="number" id="debugPort" required min="1" max="65535">
+            <p class="help-text">只有访问这个端口的页面才会显示调试按钮</p>
+        </div>
+
+        <div class="form-group">
+            <label>目标服务器</label>
+            <div class="input-group">
+                <input type="text" id="targetHost" placeholder="localhost" required>
+                <span>:</span>
+                <input type="number" id="targetPort" placeholder="8080" required min="1" max="65535">
+            </div>
+            <p class="help-text">点击按钮后打开的调试页面地址</p>
+        </div>
+
+        <div class="form-group">
+            <label for="debugPath">调试页面路径</label>
+            <input type="text" id="debugPath" required>
+        </div>
+
+        <div class="form-group">
+            <label for="autoRedirectPath">自动跳转路径</label>
+            <input type="text" id="autoRedirectPath" required>
+            <p class="help-text">匹配此路径时会自动跳转到目标服务器</p>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn-primary">保存配置</button>
+            <button type="button" id="resetBtn" class="btn-secondary">恢复默认</button>
+        </div>
+
+        <div id="message" class="message"></div>
+    </form>
+</div>
+
+<script src="storage.js"></script>
+<script src="options.js"></script>
+</body>
+</html>
