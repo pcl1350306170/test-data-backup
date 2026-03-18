@@ -40,11 +40,10 @@ DEFAULT_CONFIG = {
     "font_size": 25,
     "font_color": "#000000",
     "bg_color": "#FFFFFF",
-    "font_path": "msyh.ttc",  # 微软雅黑
+    "font_path": "msyh.ttc",
     "opacity": 1.0,
     "bottom_area_height": 150,
-    "use_bottom_area": True,      # 默认使用底部扩展
-    "use_blank_block": False,     # 右下角空白块
+    "mode": "bottom",  # 'bottom' 或 'block'
     "blank_block_width_pct": 10,
     "blank_block_height_pct": 15,
     "texts_per_file": {},
@@ -54,7 +53,7 @@ DEFAULT_CONFIG = {
 IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.bmp', '.tiff'}
 
 # ==============================
-# 工具函数：按字符自动换行（支持中英文/长词）
+# 工具函数：按字符自动换行
 # ==============================
 def wrap_text(draw, text, font, max_width):
     lines = []
@@ -89,16 +88,14 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
                 img = img.convert("RGB")
             orig_w, orig_h = img.size
 
-            use_bottom = config.get("use_bottom_area", True)
-            use_block = config.get("use_blank_block", False)
+            mode = config.get("mode", "bottom")
 
             # === 方案1：底部扩展区域 ===
-            if use_bottom and not use_block:
+            if mode == "bottom":
                 new_h = orig_h + int(config.get("bottom_area_height", 150))
                 new_img = Image.new("RGB", (orig_w, new_h), color=tuple(int(config["bg_color"].lstrip('#')[i:i+2], 16) for i in (0, 2, 4)))
                 new_img.paste(img, (0, 0))
 
-                # 绘制文字
                 draw = ImageDraw.Draw(new_img)
                 font_size = config.get("font_size", 25)
                 font_path = config.get("font_path", "msyh.ttc")
@@ -110,13 +107,11 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
                     except:
                         font = ImageFont.load_default()
 
-                # 文字颜色与透明度（此处不支持透明，因背景为纯色）
                 color_hex = config.get("font_color", "#000000")
                 r = int(color_hex[1:3], 16)
                 g = int(color_hex[3:5], 16)
                 b = int(color_hex[5:7], 16)
 
-                # 居中绘制（可多行）
                 margin = 10
                 max_text_width = orig_w - 2 * margin
                 lines = wrap_text(draw, text, font, max_text_width)
@@ -134,9 +129,8 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
                 new_img.save(output_path, quality=95)
                 return True, "成功添加底部文案"
 
-            # === 方案2：右下角空白块（覆盖式）===
-            elif use_block:
-                # 加载字体
+            # === 方案2：右下角空白块 ===
+            elif mode == "block":
                 font_size = config.get("font_size", 25)
                 font_path = config.get("font_path", "msyh.ttc")
                 try:
@@ -147,54 +141,43 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
                     except:
                         font = ImageFont.load_default()
 
-                # 创建带透明通道的图层
                 txt_layer = Image.new("RGBA", (orig_w, orig_h), (0, 0, 0, 0))
                 draw = ImageDraw.Draw(txt_layer)
 
-                # 计算空白块尺寸
                 block_w = int(orig_w * config.get("blank_block_width_pct", 10) / 100)
                 block_h = int(orig_h * config.get("blank_block_height_pct", 15) / 100)
                 margin = 10
                 max_text_width = block_w - 2 * margin
-
-                # 自动换行
                 lines = wrap_text(draw, text, font, max_text_width)
                 line_height = font_size + 4
                 text_total_h = len(lines) * line_height
                 actual_block_h = max(block_h, text_total_h + 2 * margin)
                 actual_block_w = block_w
 
-                # 确保不超出图片
                 actual_block_w = min(actual_block_w, orig_w)
                 actual_block_h = min(actual_block_h, orig_h)
 
                 x0 = orig_w - actual_block_w
                 y0 = orig_h - actual_block_h
-                x1 = orig_w
-                y1 = orig_h
 
-                # 背景颜色（带透明度）
                 bg_hex = config.get("bg_color", "#FFFFFF")
                 br = int(bg_hex[1:3], 16)
                 bg = int(bg_hex[3:5], 16)
                 bb = int(bg_hex[5:7], 16)
                 opacity = float(config.get("opacity", 1.0))
                 alpha = int(255 * opacity)
-                draw.rectangle([x0, y0, x1, y1], fill=(br, bg, bb, alpha))
+                draw.rectangle([x0, y0, orig_w, orig_h], fill=(br, bg, bb, alpha))
 
-                # 文字颜色
                 color_hex = config.get("font_color", "#000000")
                 r = int(color_hex[1:3], 16)
                 g = int(color_hex[3:5], 16)
                 b = int(color_hex[5:7], 16)
 
-                # 绘制文字（左对齐）
                 text_y = y0 + margin
                 for line in lines:
                     draw.text((x0 + margin, text_y), line, fill=(r, g, b, 255), font=font)
                     text_y += line_height
 
-                # 合并图层
                 img_rgba = img.convert("RGBA")
                 combined = Image.alpha_composite(img_rgba, txt_layer)
                 if combined.mode != "RGB":
@@ -203,7 +186,7 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
                 return True, "成功添加右下角文案"
 
             else:
-                return False, "未启用任何文案模式"
+                return False, "未知模式"
 
     except Exception as e:
         logger.error(f"处理 {image_path.name} 失败: {e}")
@@ -216,7 +199,7 @@ class BatchAddTextGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("🖼️ 批量给图片加文案")
-        self.root.geometry("850x680")
+        self.root.geometry("850x720")
         self.root.resizable(True, True)
 
         self.config = self.load_config()
@@ -233,44 +216,15 @@ class BatchAddTextGUI:
         Button(dir_frame, text="📁 浏览", command=self.browse_input_dir).pack(side=RIGHT, padx=(5, 0))
         Button(dir_frame, text="🔄 刷新", command=self.load_images).pack(side=RIGHT, padx=(5, 0))
 
-        # 模式选择
+        # 模式选择（使用 Radiobutton）
         mode_frame = LabelFrame(self.root, text="🎨 显示模式", padx=10, pady=8)
         mode_frame.pack(fill=X, padx=10, pady=5)
 
-        self.use_bottom_var = BooleanVar(value=self.config.get("use_bottom_area", True))
-        self.use_block_var = BooleanVar(value=self.config.get("use_blank_block", False))
+        self.mode_var = StringVar(value=self.config.get("mode", "bottom"))
+        Radiobutton(mode_frame, text="在图片下方扩展区域显示文案", variable=self.mode_var, value="bottom", command=self.toggle_mode).pack(side=LEFT)
+        Radiobutton(mode_frame, text="在右下角叠加空白块显示文案", variable=self.mode_var, value="block", command=self.toggle_mode).pack(side=LEFT, padx=(20, 0))
 
-        def toggle_mode():
-            self.use_bottom_var.set(not self.use_block_var.get())
-            self.use_block_var.set(not self.use_bottom_var.get())
-            self.toggle_settings()
-
-        Checkbutton(mode_frame, text="在图片下方扩展区域显示文案", variable=self.use_bottom_var, command=toggle_mode).pack(side=LEFT)
-        Checkbutton(mode_frame, text="在右下角叠加空白块显示文案", variable=self.use_block_var, command=toggle_mode).pack(side=LEFT, padx=(20, 0))
-
-        # 底部区域设置（默认显示）
-        self.bottom_frame = LabelFrame(self.root, text="🔽 底部扩展区域设置", padx=10, pady=8)
-        self.bottom_frame.pack(fill=X, padx=10, pady=5)
-
-        Label(self.bottom_frame, text="高度(px):").grid(row=0, column=0, sticky=W)
-        self.bottom_h_var = StringVar(value=str(self.config.get("bottom_area_height", 150)))
-        Entry(self.bottom_frame, textvariable=self.bottom_h_var, width=8).grid(row=0, column=1, padx=5)
-
-        # 空白块设置（默认隐藏）
-        self.block_frame = LabelFrame(self.root, text="🔷 右下角空白块设置", padx=10, pady=8)
-        self.block_frame.pack(fill=X, padx=10, pady=5)
-
-        Label(self.block_frame, text="宽度(%):").grid(row=0, column=0, sticky=W)
-        self.blank_w_var = StringVar(value=str(self.config.get("blank_block_width_pct", 10)))
-        Entry(self.block_frame, textvariable=self.blank_w_var, width=6).grid(row=0, column=1, padx=5)
-
-        Label(self.block_frame, text="高度(%):").grid(row=0, column=2, sticky=W, padx=(10,0))
-        self.blank_h_var = StringVar(value=str(self.config.get("blank_block_height_pct", 15)))
-        Entry(self.block_frame, textvariable=self.blank_h_var, width=6).grid(row=0, column=3, padx=5)
-
-        self.toggle_settings()
-
-        # 字体设置
+        # 字体设置（始终显示）
         font_frame = LabelFrame(self.root, text="🔤 字体设置", padx=10, pady=8)
         font_frame.pack(fill=X, padx=10, pady=5)
 
@@ -281,15 +235,13 @@ class BatchAddTextGUI:
 
         Label(font_frame, text="字体颜色:").grid(row=row, column=2, sticky=W, padx=(10,0))
         self.color_var = StringVar(value=self.config.get("font_color", "#000000"))
-        color_btn = Button(font_frame, text="🎨 选择", command=self.choose_font_color, width=6)
-        color_btn.grid(row=row, column=3, padx=5)
+        Button(font_frame, text="🎨 选择", command=self.choose_font_color, width=6).grid(row=row, column=3, padx=5)
         self.font_color_preview = Label(font_frame, bg=self.color_var.get(), width=2, relief=SUNKEN)
         self.font_color_preview.grid(row=row, column=4, padx=(0,10))
 
         Label(font_frame, text="背景颜色:").grid(row=row, column=5, sticky=W, padx=(10,0))
         self.bg_color_var = StringVar(value=self.config.get("bg_color", "#FFFFFF"))
-        bg_btn = Button(font_frame, text="🎨 选择", command=self.choose_bg_color, width=6)
-        bg_btn.grid(row=row, column=6, padx=5)
+        Button(font_frame, text="🎨 选择", command=self.choose_bg_color, width=6).grid(row=row, column=6, padx=5)
         self.bg_color_preview = Label(font_frame, bg=self.bg_color_var.get(), width=2, relief=SUNKEN)
         self.bg_color_preview.grid(row=row, column=7, padx=(0,10))
 
@@ -300,10 +252,30 @@ class BatchAddTextGUI:
 
         Label(font_frame, text="字体文件:").grid(row=row, column=2, sticky=W, padx=(10,0), pady=(5,0))
         self.font_path_var = StringVar(value=self.config.get("font_path", "msyh.ttc"))
-        font_entry = Entry(font_frame, textvariable=self.font_path_var, width=20)
-        font_entry.grid(row=row, column=3, columnspan=3, padx=5, pady=(5,0))
+        Entry(font_frame, textvariable=self.font_path_var, width=20).grid(row=row, column=3, columnspan=3, padx=5, pady=(5,0))
 
-        # 图片与文案列表（带滚轮）
+        # 底部区域设置（初始状态根据 mode 决定）
+        self.bottom_frame = LabelFrame(self.root, text="🔽 底部扩展区域设置", padx=10, pady=8)
+
+        Label(self.bottom_frame, text="高度(px):").grid(row=0, column=0, sticky=W)
+        self.bottom_h_var = StringVar(value=str(self.config.get("bottom_area_height", 150)))
+        Entry(self.bottom_frame, textvariable=self.bottom_h_var, width=8).grid(row=0, column=1, padx=5)
+
+        # 右下角空白块设置（放在字体设置之后）
+        self.block_frame = LabelFrame(self.root, text="🔷 右下角空白块设置", padx=10, pady=8)
+
+        Label(self.block_frame, text="宽度(%):").grid(row=0, column=0, sticky=W)
+        self.blank_w_var = StringVar(value=str(self.config.get("blank_block_width_pct", 10)))
+        Entry(self.block_frame, textvariable=self.blank_w_var, width=6).grid(row=0, column=1, padx=5)
+
+        Label(self.block_frame, text="高度(%):").grid(row=0, column=2, sticky=W, padx=(10,0))
+        self.blank_h_var = StringVar(value=str(self.config.get("blank_block_height_pct", 15)))
+        Entry(self.block_frame, textvariable=self.blank_h_var, width=6).grid(row=0, column=3, padx=5)
+
+        # 初始显示正确面板
+        self.toggle_mode()
+
+        # 图片与文案列表
         list_frame = LabelFrame(self.root, text="📝 为每张图片输入文案", padx=10, pady=8)
         list_frame.pack(fill=BOTH, expand=True, padx=10, pady=5)
 
@@ -321,9 +293,7 @@ class BatchAddTextGUI:
         # 绑定鼠标滚轮（Windows）
         def _on_mousewheel(event):
             self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        self.canvas.bind("<MouseWheel>", _on_mousewheel)
-        self.scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
-        list_frame.bind("<MouseWheel>", _on_mousewheel)
+        self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
         self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
         scrollbar.pack(side=RIGHT, fill=Y)
@@ -341,13 +311,14 @@ class BatchAddTextGUI:
 
         self.load_images()
 
-    def toggle_settings(self):
-        if self.use_bottom_var.get():
-            self.bottom_frame.pack()
+    def toggle_mode(self):
+        mode = self.mode_var.get()
+        if mode == "bottom":
+            self.bottom_frame.pack(fill=X, padx=10, pady=5)
             self.block_frame.pack_forget()
         else:
             self.bottom_frame.pack_forget()
-            self.block_frame.pack()
+            self.block_frame.pack(fill=X, padx=10, pady=5)
 
     def browse_input_dir(self):
         folder = filedialog.askdirectory(title="选择图片目录", initialdir=self.input_dir_var.get())
@@ -410,7 +381,8 @@ class BatchAddTextGUI:
             if not (0 <= opacity <= 1):
                 raise ValueError("透明度必须在 0~1 之间")
 
-            if self.use_bottom_var.get():
+            mode = self.mode_var.get()
+            if mode == "bottom":
                 bottom_h = int(self.bottom_h_var.get())
                 if bottom_h < 10:
                     raise ValueError("底部高度至少10px")
@@ -431,11 +403,10 @@ class BatchAddTextGUI:
             "bg_color": self.bg_color_var.get(),
             "font_path": self.font_path_var.get(),
             "opacity": opacity,
-            "bottom_area_height": int(self.bottom_h_var.get()) if self.use_bottom_var.get() else 150,
-            "use_bottom_area": self.use_bottom_var.get(),
-            "use_blank_block": self.use_block_var.get(),
-            "blank_block_width_pct": float(self.blank_w_var.get()) if self.use_block_var.get() else 10,
-            "blank_block_height_pct": float(self.blank_h_var.get()) if self.use_block_var.get() else 15,
+            "bottom_area_height": int(self.bottom_h_var.get()),
+            "mode": mode,
+            "blank_block_width_pct": float(self.blank_w_var.get()),
+            "blank_block_height_pct": float(self.blank_h_var.get()),
             "texts_per_file": current_texts,
         }
         self.save_config(current_config)
@@ -503,7 +474,6 @@ if __name__ == "__main__":
         try:
             with open(DB_CONFIG_PATH, 'r', encoding='utf-8') as f:
                 db_cfg = json.load(f)
-                # 此处不使用数据库，仅验证存在性
         except Exception as e:
             logger.warning(f"DB_CONFIG 加载失败: {e}")
 

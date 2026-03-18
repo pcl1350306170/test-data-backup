@@ -6,10 +6,9 @@
   "font_path": "msyh.ttc",
   "opacity": 1.0,
   "bottom_area_height": 150,
-  "use_bottom_area": true,
-  "use_blank_block": false,
-  "blank_block_width_pct": 10,
-  "blank_block_height_pct": 15,
+  "mode": "block",
+  "blank_block_width_pct": 100.0,
+  "blank_block_height_pct": 14.0,
   "texts_per_file": {
     "0010.png": "清晨七点半，金色阳光洒满阳台，照亮窗台金灿灿的向日葵盆栽，叶片露珠闪着细碎光。小糖糖穿荧光绿背带裤和向日葵T恤，脚踝套银色风语脚环，轻轻一动就发出“叮铃”声，正蹦跳着准备出门。",
     "0020.png": "楼下传来“嘀哩哩”的喇叭声，糖妈妈驾驶着“彩虹蜗牛号”小三轮赶来，车身贴满手绘贴纸，有全家福和汤姆追杰瑞的画面，车筐放着保温壶和野餐垫，车尾拖一串发光纸风车，风一吹就转着七彩光晕。",
