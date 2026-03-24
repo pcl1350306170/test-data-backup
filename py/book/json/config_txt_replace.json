@@ -1,6 +1,7 @@
 {
-  "last_input_dir": "D:/FILES/HHQQ-2026年3月16日/Ebook/txt",
+  "last_input_dir": "E:/电子书/HS/98糖/2026年3月16日/txt已转",
   "last_output_dir": "D:/FILES/HHQQ-2026年3月16日/Ebook/txt替换后",
   "use_json": true,
-  "use_db": true
+  "use_db": true,
+  "clean_chapter_titles": true
 }

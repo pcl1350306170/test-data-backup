@@ -22,14 +22,15 @@ class TxtReplacerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("TXT文本替换工具")
-        self.root.geometry("800x800")
+        self.root.geometry("800x850")  # 高度+50适配新选项
 
         # 初始化配置
         self.config = {
             "last_input_dir": "",
             "last_output_dir": "",
             "use_json": True,
-            "use_db": True
+            "use_db": True,
+            "clean_chapter_titles": True  # ✅ 新增：是否清理章节标题
         }
 
         # 数据存储
@@ -90,22 +91,27 @@ class TxtReplacerApp:
         ttk.Checkbutton(settings_frame, text="使用数据库替换规则", variable=self.use_db).grid(
             row=1, column=0, sticky=tk.W, padx=5, pady=5)
 
+        # ✅ 新增：是否清理章节标题
+        self.clean_chapters = tk.BooleanVar(value=self.config["clean_chapter_titles"])
+        ttk.Checkbutton(settings_frame, text="清理文本目录（删除包含“第X章”的行）", variable=self.clean_chapters).grid(
+            row=2, column=0, sticky=tk.W, padx=5, pady=5)
+
         # 数据库连接测试
         ttk.Button(settings_frame, text="测试数据库连接", command=self.test_db_connection).grid(
-            row=2, column=0, padx=5, pady=10, sticky=tk.W)
+            row=3, column=0, padx=5, pady=10, sticky=tk.W)
 
         # JSON替换规则预览
         ttk.Label(settings_frame, text="JSON替换规则预览:").grid(
-            row=3, column=0, sticky=tk.NW, padx=5, pady=5)
+            row=4, column=0, sticky=tk.NW, padx=5, pady=5)
         self.json_preview = tk.Text(settings_frame, height=10, width=60)
-        self.json_preview.grid(row=4, column=0, padx=5, pady=5)
+        self.json_preview.grid(row=5, column=0, padx=5, pady=5)
         self.json_preview.config(state=tk.DISABLED)
 
         # 数据库替换规则预览
         ttk.Label(settings_frame, text="数据库替换规则预览:").grid(
-            row=5, column=0, sticky=tk.NW, padx=5, pady=5)
+            row=6, column=0, sticky=tk.NW, padx=5, pady=5)
         self.db_preview = tk.Text(settings_frame, height=10, width=60)
-        self.db_preview.grid(row=6, column=0, padx=5, pady=5)
+        self.db_preview.grid(row=7, column=0, padx=5, pady=5)
         self.db_preview.config(state=tk.DISABLED)
 
         # 3. 日志标签页
@@ -328,7 +334,8 @@ class TxtReplacerApp:
                 "last_input_dir": self.config["last_input_dir"],
                 "last_output_dir": self.output_dir_var.get(),
                 "use_json": self.use_json.get(),
-                "use_db": self.use_db.get()
+                "use_db": self.use_db.get(),
+                "clean_chapter_titles": self.clean_chapters.get()  # ✅ 保存章节清理选项
             }
 
             with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -362,6 +369,28 @@ class TxtReplacerApp:
         except Exception as e:
             self.log(f"检测 {os.path.basename(file_path)} 编码失败: {str(e)}，将尝试使用utf-8")
             return 'utf-8'
+
+    def clean_chapter_lines(self, content):
+        """清理包含章节标题的行"""
+        # 匹配模式：第X章、第XX章、第XXX章、第X.X章等
+        chapter_pattern = re.compile(r'^.*第\d+[章\.点节].*$', re.MULTILINE)
+
+        lines = content.splitlines()
+        cleaned_lines = []
+        removed_count = 0
+
+        for line in lines:
+            if chapter_pattern.match(line.strip()):
+                # 发现章节标题行，跳过
+                self.log(f"  - 删除章节标题行: {line[:50]}...")  # 记录前50字符
+                removed_count += 1
+            else:
+                cleaned_lines.append(line)
+
+        if removed_count > 0:
+            self.log(f"  - 共删除 {removed_count} 行章节标题")
+
+        return '\n'.join(cleaned_lines), removed_count
 
     def replace_text_content(self, content):
         """替换文本内容（合并JSON和数据库规则）"""
@@ -408,6 +437,15 @@ class TxtReplacerApp:
                 with open(input_path, 'r', encoding='utf-8', errors='ignore') as f:
                     content = f.read()
 
+            original_line_count = len(content.splitlines())
+            self.log(f"  - 原始行数: {original_line_count}")
+
+            # ✅ 新增：清理章节标题（如果启用）
+            if self.clean_chapters.get():
+                content, removed_lines = self.clean_chapter_lines(content)
+                after_clean_line_count = len(content.splitlines())
+                self.log(f"  - 清理后行数: {after_clean_line_count}（删除 {removed_lines} 行）")
+
             # 替换内容
             new_content, count = self.replace_text_content(content)
 
@@ -440,9 +478,9 @@ class TxtReplacerApp:
         if self.use_db.get():
             active_rules.update(self.db_replacements)
 
-        if not active_rules:
-            if messagebox.askyesno("确认", "没有启用任何替换规则，是否继续?"):
-                self.log("没有启用替换规则，直接复制文件")
+        if not active_rules and not self.clean_chapters.get():
+            if messagebox.askyesno("确认", "没有启用任何替换规则或章节清理，是否继续?"):
+                self.log("没有启用替换规则或章节清理，直接复制文件")
             else:
                 return
 
