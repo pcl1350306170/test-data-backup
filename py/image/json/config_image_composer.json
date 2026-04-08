@@ -1,8 +1,8 @@
 {
-  "scale_percent": 10.0,
+  "scale_percent": 28.0,
   "alpha": 100.0,
-  "pos_x": 323,
-  "pos_y": 185,
+  "pos_x": 18,
+  "pos_y": 85,
   "bg_mode": "color",
-  "bg_color": "#7d0d82"
+  "bg_color": "#ffffff"
 }

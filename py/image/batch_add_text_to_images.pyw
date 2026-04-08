@@ -131,7 +131,7 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
 
                 # ✅ 修改：使用配置的左右边距
                 margin_x = config.get("text_margin_x", 30)
-                margin_y = 10
+                margin_y = 50
                 max_text_width = orig_w - 2 * margin_x
                 lines = wrap_text(draw, text, font, max_text_width)
                 line_height = font_size + 6

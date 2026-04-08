@@ -295,18 +295,31 @@ def save_image_with_retry(url, original_path, crop_path):
 # -------------------
 def fetch_images_from_webpage(url):
     """从指定网页获取所有符合条件的图片URL"""
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     try:
+        logger.info(f"开始请求页面: {url}")
         resp = requests.get(url, headers=headers, timeout=15)
         resp.encoding = resp.apparent_encoding
+        
+        # 【调试】记录响应状态和内容长度
+        logger.info(f"页面响应状态码: {resp.status_code}, 内容长度: {len(resp.text)} 字符")
+        
         if resp.status_code != 200:
             logger.warning(f"获取页面失败: {url} -> 状态码: {resp.status_code}")
             return []
 
         soup = BeautifulSoup(resp.text, "html.parser")
+        
+        # 【调试】保存原始HTML到文件，方便排查
+        debug_html_path = LOG_DIR / f"debug_page_{int(time.time())}.html"
+        with open(debug_html_path, 'w', encoding='utf-8') as f:
+            f.write(resp.text)
+        logger.info(f"原始HTML已保存到: {debug_html_path}")
 
         # 查找页面中的所有 img 标签
         img_tags = soup.find_all("img")
+        logger.info(f"在页面中找到 {len(img_tags)} 个 <img> 标签")
+        
         img_urls = []
         for img in img_tags:
             # 检查是否需要安全停止
@@ -340,9 +353,19 @@ def fetch_images_from_webpage(url):
                 except Exception as e:
                     logger.warning(f"获取图片尺寸出错: {img_url} - {e}")
 
+        # 【调试】如果没找到图片，输出页面标题和前500字符
+        if not img_urls and not img_tags:
+            title = soup.title.string if soup.title else "无标题"
+            logger.warning(f"未找到任何<img>标签！页面标题: {title}")
+            logger.warning(f"页面内容预览: {resp.text[:500]}...")
+        elif not img_urls:
+            logger.warning(f"找到 {len(img_tags)} 个<img>标签，但没有有效的图片URL")
+            
         return img_urls
     except Exception as e:
-        logger.warning(f"获取图片列表出错: {url} - {e}")
+        import traceback
+        logger.error(f"获取图片列表出错: {url} - {e}")
+        logger.error(traceback.format_exc())
         return []
 
 # -------------------
