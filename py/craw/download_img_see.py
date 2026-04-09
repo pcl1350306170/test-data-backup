@@ -256,20 +256,32 @@ def process_image(original_path, output_path):
 # -------------------
 def save_image_with_retry(url, original_path, crop_path):
     """带重试机制的图片下载函数"""
+    # 创建 Session
+    session = requests.Session()
+    
     for attempt in range(RETRY_COUNT):
         try:
             # 检查是否需要安全停止
             with STOP_LOCK:
                 if STOP_FLAG:
                     logger.warning(f"检测到停止信号，终止下载: {url}")
+                    session.close()
                     return False
 
             # 如果裁剪后的文件已经存在，直接跳过
             if os.path.exists(crop_path):
                 logger.warning(f"裁剪后的图片已存在，跳过: {crop_path}")
+                session.close()
                 return True
 
-            response = requests.get(url, stream=True, timeout=15)
+            # 增强请求头
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "Referer": url.rsplit('/', 2)[0] if '/' in url else '',  # 添加 Referer
+            }
+            
+            response = session.get(url, stream=True, timeout=15, headers=headers)
             if response.status_code == 200:
                 with open(original_path, 'wb') as f:
                     for chunk in response.iter_content(1024):
@@ -281,12 +293,19 @@ def save_image_with_retry(url, original_path, crop_path):
                 return True
             else:
                 logger.warning(f"下载失败（状态码: {response.status_code}），尝试第 {attempt + 1} 次: {url}")
-                time.sleep(1)  # 重试前等待1秒
+                time.sleep(2)  # 重试前等待2秒
 
+        except requests.exceptions.SSLError as e:
+            logger.error(f"SSL 错误，尝试第 {attempt + 1} 次: {url} - {e}")
+            time.sleep(2)
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"连接错误，尝试第 {attempt + 1} 次: {url} - {e}")
+            time.sleep(2)
         except Exception as e:
             logger.warning(f"下载出错，尝试第 {attempt + 1} 次: {url} - {e}")
-            time.sleep(1)  # 重试前等待1秒
-
+            time.sleep(2)  # 重试前等待2秒
+    
+    session.close()  # 关闭 Session
     logger.error(f"达到最大重试次数，放弃下载: {url}")
     return False
 
@@ -295,10 +314,34 @@ def save_image_with_retry(url, original_path, crop_path):
 # -------------------
 def fetch_images_from_webpage(url):
     """从指定网页获取所有符合条件的图片URL"""
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
+    # 增强请求头，模拟真实浏览器
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Cache-Control": "max-age=0",
+    }
+    
+    # 创建 Session 以复用连接
+    session = requests.Session()
+    
     try:
         logger.info(f"开始请求页面: {url}")
-        resp = requests.get(url, headers=headers, timeout=15)
+        
+        # 禁用 SSL 警告（可选，如果证书有问题）
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        
+        resp = session.get(
+            url, 
+            headers=headers, 
+            timeout=15,
+            verify=True,  # 验证 SSL 证书
+            allow_redirects=True  # 允许重定向
+        )
         resp.encoding = resp.apparent_encoding
         
         # 【调试】记录响应状态和内容长度
@@ -338,9 +381,12 @@ def fetch_images_from_webpage(url):
                     logger.warning(f"图片在小图列表中，跳过: {img_url}")
                     continue
 
-                # 获取图片实际尺寸
+                # 获取图片实际尺寸（使用 Session 保持连接）
                 try:
-                    image_resp = requests.get(img_url, stream=True, timeout=10)
+                    image_resp = session.get(img_url, stream=True, timeout=10, headers={
+                        "User-Agent": headers["User-Agent"],
+                        "Referer": url,  # 添加 Referer 防止防盗链
+                    })
                     if image_resp.status_code == 200:
                         img = Image.open(BytesIO(image_resp.content))
                         img_width, img_height = img.size
@@ -362,11 +408,21 @@ def fetch_images_from_webpage(url):
             logger.warning(f"找到 {len(img_tags)} 个<img>标签，但没有有效的图片URL")
             
         return img_urls
+    except requests.exceptions.SSLError as e:
+        logger.error(f"SSL 错误: {url} - {e}")
+        logger.error("建议：可能是服务器拒绝 SSL 连接，尝试添加更多请求头或使用代理")
+        return []
+    except requests.exceptions.ConnectionError as e:
+        logger.error(f"连接错误: {url} - {e}")
+        logger.error("建议：检查网络连接或目标网站是否限制了爬虫访问")
+        return []
     except Exception as e:
         import traceback
         logger.error(f"获取图片列表出错: {url} - {e}")
         logger.error(traceback.format_exc())
         return []
+    finally:
+        session.close()  # 关闭 Session
 
 # -------------------
 # 生成唯一保存目录

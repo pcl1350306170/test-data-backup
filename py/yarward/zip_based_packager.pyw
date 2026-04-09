@@ -48,7 +48,8 @@ DEFAULT_CONFIG = {
     "order_info": "2025-1987南昌市立医院新院区",
     "project_version": "1.5.1",
     "base_zip_path": r"C:\www\test\门诊\801S-订单\前端\1.5.1.zip",
-    "custom_zip_name": ""  # ← 新增：自定义ZIP名称
+    "custom_zip_name": "",  # ← 新增：自定义ZIP名称
+    "auto_commit_svn": True  # ← 新增：是否自动提交SVN
 }
 
 class ZipBasedPackagerApp:
@@ -65,6 +66,7 @@ class ZipBasedPackagerApp:
         self.project_version = tk.StringVar()
         self.base_zip_path = tk.StringVar()
         self.custom_zip_name = tk.StringVar()
+        self.auto_commit_svn = tk.BooleanVar(value=True)  # ← 新增：SVN自动提交开关
         self.is_packaging = False
 
         # 创建UI
@@ -322,10 +324,90 @@ class ZipBasedPackagerApp:
                             zipf.write(file_path, arc_name)
 
                 self._log(f"✅ 新压缩包已生成: {new_zip_path}")
+                
+                # 如果启用了自动提交SVN，则执行提交
+                if self.auto_commit_svn.get():
+                    self._commit_to_svn(new_zip_path)
+                
                 self._log("🎉 打包完成！")
 
         except Exception as e:
             self._log(f"处理基础压缩包时出错: {str(e)}", logging.ERROR)
+
+    def _commit_to_svn(self, zip_path):
+        """将生成的ZIP文件提交到SVN"""
+        try:
+            output_dir = Path(self.output_dir.get())
+            
+            # 查找SVN工作副本根目录（从当前目录向上查找）
+            svn_working_copy = None
+            check_dir = output_dir
+            max_depth = 5  # 最多向上查找5层
+            
+            for _ in range(max_depth):
+                if (check_dir / ".svn").exists():
+                    svn_working_copy = check_dir
+                    break
+                parent = check_dir.parent
+                if parent == check_dir:  # 已到达根目录
+                    break
+                check_dir = parent
+            
+            if not svn_working_copy:
+                self._log(f"⚠️ 未找到SVN工作副本（已向上查找{max_depth}层），跳过提交", logging.WARNING)
+                self._log(f"   检查路径: {output_dir}", logging.WARNING)
+                return
+            
+            if svn_working_copy != output_dir:
+                self._log(f"ℹ️ 在上级目录找到SVN工作副本: {svn_working_copy}")
+            
+            self._log(f"🔄 开始提交到SVN: {zip_path.name}")
+            
+            # 第一步：svn add（如果文件是新加的）
+            try:
+                result = subprocess.run(
+                    ["svn", "add", str(zip_path)],
+                    cwd=svn_working_copy,
+                    capture_output=True,
+                    text=True,
+                    encoding='utf-8',
+                    timeout=30
+                )
+                if result.returncode == 0:
+                    self._log(f"✅ SVN Add成功: {result.stdout.strip()}")
+                elif "already under version control" in result.stderr.lower():
+                    self._log(f"ℹ️ 文件已在版本控制中，跳过Add")
+                else:
+                    self._log(f"⚠️ SVN Add警告: {result.stderr.strip()}", logging.WARNING)
+            except Exception as e:
+                self._log(f"⚠️ SVN Add出错: {e}", logging.WARNING)
+            
+            # 第二步：svn commit
+            commit_message = f"自动提交：{zip_path.name} - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            result = subprocess.run(
+                ["svn", "commit", "-m", commit_message, str(zip_path)],
+                cwd=svn_working_copy,
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                timeout=60
+            )
+            
+            if result.returncode == 0:
+                self._log(f"✅ SVN提交成功")
+                if result.stdout:
+                    for line in result.stdout.strip().split('\n'):
+                        if line:
+                            self._log(f"   {line}")
+            else:
+                self._log(f"❌ SVN提交失败: {result.stderr.strip()}", logging.ERROR)
+                
+        except FileNotFoundError:
+            self._log("❌ 未找到svn命令，请确保已安装TortoiseSVN命令行工具或Subversion", logging.ERROR)
+        except subprocess.TimeoutExpired:
+            self._log("❌ SVN操作超时", logging.ERROR)
+        except Exception as e:
+            self._log(f"❌ SVN提交出错: {str(e)}", logging.ERROR)
 
     def _get_pinyin_initials(self, text):
         """获取中文文本的拼音首字母（优先使用 pypinyin）"""
@@ -398,7 +480,8 @@ class ZipBasedPackagerApp:
             "order_info": self.order_info.get(),
             "project_version": self.project_version.get(),
             "base_zip_path": self.base_zip_path.get(),
-            "custom_zip_name": self.custom_zip_name.get()
+            "custom_zip_name": self.custom_zip_name.get(),
+            "auto_commit_svn": self.auto_commit_svn.get()  # ← 新增：保存SVN配置
         }
 
         try:
@@ -420,6 +503,7 @@ class ZipBasedPackagerApp:
                 self.project_version.set(config.get("project_version", DEFAULT_CONFIG["project_version"]))
                 self.base_zip_path.set(config.get("base_zip_path", DEFAULT_CONFIG["base_zip_path"]))
                 self.custom_zip_name.set(config.get("custom_zip_name", DEFAULT_CONFIG["custom_zip_name"]))
+                self.auto_commit_svn.set(config.get("auto_commit_svn", DEFAULT_CONFIG["auto_commit_svn"]))  # ← 新增：加载SVN配置
                 self._log("配置已加载")
             else:
                 for attr, default_val in DEFAULT_CONFIG.items():
@@ -471,6 +555,16 @@ class ZipBasedPackagerApp:
         custom_frame.pack(fill=tk.X, pady=5)
         ttk.Label(custom_frame, text="（留空则自动生成或使用默认名称）").pack(anchor=tk.W)
         ttk.Entry(custom_frame, textvariable=self.custom_zip_name, width=70).pack(fill=tk.X, pady=5)
+
+        svn_frame = ttk.LabelFrame(main_frame, text="🔗 SVN自动提交", padding="5")
+        svn_frame.pack(fill=tk.X, pady=5)
+        svn_check = ttk.Checkbutton(
+            svn_frame, 
+            text="打包完成后自动提交到SVN（需要安装SVN命令行工具）",
+            variable=self.auto_commit_svn
+        )
+        svn_check.pack(anchor=tk.W, pady=5)
+        ttk.Label(svn_frame, text="提示：会自动查找输出目录及其上级目录中的SVN工作副本", foreground="gray").pack(anchor=tk.W)
 
         zip_frame = ttk.LabelFrame(main_frame, text="📦 基础压缩包", padding="5")
         zip_frame.pack(fill=tk.X, pady=5)
