@@ -36,6 +36,7 @@ logger = logging.getLogger()
 # 默认配置
 DEFAULT_CONFIG = {
     "input_dir": "",
+    "output_dir": "",  # ✅ 新增：输出目录
     "font_size": 25,
     "font_color": "#000000",
     "bg_color": "#FFFFFF",
@@ -243,6 +244,13 @@ class BatchAddTextGUI:
         Button(dir_frame, text="📁 浏览", command=self.browse_input_dir).pack(side=RIGHT, padx=(5, 0))
         Button(dir_frame, text="🔄 刷新", command=self.load_images).pack(side=RIGHT, padx=(5, 0))
 
+        # ✅ 新增：输出目录
+        output_dir_frame = LabelFrame(self.root, text="💾 输出目录", padx=10, pady=8)
+        output_dir_frame.pack(fill=X, padx=10, pady=5)
+        self.output_dir_var = StringVar(value=self.config.get("output_dir", ""))
+        Entry(output_dir_frame, textvariable=self.output_dir_var, font=("Consolas", 9)).pack(side=LEFT, fill=X, expand=True)
+        Button(output_dir_frame, text="📁 选择目录", command=self.browse_output_dir).pack(side=RIGHT, padx=(5, 0))
+
         # 模式选择（使用 Radiobutton）
         mode_frame = LabelFrame(self.root, text="🎨 显示模式", padx=10, pady=8)
         mode_frame.pack(fill=X, padx=10, pady=5)
@@ -378,6 +386,12 @@ class BatchAddTextGUI:
             self.input_dir_var.set(folder)
             self.load_images()
 
+    def browse_output_dir(self):
+        """选择输出目录"""
+        folder = filedialog.askdirectory(title="选择输出目录", initialdir=self.output_dir_var.get())
+        if folder:
+            self.output_dir_var.set(folder)
+
     def choose_font_color(self):
         color_code = colorchooser.askcolor(title="选择字体颜色", color=self.color_var.get())[1]
         if color_code:
@@ -447,9 +461,17 @@ class BatchAddTextGUI:
 
     def start_processing(self):
         input_dir = Path(self.input_dir_var.get().strip())
+        output_dir = Path(self.output_dir_var.get().strip())
+        
         if not input_dir.exists():
             messagebox.showwarning("警告", "请选择有效的图片目录！")
             return
+        
+        # ✅ 新增：验证输出目录
+        if not output_dir or not output_dir.exists():
+            messagebox.showwarning("警告", "请选择有效的输出目录！")
+            return
+        
         if not self.image_files:
             messagebox.showwarning("警告", "没有可处理的图片！")
             return
@@ -480,6 +502,7 @@ class BatchAddTextGUI:
         current_texts = {name: var.get() for name, var in self.text_entries.items()}
         current_config = {
             "input_dir": str(input_dir),
+            "output_dir": str(output_dir),  # ✅ 新增：保存输出目录
             "font_size": font_size,
             "font_color": self.color_var.get(),
             "bg_color": self.bg_color_var.get(),
@@ -504,6 +527,7 @@ class BatchAddTextGUI:
 
     def run_processing(self, config):
         input_dir = Path(config["input_dir"])
+        output_dir = Path(config["output_dir"])  # ✅ 新增：获取输出目录
         success_count = 0
         total = len(self.image_files)
 
@@ -519,11 +543,12 @@ class BatchAddTextGUI:
                 logger.info(f"跳过 {img_path.name}（无文案）")
                 continue
 
-            output_path = input_dir / f"{img_path.stem}_with_text{img_path.suffix}"
+            # ✅ 修改：输出到指定目录，保持原文件名
+            output_path = output_dir / img_path.name
             success, msg = process_image_with_text(img_path, output_path, text, config)
             if success:
                 success_count += 1
-                logger.info(f"✅ {img_path.name} → {output_path.name}")
+                logger.info(f"✅ {img_path.name} → {output_path}")
 
             # 更新进度
             progress = (i / len(images_with_text)) * 100
@@ -535,7 +560,8 @@ class BatchAddTextGUI:
     def on_complete(self, success_count, total):
         self.start_btn.config(state=NORMAL, text="▶️ 开始处理")
         self.progress_var.set(100)
-        msg = f"处理完成！成功 {success_count}/{total} 张图片。输出文件已添加 '_with_text' 后缀。"
+        output_dir = self.output_dir_var.get().strip()
+        msg = f"处理完成！成功 {success_count}/{total} 张图片。\n输出目录：{output_dir}"
         self.status_var.set("✅ " + msg)
         messagebox.showinfo("完成", msg)
 
