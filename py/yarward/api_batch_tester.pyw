@@ -58,6 +58,7 @@ DEFAULT_CONFIG = {
         "orderTags": ""
     }, ensure_ascii=False, indent=2),
     "dynamic_fields": "patientName,patientIdNo",
+    "start_id": 1,  # ✅ 新增：起始ID
     "raw_headers": """POST /clinic/api/qcss/register/made HTTP/1.1
 Accept: application/json, text/plain, */*
 Accept-Encoding: gzip, deflate
@@ -125,24 +126,40 @@ def generate_random_name():
 
     last = random.choice(last_names)
     first = random.choice(first_names)
-    return first + last
+    return last + first  # ✅ 修复：改为 姓+名 的顺序
 
-def generate_random_id():
-    return ''.join(random.choices(string.digits, k=6))
+def generate_sequential_id(start_id, index):
+    """生成递增的ID，格式为3位数字（如 001, 002, ...）"""
+    current_id = start_id + index
+    return f"{current_id:03d}"  # 格式化为3位数字，不足补0
 
-def replace_dynamic_fields(request_body_str, dynamic_fields_str):
-    """替换请求体中的动态字段"""
+def replace_dynamic_fields(request_body_str, dynamic_fields_str, start_id, index):
+    """替换请求体中的动态字段
+    
+    Args:
+        request_body_str: 原始请求体JSON字符串
+        dynamic_fields_str: 需要替换的字段列表（逗号分隔）
+        start_id: 起始ID
+        index: 当前是第几次调用（从0开始）
+    
+    Returns:
+        tuple: (替换后的JSON字符串, 本次使用的patientIdNo值)
+    """
     data = json.loads(request_body_str)
     fields = [f.strip() for f in dynamic_fields_str.split(',')]
+    
+    current_patient_id = None  # 记录本次使用的patientIdNo
 
     for field in fields:
         if field == "patientName":
             data[field] = generate_random_name()
         elif field == "patientIdNo":
-            data[field] = generate_random_id()
+            patient_id = generate_sequential_id(start_id, index)
+            data[field] = patient_id
+            current_patient_id = patient_id  # 记录当前ID
         # 可扩展其他字段
 
-    return json.dumps(data, ensure_ascii=False)
+    return json.dumps(data, ensure_ascii=False), current_patient_id
 
 def parse_raw_headers(raw_headers_str):
     """解析 Raw Headers 字符串为字典"""
@@ -185,6 +202,11 @@ class APITesterGUI:
         frame_times.pack(fill=X, padx=10, pady=5)
         self.times_var = StringVar(value=str(self.config.get("call_times", DEFAULT_CONFIG["call_times"])))
         Entry(frame_times, textvariable=self.times_var, width=20, font=("Consolas", 10)).pack(side=LEFT, padx=5)
+        
+        # ✅ 新增：起始ID
+        Label(frame_times, text="起始ID:").pack(side=LEFT, padx=(10, 5))
+        self.start_id_var = StringVar(value=str(self.config.get("start_id", DEFAULT_CONFIG["start_id"])))
+        Entry(frame_times, textvariable=self.start_id_var, width=10, font=("Consolas", 10)).pack(side=LEFT, padx=5)
 
         # 动态字段
         frame_dynamic = LabelFrame(self.root, text="🔄 需要替换的字段（用逗号分隔）", padx=10, pady=5)
@@ -242,6 +264,7 @@ class APITesterGUI:
             "api_url": self.url_var.get().strip(),
             "method": self.method_var.get().strip().upper(),
             "call_times": int(self.times_var.get().strip()),
+            "start_id": int(self.start_id_var.get().strip()),  # ✅ 新增：保存起始ID
             "dynamic_fields": self.dynamic_var.get().strip(),
             "raw_headers": self.headers_text.get("1.0", END).strip(),
             "request_body": self.body_text.get("1.0", END).strip()
@@ -259,12 +282,15 @@ class APITesterGUI:
             url = self.url_var.get().strip()
             method = self.method_var.get().strip().upper()
             times = int(self.times_var.get().strip())
+            start_id = int(self.start_id_var.get().strip())  # ✅ 新增：获取起始ID
             dynamic_fields = self.dynamic_var.get().strip()
             raw_headers_str = self.headers_text.get("1.0", END).strip()
             body_str = self.body_text.get("1.0", END).strip()
 
             if not url or not method or times <= 0 or not raw_headers_str:
                 raise ValueError("请填写完整信息")
+            if start_id < 0:
+                raise ValueError("起始ID不能为负数")
 
             # 解析 Raw Headers
             headers = parse_raw_headers(raw_headers_str)
@@ -286,19 +312,24 @@ class APITesterGUI:
 
         thread = threading.Thread(
             target=self.do_batch_call,
-            args=(url, method, times, dynamic_fields, body_str, headers),
+            args=(url, method, times, start_id, dynamic_fields, body_str, headers),  # ✅ 新增：传递start_id
             daemon=True
         )
         thread.start()
 
-    def do_batch_call(self, url, method, times, dynamic_fields, body_str, headers):
+    def do_batch_call(self, url, method, times, start_id, dynamic_fields, body_str, headers):
         try:
             import requests  # 延迟导入
 
             success_count = 0
             for i in range(times):
-                # 替换动态字段
-                current_body = replace_dynamic_fields(body_str, dynamic_fields)
+                # 替换动态字段（传入起始ID和当前索引）
+                current_body, current_patient_id = replace_dynamic_fields(body_str, dynamic_fields, start_id, i)
+                
+                # ✅ 在控制台打印当前使用的patientIdNo
+                if current_patient_id:
+                    print(f"[第{i+1}次] patientIdNo = {current_patient_id}")
+                    self.log(f"📋 第 {i+1} 次 - patientIdNo: {current_patient_id}")
 
                 # 发送请求
                 try:
@@ -324,6 +355,7 @@ class APITesterGUI:
 
             self.set_status(f"✅ 批量调用完成！成功 {success_count}/{times} 次", "green")
             self.log(f"🎉 总计成功 {success_count} / {times} 次")
+            self.log(f"📊 ID范围: {generate_sequential_id(start_id, 0)} ~ {generate_sequential_id(start_id, times-1)}")
 
         except Exception as e:
             self.set_status(f"❌ 批量调用失败: {e}", "red")
