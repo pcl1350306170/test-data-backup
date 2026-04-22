@@ -49,7 +49,8 @@ DEFAULT_CONFIG = {
     "project_version": "1.5.1",
     "base_zip_path": r"C:\www\test\门诊\801S-订单\前端\1.5.1.zip",
     "custom_zip_name": "",  # ← 新增：自定义ZIP名称
-    "auto_commit_svn": True  # ← 新增：是否自动提交SVN
+    "auto_commit_svn": True,  # ← 新增：是否自动提交SVN
+    "is_version_155_plus": False  # ✅ 新增：是否是1.5.5以上版本
 }
 
 class ZipBasedPackagerApp:
@@ -67,6 +68,7 @@ class ZipBasedPackagerApp:
         self.base_zip_path = tk.StringVar()
         self.custom_zip_name = tk.StringVar()
         self.auto_commit_svn = tk.BooleanVar(value=True)  # ← 新增：SVN自动提交开关
+        self.is_version_155_plus = tk.BooleanVar(value=False)  # ✅ 新增：1.5.5以上版本开关
         self.is_packaging = False
 
         # 创建UI
@@ -209,38 +211,180 @@ class ZipBasedPackagerApp:
             if not self._check_node_version():
                 return
 
-            if not self._clean_dist_dirs():
-                return
+            # ✅ 根据版本选择不同的打包方式
+            if self.is_version_155_plus.get():
+                # 1.5.5及以上版本：仅执行 npm run build
+                self._log("🔄 检测到1.5.5+版本，执行简化打包流程...")
+                if not self._clean_dist_dirs():
+                    return
+                
+                self._log("🔄 开始执行 npm run build...")
+                if not self._run_npm_command("run build"):
+                    self._log("❌ build 命令执行失败", logging.ERROR)
+                    return
+                
+                project_dir = Path(self.project_dir.get())
+                dist_dir = project_dir / "dist"
+                
+                if not dist_dir.exists():
+                    self._log("❌ 打包后未找到 dist 目录", logging.ERROR)
+                    return
+                
+                self._log("✅ 项目打包完成")
+                # 1.5.5+ 版本使用新的打包方式（不传 lib_render_dir）
+                self._process_base_zip_v155(dist_dir)
+            else:
+                # 1.5.5以下版本：原有打包流程
+                if not self._clean_dist_dirs():
+                    return
 
-            self._log("🔄 开始执行 npm run build...")
-            if not self._run_npm_command("run build"):
-                self._log("❌ build 命令执行失败", logging.ERROR)
-                return
+                self._log("🔄 开始执行 npm run build...")
+                if not self._run_npm_command("run build"):
+                    self._log("❌ build 命令执行失败", logging.ERROR)
+                    return
 
-            self._log("🔄 开始执行 npm run lib-render2...")
-            if not self._run_npm_command("run lib-render2"):
-                self._log("❌ lib-render2 命令执行失败", logging.ERROR)
-                return
+                self._log("🔄 开始执行 npm run lib-render2...")
+                if not self._run_npm_command("run lib-render2"):
+                    self._log("❌ lib-render2 命令执行失败", logging.ERROR)
+                    return
 
-            project_dir = Path(self.project_dir.get())
-            dist_dir = project_dir / "dist"
-            lib_render_dir = project_dir / "lib-render-dist"
+                project_dir = Path(self.project_dir.get())
+                dist_dir = project_dir / "dist"
+                lib_render_dir = project_dir / "lib-render-dist"
 
-            if not dist_dir.exists():
-                self._log("❌ 打包后未找到 dist 目录", logging.ERROR)
-                return
-            if not lib_render_dir.exists():
-                self._log("❌ 打包后未找到 lib-render-dist 目录", logging.ERROR)
-                return
+                if not dist_dir.exists():
+                    self._log("❌ 打包后未找到 dist 目录", logging.ERROR)
+                    return
+                if not lib_render_dir.exists():
+                    self._log("❌ 打包后未找到 lib-render-dist 目录", logging.ERROR)
+                    return
 
-            self._log("✅ 项目打包完成")
-            self._process_base_zip(dist_dir, lib_render_dir)
+                self._log("✅ 项目打包完成")
+                self._process_base_zip(dist_dir, lib_render_dir)
 
         except Exception as e:
             self._log(f"打包过程中出错: {str(e)}", logging.ERROR)
         finally:
             self.is_packaging = False
             self.root.after(0, self._update_button_states)
+
+    def _process_base_zip_v155(self, dist_dir):
+        """1.5.5及以上版本的打包方式"""
+        try:
+            base_zip_path = Path(self.base_zip_path.get())
+            output_dir = Path(self.output_dir.get())
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+            import tempfile
+            with tempfile.TemporaryDirectory() as temp_dir:
+                temp_path = Path(temp_dir)
+
+                with zipfile.ZipFile(base_zip_path, 'r') as zipf:
+                    zipf.extractall(temp_path)
+
+                self._log("✅ 基础压缩包解压完成")
+
+                # 从 dist 目录获取 design 和 resource
+                design_source = dist_dir / "design"
+                resource_source = dist_dir / "resource"
+
+                # 替换或新建 design 目录
+                design_target = temp_path / "design"
+                if design_source.exists():
+                    if design_target.exists():
+                        # 如果已存在，先清空
+                        for item in design_target.iterdir():
+                            if item.is_file():
+                                item.unlink()
+                            elif item.is_dir():
+                                shutil.rmtree(item)
+                    else:
+                        # 不存在则创建
+                        design_target.mkdir(parents=True, exist_ok=True)
+                    
+                    # 复制 design 内容
+                    for item in design_source.iterdir():
+                        dest = design_target / item.name
+                        if item.is_file():
+                            shutil.copy2(item, dest)
+                        elif item.is_dir():
+                            shutil.copytree(item, dest)
+                    self._log("✅ design 目录内容已替换/创建")
+                else:
+                    self._log("⚠️ dist/design 目录不存在，跳过", logging.WARNING)
+
+                # 替换或新建 resource 目录
+                resource_target = temp_path / "resource"
+                if resource_source.exists():
+                    if resource_target.exists():
+                        # 如果已存在，先清空
+                        for item in resource_target.iterdir():
+                            if item.is_file():
+                                item.unlink()
+                            elif item.is_dir():
+                                shutil.rmtree(item)
+                    else:
+                        # 不存在则创建
+                        resource_target.mkdir(parents=True, exist_ok=True)
+                    
+                    # 复制 resource 内容
+                    for item in resource_source.iterdir():
+                        dest = resource_target / item.name
+                        if item.is_file():
+                            shutil.copy2(item, dest)
+                        elif item.is_dir():
+                            shutil.copytree(item, dest)
+                    self._log("✅ resource 目录内容已替换/创建")
+                else:
+                    self._log("⚠️ dist/resource 目录不存在，跳过", logging.WARNING)
+
+                # 生成ZIP文件名（逻辑不变）
+                order_info = self.order_info.get()
+                version = self.project_version.get()
+                custom_name = self.custom_zip_name.get().strip()
+
+                if custom_name:
+                    new_zip_name = custom_name
+                    if not new_zip_name.lower().endswith('.zip'):
+                        new_zip_name += '.zip'
+                else:
+                    if len(order_info) >= 9:
+                        order_id = order_info[:9]
+                        hospital_name = order_info[9:]
+                        self._log(f"解析订单号: {order_id}, 医院名: {hospital_name}")
+
+                        order_parts = order_id.split('-')
+                        if len(order_parts) == 2:
+                            year_part = order_parts[0][-2:]
+                            order_num = order_parts[1]
+                            pinyin_initials = self._get_pinyin_initials(hospital_name)
+                            new_zip_name = f"YM-801S-TLSS-V{version}.{year_part}{order_num}.01001-{pinyin_initials}-FE.zip"
+                        else:
+                            self._log(f"⚠️ 订单号格式不匹配: '{order_id}'，使用默认名称", logging.WARNING)
+                            new_zip_name = f"{version}.zip"
+                    else:
+                        self._log(f"⚠️ 订单信息长度不足9位: '{order_info}'，使用默认名称", logging.WARNING)
+                        new_zip_name = f"{version}.zip"
+
+                new_zip_path = output_dir / new_zip_name
+
+                with zipfile.ZipFile(new_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                    for root, dirs, files in os.walk(temp_path):
+                        for file in files:
+                            file_path = Path(root) / file
+                            arc_name = file_path.relative_to(temp_path).as_posix()
+                            zipf.write(file_path, arc_name)
+
+                self._log(f"✅ 新压缩包已生成: {new_zip_path}")
+                
+                # 如果启用了自动提交SVN，则执行提交
+                if self.auto_commit_svn.get():
+                    self._commit_to_svn(new_zip_path)
+                
+                self._log("🎉 打包完成！")
+
+        except Exception as e:
+            self._log(f"处理基础压缩包时出错: {str(e)}", logging.ERROR)
 
     def _process_base_zip(self, dist_dir, lib_render_dir):
         try:
@@ -481,7 +625,8 @@ class ZipBasedPackagerApp:
             "project_version": self.project_version.get(),
             "base_zip_path": self.base_zip_path.get(),
             "custom_zip_name": self.custom_zip_name.get(),
-            "auto_commit_svn": self.auto_commit_svn.get()  # ← 新增：保存SVN配置
+            "auto_commit_svn": self.auto_commit_svn.get(),  # ← 新增：保存SVN配置
+            "is_version_155_plus": self.is_version_155_plus.get()  # ✅ 新增：保存版本标识
         }
 
         try:
@@ -504,6 +649,7 @@ class ZipBasedPackagerApp:
                 self.base_zip_path.set(config.get("base_zip_path", DEFAULT_CONFIG["base_zip_path"]))
                 self.custom_zip_name.set(config.get("custom_zip_name", DEFAULT_CONFIG["custom_zip_name"]))
                 self.auto_commit_svn.set(config.get("auto_commit_svn", DEFAULT_CONFIG["auto_commit_svn"]))  # ← 新增：加载SVN配置
+                self.is_version_155_plus.set(config.get("is_version_155_plus", DEFAULT_CONFIG["is_version_155_plus"]))  # ✅ 新增：加载版本标识
                 self._log("配置已加载")
             else:
                 for attr, default_val in DEFAULT_CONFIG.items():
@@ -535,7 +681,8 @@ class ZipBasedPackagerApp:
 
         version_frame = ttk.LabelFrame(main_frame, text="🔄 项目版本", padding="5")
         version_frame.pack(fill=tk.X, pady=5)
-        versions = ["1.5.0", "1.5.1", "1.5.2", "1.5.3", "1.5.4"]
+        versions = ["1.5.0", "1.5.1", "1.5.2",
+                    "1.5.3", "1.5.4", "1.5.5", "1.5.6"]
         version_combo = ttk.Combobox(
             version_frame,
             textvariable=self.project_version,
@@ -565,6 +712,17 @@ class ZipBasedPackagerApp:
         )
         svn_check.pack(anchor=tk.W, pady=5)
         ttk.Label(svn_frame, text="提示：会自动查找输出目录及其上级目录中的SVN工作副本", foreground="gray").pack(anchor=tk.W)
+
+        # ✅ 新增：版本选择
+        version_type_frame = ttk.LabelFrame(main_frame, text="📌 版本类型", padding="5")
+        version_type_frame.pack(fill=tk.X, pady=5)
+        version_type_check = ttk.Checkbutton(
+            version_type_frame,
+            text="是 1.5.5 及以上版本（仅执行 npm run build）",
+            variable=self.is_version_155_plus
+        )
+        version_type_check.pack(anchor=tk.W, pady=5)
+        ttk.Label(version_type_frame, text="提示：勾选后仅执行 build，不执行 lib-render2，并使用新的打包结构", foreground="gray").pack(anchor=tk.W)
 
         zip_frame = ttk.LabelFrame(main_frame, text="📦 基础压缩包", padding="5")
         zip_frame.pack(fill=tk.X, pady=5)

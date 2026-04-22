@@ -173,6 +173,11 @@ def do_directory_upgrade(host, password, local_project_dir, progress_callback):
     progress_callback("✅ 目录升级完成！")
 
 def do_package_upgrade(host, password, zip_path, progress_callback):
+    """
+    压缩包升级逻辑，支持两种目录结构：
+    1. 旧版（1.5.5以下）：design/ + resource/js/render-design/
+    2. 新版（1.5.5及以上）：design/ + resource/
+    """
     with tempfile.TemporaryDirectory() as tmpdir:
         progress_callback("解压压缩包...")
         with zipfile.ZipFile(zip_path, 'r') as zf:
@@ -185,10 +190,26 @@ def do_package_upgrade(host, password, zip_path, progress_callback):
             root_dir = Path(tmpdir)
 
         design_dir = root_dir / "design"
-        resource_js_render = root_dir / "resource" / "js" / "render-design"
+        
+        # ✅ 检测是新版还是旧版目录结构
+        new_resource_dir = root_dir / "resource"  # 新版：直接是 resource/
+        old_resource_dir = root_dir / "resource" / "js" / "render-design"  # 旧版：resource/js/render-design/
+        
+        if new_resource_dir.exists() and not old_resource_dir.exists():
+            # 新版结构（1.5.5+）
+            resource_upload_dir = new_resource_dir
+            progress_callback("✅ 检测到新版目录结构（1.5.5+）")
+            logger.info(f"使用新版目录结构: resource/ -> {RENDER_REMOTE_PATH}")
+        elif old_resource_dir.exists():
+            # 旧版结构（1.5.5以下）
+            resource_upload_dir = old_resource_dir
+            progress_callback("✅ 检测到旧版目录结构（1.5.5以下）")
+            logger.info(f"使用旧版目录结构: resource/js/render-design/ -> {RENDER_REMOTE_PATH}")
+        else:
+            raise ValueError("压缩包内缺少 design 或 resource 目录！")
 
-        if not design_dir.exists() or not resource_js_render.exists():
-            raise ValueError("压缩包内缺少 design 或 resource/js/render-design 目录！")
+        if not design_dir.exists():
+            raise ValueError("压缩包内缺少 design 目录！")
 
         progress_callback("正在连接服务器...")
         with get_ssh_client(host, password=password) as ssh:
@@ -202,7 +223,7 @@ def do_package_upgrade(host, password, zip_path, progress_callback):
             progress_callback("清空 render-design 目录...")
             clear_remote_dir(sftp, RENDER_REMOTE_PATH)
             progress_callback("上传 render-design 文件...")
-            upload_dir(sftp, str(resource_js_render), RENDER_REMOTE_PATH)
+            upload_dir(sftp, str(resource_upload_dir), RENDER_REMOTE_PATH)
 
             sftp.close()
         progress_callback("✅ 压缩包升级完成！")
@@ -250,7 +271,7 @@ class YarwardUpgradeGUI:
         frame_mode = LabelFrame(self.root, text="升级方式", padx=10, pady=5)
         frame_mode.pack(pady=5, padx=10, fill=X)
 
-        self.upgrade_mode = StringVar(value="directory")
+        self.upgrade_mode = StringVar(value="package")  # ✅ 默认使用压缩包升级
         Radiobutton(frame_mode, text="目录升级", variable=self.upgrade_mode, value="directory").pack(anchor=W)
         Radiobutton(frame_mode, text="压缩包升级", variable=self.upgrade_mode, value="package").pack(anchor=W)
 

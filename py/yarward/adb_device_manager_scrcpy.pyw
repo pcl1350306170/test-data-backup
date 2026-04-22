@@ -26,7 +26,7 @@ DEFAULT_SCRCPY_DIR = r"D:\tools\scrcpy-win64-v3.3.3"
 
 # 运行时实际使用的 scrcpy 目录（优先用配置，其次默认，最后尝试打包内嵌）
 CONFIG_DIR = SCRIPT_DIR / "json"
-CONFIG_PATH = CONFIG_DIR / "config_adb_device_manager.json"
+CONFIG_PATH = CONFIG_DIR / "config_adb_device_manager_scrcpy.json"
 LOGS_DIR = CONFIG_DIR / "logs"
 PROCESS_LOG_FILE = LOGS_DIR / "log_adb_device_manager.log"
 
