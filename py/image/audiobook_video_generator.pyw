@@ -11,6 +11,13 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 import subprocess
 
+# 尝试导入 vlc 用于音频播放
+try:
+    import vlc
+    HAS_VLC = True
+except ImportError:
+    HAS_VLC = False
+
 # ================== 配置与常量 ==================
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
 SCRIPT_NAME = "audiobook_video_generator"
@@ -38,7 +45,8 @@ DEFAULT_CONFIG = {
     "fps": 8,  # 帧率，静态图片使用低帧率提升渲染速度
     "trim_start": 5.0,  # 裁剪开头秒数
     "trim_end": 5.0,  # 裁剪结尾秒数
-    "timeline_file": ""  # 时间轴配置文件（可选）
+    "timeline_file": "",  # 时间轴配置文件（可选）
+    "use_interactive_mode": False  # 是否使用交互式时间轴编辑模式
 }
 
 # 支持的图片格式
@@ -239,6 +247,485 @@ def resize_image_if_needed(image_path, max_size=MAX_IMAGE_SIZE):
         # 如果处理失败，返回原路径
         print(f"警告: 无法处理图片 {image_path}: {e}")
         return str(image_path), False
+
+# ================== 交互式时间轴编辑器 ==================
+class InteractiveTimelineEditor:
+    """交互式时间轴编辑器：播放音频，点击图片标记时间戳"""
+    
+    def __init__(self, parent, images, audio_path, log_callback=None):
+        self.parent = parent
+        self.images = images
+        self.audio_path = audio_path
+        self.log_callback = log_callback or (lambda msg: None)
+        
+        # 状态变量
+        self.timestamps = []  # [(image_index, timestamp_seconds), ...]
+        self.is_playing = False
+        self.play_start_time = 0
+        self.audio_duration = 0
+        self.current_position = 0
+        self.playback_rate = 1.0  # 播放倍速（1.0 = 正常速度）
+        
+        # 创建窗口 - 使用 parent.root 作为父窗口
+        self.window = tk.Toplevel(parent.root)
+        self.window.title("⏱️ 交互式时间轴编辑器")
+        self.window.geometry("900x700")
+        self.window.minsize(800, 600)
+        
+        # 初始化 vlc 播放器
+        if HAS_VLC:
+            self.vlc_instance = vlc.Instance()
+            self.media_player = self.vlc_instance.media_player_new()
+            media = self.vlc_instance.media_new(str(audio_path))
+            self.media_player.set_media(media)
+            
+            # 获取音频时长
+            try:
+                from moviepy import AudioFileClip
+            except ImportError:
+                from moviepy.editor import AudioFileClip
+            
+            audio_clip = AudioFileClip(str(audio_path))
+            self.audio_duration = audio_clip.duration
+            audio_clip.close()
+        
+        self._create_widgets()
+        self._load_thumbnails()
+    
+    def _create_widgets(self):
+        main_frame = ttk.Frame(self.window, padding="10")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        
+        # === 音频控制区 ===
+        control_frame = ttk.LabelFrame(main_frame, text="🔊 音频控制", padding="10")
+        control_frame.pack(fill=tk.X, pady=5)
+        
+        btn_frame = ttk.Frame(control_frame)
+        btn_frame.pack(fill=tk.X, pady=5)
+        
+        self.play_btn = ttk.Button(btn_frame, text="▶️ 播放", command=self._toggle_play, width=10)
+        self.play_btn.pack(side=tk.LEFT, padx=5)
+        
+        ttk.Button(btn_frame, text="⏹ 停止", command=self._stop, width=10).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="↩️ 撤销", command=self._undo, width=10).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="🔄 重置", command=self._reset, width=10).pack(side=tk.LEFT, padx=5)
+        
+        # 倍速控制
+        speed_frame = ttk.Frame(control_frame)
+        speed_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Label(speed_frame, text="播放倍速:").pack(side=tk.LEFT, padx=(0, 10))
+        
+        self.speed_var = tk.DoubleVar(value=1.0)
+        speed_combo = ttk.Combobox(
+            speed_frame,
+            textvariable=self.speed_var,
+            values=[0.5, 0.75, 1.0, 1.25, 1.5, 2.0],
+            width=8,
+            state="readonly"
+        )
+        speed_combo.pack(side=tk.LEFT, padx=5)
+        speed_combo.bind('<<ComboboxSelected>>', lambda e: self._change_speed())
+        
+        ttk.Label(speed_frame, text="x  (加快标记速度)", foreground="gray").pack(side=tk.LEFT)
+        
+        # 进度显示
+        progress_frame = ttk.Frame(control_frame)
+        progress_frame.pack(fill=tk.X, pady=5)
+        
+        ttk.Label(progress_frame, text="当前时间:").pack(side=tk.LEFT)
+        self.time_label = ttk.Label(progress_frame, text="00:00.0 / 00:00.0", font=("Consolas", 12))
+        self.time_label.pack(side=tk.LEFT, padx=10)
+        
+        # 进度条
+        self.progress_var = tk.DoubleVar(value=0)
+        self.progress_bar = ttk.Progressbar(progress_frame, variable=self.progress_var, maximum=100)
+        self.progress_bar.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=10)
+        
+        # === 图片展示区 ===
+        image_frame = ttk.LabelFrame(main_frame, text="📸 点击图片标记时间戳（按顺序点击）", padding="10")
+        image_frame.pack(fill=tk.BOTH, expand=True, pady=5)
+        
+        # 创建可滚动的图片网格
+        canvas_frame = ttk.Frame(image_frame)
+        canvas_frame.pack(fill=tk.BOTH, expand=True)
+        
+        canvas = tk.Canvas(canvas_frame)
+        scrollbar = ttk.Scrollbar(canvas_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.image_buttons = []
+        self.thumbnail_images = []  # 保持引用防止被垃圾回收
+        self.scrollable_frame = scrollable_frame
+        
+        # === 时间轴预览区 ===
+        timeline_frame = ttk.LabelFrame(main_frame, text="⏱️ 时间轴预览", padding="10")
+        timeline_frame.pack(fill=tk.X, pady=5)
+        
+        self.timeline_text = scrolledtext.ScrolledText(timeline_frame, height=8, state=tk.DISABLED, wrap=tk.WORD, font=("Consolas", 9))
+        self.timeline_text.pack(fill=tk.BOTH, expand=True)
+        
+        # === 底部按钮 ===
+        bottom_frame = ttk.Frame(main_frame)
+        bottom_frame.pack(fill=tk.X, pady=10)
+        
+        ttk.Button(bottom_frame, text="💾 保存时间轴", command=self._save_timeline).pack(side=tk.LEFT, padx=5)
+        ttk.Button(bottom_frame, text="❌ 关闭", command=self._close).pack(side=tk.RIGHT, padx=5)
+        
+        # 绑定键盘快捷键
+        self.window.bind('<space>', lambda e: self._toggle_play())
+        self.window.bind('<Control-z>', lambda e: self._undo())
+        self.window.bind('<Escape>', lambda e: self._close())
+        
+        # 启动进度更新循环
+        self._update_progress()
+    
+    def _load_thumbnails(self):
+        """加载图片缩略图"""
+        try:
+            from PIL import Image, ImageTk
+            
+            thumb_size = (150, 100)
+            
+            for i, img_path in enumerate(self.images):
+                try:
+                    # 加载并缩放图片
+                    img = Image.open(str(img_path))
+                    img.thumbnail(thumb_size, Image.LANCZOS)
+                    
+                    # 转换为 RGB（处理 PNG 透明背景）
+                    if img.mode in ('RGBA', 'P'):
+                        img = img.convert('RGB')
+                    
+                    # 转换为 Tkinter 可用的格式
+                    photo = ImageTk.PhotoImage(img)
+                    self.thumbnail_images.append(photo)
+                    
+                    # 创建按钮
+                    btn_frame = ttk.Frame(self.scrollable_frame)
+                    btn_frame.grid(row=i//4, column=i%4, padx=5, pady=5, sticky="nsew")
+                    
+                    btn = ttk.Button(btn_frame, image=photo, command=lambda idx=i: self._mark_timestamp(idx))
+                    btn.pack(pady=2)
+                    
+                    label = ttk.Label(btn_frame, text=f"{img_path.name}\n未标记", font=("Arial", 8), foreground="gray")
+                    label.pack()
+                    
+                    self.image_buttons.append({
+                        'button': btn,
+                        'label': label,
+                        'index': i,
+                        'marked': False
+                    })
+                    
+                except Exception as e:
+                    print(f"警告: 无法加载缩略图 {img_path}: {e}")
+            
+            # 配置网格列权重
+            for col in range(4):
+                self.scrollable_frame.grid_columnconfigure(col, weight=1)
+                
+        except ImportError:
+            messagebox.showerror("错误", "需要安装 Pillow 库来显示缩略图\n请运行: pip install Pillow")
+            self._close()
+    
+    def _toggle_play(self):
+        """切换播放/暂停"""
+        if not HAS_VLC:
+            messagebox.showerror("错误", "未安装 python-vlc 库\n请运行: pip install python-vlc")
+            return
+        
+        if self.is_playing:
+            self._pause()
+        else:
+            self._play()
+    
+    def _play(self):
+        """开始播放"""
+        if not HAS_VLC:
+            return
+        
+        # 设置播放倍速
+        try:
+            self.media_player.set_rate(self.playback_rate)
+        except Exception:
+            pass  # 某些 VLC 版本可能不支持
+        
+        self.media_player.play()
+        self.is_playing = True
+        self.play_start_time = time.time() - self.current_position
+        self.play_btn.config(text="⏸ 暂停")
+        self.log_callback(f"▶️ 开始播放音频 ({self.playback_rate}x)")
+    
+    def _pause(self):
+        """暂停播放"""
+        if not HAS_VLC:
+            return
+        
+        self.media_player.pause()
+        self.is_playing = False
+        self.current_position = time.time() - self.play_start_time
+        self.play_btn.config(text="▶️ 播放")
+        self.log_callback("⏸ 暂停播放")
+    
+    def _stop(self):
+        """停止播放"""
+        if not HAS_VLC:
+            return
+        
+        self.media_player.stop()
+        self.is_playing = False
+        self.current_position = 0
+        self.play_btn.config(text="▶️ 播放")
+        self.progress_var.set(0)
+        self.time_label.config(text="00:00.0 / 00:00.0")
+        self.log_callback("⏹ 停止播放")
+    
+    def _change_speed(self):
+        """改变播放倍速"""
+        new_speed = self.speed_var.get()
+        old_speed = self.playback_rate
+        self.playback_rate = new_speed
+        
+        # 如果正在播放，立即应用新速度
+        if self.is_playing and HAS_VLC:
+            try:
+                self.media_player.set_rate(new_speed)
+            except Exception:
+                pass
+        
+        self.log_callback(f"⚡ 播放速度: {old_speed}x → {new_speed}x")
+    
+    def _get_current_position(self):
+        """获取当前播放位置（秒）"""
+        if HAS_VLC and self.media_player.is_playing():
+            # VLC 返回毫秒，转换为秒
+            return self.media_player.get_time() / 1000.0
+        else:
+            return self.current_position
+    
+    def _update_progress(self):
+        """更新进度条和时间显示"""
+        current = self._get_current_position()
+        
+        if self.audio_duration > 0:
+            progress = (current / self.audio_duration) * 100
+            self.progress_var.set(min(progress, 100))
+        
+        # 格式化时间显示
+        current_min = int(current // 60)
+        current_sec = current % 60
+        total_min = int(self.audio_duration // 60)
+        total_sec = self.audio_duration % 60
+        
+        self.time_label.config(text=f"{current_min:02d}:{current_sec:04.1f} / {total_min:02d}:{total_sec:04.1f}")
+        
+        # 每 100ms 更新一次
+        self.window.after(100, self._update_progress)
+    
+    def _mark_timestamp(self, image_index):
+        """标记时间戳"""
+        current_time = self._get_current_position()
+        
+        # 检查是否按顺序点击
+        expected_index = len(self.timestamps)
+        if image_index != expected_index:
+            messagebox.showwarning(
+                "顺序错误",
+                f"请按顺序点击！\n\n应该点击第 {expected_index + 1} 张图片\n你点击了第 {image_index + 1} 张"
+            )
+            return
+        
+        # 记录时间戳
+        self.timestamps.append((image_index, current_time))
+        
+        # 更新 UI
+        btn_info = self.image_buttons[image_index]
+        btn_info['marked'] = True
+        btn_info['button'].config(style="Accent.TButton")
+        
+        # 计算上一张图片的时长
+        if len(self.timestamps) >= 2:
+            prev_idx, prev_time = self.timestamps[-2]
+            duration = current_time - prev_time
+            btn_info['label'].config(
+                text=f"{self.images[image_index].name}\n{prev_time:.1f}s-{current_time:.1f}s\n({duration:.1f}s)",
+                foreground="green"
+            )
+        else:
+            btn_info['label'].config(
+                text=f"{self.images[image_index].name}\n从 {current_time:.1f}s 开始",
+                foreground="blue"
+            )
+        
+        self.log_callback(f"✅ 标记第 {image_index + 1} 页: {self.images[image_index].name} @ {current_time:.1f}s")
+        
+        # 更新时间轴预览
+        self._update_timeline_preview()
+        
+        # 检查是否完成所有图片
+        if len(self.timestamps) == len(self.images):
+            messagebox.showinfo(
+                "完成",
+                f"已标记所有 {len(self.images)} 张图片！\n\n请点击'保存时间轴'生成 JSON 文件"
+            )
+    
+    def _undo(self):
+        """撤销最后一个标记"""
+        if not self.timestamps:
+            messagebox.showinfo("提示", "没有可以撤销的标记")
+            return
+        
+        last_idx, last_time = self.timestamps.pop()
+        
+        # 重置 UI
+        btn_info = self.image_buttons[last_idx]
+        btn_info['marked'] = False
+        btn_info['button'].config(style="TButton")
+        btn_info['label'].config(
+            text=f"{self.images[last_idx].name}\n未标记",
+            foreground="gray"
+        )
+        
+        self.log_callback(f"↩️ 撤销第 {last_idx + 1} 页的标记")
+        self._update_timeline_preview()
+    
+    def _reset(self):
+        """重置所有标记"""
+        if not self.timestamps:
+            return
+        
+        if messagebox.askyesno("确认", "确定要重置所有标记吗？"):
+            self.timestamps.clear()
+            
+            for btn_info in self.image_buttons:
+                btn_info['marked'] = False
+                btn_info['button'].config(style="TButton")
+                btn_info['label'].config(
+                    text=f"{self.images[btn_info['index']].name}\n未标记",
+                    foreground="gray"
+                )
+            
+            self.log_callback("🔄 已重置所有标记")
+            self._update_timeline_preview()
+    
+    def _update_timeline_preview(self):
+        """更新时间轴预览文本"""
+        self.timeline_text.config(state=tk.NORMAL)
+        self.timeline_text.delete(1.0, tk.END)
+        
+        if not self.timestamps:
+            self.timeline_text.insert(tk.END, "尚未标记任何图片...\n\n操作说明：\n1. 点击'播放'开始播放音频\n2. 听到每页内容结束时，点击对应图片\n3. 按顺序从左到右、从上到下点击\n4. 完成后点击'保存时间轴'")
+        else:
+            for i, (idx, start_time) in enumerate(self.timestamps):
+                if i < len(self.timestamps) - 1:
+                    end_time = self.timestamps[i + 1][1]
+                    duration = end_time - start_time
+                    self.timeline_text.insert(tk.END, f"{i+1:3d}. {self.images[idx].name:20s} | {start_time:6.1f}s - {end_time:6.1f}s | {duration:5.1f}s ✅\n")
+                else:
+                    self.timeline_text.insert(tk.END, f"{i+1:3d}. {self.images[idx].name:20s} | {start_time:6.1f}s - ???     | 等待下一页... ⏳\n")
+            
+            # 显示统计信息
+            marked_count = len(self.timestamps)
+            total_count = len(self.images)
+            self.timeline_text.insert(tk.END, f"\n{'='*60}\n")
+            self.timeline_text.insert(tk.END, f"已标记: {marked_count}/{total_count} 页")
+            
+            if marked_count == total_count:
+                self.timeline_text.insert(tk.END, " ✅ 全部完成！")
+        
+        self.timeline_text.config(state=tk.DISABLED)
+    
+    def _save_timeline(self):
+        """保存时间轴为 JSON 文件"""
+        if not self.timestamps:
+            messagebox.showwarning("警告", "尚未标记任何图片！")
+            return
+        
+        if len(self.timestamps) < len(self.images):
+            if not messagebox.askyesno(
+                "确认",
+                f"只标记了 {len(self.timestamps)}/{len(self.images)} 页\n\n未标记的页面将使用平均时长，是否继续？"
+            ):
+                return
+        
+        # 生成时间轴数据
+        timeline = {}
+        
+        for i, (idx, start_time) in enumerate(self.timestamps):
+            img_name = self.images[idx].name
+            
+            if i < len(self.timestamps) - 1:
+                # 有下一张标记的图片
+                end_time = self.timestamps[i + 1][1]
+                duration = end_time - start_time
+            else:
+                # 最后一张标记的图片
+                if len(self.timestamps) == len(self.images):
+                    # 所有图片都标记了，使用剩余音频时长
+                    duration = self.audio_duration - start_time
+                else:
+                    # 还有未标记的图片，计算平均时长
+                    remaining_time = self.audio_duration - start_time
+                    remaining_images = len(self.images) - len(self.timestamps)
+                    duration = remaining_time / (remaining_images + 1)
+            
+            timeline[img_name] = round(duration, 2)
+        
+        # 为未标记的图片分配平均时长
+        if len(self.timestamps) < len(self.images):
+            marked_end_time = self.timestamps[-1][1] if self.timestamps else 0
+            remaining_time = self.audio_duration - marked_end_time
+            unmarked_count = len(self.images) - len(self.timestamps)
+            avg_duration = remaining_time / unmarked_count if unmarked_count > 0 else 0
+            
+            for i, img in enumerate(self.images):
+                if img.name not in timeline:
+                    timeline[img.name] = round(avg_duration, 2)
+        
+        # 保存到文件
+        default_path = Path(self.audio_path).parent / "timeline.json"
+        save_path = filedialog.asksaveasfilename(
+            title="保存时间轴文件",
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+            initialfile=default_path.name,
+            initialdir=str(default_path.parent)
+        )
+        
+        if save_path:
+            try:
+                with open(save_path, 'w', encoding='utf-8') as f:
+                    json.dump(timeline, f, ensure_ascii=False, indent=2)
+                
+                self.log_callback(f"💾 时间轴已保存: {Path(save_path).name}")
+                messagebox.showinfo("成功", f"时间轴已保存:\n{save_path}")
+                
+                # 自动设置到主窗口的时间轴文件路径
+                if hasattr(self.parent, 'timeline_file'):
+                    self.parent.timeline_file.set(save_path)
+                
+            except Exception as e:
+                messagebox.showerror("错误", f"保存失败:\n{e}")
+    
+    def _close(self):
+        """关闭窗口"""
+        if HAS_VLC:
+            self.media_player.stop()
+            self.media_player.release()
+            self.vlc_instance.release()
+        self.window.destroy()
 
 def generate_video_with_moviepy(images, audio_path, output_path, fps, log_callback, timeline_file=None):
     """使用 moviepy 生成视频"""
@@ -483,6 +970,15 @@ class AudiobookVideoGeneratorApp:
         ttk.Entry(timeline_frame, textvariable=self.timeline_file, width=40).pack(side=tk.LEFT, padx=5)
         ttk.Button(timeline_frame, text="浏览...", command=self._browse_timeline_file).pack(side=tk.LEFT, padx=5)
         ttk.Button(timeline_frame, text="创建模板", command=self._create_timeline_template).pack(side=tk.LEFT)
+        
+        # 交互式编辑器按钮
+        interactive_btn = ttk.Button(
+            timeline_frame,
+            text="🎯 交互式编辑",
+            command=self._open_interactive_editor,
+            style="Accent.TButton"
+        )
+        interactive_btn.pack(side=tk.LEFT, padx=10)
 
         # === 控制按钮 ===
         btn_frame = ttk.Frame(main_frame)
@@ -573,6 +1069,44 @@ class AudiobookVideoGeneratorApp:
         self.timeline_file.set(str(output_path))
         messagebox.showinfo("成功", f"已创建时间轴模板:\n{output_path}\n\n请编辑该文件，设置每页的展示时长（秒）")
         self._log(f"✅ 时间轴模板已创建: {output_path.name}")
+    
+    def _open_interactive_editor(self):
+        """打开交互式时间轴编辑器"""
+        # 检查 vlc 是否可用
+        if not HAS_VLC:
+            messagebox.showerror(
+                "依赖缺失",
+                "交互式编辑器需要 python-vlc 库\n\n请运行以下命令安装:\npip install python-vlc\n\n注意：还需要安装 VLC 播放器软件"
+            )
+            return
+        
+        # 验证必要参数
+        image_dir = self.image_dir.get().strip()
+        audio_path = self.audio_path.get().strip()
+        
+        if not image_dir or not Path(image_dir).exists():
+            messagebox.showwarning("警告", "请先选择图片文件夹！")
+            return
+        
+        if not audio_path or not Path(audio_path).exists():
+            messagebox.showwarning("警告", "请先选择音频文件！")
+            return
+        
+        # 获取图片列表
+        images = get_sorted_images(image_dir)
+        if len(images) == 0:
+            messagebox.showwarning("警告", "图片文件夹内没有支持的图片文件！")
+            return
+        
+        self._log("🎯 打开交互式时间轴编辑器...")
+        
+        # 创建编辑器窗口
+        editor = InteractiveTimelineEditor(
+            self,
+            images,
+            audio_path,
+            log_callback=lambda msg: self._log(msg)
+        )
 
     def _open_output_dir(self):
         """打开输出目录"""
@@ -606,6 +1140,12 @@ class AudiobookVideoGeneratorApp:
         self.trim_end.set(config.get("trim_end", 5.0))
         self.timeline_file.set(config.get("timeline_file", ""))
         self._log("✅ 配置加载成功")
+        
+        # 检查 vlc 可用性
+        if not HAS_VLC:
+            self._log("⚠️ 未检测到 python-vlc，交互式编辑器将不可用")
+            self._log("   安装命令: pip install python-vlc")
+            self._log("   注意：还需要安装 VLC 播放器软件")
 
     def _save_config(self):
         """保存配置"""
@@ -617,7 +1157,8 @@ class AudiobookVideoGeneratorApp:
             "fps": self.fps.get(),
             "trim_start": round(self.trim_start.get(), 1),
             "trim_end": round(self.trim_end.get(), 1),
-            "timeline_file": self.timeline_file.get()
+            "timeline_file": self.timeline_file.get(),
+            "use_interactive_mode": False
         }
         try:
             CONFIG_PATH.parent.mkdir(exist_ok=True)

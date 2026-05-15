@@ -94,6 +94,27 @@ def clear_remote_dir(sftp, remote_path):
     except Exception as e:
         logger.warning(f"Clear dir failed (may not exist): {remote_path}, error: {e}")
 
+def ensure_remote_dir_exists(sftp, remote_path, progress_callback=None):
+    """确保远程目录存在，不存在则递归创建"""
+    try:
+        sftp.stat(remote_path)
+        if progress_callback:
+            progress_callback(f"✅ 远程目录已存在: {remote_path}")
+        return True
+    except FileNotFoundError:
+        if progress_callback:
+            progress_callback(f"📁 创建远程目录: {remote_path}")
+        parent_dir = '/'.join(remote_path.split('/')[:-1])
+        if parent_dir:
+            ensure_remote_dir_exists(sftp, parent_dir, progress_callback)
+        try:
+            sftp.mkdir(remote_path)
+            logger.info(f"Created remote directory: {remote_path}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to create remote directory {remote_path}: {e}")
+            raise
+
 def upload_dir(sftp, local_dir, remote_dir):
     """递归上传本地目录到远程"""
     for item in os.listdir(local_dir):
@@ -152,18 +173,30 @@ def do_directory_upgrade(host, password, local_project_dir, progress_callback):
     dist_dir = Path(local_project_dir) / "dist"
     lib_render_dir = Path(local_project_dir) / "lib-render-dist"
 
-    if not dist_dir.exists() or not lib_render_dir.exists():
-        raise ValueError("项目目录下缺少 dist 或 lib-render-dist 目录！请先打包。")
+    missing_dirs = []
+    if not dist_dir.exists():
+        missing_dirs.append("dist")
+    if not lib_render_dir.exists():
+        missing_dirs.append("lib-render-dist")
+    
+    if missing_dirs:
+        raise ValueError(f"项目目录下缺少以下目录：{', '.join(missing_dirs)}！请先打包。")
 
     progress_callback("正在连接服务器...")
     with get_ssh_client(host, password=password) as ssh:
         sftp = ssh.open_sftp()
 
+        # 确保远程目录存在
+        ensure_remote_dir_exists(sftp, DESIGN_REMOTE_PATH, progress_callback)
+        
         progress_callback("清空 design 目录...")
         clear_remote_dir(sftp, DESIGN_REMOTE_PATH)
         progress_callback("上传 design 文件...")
         upload_dir(sftp, str(dist_dir), DESIGN_REMOTE_PATH)
 
+        # 确保远程目录存在
+        ensure_remote_dir_exists(sftp, RENDER_REMOTE_PATH, progress_callback)
+        
         progress_callback("清空 render-design 目录...")
         clear_remote_dir(sftp, RENDER_REMOTE_PATH)
         progress_callback("上传 render-design 文件...")
@@ -195,35 +228,60 @@ def do_package_upgrade(host, password, zip_path, progress_callback):
         new_resource_dir = root_dir / "resource"  # 新版：直接是 resource/
         old_resource_dir = root_dir / "resource" / "js" / "render-design"  # 旧版：resource/js/render-design/
         
-        if new_resource_dir.exists() and not old_resource_dir.exists():
+        has_design = design_dir.exists()
+        has_new_resource = new_resource_dir.exists() and not old_resource_dir.exists()
+        has_old_resource = old_resource_dir.exists()
+        
+        if not has_design and not has_new_resource and not has_old_resource:
+            raise ValueError("压缩包内缺少 design 和 resource 目录！无法进行升级。")
+        
+        if has_new_resource:
             # 新版结构（1.5.5+）
             resource_upload_dir = new_resource_dir
             progress_callback("✅ 检测到新版目录结构（1.5.5+）")
             logger.info(f"使用新版目录结构: resource/ -> {RENDER_REMOTE_PATH}")
-        elif old_resource_dir.exists():
+        elif has_old_resource:
             # 旧版结构（1.5.5以下）
             resource_upload_dir = old_resource_dir
             progress_callback("✅ 检测到旧版目录结构（1.5.5以下）")
             logger.info(f"使用旧版目录结构: resource/js/render-design/ -> {RENDER_REMOTE_PATH}")
         else:
-            raise ValueError("压缩包内缺少 design 或 resource 目录！")
+            resource_upload_dir = None
+            progress_callback("⚠️ 压缩包中未找到 resource 目录，将跳过 resource 上传")
+            logger.warning("压缩包中缺少 resource 目录")
 
-        if not design_dir.exists():
-            raise ValueError("压缩包内缺少 design 目录！")
+        if not has_design:
+            progress_callback("⚠️ 压缩包中未找到 design 目录，将跳过 design 上传")
+            logger.warning("压缩包中缺少 design 目录")
+
+        if not has_design and resource_upload_dir is None:
+            raise ValueError("压缩包内既没有 design 也没有 resource 目录！无法进行升级。")
 
         progress_callback("正在连接服务器...")
         with get_ssh_client(host, password=password) as ssh:
             sftp = ssh.open_sftp()
 
-            progress_callback("清空 design 目录...")
-            clear_remote_dir(sftp, DESIGN_REMOTE_PATH)
-            progress_callback("上传 design 文件...")
-            upload_dir(sftp, str(design_dir), DESIGN_REMOTE_PATH)
+            # 处理 design 目录
+            if has_design:
+                ensure_remote_dir_exists(sftp, DESIGN_REMOTE_PATH, progress_callback)
+                
+                progress_callback("清空 design 目录...")
+                clear_remote_dir(sftp, DESIGN_REMOTE_PATH)
+                progress_callback("上传 design 文件...")
+                upload_dir(sftp, str(design_dir), DESIGN_REMOTE_PATH)
+            else:
+                progress_callback("⏭️ 跳过 design 目录上传（压缩包中不存在）")
 
-            progress_callback("清空 render-design 目录...")
-            clear_remote_dir(sftp, RENDER_REMOTE_PATH)
-            progress_callback("上传 render-design 文件...")
-            upload_dir(sftp, str(resource_upload_dir), RENDER_REMOTE_PATH)
+            # 处理 resource 目录
+            if resource_upload_dir is not None:
+                ensure_remote_dir_exists(sftp, RENDER_REMOTE_PATH, progress_callback)
+                
+                progress_callback("清空 render-design 目录...")
+                clear_remote_dir(sftp, RENDER_REMOTE_PATH)
+                progress_callback("上传 render-design 文件...")
+                upload_dir(sftp, str(resource_upload_dir), RENDER_REMOTE_PATH)
+            else:
+                progress_callback("⏭️ 跳过 render-design 目录上传（压缩包中不存在）")
 
             sftp.close()
         progress_callback("✅ 压缩包升级完成！")
