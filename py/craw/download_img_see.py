@@ -5,7 +5,7 @@ import pymysql
 import requests
 import threading
 import logging
-from logging.handlers import RotatingFileHandler  # 新增导入
+from logging.handlers import RotatingFileHandler
 from queue import Queue
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -14,7 +14,7 @@ from io import BytesIO
 import time
 import signal
 import tkinter as tk
-from tkinter import filedialog, ttk, messagebox
+from tkinter import filedialog, ttk, messagebox, simpledialog
 from pathlib import Path
 import sys
 
@@ -45,12 +45,14 @@ STOP_LOCK = threading.Lock()
 # 新增：日志文件大小限制(1MB)
 MAX_LOG_SIZE = 1 * 1024 * 1024  # 1MB
 
-# 配置默认值 - 新增"保存日志文件"配置
+# 配置默认值 - 新增"保存日志文件"配置和爬虫模式
 DEFAULT_CONFIG = {
     "SAVE_DIR": str(SCRIPT_DIR / "IMAGE" / "V33" / "已处理"),
     "THREAD_COUNT": 5,
     "RETRY_COUNT": 3,
-    "SAVE_LOG_FILE": True  # 新增：是否保存日志文件
+    "SAVE_LOG_FILE": True,
+    "CRAWLER_MODE": "requests",
+    "DATA_TYPE_FILTER": "V33-IMG-%"  # 新增：data_type 查询过滤条件
 }
 
 # -------------------
@@ -123,7 +125,8 @@ config = load_config()
 SAVE_DIR = config["SAVE_DIR"]
 THREAD_COUNT = config["THREAD_COUNT"]
 RETRY_COUNT = config["RETRY_COUNT"]
-SAVE_LOG_FILE = config["SAVE_LOG_FILE"]  # 新增：日志保存开关
+SAVE_LOG_FILE = config["SAVE_LOG_FILE"]
+DATA_TYPE_FILTER = config.get("DATA_TYPE_FILTER", "V33-IMG-%")  # 新增：加载 data_type 过滤条件
 
 # -------------------
 # 初始化
@@ -168,22 +171,26 @@ def get_db_connection():
 # -------------------
 # 获取待处理数据
 # -------------------
-def fetch_pending_data(conn):
+def fetch_pending_data(conn, data_type_filter=None):
     """从数据库获取待处理的数据"""
     if not conn:
         return []
 
+    # 使用配置的过滤条件，如果未提供则使用全局变量
+    if data_type_filter is None:
+        data_type_filter = DATA_TYPE_FILTER
+
     sql = """
         SELECT id, data_key, data_content, data_type
         FROM general_data
-        WHERE data_type LIKE 'V33-IMG-%'
+        WHERE data_type LIKE %s
           AND is_deleted=0
     """
     try:
         with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute(sql)
+            cursor.execute(sql, (data_type_filter,))
             data = cursor.fetchall()
-            logger.info(f"获取到 {len(data)} 条待处理记录")
+            logger.info(f"获取到 {len(data)} 条待处理记录 (data_type LIKE '{data_type_filter}')")
             return data
     except Exception as e:
         logger.error(f"获取待处理数据失败: {e}")
@@ -314,6 +321,16 @@ def save_image_with_retry(url, original_path, crop_path):
 # -------------------
 def fetch_images_from_webpage(url):
     """从指定网页获取所有符合条件的图片URL"""
+    config = load_config()
+    crawler_mode = config.get("CRAWLER_MODE", "requests")
+    
+    if crawler_mode == "selenium":
+        return fetch_images_with_selenium(url)
+    else:
+        return fetch_images_with_requests(url)
+
+def fetch_images_with_requests(url):
+    """使用 requests 获取图片（原有逻辑）"""
     # 增强请求头，模拟真实浏览器
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -339,12 +356,11 @@ def fetch_images_from_webpage(url):
             url, 
             headers=headers, 
             timeout=15,
-            verify=True,  # 验证 SSL 证书
-            allow_redirects=True  # 允许重定向
+            verify=True,
+            allow_redirects=True
         )
         resp.encoding = resp.apparent_encoding
         
-        # 【调试】记录响应状态和内容长度
         logger.info(f"页面响应状态码: {resp.status_code}, 内容长度: {len(resp.text)} 字符")
         
         if resp.status_code != 200:
@@ -353,44 +369,38 @@ def fetch_images_from_webpage(url):
 
         soup = BeautifulSoup(resp.text, "html.parser")
         
-        # 【调试】保存原始HTML到文件，方便排查
         debug_html_path = LOG_DIR / f"debug_page_{int(time.time())}.html"
         with open(debug_html_path, 'w', encoding='utf-8') as f:
             f.write(resp.text)
         logger.info(f"原始HTML已保存到: {debug_html_path}")
 
-        # 查找页面中的所有 img 标签
         img_tags = soup.find_all("img")
         logger.info(f"在页面中找到 {len(img_tags)} 个 <img> 标签")
         
         img_urls = []
         for img in img_tags:
-            # 检查是否需要安全停止
             with STOP_LOCK:
                 if STOP_FLAG:
                     logger.warning(f"检测到停止信号，终止图片获取")
                     return img_urls
 
-            img_url = img.get("src") or img.get("data-src")  # 图片URL可能在data-src属性中
+            img_url = img.get("src") or img.get("data-src")
             if img_url:
-                img_url = urljoin(url, img_url)  # 处理相对路径
+                img_url = urljoin(url, img_url)
                 logger.info(f"发现图片URL: {img_url}")
 
-                # 检查是否已在小图列表中
                 if is_in_small_mapping(img_url):
                     logger.warning(f"图片在小图列表中，跳过: {img_url}")
                     continue
 
-                # 获取图片实际尺寸（使用 Session 保持连接）
                 try:
                     image_resp = session.get(img_url, stream=True, timeout=10, headers={
                         "User-Agent": headers["User-Agent"],
-                        "Referer": url,  # 添加 Referer 防止防盗链
+                        "Referer": url,
                     })
                     if image_resp.status_code == 200:
-                        img = Image.open(BytesIO(image_resp.content))
-                        img_width, img_height = img.size
-                        # 过滤小于100px x 100px的图片并添加到小图列表
+                        img_obj = Image.open(BytesIO(image_resp.content))
+                        img_width, img_height = img_obj.size
                         if img_width < 100 or img_height < 100:
                             logger.warning(f"图片尺寸过小 ({img_width}x{img_height})，添加到小图列表: {img_url}")
                             add_to_small_mapping(img_url)
@@ -399,7 +409,6 @@ def fetch_images_from_webpage(url):
                 except Exception as e:
                     logger.warning(f"获取图片尺寸出错: {img_url} - {e}")
 
-        # 【调试】如果没找到图片，输出页面标题和前500字符
         if not img_urls and not img_tags:
             title = soup.title.string if soup.title else "无标题"
             logger.warning(f"未找到任何<img>标签！页面标题: {title}")
@@ -410,11 +419,9 @@ def fetch_images_from_webpage(url):
         return img_urls
     except requests.exceptions.SSLError as e:
         logger.error(f"SSL 错误: {url} - {e}")
-        logger.error("建议：可能是服务器拒绝 SSL 连接，尝试添加更多请求头或使用代理")
         return []
     except requests.exceptions.ConnectionError as e:
         logger.error(f"连接错误: {url} - {e}")
-        logger.error("建议：检查网络连接或目标网站是否限制了爬虫访问")
         return []
     except Exception as e:
         import traceback
@@ -422,7 +429,106 @@ def fetch_images_from_webpage(url):
         logger.error(traceback.format_exc())
         return []
     finally:
-        session.close()  # 关闭 Session
+        session.close()
+
+def fetch_images_with_selenium(url):
+    """使用 Selenium 获取图片（支持JS动态加载）"""
+    try:
+        from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+    except ImportError:
+        logger.error("未安装 selenium，请先运行: pip install selenium")
+        messagebox.showerror("错误", "未安装 selenium，请先运行:\npip install selenium")
+        return []
+    
+    logger.info(f"[Selenium] 开始请求页面: {url}")
+    
+    options = Options()
+    options.add_argument('--headless')  # 无头模式
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--window-size=1920,1080')
+    options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+    
+    driver = None
+    try:
+        driver = webdriver.Chrome(options=options)
+        driver.set_page_load_timeout(30)
+        driver.get(url)
+        
+        # 等待页面加载完成
+        time.sleep(3)
+        
+        # 尝试滚动页面触发懒加载
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
+        driver.execute_script("window.scrollTo(0, 0);")
+        time.sleep(1)
+        
+        # 获取所有图片元素
+        img_elements = driver.find_elements(By.TAG_NAME, "img")
+        logger.info(f"[Selenium] 找到 {len(img_elements)} 个 <img> 标签")
+        
+        img_urls = []
+        for img in img_elements:
+            with STOP_LOCK:
+                if STOP_FLAG:
+                    logger.warning(f"检测到停止信号，终止图片获取")
+                    return img_urls
+            
+            # 尝试多种属性获取图片URL
+            img_url = (
+                img.get_attribute("src") or
+                img.get_attribute("data-src") or
+                img.get_attribute("data-original") or
+                img.get_attribute("data-lazy-src") or
+                img.get_attribute("ng-src")
+            )
+            
+            if img_url:
+                img_url = urljoin(url, img_url)
+                
+                if is_in_small_mapping(img_url):
+                    continue
+                
+                # 检查图片尺寸
+                try:
+                    width = img.get_attribute("naturalWidth") or img.get_attribute("width")
+                    height = img.get_attribute("naturalHeight") or img.get_attribute("height")
+                    
+                    if width and height:
+                        width, height = int(width), int(height)
+                        if width < 100 or height < 100:
+                            logger.warning(f"图片尺寸过小 ({width}x{height})，跳过: {img_url}")
+                            add_to_small_mapping(img_url)
+                            continue
+                    
+                    img_urls.append(img_url)
+                    logger.info(f"[Selenium] 发现图片: {img_url}")
+                except:
+                    img_urls.append(img_url)
+        
+        # 保存页面源码用于调试
+        debug_html_path = LOG_DIR / f"debug_selenium_{int(time.time())}.html"
+        with open(debug_html_path, 'w', encoding='utf-8') as f:
+            f.write(driver.page_source)
+        logger.info(f"Selenium页面源码已保存到: {debug_html_path}")
+        
+        logger.info(f"[Selenium] 共找到 {len(img_urls)} 张有效图片")
+        return img_urls
+        
+    except Exception as e:
+        import traceback
+        logger.error(f"[Selenium] 获取图片失败: {url} - {e}")
+        logger.error(traceback.format_exc())
+        return []
+    finally:
+        if driver:
+            driver.quit()
 
 # -------------------
 # 生成唯一保存目录
@@ -576,20 +682,34 @@ class ImageCrawlerApp:
         self.retry_count_var = tk.IntVar(value=self.config["RETRY_COUNT"])
         ttk.Spinbox(main_frame, from_=1, to=10, textvariable=self.retry_count_var, width=10).grid(row=2, column=1, sticky=tk.W, pady=5)
 
-        # 新增：日志文件保存设置
-        ttk.Label(main_frame, text="保存日志文件:").grid(row=3, column=0, sticky=tk.W, pady=5)
+        # data_type 过滤条件设置
+        ttk.Label(main_frame, text="data_type过滤:").grid(row=3, column=0, sticky=tk.W, pady=5)
+        self.data_type_filter_var = tk.StringVar(value=self.config.get("DATA_TYPE_FILTER", "V33-IMG-%"))
+        ttk.Entry(main_frame, textvariable=self.data_type_filter_var, width=50).grid(row=3, column=1, pady=5)
+        ttk.Label(main_frame, text="(支持%通配符)", foreground="gray").grid(row=3, column=2, sticky=tk.W, padx=5)
+
+        # 爬虫模式设置
+        ttk.Label(main_frame, text="爬虫模式:").grid(row=4, column=0, sticky=tk.W, pady=5)
+        self.crawler_mode_var = tk.StringVar(value=self.config.get("CRAWLER_MODE", "requests"))
+        mode_frame = ttk.Frame(main_frame)
+        mode_frame.grid(row=4, column=1, sticky=tk.W, pady=5)
+        ttk.Radiobutton(mode_frame, text="Requests(快)", variable=self.crawler_mode_var, value="requests").pack(side=tk.LEFT)
+        ttk.Radiobutton(mode_frame, text="Selenium(强)", variable=self.crawler_mode_var, value="selenium").pack(side=tk.LEFT, padx=10)
+
+        # 日志文件保存设置
+        ttk.Label(main_frame, text="保存日志文件:").grid(row=5, column=0, sticky=tk.W, pady=5)
         self.save_log_var = tk.BooleanVar(value=self.config["SAVE_LOG_FILE"])
-        ttk.Checkbutton(main_frame, variable=self.save_log_var).grid(row=3, column=1, sticky=tk.W, pady=5)
+        ttk.Checkbutton(main_frame, variable=self.save_log_var).grid(row=5, column=1, sticky=tk.W, pady=5)
 
         # 状态显示
-        ttk.Label(main_frame, text="状态:").grid(row=4, column=0, sticky=tk.W, pady=5)
+        ttk.Label(main_frame, text="状态:").grid(row=6, column=0, sticky=tk.W, pady=5)
         self.status_var = tk.StringVar(value="就绪")
-        ttk.Label(main_frame, textvariable=self.status_var).grid(row=4, column=1, sticky=tk.W, pady=5)
+        ttk.Label(main_frame, textvariable=self.status_var).grid(row=6, column=1, sticky=tk.W, pady=5)
 
         # 日志区域
-        ttk.Label(main_frame, text="操作日志:").grid(row=5, column=0, sticky=tk.NW, pady=5)
+        ttk.Label(main_frame, text="操作日志:").grid(row=7, column=0, sticky=tk.NW, pady=5)
         log_frame = ttk.Frame(main_frame)
-        log_frame.grid(row=5, column=1, columnspan=2, sticky=tk.NSEW, pady=5)
+        log_frame.grid(row=7, column=1, columnspan=2, sticky=tk.NSEW, pady=5)
 
         scrollbar = ttk.Scrollbar(log_frame)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -617,13 +737,16 @@ class ImageCrawlerApp:
 
         # 按钮区域
         btn_frame = ttk.Frame(main_frame)
-        btn_frame.grid(row=6, column=0, columnspan=3, pady=10)
+        btn_frame.grid(row=8, column=0, columnspan=3, pady=10)
 
         self.start_btn = ttk.Button(btn_frame, text="开始爬取", command=self.start_crawling)
         self.start_btn.pack(side=tk.LEFT, padx=5)
 
         self.stop_btn = ttk.Button(btn_frame, text="停止", command=self.stop_crawling, state=tk.DISABLED)
         self.stop_btn.pack(side=tk.LEFT, padx=5)
+
+        self.test_url_btn = ttk.Button(btn_frame, text="测试URL", command=self.test_single_url)
+        self.test_url_btn.pack(side=tk.LEFT, padx=5)
 
         self.save_config_btn = ttk.Button(btn_frame, text="保存配置", command=self.save_current_config)
         self.save_config_btn.pack(side=tk.LEFT, padx=5)
@@ -633,7 +756,7 @@ class ImageCrawlerApp:
 
         # 配置网格权重
         main_frame.columnconfigure(1, weight=1)
-        main_frame.rowconfigure(5, weight=1)
+        main_frame.rowconfigure(7, weight=1)
 
     def browse_save_dir(self):
         directory = filedialog.askdirectory(title="选择保存目录")
@@ -645,7 +768,9 @@ class ImageCrawlerApp:
             "SAVE_DIR": self.save_dir_var.get(),
             "THREAD_COUNT": self.thread_count_var.get(),
             "RETRY_COUNT": self.retry_count_var.get(),
-            "SAVE_LOG_FILE": self.save_log_var.get()  # 新增：保存日志配置
+            "SAVE_LOG_FILE": self.save_log_var.get(),
+            "CRAWLER_MODE": self.crawler_mode_var.get(),
+            "DATA_TYPE_FILTER": self.data_type_filter_var.get()  # 新增：保存 data_type 过滤条件
         }
         save_config(new_config)
 
@@ -672,6 +797,66 @@ class ImageCrawlerApp:
             logger.error(f"打开日志文件失败: {e}")
             messagebox.showerror("错误", f"打开日志文件失败: {e}")
 
+    def test_single_url(self):
+        """测试单个URL是否能爬取图片"""
+        test_url = simpledialog.askstring(
+            "测试URL",
+            "请输入要测试的网页地址：",
+            parent=self.root
+        )
+        
+        if not test_url:
+            return
+        
+        if not test_url.startswith(('http://', 'https://')):
+            messagebox.showwarning("警告", "URL必须以 http:// 或 https:// 开头")
+            return
+        
+        logger.info(f"=" * 50)
+        logger.info(f"开始测试URL: {test_url}")
+        logger.info(f"=" * 50)
+        
+        # 在新线程中执行测试，避免界面卡死
+        def run_test():
+            try:
+                self.status_var.set(f"测试中: {test_url}")
+                
+                # 调用图片获取函数
+                img_urls = fetch_images_from_webpage(test_url)
+                
+                if img_urls:
+                    msg = f"✅ 成功找到 {len(img_urls)} 张图片！\n\n"
+                    msg += "前5张图片URL：\n"
+                    for i, url in enumerate(img_urls[:5], 1):
+                        msg += f"{i}. {url}\n"
+                    
+                    if len(img_urls) > 5:
+                        msg += f"... 还有 {len(img_urls) - 5} 张图片"
+                    
+                    logger.info(f"测试结果: 找到 {len(img_urls)} 张图片")
+                    self.root.after(0, lambda: messagebox.showinfo("测试成功", msg))
+                else:
+                    msg = "❌ 未找到任何有效图片\n\n可能原因：\n"
+                    msg += "1. 网页中没有 <img> 标签\n"
+                    msg += "2. 图片使用了特殊加载方式（如JS动态加载）\n"
+                    msg += "3. 网站有反爬虫机制\n"
+                    msg += "4. 需要登录才能访问\n\n"
+                    msg += "请查看日志文件中的调试信息（已保存HTML到json/logs目录）"
+                    
+                    logger.warning(f"测试结果: 未找到图片")
+                    self.root.after(0, lambda: messagebox.showwarning("测试失败", msg))
+                
+            except Exception as e:
+                error_msg = f"测试出错: {str(e)}"
+                logger.error(error_msg)
+                self.root.after(0, lambda: messagebox.showerror("错误", error_msg))
+            finally:
+                self.root.after(0, lambda: self.status_var.set("就绪"))
+        
+        # 启动测试线程
+        test_thread = threading.Thread(target=run_test, daemon=True)
+        test_thread.start()
+
     def start_crawling(self):
         global STOP_FLAG
         with STOP_LOCK:
@@ -685,17 +870,23 @@ class ImageCrawlerApp:
         # 先保存当前配置
         self.save_current_config()
 
-        # 获取待处理数据
+        # 获取待处理数据（使用配置的 data_type 过滤条件）
         conn = get_db_connection()
         if not conn:
             self.reset_ui_state()
             return
 
-        records = fetch_pending_data(conn)
+        data_type_filter = self.data_type_filter_var.get().strip()
+        if not data_type_filter:
+            messagebox.showwarning("警告", "data_type 过滤条件不能为空！")
+            self.reset_ui_state()
+            return
+
+        records = fetch_pending_data(conn, data_type_filter)
         conn.close()
 
         if not records:
-            messagebox.showinfo("提示", "没有待处理的记录")
+            messagebox.showinfo("提示", f"没有待处理的记录 (data_type LIKE '{data_type_filter}')")
             self.reset_ui_state()
             return
 
@@ -775,3 +966,27 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = ImageCrawlerApp(root)
     root.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
