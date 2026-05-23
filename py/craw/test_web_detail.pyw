@@ -179,7 +179,7 @@ class DeviceStressTestGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("🔥 设备极限压力测试工具")
-        self.root.geometry("550x480")
+        self.root.geometry("550x680")
         self.root.resizable(False, False)
         self.running = False
         self.paused = False
