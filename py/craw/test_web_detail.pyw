@@ -37,27 +37,47 @@ logger = logging.getLogger()
 
 # 默认配置
 DEFAULT_CONFIG = {
+    "DB_HOST": "localhost",
+    "DB_PORT": 3306,
+    "DB_USER": "root",
+    "DB_PASSWORD": "",
+    "DB_NAME": "test",
     "close_after_seconds": 5,  # 保留但不在UI显示
     "open_batch_size": 2,
     "batch_interval_seconds": 2,
     "url_suffix": "",  # URL后缀参数
-    "data_type_filter": "V33-IMG-AI"  # 保留但不在UI显示
+    "data_type_filter": "V33-IMG-AI"  # data_type过滤条件
 }
 
 # ==============================
 # 数据库工具
 # ==============================
-def get_db_connection():
-    if not DB_CONFIG_PATH.exists():
-        raise FileNotFoundError(f"数据库配置文件不存在: {DB_CONFIG_PATH}")
-    with open(DB_CONFIG_PATH, 'r', encoding='utf-8') as f:
-        db_config = json.load(f)
-    return pymysql.connect(**db_config)
+def get_db_connection(db_config=None):
+    """获取数据库连接"""
+    if db_config is None:
+        # 如果没有传入配置，从配置文件读取
+        if not DB_CONFIG_PATH.exists():
+            raise FileNotFoundError(f"数据库配置文件不存在: {DB_CONFIG_PATH}")
+        with open(DB_CONFIG_PATH, 'r', encoding='utf-8') as f:
+            db_config = json.load(f)
+    
+    try:
+        return pymysql.connect(
+            host=db_config.get("DB_HOST", "localhost"),
+            port=int(db_config.get("DB_PORT", 3306)),
+            user=db_config.get("DB_USER", "root"),
+            password=db_config.get("DB_PASSWORD", ""),
+            database=db_config.get("DB_NAME", "test"),
+            charset="utf8mb4"
+        )
+    except Exception as e:
+        logger.error(f"数据库连接失败: {e}")
+        raise
 
-def fetch_pending_urls(batch_size=2, data_type_filter="V33-IMG-AI"):
+def fetch_pending_urls(batch_size=2, data_type_filter="V33-IMG-AI", db_config=None):
     """从 general_data 表中获取待加载的链接"""
     try:
-        conn = get_db_connection()
+        conn = get_db_connection(db_config)
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         query = """
             SELECT id, data_key, data_content, data_type
@@ -76,13 +96,13 @@ def fetch_pending_urls(batch_size=2, data_type_filter="V33-IMG-AI"):
         logger.error(f"数据库查询失败: {e}")
         raise
 
-def check_urls_completed(url_ids):
+def check_urls_completed(url_ids, db_config=None):
     """检查指定ID列表的URL是否都已标记为完成（is_deleted = 1）"""
     if not url_ids:
         return True
     
     try:
-        conn = get_db_connection()
+        conn = get_db_connection(db_config)
         cursor = conn.cursor()
         
         # 构建查询：检查这些ID中还有多少个 is_deleted = 0
@@ -194,6 +214,46 @@ class DeviceStressTestGUI:
         frame_cfg = LabelFrame(self.root, text="⚙️ 测试配置", padx=10, pady=8)
         frame_cfg.pack(fill=X, padx=10, pady=5)
 
+        # === 数据库配置 ===
+        db_frame = LabelFrame(frame_cfg, text="数据库配置", padx=5, pady=5)
+        db_frame.pack(fill=X, pady=5)
+
+        # 主机
+        row_db1 = Frame(db_frame)
+        row_db1.pack(fill=X, pady=2)
+        Label(row_db1, text="主机:", width=10, anchor=W).pack(side=LEFT)
+        self.db_host_var = StringVar(value=self.config.get("DB_HOST", "localhost"))
+        Entry(row_db1, textvariable=self.db_host_var, width=20).pack(side=LEFT, padx=5)
+        Label(row_db1, text="(IP或域名)", foreground="gray", font=("Arial", 8)).pack(side=LEFT)
+
+        # 端口
+        row_db2 = Frame(db_frame)
+        row_db2.pack(fill=X, pady=2)
+        Label(row_db2, text="端口:", width=10, anchor=W).pack(side=LEFT)
+        self.db_port_var = StringVar(value=str(self.config.get("DB_PORT", 3306)))
+        Spinbox(row_db2, from_=1, to=65535, textvariable=self.db_port_var, width=10).pack(side=LEFT, padx=5)
+
+        # 用户名
+        row_db3 = Frame(db_frame)
+        row_db3.pack(fill=X, pady=2)
+        Label(row_db3, text="用户名:", width=10, anchor=W).pack(side=LEFT)
+        self.db_user_var = StringVar(value=self.config.get("DB_USER", "root"))
+        Entry(row_db3, textvariable=self.db_user_var, width=20).pack(side=LEFT, padx=5)
+
+        # 密码
+        row_db4 = Frame(db_frame)
+        row_db4.pack(fill=X, pady=2)
+        Label(row_db4, text="密码:", width=10, anchor=W).pack(side=LEFT)
+        self.db_pwd_var = StringVar(value=self.config.get("DB_PASSWORD", ""))
+        Entry(row_db4, textvariable=self.db_pwd_var, width=20, show="*").pack(side=LEFT, padx=5)
+
+        # 数据库名
+        row_db5 = Frame(db_frame)
+        row_db5.pack(fill=X, pady=2)
+        Label(row_db5, text="数据库:", width=10, anchor=W).pack(side=LEFT)
+        self.db_name_var = StringVar(value=self.config.get("DB_NAME", "test"))
+        Entry(row_db5, textvariable=self.db_name_var, width=20).pack(side=LEFT, padx=5)
+
         # data_type 过滤条件
         row1 = Frame(frame_cfg)
         row1.pack(fill=X, pady=3)
@@ -275,11 +335,29 @@ class DeviceStressTestGUI:
             data_type_filter = self.data_type_var.get().strip()
             url_suffix = self.suffix_var.get().strip()
             
+            # 数据库配置
+            db_host = self.db_host_var.get().strip()
+            db_port = int(self.db_port_var.get())
+            db_user = self.db_user_var.get().strip()
+            db_password = self.db_pwd_var.get()
+            db_name = self.db_name_var.get().strip()
+            
             if batch_size < 1 or interval_sec < 1:
                 raise ValueError("时间参数必须大于0")
             if not data_type_filter:
                 raise ValueError("data_type过滤条件不能为空")
+            if not db_host:
+                raise ValueError("数据库主机不能为空")
+            if not db_user:
+                raise ValueError("数据库用户名不能为空")
+            if not db_name:
+                raise ValueError("数据库名称不能为空")
             
+            self.config["DB_HOST"] = db_host
+            self.config["DB_PORT"] = db_port
+            self.config["DB_USER"] = db_user
+            self.config["DB_PASSWORD"] = db_password
+            self.config["DB_NAME"] = db_name
             self.config["open_batch_size"] = batch_size
             self.config["batch_interval_seconds"] = interval_sec
             self.config["data_type_filter"] = data_type_filter
@@ -334,10 +412,19 @@ class DeviceStressTestGUI:
             total_urls = 0
             data_type_filter = self.config["data_type_filter"]
             url_suffix = self.config["url_suffix"]
+            
+            # 构建数据库配置
+            db_config = {
+                "DB_HOST": self.config["DB_HOST"],
+                "DB_PORT": self.config["DB_PORT"],
+                "DB_USER": self.config["DB_USER"],
+                "DB_PASSWORD": self.config["DB_PASSWORD"],
+                "DB_NAME": self.config["DB_NAME"]
+            }
 
             # 首先统计总共有多少待处理的URL
             try:
-                conn = get_db_connection()
+                conn = get_db_connection(db_config)
                 cursor = conn.cursor()
                 count_query = """
                     SELECT COUNT(*) as count
@@ -354,6 +441,7 @@ class DeviceStressTestGUI:
             except Exception as e:
                 logger.error(f"统计总链接数失败: {e}")
                 self.progress_var.set("统计总链接数失败")
+                return
 
             while self.running:
                 # 检查是否暂停
@@ -363,7 +451,7 @@ class DeviceStressTestGUI:
                 if not self.running:
                     break
 
-                urls = fetch_pending_urls(self.config["open_batch_size"], data_type_filter)
+                urls = fetch_pending_urls(self.config["open_batch_size"], data_type_filter, db_config)
                 if not urls:
                     self.log_to_gui("✅ 所有待测试的链接已处理完毕！")
                     break
@@ -420,7 +508,7 @@ class DeviceStressTestGUI:
                 
                 while self.running and not self.paused:
                     # 检查是否所有页面都已标记为完成
-                    if check_urls_completed(batch_ids):
+                    if check_urls_completed(batch_ids, db_config):
                         self.log_to_gui("✅ 当前批次所有页面已成功加载")
                         break
                     
@@ -448,7 +536,7 @@ class DeviceStressTestGUI:
                       AND is_deleted = 0
                 """
                 try:
-                    conn = get_db_connection()
+                    conn = get_db_connection(db_config)
                     cursor = conn.cursor()
                     cursor.execute(remaining_count_query, (data_type_filter,))
                     remaining_result = cursor.fetchone()

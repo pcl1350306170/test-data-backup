@@ -1,7 +1,12 @@
 {
   "close_after_seconds": 10,
-  "open_batch_size": 30,
+  "open_batch_size": 2,
   "batch_interval_seconds": 2,
   "url_suffix": "pageFrom=image",
-  "data_type_filter": "V33-IMG-AI"
+  "data_type_filter": "V33-IMG-AI",
+  "DB_HOST": "192.168.3.227",
+  "DB_PORT": 3306,
+  "DB_USER": "root",
+  "DB_PASSWORD": "123456",
+  "DB_NAME": "test"
 }
