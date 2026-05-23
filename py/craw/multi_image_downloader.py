@@ -269,7 +269,7 @@ def fetch_data(db_config):
     try:
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         cursor.execute(
-            "SELECT uid, title, content FROM web_crawl_data WHERE is_deleted=0")
+            "SELECT uid, title, content, source FROM web_crawl_data WHERE is_deleted=0")
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -324,11 +324,19 @@ def mark_as_deleted(db_config, uid):
         return False
 
 
-def worker_task(uid, title, urls, db_config, status_callback):
+def worker_task(uid, title, urls, db_config, status_callback, source=""):
     """线程任务：下载一个数据记录中的所有图片"""
-    safe_title = "".join(c for c in title if c.isalnum()
-                         or c in " _-").strip() or "untitled"
-    save_dir = os.path.join(config["BASE_DIR"], safe_title)
+    # 清理标题中的非法字符
+    safe_title = "".join(c for c in title if c.isalnum() or c in " _-").strip() or "untitled"
+    
+    # 根据 source 和 title 构建目录结构
+    if source:
+        # 清理 source 中的非法字符
+        safe_source = "".join(c for c in source if c.isalnum() or c in " _-").strip() or "unknown"
+        save_dir = os.path.join(config["BASE_DIR"], safe_source, safe_title)
+    else:
+        save_dir = os.path.join(config["BASE_DIR"], safe_title)
+    
     os.makedirs(save_dir, exist_ok=True)
 
     total = len(urls)
@@ -382,40 +390,6 @@ class MultiImageDownloaderApp:
         # 主框架
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.pack(fill=tk.BOTH, expand=True)
-
-        # === 数据库配置 ===
-        db_frame = ttk.LabelFrame(main_frame, text="数据库配置", padding="10")
-        db_frame.pack(fill=tk.X, pady=5)
-
-        ttk.Label(db_frame, text="主机:").grid(
-            row=0, column=0, sticky=tk.W, pady=3)
-        self.db_host_var = tk.StringVar(value=self.config["DB_HOST"])
-        ttk.Entry(db_frame, textvariable=self.db_host_var,
-                  width=20).grid(row=0, column=1, padx=5, pady=3)
-
-        ttk.Label(db_frame, text="端口:").grid(
-            row=0, column=2, sticky=tk.W, pady=3)
-        self.db_port_var = tk.IntVar(value=self.config["DB_PORT"])
-        ttk.Spinbox(db_frame, from_=1, to=65535, textvariable=self.db_port_var,
-                    width=10).grid(row=0, column=3, padx=5, pady=3)
-
-        ttk.Label(db_frame, text="用户名:").grid(
-            row=1, column=0, sticky=tk.W, pady=3)
-        self.db_user_var = tk.StringVar(value=self.config["DB_USER"])
-        ttk.Entry(db_frame, textvariable=self.db_user_var,
-                  width=20).grid(row=1, column=1, padx=5, pady=3)
-
-        ttk.Label(db_frame, text="密码:").grid(
-            row=1, column=2, sticky=tk.W, pady=3)
-        self.db_pwd_var = tk.StringVar(value=self.config["DB_PASSWORD"])
-        ttk.Entry(db_frame, textvariable=self.db_pwd_var, width=20,
-                  show="*").grid(row=1, column=3, padx=5, pady=3)
-
-        ttk.Label(db_frame, text="数据库:").grid(
-            row=2, column=0, sticky=tk.W, pady=3)
-        self.db_name_var = tk.StringVar(value=self.config["DB_NAME"])
-        ttk.Entry(db_frame, textvariable=self.db_name_var,
-                  width=20).grid(row=2, column=1, padx=5, pady=3)
 
         # === 下载配置 ===
         dl_frame = ttk.LabelFrame(main_frame, text="下载配置", padding="10")
@@ -528,16 +502,16 @@ class MultiImageDownloaderApp:
 
     def save_current_config(self):
         new_config = {
-            "DB_HOST": self.db_host_var.get(),
-            "DB_PORT": self.db_port_var.get(),
-            "DB_USER": self.db_user_var.get(),
-            "DB_PASSWORD": self.db_pwd_var.get(),
-            "DB_NAME": self.db_name_var.get(),
+            "DB_HOST": self.config["DB_HOST"],
+            "DB_PORT": self.config["DB_PORT"],
+            "DB_USER": self.config["DB_USER"],
+            "DB_PASSWORD": self.config["DB_PASSWORD"],
+            "DB_NAME": self.config["DB_NAME"],
             "BASE_DIR": self.base_dir_var.get(),
             "MAX_THREADS": self.thread_count_var.get(),
             "RETRY_COUNT": self.retry_count_var.get(),
             "SAVE_LOG_FILE": self.save_log_var.get(),
-            "CROP_IMAGE": self.crop_image_var.get()  # 新增：保存裁剪配置
+            "CROP_IMAGE": self.crop_image_var.get()
         }
         save_config(new_config)
 
@@ -621,6 +595,7 @@ class MultiImageDownloaderApp:
                     uid = row["uid"]
                     title = row["title"] or "untitled"
                     content = row["content"]
+                    source = row.get("source", "")  # 获取 source 字段
 
                     if not content:
                         logger.info(f"{uid} 没有图片，跳过并标记为已处理")
@@ -630,7 +605,7 @@ class MultiImageDownloaderApp:
 
                     urls = [u.strip() for u in content.split(",") if u.strip()]
                     futures[executor.submit(
-                        worker_task, uid, title, urls, db_config, update_status)] = uid
+                        worker_task, uid, title, urls, db_config, update_status, source)] = uid
 
                 for f in as_completed(futures):
                     with STOP_LOCK:

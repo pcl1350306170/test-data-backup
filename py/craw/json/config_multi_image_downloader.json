@@ -4,8 +4,8 @@
   "DB_USER": "root",
   "DB_PASSWORD": "123456",
   "DB_NAME": "test",
-  "BASE_DIR": "D:/FILES/IMG/v33/AI",
-  "MAX_THREADS": 5,
+  "BASE_DIR": "D:/FILES/IMG/v33",
+  "MAX_THREADS": 4,
   "RETRY_COUNT": 2,
   "SAVE_LOG_FILE": true,
   "CROP_IMAGE": true

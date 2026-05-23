@@ -1,7 +1,7 @@
 {
-  "close_after_seconds": 5,
-  "open_batch_size": 2,
-  "batch_interval_seconds": 10,
+  "close_after_seconds": 10,
+  "open_batch_size": 30,
+  "batch_interval_seconds": 2,
   "url_suffix": "pageFrom=image",
   "data_type_filter": "V33-IMG-AI"
 }

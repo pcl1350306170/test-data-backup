@@ -37,11 +37,11 @@ logger = logging.getLogger()
 
 # 默认配置
 DEFAULT_CONFIG = {
-    "close_after_seconds": 5,
+    "close_after_seconds": 5,  # 保留但不在UI显示
     "open_batch_size": 2,
     "batch_interval_seconds": 2,
-    "url_suffix": "",  # 新增：URL后缀参数
-    "data_type_filter": "V33-IMG-AI"  # 新增：data_type过滤条件
+    "url_suffix": "",  # URL后缀参数
+    "data_type_filter": "V33-IMG-AI"  # 保留但不在UI显示
 }
 
 # ==============================
@@ -76,47 +76,77 @@ def fetch_pending_urls(batch_size=2, data_type_filter="V33-IMG-AI"):
         logger.error(f"数据库查询失败: {e}")
         raise
 
-def mark_url_as_done(url_id):
-    """将指定记录的 is_deleted 设为 1"""
+def check_urls_completed(url_ids):
+    """检查指定ID列表的URL是否都已标记为完成（is_deleted = 1）"""
+    if not url_ids:
+        return True
+    
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        update_query = "UPDATE general_data SET is_deleted = 1 WHERE id = %s"
-        cursor.execute(update_query, (url_id,))
-        conn.commit()
+        
+        # 构建查询：检查这些ID中还有多少个 is_deleted = 0
+        placeholders = ','.join(['%s'] * len(url_ids))
+        query = f"""
+            SELECT COUNT(*) as remaining
+            FROM general_data
+            WHERE id IN ({placeholders})
+              AND is_deleted = 0
+        """
+        cursor.execute(query, tuple(url_ids))
+        result = cursor.fetchone()
+        remaining = result[0] if result else 0
+        
         cursor.close()
         conn.close()
-        logger.info(f"已标记 ID={url_id} 为已完成")
+        
+        return remaining == 0
     except Exception as e:
-        logger.error(f"更新数据库失败 (ID={url_id}): {e}")
-        raise
+        logger.error(f"检查URL完成状态失败: {e}")
+        return False
 
 # ==============================
 # 核心逻辑
 # ==============================
-def build_url_with_suffix(base_url, suffix):
-    """在URL后面拼接自定义后缀"""
-    if not suffix:
+def build_url_with_suffix(base_url, suffix, general_data_id=None, source=None):
+    """在URL后面拼接自定义后缀、generalDataId和source参数"""
+    params = []
+    
+    # 添加自定义后缀
+    if suffix:
+        suffix = suffix.strip()
+        params.append(suffix)
+    
+    # 添加 generalDataId 参数
+    if general_data_id is not None:
+        params.append(f"generalDataId={general_data_id}")
+    
+    # 添加 source 参数（来自 data_type 字段）
+    if source:
+        source = source.strip()
+        params.append(f"source={source}")
+    
+    # 如果没有参数，直接返回原URL
+    if not params:
         return base_url
     
-    # 去除前后空格
-    suffix = suffix.strip()
+    # 拼接所有参数
+    combined_params = "&".join(params)
     
     # 如果base_url已经有参数，使用&连接；否则使用?连接
     if '?' in base_url:
-        return f"{base_url}&{suffix}"
+        return f"{base_url}&{combined_params}"
     else:
-        return f"{base_url}?{suffix}"
+        return f"{base_url}?{combined_params}"
 
 def open_and_close_url(url, delay_seconds, url_id, on_complete_callback):
-    """在默认浏览器中打开 URL，等待 N 秒后记录行为"""
+    """在默认浏览器中打开 URL，等待 N 秒后记录行为（不修改数据库状态）"""
     try:
         logger.info(f"正在打开: {url}")
         webbrowser.open(url)
         time.sleep(delay_seconds)
-        # 注意：Python 无法强制关闭由 webbrowser 打开的浏览器标签/窗口
-        # 但我们可以记录"已加载"，并更新数据库
-        mark_url_as_done(url_id)
+        # 注意：不再修改数据库状态，由浏览器端监听脚本负责
+        logger.info(f"已加载完成 (ID={url_id})，等待浏览器端处理")
         on_complete_callback(url_id, True, None)
     except Exception as e:
         logger.error(f"处理 URL 失败 ({url}): {e}")
@@ -164,12 +194,13 @@ class DeviceStressTestGUI:
         frame_cfg = LabelFrame(self.root, text="⚙️ 测试配置", padx=10, pady=8)
         frame_cfg.pack(fill=X, padx=10, pady=5)
 
-        # 网页停留时间
+        # data_type 过滤条件
         row1 = Frame(frame_cfg)
         row1.pack(fill=X, pady=3)
-        Label(row1, text="网页停留时间（秒）:", width=20, anchor=W).pack(side=LEFT)
-        self.delay_var = StringVar(value=str(self.config.get("close_after_seconds", 5)))
-        Spinbox(row1, from_=1, to=60, textvariable=self.delay_var, width=8).pack(side=LEFT)
+        Label(row1, text="data_type过滤:", width=20, anchor=W).pack(side=LEFT)
+        self.data_type_var = StringVar(value=self.config.get("data_type_filter", "V33-IMG-AI"))
+        Entry(row1, textvariable=self.data_type_var, width=25).pack(side=LEFT, padx=5)
+        Label(row1, text="(支持%通配符)", foreground="gray", font=("Arial", 8)).pack(side=LEFT)
 
         # 批量大小
         row2 = Frame(frame_cfg)
@@ -185,21 +216,13 @@ class DeviceStressTestGUI:
         self.interval_var = StringVar(value=str(self.config.get("batch_interval_seconds", 2)))
         Spinbox(row3, from_=1, to=60, textvariable=self.interval_var, width=8).pack(side=LEFT)
 
-        # data_type 过滤条件
+        # URL后缀参数
         row4 = Frame(frame_cfg)
         row4.pack(fill=X, pady=3)
-        Label(row4, text="data_type过滤:", width=20, anchor=W).pack(side=LEFT)
-        self.data_type_var = StringVar(value=self.config.get("data_type_filter", "V33-IMG-AI"))
-        Entry(row4, textvariable=self.data_type_var, width=25).pack(side=LEFT, padx=5)
-        Label(row4, text="(支持%通配符)", foreground="gray", font=("Arial", 8)).pack(side=LEFT)
-
-        # URL后缀参数
-        row5 = Frame(frame_cfg)
-        row5.pack(fill=X, pady=3)
-        Label(row5, text="URL后缀参数:", width=20, anchor=W).pack(side=LEFT)
+        Label(row4, text="URL后缀参数:", width=20, anchor=W).pack(side=LEFT)
         self.suffix_var = StringVar(value=self.config.get("url_suffix", ""))
-        Entry(row5, textvariable=self.suffix_var, width=25).pack(side=LEFT, padx=5)
-        Label(row5, text="例: pageFrom=image", foreground="gray", font=("Arial", 8)).pack(side=LEFT)
+        Entry(row4, textvariable=self.suffix_var, width=25).pack(side=LEFT, padx=5)
+        Label(row4, text="例: pageFrom=image", foreground="gray", font=("Arial", 8)).pack(side=LEFT)
 
         # 按钮区
         btn_frame = Frame(self.root)
@@ -247,18 +270,16 @@ class DeviceStressTestGUI:
 
         # 保存配置
         try:
-            delay_sec = int(self.delay_var.get())
             batch_size = int(self.batch_var.get())
             interval_sec = int(self.interval_var.get())
             data_type_filter = self.data_type_var.get().strip()
             url_suffix = self.suffix_var.get().strip()
             
-            if delay_sec < 1 or batch_size < 1 or interval_sec < 1:
+            if batch_size < 1 or interval_sec < 1:
                 raise ValueError("时间参数必须大于0")
             if not data_type_filter:
                 raise ValueError("data_type过滤条件不能为空")
             
-            self.config["close_after_seconds"] = delay_sec
             self.config["open_batch_size"] = batch_size
             self.config["batch_interval_seconds"] = interval_sec
             self.config["data_type_filter"] = data_type_filter
@@ -368,12 +389,19 @@ class DeviceStressTestGUI:
                     self.progress_var.set(f"已处理: {total_processed}/{total_urls} 个链接")
 
                 delay = self.config["close_after_seconds"]
+                batch_ids = [item['id'] for item in urls]  # 记录当前批次的ID列表
+                
                 for item in urls:
                     if not self.running:
                         break
                     
-                    # 构建带后缀的URL
-                    final_url = build_url_with_suffix(item['data_content'], url_suffix)
+                    # 构建带后缀、generalDataId和source的URL
+                    final_url = build_url_with_suffix(
+                        item['data_content'], 
+                        url_suffix,
+                        general_data_id=item['id'],
+                        source=item.get('data_type', '')  # 添加 source 参数
+                    )
                     
                     t = threading.Thread(
                         target=open_and_close_url,
@@ -384,9 +412,33 @@ class DeviceStressTestGUI:
                     t.start()
                     time.sleep(0.2)  # 同一批次内打开URL的间隔
 
-                # 等待当前批次完成
-                while completed[0] < total and self.running:
-                    time.sleep(0.1)
+                # 等待当前批次所有页面都成功加载（通过检查数据库状态）
+                self.log_to_gui(f"等待浏览器端处理完成... (共 {len(batch_ids)} 个页面)")
+                check_interval = 1  # 每秒检查一次
+                max_wait_time = 300  # 最多等待5分钟
+                waited_time = 0
+                
+                while self.running and not self.paused:
+                    # 检查是否所有页面都已标记为完成
+                    if check_urls_completed(batch_ids):
+                        self.log_to_gui("✅ 当前批次所有页面已成功加载")
+                        break
+                    
+                    time.sleep(check_interval)
+                    waited_time += check_interval
+                    
+                    # 每10秒显示一次等待信息
+                    if waited_time % 10 == 0:
+                        self.log_to_gui(f"⏳ 等待中... ({waited_time}秒)")
+                    
+                    # 超时检查
+                    if waited_time >= max_wait_time:
+                        self.log_to_gui(f"⚠️ 等待超时 ({max_wait_time}秒)，部分页面可能未成功加载")
+                        break
+                
+                # 如果用户停止或暂停，退出循环
+                if not self.running or self.paused:
+                    break
 
                 # 如果还有更多URL待处理，等待批次间隔时间
                 remaining_count_query = """
