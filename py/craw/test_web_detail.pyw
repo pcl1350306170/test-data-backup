@@ -45,6 +45,7 @@ DEFAULT_CONFIG = {
     "close_after_seconds": 5,  # 保留但不在UI显示
     "open_batch_size": 2,
     "batch_interval_seconds": 2,
+    "url_open_interval": 1.0,  # 同一批次内打开URL的间隔（秒）
     "url_suffix": "",  # URL后缀参数
     "data_type_filter": "V33-IMG-AI"  # data_type过滤条件
 }
@@ -97,32 +98,72 @@ def fetch_pending_urls(batch_size=2, data_type_filter="V33-IMG-AI", db_config=No
         raise
 
 def check_urls_completed(url_ids, db_config=None):
-    """检查指定ID列表的URL是否都已标记为完成（is_deleted = 1）"""
+    """检查指定ID列表的URL是否都已标记为完成(is_deleted = 1)
+    
+    Returns:
+        tuple: (是否全部完成, 未完成的ID列表)
+    """
     if not url_ids:
-        return True
+        return True, []
     
     try:
         conn = get_db_connection(db_config)
         cursor = conn.cursor()
         
-        # 构建查询：检查这些ID中还有多少个 is_deleted = 0
+        # 构建查询：查找这些ID中 is_deleted = 0 的记录
         placeholders = ','.join(['%s'] * len(url_ids))
         query = f"""
-            SELECT COUNT(*) as remaining
+            SELECT id
             FROM general_data
             WHERE id IN ({placeholders})
               AND is_deleted = 0
         """
         cursor.execute(query, tuple(url_ids))
-        result = cursor.fetchone()
-        remaining = result[0] if result else 0
+        incomplete_ids = [row[0] for row in cursor.fetchall()]
         
         cursor.close()
         conn.close()
         
-        return remaining == 0
+        return len(incomplete_ids) == 0, incomplete_ids
     except Exception as e:
         logger.error(f"检查URL完成状态失败: {e}")
+        return False, url_ids  # 出错时返回所有ID未完成
+
+def mark_url_as_completed(url_id, db_config=None):
+    """手动将URL标记为已完成(is_deleted = 1)
+    
+    Args:
+        url_id: 数据ID
+        db_config: 数据库配置
+        
+    Returns:
+        bool: 是否成功
+    """
+    try:
+        conn = get_db_connection(db_config)
+        cursor = conn.cursor()
+        
+        update_query = """
+            UPDATE general_data
+            SET is_deleted = 1
+            WHERE id = %s
+        """
+        cursor.execute(update_query, (url_id,))
+        conn.commit()
+        
+        affected_rows = cursor.rowcount
+        cursor.close()
+        conn.close()
+        
+        if affected_rows > 0:
+            logger.info(f"手动标记 ID={url_id} 为已完成")
+            return True
+        else:
+            logger.warning(f"标记 ID={url_id} 失败：记录不存在或已被标记")
+            return False
+            
+    except Exception as e:
+        logger.error(f"手动标记 ID={url_id} 失败: {e}")
         return False
 
 # ==============================
@@ -163,13 +204,30 @@ def open_and_close_url(url, delay_seconds, url_id, on_complete_callback):
     """在默认浏览器中打开 URL，等待 N 秒后记录行为（不修改数据库状态）"""
     try:
         logger.info(f"正在打开: {url}")
-        webbrowser.open(url)
+        
+        # 尝试打开浏览器
+        result = webbrowser.open(url)
+        
+        if not result:
+            logger.warning(f"⚠️ webbrowser.open() 返回 False，可能无法打开浏览器")
+            logger.warning(f"请检查：")
+            logger.warning(f"  1. 系统是否安装了默认浏览器")
+            logger.warning(f"  2. 默认浏览器是否可以正常启动")
+            logger.warning(f"  3. URL 格式是否正确: {url}")
+        else:
+            logger.info(f"✅ 已调用浏览器打开 URL")
+        
         time.sleep(delay_seconds)
         # 注意：不再修改数据库状态，由浏览器端监听脚本负责
         logger.info(f"已加载完成 (ID={url_id})，等待浏览器端处理")
         on_complete_callback(url_id, True, None)
     except Exception as e:
-        logger.error(f"处理 URL 失败 ({url}): {e}")
+        logger.error(f"❌ 处理 URL 失败 ({url}): {e}")
+        logger.error(f"可能的原因：")
+        logger.error(f"  1. 系统未安装浏览器")
+        logger.error(f"  2. 默认浏览器损坏或被卸载")
+        logger.error(f"  3. 权限不足或被安全软件阻止")
+        logger.error(f"  4. URL 格式错误")
         on_complete_callback(url_id, False, str(e))
 
 # ==============================
@@ -269,6 +327,14 @@ class DeviceStressTestGUI:
         self.batch_var = StringVar(value=str(self.config.get("open_batch_size", 2)))
         Spinbox(row2, from_=1, to=20, textvariable=self.batch_var, width=8).pack(side=LEFT)
 
+        # 同一批次内打开URL的间隔
+        row2b = Frame(frame_cfg)
+        row2b.pack(fill=X, pady=3)
+        Label(row2b, text="URL打开间隔（秒）:", width=20, anchor=W).pack(side=LEFT)
+        self.url_open_interval_var = StringVar(value=str(self.config.get("url_open_interval", 1.0)))
+        Spinbox(row2b, from_=0.1, to=10, increment=0.1, textvariable=self.url_open_interval_var, width=8).pack(side=LEFT)
+        Label(row2b, text="(建议1-3秒，避免Chrome卡死)", foreground="gray", font=("Arial", 8)).pack(side=LEFT)
+
         # 批次间隔时间
         row3 = Frame(frame_cfg)
         row3.pack(fill=X, pady=3)
@@ -332,6 +398,7 @@ class DeviceStressTestGUI:
         try:
             batch_size = int(self.batch_var.get())
             interval_sec = int(self.interval_var.get())
+            url_open_interval = float(self.url_open_interval_var.get())
             data_type_filter = self.data_type_var.get().strip()
             url_suffix = self.suffix_var.get().strip()
             
@@ -344,6 +411,8 @@ class DeviceStressTestGUI:
             
             if batch_size < 1 or interval_sec < 1:
                 raise ValueError("时间参数必须大于0")
+            if url_open_interval < 0.1:
+                raise ValueError("URL打开间隔至少0.1秒")
             if not data_type_filter:
                 raise ValueError("data_type过滤条件不能为空")
             if not db_host:
@@ -360,6 +429,7 @@ class DeviceStressTestGUI:
             self.config["DB_NAME"] = db_name
             self.config["open_batch_size"] = batch_size
             self.config["batch_interval_seconds"] = interval_sec
+            self.config["url_open_interval"] = url_open_interval
             self.config["data_type_filter"] = data_type_filter
             self.config["url_suffix"] = url_suffix
             self.save_config()
@@ -477,6 +547,7 @@ class DeviceStressTestGUI:
                     self.progress_var.set(f"已处理: {total_processed}/{total_urls} 个链接")
 
                 delay = self.config["close_after_seconds"]
+                url_open_interval = self.config["url_open_interval"]  # 获取URL打开间隔
                 batch_ids = [item['id'] for item in urls]  # 记录当前批次的ID列表
                 
                 for item in urls:
@@ -498,32 +569,100 @@ class DeviceStressTestGUI:
                     )
                     threads.append(t)
                     t.start()
-                    time.sleep(0.2)  # 同一批次内打开URL的间隔
+                    time.sleep(url_open_interval)  # 使用配置的间隔时间
 
                 # 等待当前批次所有页面都成功加载（通过检查数据库状态）
                 self.log_to_gui(f"等待浏览器端处理完成... (共 {len(batch_ids)} 个页面)")
-                check_interval = 1  # 每秒检查一次
-                max_wait_time = 300  # 最多等待5分钟
-                waited_time = 0
-                
+                                
+                # 重试机制配置
+                max_wait_time = 60  # 单次等待最多60秒（1分钟）
+                max_retries = 3  # 最多重试3次
+                retry_count = 0
+                                
+                # 记录每个ID的重试次数
+                retry_tracker = {url_id: 0 for url_id in batch_ids}
+                                
                 while self.running and not self.paused:
                     # 检查是否所有页面都已标记为完成
-                    if check_urls_completed(batch_ids, db_config):
-                        self.log_to_gui("✅ 当前批次所有页面已成功加载")
+                    all_completed, incomplete_ids = check_urls_completed(batch_ids, db_config)
+                                    
+                    if all_completed:
+                        self.log_to_gui(f"✅ 当前批次所有页面已成功加载")
                         break
-                    
-                    time.sleep(check_interval)
-                    waited_time += check_interval
-                    
+                                    
+                    # 显示未完成的情况
+                    if len(incomplete_ids) < len(batch_ids):
+                        completed_count = len(batch_ids) - len(incomplete_ids)
+                        self.log_to_gui(f"⏳ 已完成 {completed_count}/{len(batch_ids)} 个，等待剩余 {len(incomplete_ids)} 个...")
+                                    
+                    # 等待1秒后检查
+                    time.sleep(1)
+                    waited_time += 1
+                                    
                     # 每10秒显示一次等待信息
                     if waited_time % 10 == 0:
-                        self.log_to_gui(f"⏳ 等待中... ({waited_time}秒)")
-                    
-                    # 超时检查
+                        self.log_to_gui(f"⏳ 等待中... ({waited_time}秒，未完成: {len(incomplete_ids)}个)")
+                                    
+                    # 检查是否超时（超过1分钟）
                     if waited_time >= max_wait_time:
-                        self.log_to_gui(f"⚠️ 等待超时 ({max_wait_time}秒)，部分页面可能未成功加载")
-                        break
-                
+                        retry_count += 1
+                                        
+                        if retry_count <= max_retries:
+                            # 记录需要重新打开的ID
+                            ids_to_reopen = []
+                                            
+                            for url_id in incomplete_ids:
+                                retry_tracker[url_id] = retry_tracker.get(url_id, 0) + 1
+                                                
+                                # 如果某个ID重试超过3次，直接标记为完成
+                                if retry_tracker[url_id] >= 3:
+                                    self.log_to_gui(f"⚠️ ID={url_id} 已重试 {retry_tracker[url_id]} 次，强制标记为完成")
+                                    mark_url_as_completed(url_id, db_config)
+                                else:
+                                    ids_to_reopen.append(url_id)
+                                            
+                            # 重新打开未完成的URL
+                            if ids_to_reopen:
+                                self.log_to_gui(f"🔄 第 {retry_count} 次重试，重新打开 {len(ids_to_reopen)} 个未完成的页面...")
+                                                
+                                for url_id in ids_to_reopen:
+                                    if not self.running:
+                                        break
+                                                    
+                                    # 找到对应的URL
+                                    url_item = next((item for item in urls if item['id'] == url_id), None)
+                                    if url_item:
+                                        final_url = build_url_with_suffix(
+                                            url_item['data_content'],
+                                            url_suffix,
+                                            general_data_id=url_id,
+                                            source=url_item.get('data_type', '')
+                                        )
+                                                        
+                                        # 重新打开URL
+                                        try:
+                                            logger.info(f"重新打开: {final_url}")
+                                            webbrowser.open(final_url)
+                                            self.log_to_gui(f"🔄 重新打开 ID={url_id}")
+                                        except Exception as e:
+                                            logger.error(f"重新打开 ID={url_id} 失败: {e}")
+                                                        
+                                        time.sleep(0.5)  # 重新打开时稍微延迟
+                                                
+                                # 重置等待时间，继续监听
+                                waited_time = 0
+                                self.log_to_gui(f"继续监听未完成页面...")
+                            else:
+                                # 所有未完成的都已经被强制标记
+                                self.log_to_gui("✅ 所有页面已处理完成（部分强制标记）")
+                                break
+                        else:
+                            # 超过最大重试次数，强制标记所有剩余的
+                            self.log_to_gui(f"⚠️ 已达到最大重试次数 ({max_retries})，强制标记剩余 {len(incomplete_ids)} 个页面")
+                            for url_id in incomplete_ids:
+                                mark_url_as_completed(url_id, db_config)
+                            break
+                                
                 # 如果用户停止或暂停，退出循环
                 if not self.running or self.paused:
                     break

@@ -126,7 +126,7 @@ def generate_random_name():
 
     last = random.choice(last_names)
     first = random.choice(first_names)
-    return last + first  # ✅ 修复：改为 姓+名 的顺序
+    return first + last  # ✅ 修复：改为 姓+名 的顺序
 
 def generate_sequential_id(start_id, index):
     """生成递增的ID，格式为3位数字（如 001, 002, ...）"""
@@ -157,6 +157,9 @@ def replace_dynamic_fields(request_body_str, dynamic_fields_str, start_id, index
             patient_id = generate_sequential_id(start_id, index)
             data[field] = patient_id
             current_patient_id = patient_id  # 记录当前ID
+            # ✅ 如果存在 orderNo 字段，也设置为相同的值
+            if "orderNo" in data:
+                data["orderNo"] = patient_id
         # 可扩展其他字段
 
     return json.dumps(data, ensure_ascii=False), current_patient_id
