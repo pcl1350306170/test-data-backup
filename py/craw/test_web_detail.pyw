@@ -578,6 +578,7 @@ class DeviceStressTestGUI:
                 max_wait_time = 60  # 单次等待最多60秒（1分钟）
                 max_retries = 3  # 最多重试3次
                 retry_count = 0
+                waited_time = 0  # ✅ 初始化等待时间
                                 
                 # 记录每个ID的重试次数
                 retry_tracker = {url_id: 0 for url_id in batch_ids}
