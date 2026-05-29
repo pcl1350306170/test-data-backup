@@ -43,7 +43,8 @@ DEFAULT_CONFIG = {
     "MAX_THREADS": 5,
     "RETRY_COUNT": 2,
     "SAVE_LOG_FILE": True,
-    "CROP_IMAGE": True  # 新增：是否裁剪图片
+    "CROP_IMAGE": True,  # 新增：是否裁剪图片
+    "SOURCE_FILTER": "%动漫%"  # source 过滤条件（支持 % 通配符）
 }
 
 # 需要跳过的图片文件名
@@ -260,7 +261,7 @@ def get_db_connection(db_config):
         return None
 
 
-def fetch_data(db_config):
+def fetch_data(db_config, source_filter="%动漫%"):
     """从数据库读取数据"""
     conn = get_db_connection(db_config)
     if not conn:
@@ -268,12 +269,12 @@ def fetch_data(db_config):
 
     try:
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute(
-            "SELECT uid, title, content, source FROM web_crawl_data WHERE is_deleted=0")
+        query = "SELECT uid, title, content, source FROM web_crawl_data WHERE is_deleted=0 AND source LIKE %s"
+        cursor.execute(query, (source_filter,))
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        logger.info(f"获取到 {len(rows)} 条待处理记录")
+        logger.info(f"获取到 {len(rows)} 条待处理记录 (source过滤: {source_filter})")
         return rows
     except Exception as e:
         logger.error(f"获取待处理数据失败: {e}")
@@ -427,6 +428,14 @@ class MultiImageDownloaderApp:
         ttk.Checkbutton(dl_frame, variable=self.crop_image_var).grid(
             row=2, column=3, sticky=tk.W, padx=5, pady=3)
 
+        ttk.Label(dl_frame, text="source过滤:").grid(
+            row=3, column=0, sticky=tk.W, pady=3)
+        self.source_filter_var = tk.StringVar(value=self.config.get("SOURCE_FILTER", "%动漫%"))
+        ttk.Entry(dl_frame, textvariable=self.source_filter_var,
+                  width=40).grid(row=3, column=1, columnspan=3, padx=5, pady=3, sticky=tk.W)
+        ttk.Label(dl_frame, text="(支持%通配符，例: %动漫%, %小说%)", 
+                  foreground="gray", font=("Arial", 8)).grid(row=4, column=0, columnspan=4, sticky=tk.W, padx=5)
+
         # === 状态显示 ===
         status_frame = ttk.Frame(main_frame)
         status_frame.pack(fill=tk.X, pady=5)
@@ -511,7 +520,8 @@ class MultiImageDownloaderApp:
             "MAX_THREADS": self.thread_count_var.get(),
             "RETRY_COUNT": self.retry_count_var.get(),
             "SAVE_LOG_FILE": self.save_log_var.get(),
-            "CROP_IMAGE": self.crop_image_var.get()
+            "CROP_IMAGE": self.crop_image_var.get(),
+            "SOURCE_FILTER": self.source_filter_var.get()
         }
         save_config(new_config)
 
@@ -561,9 +571,13 @@ class MultiImageDownloaderApp:
         }
 
         # 获取数据
-        rows = fetch_data(db_config)
+        source_filter = self.source_filter_var.get().strip()
+        if not source_filter:
+            source_filter = "%"  # 如果为空，匹配所有
+        
+        rows = fetch_data(db_config, source_filter)
         if not rows:
-            messagebox.showinfo("提示", "没有待处理的记录")
+            messagebox.showinfo("提示", f"没有待处理的记录 (source过滤: {source_filter})")
             self.reset_ui_state()
             return
 

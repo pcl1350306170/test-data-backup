@@ -8,5 +8,6 @@
   "MAX_THREADS": 5,
   "RETRY_COUNT": 2,
   "SAVE_LOG_FILE": true,
-  "CROP_IMAGE": true
+  "CROP_IMAGE": false,
+  "SOURCE_FILTER": "%动漫%"
 }

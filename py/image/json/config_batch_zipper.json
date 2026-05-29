@@ -1,10 +1,10 @@
 {
-  "source_dir": "D:/FILES/download/V33-IMG-鸥媚",
-  "output_dir": "D:/FILES/download/zip",
+  "source_dir": "D:/FILES/IMG/v33/oo",
+  "output_dir": "D:/FILES/download",
   "archive_format": "zip",
   "enable_password": true,
   "password": "1350306170",
-  "files_per_archive": 3600,
-  "archive_prefix": "v33-鸥媚-",
+  "files_per_archive": 3000,
+  "archive_prefix": "2026年5月28日",
   "seven_zip_path": "D:/TOOLS/7-Zip/7z.exe"
 }
