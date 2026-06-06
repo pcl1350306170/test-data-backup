@@ -1,13 +1,13 @@
 {
   "sort_method": "create_time",
-  "max_images": 600,
+  "max_images": 800,
   "max_chapter_size": 200,
   "cover_width": 801,
   "cover_height": 1201,
   "remove_chapter_marks": true,
-  "default_cover_dir": "D:\\FILES\\HHQQ-2026年3月16日\\Ebook\\封面",
-  "default_output_dir": "D:\\FILES\\HHQQ-2026年3月16日\\Ebook\\epub",
-  "custom_filename": "小俊定制",
+  "default_cover_dir": "D:\\FILES\\IMG\\v33\\HHQQ-2026年3月16日\\Ebook\\封面",
+  "default_output_dir": "D:\\FILES\\IMG\\v33\\HHQQ-2026年3月16日\\Ebook\\epub",
+  "custom_filename": "媽嫦5",
   "use_custom_filename": true,
-  "last_used": "2026-04-13 13:18:43"
+  "last_used": "2026-06-04 17:03:28"
 }

@@ -1,10 +1,10 @@
 {
-  "project_dir": "D:/CODE/Yarward/门诊/template1.5.6",
-  "output_dir": "D:/CODE/Yarward/SVN/0门诊/2026-0783乐山市市中区人民医院/前端",
-  "order_info": "2026-0783乐山市市中区人民医院",
-  "project_version": "1.5.6",
-  "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-0783乐山市市中区人民医院/前端/YM-801S-TLSS-V1.5.6.260783.01001-LSSSZQRMYY-FE.zip",
+  "project_dir": "D:/CODE/Yarward/门诊/template1.5.2",
+  "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-1015沛县中医院\\前端",
+  "order_info": "2026-1015沛县中医院",
+  "project_version": "1.5.2",
+  "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-1015沛县中医院/前端/YM-801S-TLSS-V1.5.2.261015.01001-PXZYY-FE.zip",
   "custom_zip_name": "",
   "auto_commit_svn": false,
-  "is_version_155_plus": true
+  "is_version_155_plus": false
 }

@@ -30,7 +30,10 @@ class TxtReplacerApp:
             "last_output_dir": "",
             "use_json": True,
             "use_db": True,
-            "clean_chapter_titles": True  # ✅ 新增：是否清理章节标题
+            "clean_chapter_titles": True,  # ✅ 新增：是否清理章节标题
+            "remove_empty_lines": False,     # ✅ 新增：是否清除空换行
+            "remove_duplicate_lines": False,  # ✅ 新增：是否清除重复行
+            "filter_bracket_lines": False     # ✅ 新增：是否过滤括号行
         }
 
         # 数据存储
@@ -93,25 +96,40 @@ class TxtReplacerApp:
 
         # ✅ 新增：是否清理章节标题
         self.clean_chapters = tk.BooleanVar(value=self.config["clean_chapter_titles"])
-        ttk.Checkbutton(settings_frame, text="清理文本目录（删除包含“第X章”的行）", variable=self.clean_chapters).grid(
+        ttk.Checkbutton(settings_frame, text="清理文本目录（删除包含'第X章'的行）", variable=self.clean_chapters).grid(
             row=2, column=0, sticky=tk.W, padx=5, pady=5)
+        
+        # ✅ 新增：是否清除空换行
+        self.remove_empty = tk.BooleanVar(value=self.config["remove_empty_lines"])
+        ttk.Checkbutton(settings_frame, text="清除空换行（删除空白行）", variable=self.remove_empty).grid(
+            row=3, column=0, sticky=tk.W, padx=5, pady=5)
+        
+        # ✅ 新增：是否清除重复行
+        self.remove_duplicates = tk.BooleanVar(value=self.config["remove_duplicate_lines"])
+        ttk.Checkbutton(settings_frame, text="清除重复行（删除内容完全相同的行）", variable=self.remove_duplicates).grid(
+            row=4, column=0, sticky=tk.W, padx=5, pady=5)
+        
+        # ✅ 新增：是否过滤括号行
+        self.filter_brackets = tk.BooleanVar(value=self.config["filter_bracket_lines"])
+        ttk.Checkbutton(settings_frame, text="过滤括号行（删除被括号完全包裹的行）", variable=self.filter_brackets).grid(
+            row=5, column=0, sticky=tk.W, padx=5, pady=5)
 
         # 数据库连接测试
         ttk.Button(settings_frame, text="测试数据库连接", command=self.test_db_connection).grid(
-            row=3, column=0, padx=5, pady=10, sticky=tk.W)
+            row=6, column=0, padx=5, pady=10, sticky=tk.W)
 
         # JSON替换规则预览
         ttk.Label(settings_frame, text="JSON替换规则预览:").grid(
-            row=4, column=0, sticky=tk.NW, padx=5, pady=5)
+            row=7, column=0, sticky=tk.NW, padx=5, pady=5)
         self.json_preview = tk.Text(settings_frame, height=10, width=60)
-        self.json_preview.grid(row=5, column=0, padx=5, pady=5)
+        self.json_preview.grid(row=8, column=0, padx=5, pady=5)
         self.json_preview.config(state=tk.DISABLED)
 
         # 数据库替换规则预览
         ttk.Label(settings_frame, text="数据库替换规则预览:").grid(
-            row=6, column=0, sticky=tk.NW, padx=5, pady=5)
+            row=9, column=0, sticky=tk.NW, padx=5, pady=5)
         self.db_preview = tk.Text(settings_frame, height=10, width=60)
-        self.db_preview.grid(row=7, column=0, padx=5, pady=5)
+        self.db_preview.grid(row=10, column=0, padx=5, pady=5)
         self.db_preview.config(state=tk.DISABLED)
 
         # 3. 日志标签页
@@ -335,7 +353,10 @@ class TxtReplacerApp:
                 "last_output_dir": self.output_dir_var.get(),
                 "use_json": self.use_json.get(),
                 "use_db": self.use_db.get(),
-                "clean_chapter_titles": self.clean_chapters.get()  # ✅ 保存章节清理选项
+                "clean_chapter_titles": self.clean_chapters.get(),  # ✅ 保存章节清理选项
+                "remove_empty_lines": self.remove_empty.get(),       # ✅ 保存空行清理选项
+                "remove_duplicate_lines": self.remove_duplicates.get(),  # ✅ 保存重复行清理选项
+                "filter_bracket_lines": self.filter_brackets.get()  # ✅ 保存括号行过滤选项
             }
 
             with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -389,6 +410,95 @@ class TxtReplacerApp:
 
         if removed_count > 0:
             self.log(f"  - 共删除 {removed_count} 行章节标题")
+
+        return '\n'.join(cleaned_lines), removed_count
+
+    def remove_empty_lines(self, content):
+        """清除空换行（删除空白行）"""
+        lines = content.splitlines()
+        cleaned_lines = []
+        removed_count = 0
+
+        for line in lines:
+            if line.strip():  # 如果行不为空（去除空白后仍有内容）
+                cleaned_lines.append(line)
+            else:
+                removed_count += 1
+
+        if removed_count > 0:
+            self.log(f"  - 共删除 {removed_count} 个空行")
+
+        return '\n'.join(cleaned_lines), removed_count
+
+    def remove_duplicate_lines(self, content):
+        """清除重复行（删除内容完全相同的行，保留第一次出现的）"""
+        lines = content.splitlines()
+        seen_lines = set()  # 用于记录已出现的行
+        cleaned_lines = []
+        removed_count = 0
+
+        for line in lines:
+            line_stripped = line.strip()
+            if line_stripped and line_stripped not in seen_lines:  # 非空且未出现过
+                seen_lines.add(line_stripped)
+                cleaned_lines.append(line)
+            elif not line_stripped:  # 空行直接保留（由清除空换行功能处理）
+                cleaned_lines.append(line)
+            else:  # 重复行
+                removed_count += 1
+
+        if removed_count > 0:
+            self.log(f"  - 共删除 {removed_count} 个重复行")
+
+        return '\n'.join(cleaned_lines), removed_count
+
+    def filter_bracket_lines(self, content):
+        """过滤括号行（删除被括号完全包裹的行）
+        支持的括号类型：
+        - 英文括号: () [] {}
+        - 中文括号: （）【】{}《》「」『』
+        """
+        # 定义括号对（左括号 -> 右括号）
+        bracket_pairs = {
+            '(': ')',   # 英文圆括号
+            '[': ']',   # 英文方括号
+            '{': '}',   # 英文花括号
+            '（': '）', # 中文圆括号
+            '【': '】', # 中文方括号
+            '《': '》', # 中文书名号
+            '「': '」', # 中文直角引号（单）
+            '『': '』', # 中文直角引号（双）
+        }
+        
+        lines = content.splitlines()
+        cleaned_lines = []
+        removed_count = 0
+
+        for line in lines:
+            line_stripped = line.strip()
+            is_bracket_line = False
+            
+            # 检查是否为空行
+            if not line_stripped:
+                cleaned_lines.append(line)
+                continue
+            
+            # 检查是否被任何一对括号完全包裹
+            for left_bracket, right_bracket in bracket_pairs.items():
+                if (line_stripped.startswith(left_bracket) and 
+                    line_stripped.endswith(right_bracket) and 
+                    len(line_stripped) >= 2):  # 至少包含一对括号
+                    is_bracket_line = True
+                    break
+            
+            if is_bracket_line:
+                self.log(f"  - 删除括号行: {line_stripped[:50]}...")
+                removed_count += 1
+            else:
+                cleaned_lines.append(line)
+
+        if removed_count > 0:
+            self.log(f"  - 共删除 {removed_count} 个括号行")
 
         return '\n'.join(cleaned_lines), removed_count
 
@@ -446,6 +556,24 @@ class TxtReplacerApp:
                 after_clean_line_count = len(content.splitlines())
                 self.log(f"  - 清理后行数: {after_clean_line_count}（删除 {removed_lines} 行）")
 
+            # ✅ 新增：清除空换行（如果启用）
+            if self.remove_empty.get():
+                content, removed_empty = self.remove_empty_lines(content)
+                after_remove_line_count = len(content.splitlines())
+                self.log(f"  - 清除空行后行数: {after_remove_line_count}（删除 {removed_empty} 个空行）")
+
+            # ✅ 新增：清除重复行（如果启用）
+            if self.remove_duplicates.get():
+                content, removed_duplicates = self.remove_duplicate_lines(content)
+                after_duplicate_line_count = len(content.splitlines())
+                self.log(f"  - 清除重复行后行数: {after_duplicate_line_count}（删除 {removed_duplicates} 个重复行）")
+
+            # ✅ 新增：过滤括号行（如果启用）
+            if self.filter_brackets.get():
+                content, removed_brackets = self.filter_bracket_lines(content)
+                after_bracket_line_count = len(content.splitlines())
+                self.log(f"  - 过滤括号行后行数: {after_bracket_line_count}（删除 {removed_brackets} 个括号行）")
+
             # 替换内容
             new_content, count = self.replace_text_content(content)
 
@@ -478,8 +606,8 @@ class TxtReplacerApp:
         if self.use_db.get():
             active_rules.update(self.db_replacements)
 
-        if not active_rules and not self.clean_chapters.get():
-            if messagebox.askyesno("确认", "没有启用任何替换规则或章节清理，是否继续?"):
+        if not active_rules and not self.clean_chapters.get() and not self.remove_empty.get() and not self.remove_duplicates.get() and not self.filter_brackets.get():
+            if messagebox.askyesno("确认", "没有启用任何替换规则、章节清理、空行清理、重复行清理或括号行过滤，是否继续?"):
                 self.log("没有启用替换规则或章节清理，直接复制文件")
             else:
                 return

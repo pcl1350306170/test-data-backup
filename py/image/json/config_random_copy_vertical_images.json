@@ -1,7 +1,8 @@
 {
-  "source_dir": "E:/图片/v33/写真",
-  "target_dir": "D:/FILES/HHQQ-2026年3月16日/Ebook/封面",
-  "copy_count": 600,
-  "random_skip_rate": 0.5,
-  "max_per_subdir": 600
+  "source_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/V33-IMG-AI_batch_002",
+  "target_dir": "D:\\FILES\\IMG\\v33\\HHQQ-2026年3月16日\\Ebook\\封面",
+  "copy_count": 800,
+  "random_skip_rate": 0.4364516129032258,
+  "max_per_subdir": 600,
+  "is_cut": true
 }

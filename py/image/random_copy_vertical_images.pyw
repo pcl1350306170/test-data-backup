@@ -30,7 +30,8 @@ class ImageCopyApp:
             "target_dir": "",
             "copy_count": 60,
             "random_skip_rate": 0.5,
-            "max_per_subdir": 2  # 新增：每个子目录最多选取的图片数
+            "max_per_subdir": 2,
+            "is_cut": False
         }
 
         # 加载配置
@@ -82,9 +83,13 @@ class ImageCopyApp:
         self.skip_rate_label.grid(row=4, column=2, padx=5)
         self.skip_rate_var.trace_add("write", self.update_skip_rate_label)
 
+        # 是否剪切图片
+        self.is_cut_var = tk.BooleanVar(value=self.config["is_cut"])
+        ttk.Checkbutton(frame_main, text="是否剪切图片", variable=self.is_cut_var).grid(row=5, column=0, columnspan=2, sticky=tk.W, pady=5)
+
         # 操作按钮
         button_frame = ttk.Frame(frame_main)
-        button_frame.grid(row=5, column=0, columnspan=3, pady=20)
+        button_frame.grid(row=6, column=0, columnspan=3, pady=20)
 
         ttk.Button(button_frame, text="保存配置", command=self.save_config).pack(side=tk.LEFT, padx=10)
         ttk.Button(button_frame, text="清除历史", command=self.clear_history).pack(side=tk.LEFT, padx=10)
@@ -128,7 +133,8 @@ class ImageCopyApp:
                 "target_dir": self.target_dir_var.get(),
                 "copy_count": self.copy_count_var.get(),
                 "random_skip_rate": self.skip_rate_var.get(),
-                "max_per_subdir": self.max_per_subdir_var.get()
+                "max_per_subdir": self.max_per_subdir_var.get(),
+                "is_cut": self.is_cut_var.get()
             }
 
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
@@ -221,8 +227,9 @@ class ImageCopyApp:
                     continue
 
                 full_path = os.path.join(subdir_path, file)
-                # 检查是否已复制过
-                if full_path in self.history:
+                
+                # ✅ 修改：只检查文件名是否已复制过（图片名都是不重复的）
+                if file in self.history:
                     continue
 
                 # 检查是否为垂直图片
@@ -286,22 +293,30 @@ class ImageCopyApp:
             os.makedirs(target_dir, exist_ok=True)
 
             for img_path in selected:
-                dest_path = os.path.join(target_dir, os.path.basename(img_path))
+                filename = os.path.basename(img_path)
+                dest_path = os.path.join(target_dir, filename)
                 # 处理重名文件
                 counter = 1
                 while os.path.exists(dest_path):
-                    name, ext = os.path.splitext(os.path.basename(img_path))
+                    name, ext = os.path.splitext(filename)
                     dest_path = os.path.join(target_dir, f"{name}_{counter}{ext}")
                     counter += 1
 
-                shutil.copy2(img_path, dest_path)
-                self.history.add(img_path)
-                self.log(f"已复制: {os.path.basename(img_path)}")
+                if self.is_cut_var.get():
+                    shutil.move(img_path, dest_path)
+                    self.log(f"已剪切: {filename}")
+                else:
+                    shutil.copy2(img_path, dest_path)
+                    self.log(f"已复制: {filename}")
+                
+                # ✅ 修改：只保存图片名到历史记录（图片名都是不重复的）
+                self.history.add(filename)
 
             self.save_history()
-            self.log(f"✅ 复制完成，共复制 {len(selected)} 张图片")
+            operation = "剪切" if self.is_cut_var.get() else "复制"
+            self.log(f"✅ {operation}完成，共{operation} {len(selected)} 张图片")
             self.log(f"📁 目标目录: {target_dir}")
-            messagebox.showinfo("成功", f"复制完成，共复制 {len(selected)} 张图片到 {target_dir}")
+            messagebox.showinfo("成功", f"{operation}完成，共{operation} {len(selected)} 张图片到 {target_dir}")
         except Exception as e:
             self.log(f"复制过程出错: {str(e)}")
             messagebox.showerror("错误", f"复制过程出错: {str(e)}")

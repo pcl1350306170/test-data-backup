@@ -26,7 +26,8 @@ SUPPORTED_FORMATS = {
     "PNG": ".png",
     "BMP": ".bmp",
     "GIF": ".gif",
-    "WEBP": ".webp"
+    "WEBP": ".webp",
+    "ICO": ".ico"
 }
 
 class ImageFormatConverter:
@@ -222,8 +223,22 @@ class ImageFormatConverter:
                     # 特殊处理透明通道（PNG转JPG时）
                     if output_format == "JPEG" and img.mode in ("RGBA", "P"):
                         img = img.convert("RGB")
-
-                    img.save(output_path, format=output_format)
+                    
+                    # 特殊处理 ICO 格式
+                    if output_format == "ICO":
+                        # ICO 格式需要调整尺寸（最大 256x256）
+                        max_size = 256
+                        if img.width > max_size or img.height > max_size:
+                            img.thumbnail((max_size, max_size), Image.LANCZOS)
+                        
+                        # 确保有 alpha 通道以支持透明度
+                        if img.mode != "RGBA":
+                            img = img.convert("RGBA")
+                        
+                        # 保存为 ICO 格式，可以包含多个尺寸
+                        img.save(output_path, format="ICO", sizes=[(img.width, img.height)])
+                    else:
+                        img.save(output_path, format=output_format)
 
                 success_count += 1
                 self.update_status(f"成功: {os.path.basename(file_path)} → {os.path.basename(output_path)}")

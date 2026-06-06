@@ -17,17 +17,19 @@ function exportLocalStorageAndToken() {
 }
 exportLocalStorageAndToken();
 
+1-1×2
 
 AI播客-猫和老鼠-
 
 
-帮我记忆单词【 pearlescent 】
+帮我记忆单词【 release 】
+
+以后我给你发单个单词，没有特殊要求的话，就给我按以下方式处理：
 简单翻译，标注词性
 拆分词根组成，并分析解释
-然后列出相同词根、或者长得像的常用单词，尽量全面（不要列举这个单词的过去式、进行式、复数等），并提供音标和解释，没有就算了,列出的单词放在表格里，
-表头分别是【单词、音标、词性（放在同一个格子里面，第一行单词，第二行音标，第三行词性）】【来源】【释义】【使用关联说明】
-提供3个例句，可以贴近程序员，互联网技术，或者主流使用方式，也可以获取当下时事新闻介绍等，6句话以内，带翻译（能翻译的都给翻译了，里面尽量不要带着英文）
-不要一句话记忆锚点
+基于这个单词，可以延伸出哪些单词，哪些和他同义的词，列举一下
+提供3个例句【内容是日常、工作、互联网技术】，10句话以内，带翻译
+
 
 
 使用“ consistency ”造3个例句，长度是1-4句话，
@@ -636,7 +638,7 @@ https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main
 
 https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/Chrome/门诊web调试页面加载 Chrome 扩展.zip
 
-
+https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/背景/劳斯莱斯.jpg
 
 [密码jd]
 
