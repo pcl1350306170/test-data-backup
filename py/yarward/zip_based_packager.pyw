@@ -487,7 +487,7 @@ class ZipBasedPackagerApp:
             self._log(f"处理基础压缩包时出错: {str(e)}", logging.ERROR)
 
     def _add_to_history(self):
-        """添加当前打包配置到历史记录"""
+        """添加当前打包配置到历史记录（按订单信息去重）"""
         record = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "project_dir": self.project_dir.get(),
@@ -500,7 +500,14 @@ class ZipBasedPackagerApp:
             "is_version_155_plus": self.is_version_155_plus.get()
         }
         
-        # 添加到历史记录开头
+        # ✅ 新增：按订单信息去重，删除旧的同名记录
+        order_info = self.order_info.get()
+        self.history_records = [
+            r for r in self.history_records 
+            if r['order_info'] != order_info
+        ]
+        
+        # 添加到历史记录开头（最新）
         self.history_records.insert(0, record)
         
         # 只保留最近10条
@@ -513,7 +520,7 @@ class ZipBasedPackagerApp:
         # 保存到配置文件
         self._save_config()
         
-        self._log(f"✅ 已添加到历史记录（当前共 {len(self.history_records)} 条）")
+        self._log(f"✅ 已添加到历史记录（当前共 {len(self.history_records)} 条，已去重）")
     
     def _refresh_history_listbox(self):
         """刷新历史记录列表框"""

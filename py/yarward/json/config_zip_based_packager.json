@@ -1,13 +1,35 @@
 {
-  "project_dir": "D:/CODE/Yarward/门诊/template1.5.0",
-  "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-0931上饶市人民医院-前端",
-  "order_info": "2026-0931上饶市人民医院",
-  "project_version": "1.5.1",
-  "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-0931上饶市人民医院-前端/YM-801S-TLSS-V1.5.1.260931.01001-SRSRMYY-FE.zip",
+  "project_dir": "D:/CODE/Yarward/门诊/template1.5.6",
+  "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-0989临沂市妇幼保健院\\前端",
+  "order_info": "2026-0989临沂市妇幼保健院",
+  "project_version": "1.5.6",
+  "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-0989临沂市妇幼保健院/前端/YM-801S-TLSS-V1.5.6.260989.01001-LYSFYBJY-FE.zip",
   "custom_zip_name": "",
-  "auto_commit_svn": false,
-  "is_version_155_plus": false,
+  "auto_commit_svn": true,
+  "is_version_155_plus": true,
   "history_records": [
+    {
+      "timestamp": "2026-06-09 19:41:57",
+      "project_dir": "D:/CODE/Yarward/门诊/template1.5.6",
+      "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-0989临沂市妇幼保健院\\前端",
+      "order_info": "2026-0989临沂市妇幼保健院",
+      "project_version": "1.5.6",
+      "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-0989临沂市妇幼保健院/前端/YM-801S-TLSS-V1.5.6.260989.01001-LYSFYBJY-FE.zip",
+      "custom_zip_name": "",
+      "auto_commit_svn": true,
+      "is_version_155_plus": true
+    },
+    {
+      "timestamp": "2026-06-08 15:10:40",
+      "project_dir": "D:/CODE/Yarward/门诊/template1.5.6",
+      "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-1032西乡县新东方医院\\前端",
+      "order_info": "2026-1032西乡县新东方医院",
+      "project_version": "1.5.6",
+      "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-1032西乡县新东方医院/前端/YM-801S-TLSS-V1.5.6.260802.01001-XXXXDFYY-FE.zip",
+      "custom_zip_name": "",
+      "auto_commit_svn": false,
+      "is_version_155_plus": true
+    },
     {
       "timestamp": "2026-06-08 11:26:29",
       "project_dir": "D:/CODE/Yarward/门诊/template1.5.0",
