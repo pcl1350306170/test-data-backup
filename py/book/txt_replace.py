@@ -33,7 +33,8 @@ class TxtReplacerApp:
             "clean_chapter_titles": True,  # ✅ 新增：是否清理章节标题
             "remove_empty_lines": False,     # ✅ 新增：是否清除空换行
             "remove_duplicate_lines": False,  # ✅ 新增：是否清除重复行
-            "filter_bracket_lines": False     # ✅ 新增：是否过滤括号行
+            "filter_bracket_lines": False,    # ✅ 新增：是否过滤括号行
+            "replace_spaces": False           # ✅ 新增：是否替换空格（删除所有空格）
         }
 
         # 数据存储
@@ -113,6 +114,11 @@ class TxtReplacerApp:
         self.filter_brackets = tk.BooleanVar(value=self.config["filter_bracket_lines"])
         ttk.Checkbutton(settings_frame, text="过滤括号行（删除被括号完全包裹的行）", variable=self.filter_brackets).grid(
             row=5, column=0, sticky=tk.W, padx=5, pady=5)
+        
+        # ✅ 新增：是否替换空格
+        self.replace_spaces = tk.BooleanVar(value=self.config["replace_spaces"])
+        ttk.Checkbutton(settings_frame, text="替换空格（删除TXT文件中所有空格）", variable=self.replace_spaces).grid(
+            row=6, column=0, sticky=tk.W, padx=5, pady=5)
 
         # 数据库连接测试
         ttk.Button(settings_frame, text="测试数据库连接", command=self.test_db_connection).grid(
@@ -356,7 +362,8 @@ class TxtReplacerApp:
                 "clean_chapter_titles": self.clean_chapters.get(),  # ✅ 保存章节清理选项
                 "remove_empty_lines": self.remove_empty.get(),       # ✅ 保存空行清理选项
                 "remove_duplicate_lines": self.remove_duplicates.get(),  # ✅ 保存重复行清理选项
-                "filter_bracket_lines": self.filter_brackets.get()  # ✅ 保存括号行过滤选项
+                "filter_bracket_lines": self.filter_brackets.get(),  # ✅ 保存括号行过滤选项
+                "replace_spaces": self.replace_spaces.get()          # ✅ 保存空格替换选项
             }
 
             with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -467,22 +474,22 @@ class TxtReplacerApp:
             '【': '】', # 中文方括号
             '《': '》', # 中文书名号
             '「': '」', # 中文直角引号（单）
-            '『': '』', # 中文直角引号（双）
+            '『': '』', # 中文直角引号（双）,
         }
-        
+            
         lines = content.splitlines()
         cleaned_lines = []
         removed_count = 0
-
+    
         for line in lines:
             line_stripped = line.strip()
             is_bracket_line = False
-            
+                
             # 检查是否为空行
             if not line_stripped:
                 cleaned_lines.append(line)
                 continue
-            
+                
             # 检查是否被任何一对括号完全包裹
             for left_bracket, right_bracket in bracket_pairs.items():
                 if (line_stripped.startswith(left_bracket) and 
@@ -490,17 +497,27 @@ class TxtReplacerApp:
                     len(line_stripped) >= 2):  # 至少包含一对括号
                     is_bracket_line = True
                     break
-            
+                
             if is_bracket_line:
                 self.log(f"  - 删除括号行: {line_stripped[:50]}...")
                 removed_count += 1
             else:
                 cleaned_lines.append(line)
-
+    
         if removed_count > 0:
             self.log(f"  - 共删除 {removed_count} 个括号行")
-
+    
         return '\n'.join(cleaned_lines), removed_count
+        
+    def replace_spaces(self, content):
+        """替换空格（删除所有空格字符）"""
+        original_count = content.count(' ')
+        new_content = content.replace(' ', '')
+            
+        if original_count > 0:
+            self.log(f"  - 共删除 {original_count} 个空格")
+            
+        return new_content, original_count
 
     def replace_text_content(self, content):
         """替换文本内容（合并JSON和数据库规则）"""
@@ -573,6 +590,11 @@ class TxtReplacerApp:
                 content, removed_brackets = self.filter_bracket_lines(content)
                 after_bracket_line_count = len(content.splitlines())
                 self.log(f"  - 过滤括号行后行数: {after_bracket_line_count}（删除 {removed_brackets} 个括号行）")
+            
+            # ✅ 新增：替换空格（如果启用）
+            if self.replace_spaces.get():
+                content, removed_spaces = self.replace_spaces(content)
+                self.log(f"  - 已删除所有空格（共 {removed_spaces} 个）")
 
             # 替换内容
             new_content, count = self.replace_text_content(content)
@@ -606,7 +628,7 @@ class TxtReplacerApp:
         if self.use_db.get():
             active_rules.update(self.db_replacements)
 
-        if not active_rules and not self.clean_chapters.get() and not self.remove_empty.get() and not self.remove_duplicates.get() and not self.filter_brackets.get():
+        if not active_rules and not self.clean_chapters.get() and not self.remove_empty.get() and not self.remove_duplicates.get() and not self.filter_brackets.get() and not self.replace_spaces.get():
             if messagebox.askyesno("确认", "没有启用任何替换规则、章节清理、空行清理、重复行清理或括号行过滤，是否继续?"):
                 self.log("没有启用替换规则或章节清理，直接复制文件")
             else:
