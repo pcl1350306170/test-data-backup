@@ -10,6 +10,7 @@ import string
 from pathlib import Path
 from tkinter import *
 from tkinter import filedialog, messagebox, ttk, scrolledtext
+from datetime import datetime
 
 # ==============================
 # 配置与常量
@@ -149,6 +150,13 @@ def replace_dynamic_fields(request_body_str, dynamic_fields_str, start_id, index
     fields = [f.strip() for f in dynamic_fields_str.split(',')]
     
     current_patient_id = None  # 记录本次使用的patientIdNo
+    
+    # ✅ 新增：自动替换时间为当前时间
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if "registerTime" in data:
+        data["registerTime"] = current_time
+    if "signTime" in data:
+        data["signTime"] = current_time
 
     for field in fields:
         if field == "patientName":
