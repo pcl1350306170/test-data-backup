@@ -6,6 +6,7 @@ import subprocess
 import json
 import logging
 from pathlib import Path
+import platform
 
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout,
@@ -41,8 +42,9 @@ DEFAULT_CONFIG = {
     "onefile": True,
     "windowed": True,
     "icon_path": "",
-    "dist_path": str(SCRIPT_DIR / "dist"),
-    "work_path": str(SCRIPT_DIR / "build")
+    "output_path": str(SCRIPT_DIR / "output"),
+    "dist_path": "",
+    "work_path": ""
 }
 
 # ========================
@@ -77,11 +79,12 @@ def save_config(config):
 # ========================
 class PackagerThread(QThread):
     output_signal = pyqtSignal(str)
-    finished_signal = pyqtSignal(bool, str)
+    finished_signal = pyqtSignal(bool, str, str)  # ✅ 新增第三个参数: 输出目录路径
 
-    def __init__(self, cmd):
+    def __init__(self, cmd, dist_path):
         super().__init__()
         self.cmd = cmd
+        self.dist_path = dist_path
 
     def run(self):
         try:
@@ -99,11 +102,11 @@ class PackagerThread(QThread):
             self.output_signal.emit(output)
             success = result.returncode == 0
             msg = "打包成功！" if success else "打包失败，请查看日志。"
-            self.finished_signal.emit(success, msg)
+            self.finished_signal.emit(success, msg, self.dist_path)
         except Exception as e:
             error_msg = f"异常: {str(e)}"
             self.output_signal.emit(error_msg)
-            self.finished_signal.emit(False, error_msg)
+            self.finished_signal.emit(False, error_msg, self.dist_path)
 
 # ========================
 # 主窗口
@@ -141,6 +144,16 @@ class PackerGUI(QWidget):
         icon_layout.addWidget(icon_btn)
         layout.addLayout(icon_layout)
 
+        # ✅ 新增：输出目录选择
+        output_layout = QHBoxLayout()
+        self.output_input = QLineEdit()
+        output_btn = QPushButton("选择输出目录")
+        output_btn.clicked.connect(self.select_output_dir)
+        output_layout.addWidget(QLabel("输出目录:"))
+        output_layout.addWidget(self.output_input)
+        output_layout.addWidget(output_btn)
+        layout.addLayout(output_layout)
+
         # 选项
         self.onefile_cb = QCheckBox("--onefile (单文件)")
         self.windowed_cb = QCheckBox("--windowed (无控制台)")
@@ -177,20 +190,30 @@ class PackerGUI(QWidget):
         if path:
             self.icon_input.setText(path)
 
+    def select_output_dir(self):
+        path = QFileDialog.getExistingDirectory(self, "选择打包输出目录", "")
+        if path:
+            self.output_input.setText(path)
+
     def load_config_to_ui(self):
         self.script_input.setText(self.config.get("script_path", ""))
         self.icon_input.setText(self.config.get("icon_path", ""))
+        self.output_input.setText(self.config.get("output_path", str(SCRIPT_DIR / "output")))
         self.onefile_cb.setChecked(self.config.get("onefile", True))
         self.windowed_cb.setChecked(self.config.get("windowed", True))
 
     def get_config_from_ui(self):
+        output_path = self.output_input.text().strip()
+        if not output_path:
+            output_path = str(SCRIPT_DIR / "output")
         return {
             "script_path": self.script_input.text().strip(),
             "icon_path": self.icon_input.text().strip(),
+            "output_path": output_path,
             "onefile": self.onefile_cb.isChecked(),
             "windowed": self.windowed_cb.isChecked(),
-            "dist_path": str(SCRIPT_DIR / "dist"),
-            "work_path": str(SCRIPT_DIR / "build")
+            "dist_path": os.path.join(output_path, "dist"),
+            "work_path": os.path.join(output_path, "build")
         }
 
     def save_config_only(self):
@@ -224,8 +247,8 @@ class PackerGUI(QWidget):
         self.log_text.clear()
         self.log_text.append("开始打包...\n")
 
-        # 启动线程
-        self.thread = PackagerThread(cmd)
+        # 启动线程（传递dist_path用于打包完成后打开目录）
+        self.thread = PackagerThread(cmd, config["dist_path"])
         self.thread.output_signal.connect(self.append_log)
         self.thread.finished_signal.connect(self.on_pack_finished)
         self.thread.start()
@@ -233,10 +256,28 @@ class PackerGUI(QWidget):
     def append_log(self, text):
         self.log_text.append(text)
 
-    def on_pack_finished(self, success, msg):
+    def on_pack_finished(self, success, msg, dist_path):
         self.pack_btn.setEnabled(True)
         QMessageBox.information(self, "打包完成", msg)
         logger.info(f"打包结束: {'成功' if success else '失败'}")
+        # ✅ 打包成功后自动打开输出目录
+        if success and dist_path and os.path.isdir(dist_path):
+            self.log_text.append(f"\n打开输出目录: {dist_path}\n")
+            self._open_directory(dist_path)
+
+    def _open_directory(self, path):
+        """跨平台打开目录"""
+        try:
+            system = platform.system()
+            if system == "Windows":
+                os.startfile(path)
+            elif system == "Darwin":  # macOS
+                subprocess.run(["open", path])
+            else:  # Linux
+                subprocess.run(["xdg-open", path])
+            logger.info(f"已打开目录: {path}")
+        except Exception as e:
+            logger.error(f"打开目录失败: {e}")
 
 # ========================
 # 主程序

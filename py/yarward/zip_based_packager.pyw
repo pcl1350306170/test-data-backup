@@ -6,6 +6,8 @@ import json
 import platform
 import zipfile
 import shutil
+import urllib.request
+import urllib.error
 from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
@@ -48,18 +50,20 @@ DEFAULT_CONFIG = {
     "order_info": "2025-1987南昌市立医院新院区",
     "project_version": "1.5.1",
     "base_zip_path": r"C:\www\test\门诊\801S-订单\前端\1.5.1.zip",
-    "custom_zip_name": "",  # ← 新增：自定义ZIP名称
-    "auto_commit_svn": True,  # ← 新增：是否自动提交SVN
-    "is_version_155_plus": False,  # ✅ 新增：是否是1.5.5以上版本
-    "history_records": []  # ✅ 新增：打包历史记录（最多10条）
+    "custom_zip_name": "",
+    "auto_commit_svn": True,
+    "is_version_155_plus": False,
+    "history_records": [],
+    "enable_wechat_notify": False,   # ✅ 新增：是否启用企业微信通知
+    "wechat_webhook": ""              # ✅ 新增：企业微信 Webhook 地址
 }
 
 class ZipBasedPackagerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("📦 基于压缩包的打包工具")
-        self.root.geometry("900x850")  # ✅ 增加高度以显示历史记录区域
-        self.root.minsize(800, 850)  # ✅ 增加最小高度
+        self.root.geometry("900x1000")
+        self.root.minsize(800, 750)
 
         # 初始化变量
         self.project_dir = tk.StringVar()
@@ -68,10 +72,12 @@ class ZipBasedPackagerApp:
         self.project_version = tk.StringVar()
         self.base_zip_path = tk.StringVar()
         self.custom_zip_name = tk.StringVar()
-        self.auto_commit_svn = tk.BooleanVar(value=True)  # ← 新增：SVN自动提交开关
-        self.is_version_155_plus = tk.BooleanVar(value=False)  # ✅ 新增：1.5.5以上版本开关
+        self.auto_commit_svn = tk.BooleanVar(value=True)
+        self.is_version_155_plus = tk.BooleanVar(value=False)
+        self.enable_wechat_notify = tk.BooleanVar(value=False)  # ✅ 新增：企业微信通知开关
+        self.wechat_webhook = tk.StringVar()                     # ✅ 新增：Webhook 地址
         self.is_packaging = False
-        self.history_records = []  # ✅ 新增：历史记录数据
+        self.history_records = []
 
         # 创建UI
         self._create_widgets()
@@ -386,6 +392,9 @@ class ZipBasedPackagerApp:
                 if self.auto_commit_svn.get():
                     self._commit_to_svn(new_zip_path)
                 
+                # ✅ 新增：发送企业微信通知
+                self._send_wechat_notify(new_zip_name)
+                
                 self._log("🎉 打包完成！")
 
         except Exception as e:
@@ -481,6 +490,9 @@ class ZipBasedPackagerApp:
                 if self.auto_commit_svn.get():
                     self._commit_to_svn(new_zip_path)
                 
+                # ✅ 新增：发送企业微信通知
+                self._send_wechat_notify(new_zip_name)
+                
                 self._log("🎉 打包完成！")
 
         except Exception as e:
@@ -531,7 +543,7 @@ class ZipBasedPackagerApp:
             self.history_listbox.insert(tk.END, display_text)
     
     def _load_history_record(self, event=None):
-        """加载选中的历史记录"""
+        """加载选中的历史记录（双击时直接加载并开始打包）"""
         selection = self.history_listbox.curselection()
         if not selection:
             return
@@ -540,28 +552,20 @@ class ZipBasedPackagerApp:
         if 0 <= index < len(self.history_records):
             record = self.history_records[index]
             
-            # 确认是否加载
-            confirm = messagebox.askyesno(
-                "确认加载历史记录",
-                f"是否加载以下历史记录？\n\n"
-                f"时间: {record['timestamp']}\n"
-                f"订单: {record['order_info']}\n"
-                f"版本: {record['project_version']}\n\n"
-                f"这将覆盖当前的所有配置项。"
-            )
+            # 直接加载配置，无需确认
+            self.project_dir.set(record['project_dir'])
+            self.output_dir.set(record['output_dir'])
+            self.order_info.set(record['order_info'])
+            self.project_version.set(record['project_version'])
+            self.base_zip_path.set(record['base_zip_path'])
+            self.custom_zip_name.set(record['custom_zip_name'])
+            self.auto_commit_svn.set(record['auto_commit_svn'])
+            self.is_version_155_plus.set(record['is_version_155_plus'])
             
-            if confirm:
-                self.project_dir.set(record['project_dir'])
-                self.output_dir.set(record['output_dir'])
-                self.order_info.set(record['order_info'])
-                self.project_version.set(record['project_version'])
-                self.base_zip_path.set(record['base_zip_path'])
-                self.custom_zip_name.set(record['custom_zip_name'])
-                self.auto_commit_svn.set(record['auto_commit_svn'])
-                self.is_version_155_plus.set(record['is_version_155_plus'])
-                
-                self._log(f"✅ 已加载历史记录: {record['timestamp']} - {record['order_info']}")
-                messagebox.showinfo("成功", "历史记录已加载！\n您可以直接点击'开始打包'使用此配置。")
+            self._log(f"✅ 已加载历史记录: {record['timestamp']} - {record['order_info']}")
+            
+            # 自动开始打包
+            self._start_packaging()
     
     def _delete_history_record(self):
         """删除选中的历史记录"""
@@ -587,6 +591,53 @@ class ZipBasedPackagerApp:
                 self._save_config()
                 self._log(f"✅ 已删除历史记录: {record['timestamp']}")
                 messagebox.showinfo("成功", "历史记录已删除")
+
+    def _send_wechat_notify(self, zip_name, success=True):
+        """发送企业微信通知（打包完成后调用）"""
+        if not self.enable_wechat_notify.get():
+            return
+        
+        webhook_url = self.wechat_webhook.get().strip()
+        if not webhook_url:
+            self._log("⚠️ 企业微信通知已启用，但未配置 Webhook 地址", logging.WARNING)
+            return
+        
+        try:
+            order_info = self.order_info.get()
+            version = self.project_version.get()
+            status = "✅ 打包成功" if success else "❌ 打包失败"
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            content = (
+                f"{status}\n"
+                f"📋 订单: {order_info}\n"
+                f"🔄 版本: V{version}\n"
+                f"📦 文件: {zip_name}\n"
+                f"🕐 时间: {current_time}"
+            )
+            
+            payload = json.dumps({
+                "msgtype": "text",
+                "text": {"content": content}
+            }).encode('utf-8')
+            
+            req = urllib.request.Request(
+                webhook_url,
+                data=payload,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                result = json.loads(resp.read().decode('utf-8'))
+                if result.get("errcode") == 0:
+                    self._log("✅ 企业微信通知发送成功")
+                else:
+                    self._log(f"⚠️ 企业微信通知失败: {result.get('errmsg', '未知错误')}", logging.WARNING)
+        
+        except urllib.error.URLError as e:
+            self._log(f"⚠️ 企业微信通知网络错误: {e}", logging.WARNING)
+        except Exception as e:
+            self._log(f"⚠️ 企业微信通知异常: {e}", logging.WARNING)
 
     def _commit_to_svn(self, zip_path):
         """将生成的ZIP文件提交到SVN"""
@@ -697,16 +748,26 @@ class ZipBasedPackagerApp:
         if not self.project_dir.get():
             messagebox.showerror("错误", "请先选择项目目录")
             return
+        if not Path(self.project_dir.get()).exists():
+            messagebox.showerror("错误", f"项目目录不存在：\n{self.project_dir.get()}")
+            return
         if not self.output_dir.get():
             messagebox.showerror("错误", "请先选择输出目录")
             return
-        if not self.base_zip_path.get():
+        base_zip = self.base_zip_path.get()
+        if not base_zip:
             messagebox.showerror("错误", "请先选择基础压缩包")
+            return
+        if not Path(base_zip).exists():
+            messagebox.showerror("错误", f"基础压缩包不存在：\n{base_zip}\n\n请检查文件路径是否正确，或重新选择。")
             return
         if not self.project_version.get():
             messagebox.showerror("错误", "请选择或输入项目版本")
             return
 
+        # ✅ 自动切换到日志标签页
+        self.notebook.select(1)
+        
         self.is_packaging = True
         self._update_button_states()
         threading.Thread(target=self._do_packaging, daemon=True).start()
@@ -735,9 +796,11 @@ class ZipBasedPackagerApp:
             "project_version": self.project_version.get(),
             "base_zip_path": self.base_zip_path.get(),
             "custom_zip_name": self.custom_zip_name.get(),
-            "auto_commit_svn": self.auto_commit_svn.get(),  # ← 新增：保存SVN配置
-            "is_version_155_plus": self.is_version_155_plus.get(),  # ✅ 新增：保存版本标识
-            "history_records": self.history_records  # ✅ 新增：保存历史记录
+            "auto_commit_svn": self.auto_commit_svn.get(),
+            "is_version_155_plus": self.is_version_155_plus.get(),
+            "history_records": self.history_records,
+            "enable_wechat_notify": self.enable_wechat_notify.get(),
+            "wechat_webhook": self.wechat_webhook.get()
         }
 
         try:
@@ -760,9 +823,11 @@ class ZipBasedPackagerApp:
                 self.base_zip_path.set(config.get("base_zip_path", DEFAULT_CONFIG["base_zip_path"]))
                 self.custom_zip_name.set(config.get("custom_zip_name", DEFAULT_CONFIG["custom_zip_name"]))
                 self.auto_commit_svn.set(config.get("auto_commit_svn", DEFAULT_CONFIG["auto_commit_svn"]))  # ← 新增：加载SVN配置
-                self.is_version_155_plus.set(config.get("is_version_155_plus", DEFAULT_CONFIG["is_version_155_plus"]))  # ✅ 新增：加载版本标识
-                self.history_records = config.get("history_records", [])  # ✅ 新增：加载历史记录
-                self._refresh_history_listbox()  # ✅ 新增：刷新历史记录UI
+                self.is_version_155_plus.set(config.get("is_version_155_plus", DEFAULT_CONFIG["is_version_155_plus"]))
+                self.history_records = config.get("history_records", [])
+                self.enable_wechat_notify.set(config.get("enable_wechat_notify", DEFAULT_CONFIG["enable_wechat_notify"]))
+                self.wechat_webhook.set(config.get("wechat_webhook", DEFAULT_CONFIG["wechat_webhook"]))
+                self._refresh_history_listbox()
                 self._log("配置已加载")
             else:
                 for attr, default_val in DEFAULT_CONFIG.items():
@@ -773,27 +838,32 @@ class ZipBasedPackagerApp:
             self._log(f"加载配置失败: {str(e)}", logging.ERROR)
 
     def _create_widgets(self):
-        main_frame = ttk.Frame(self.root, padding="10")
-        main_frame.pack(fill=tk.BOTH, expand=True)
+        # ✅ 使用 Notebook 创建两个标签页
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        project_frame = ttk.LabelFrame(main_frame, text="📁 项目目录", padding="5")
+        # ========== 标签页1：配置 ==========
+        config_tab = ttk.Frame(self.notebook, padding="10")
+        self.notebook.add(config_tab, text="⚙️ 打包配置")
+
+        project_frame = ttk.LabelFrame(config_tab, text="📁 项目目录", padding="5")
         project_frame.pack(fill=tk.X, pady=5)
         ttk.Entry(project_frame, textvariable=self.project_dir, width=70).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
         self.select_project_btn = ttk.Button(project_frame, text="浏览...", command=self._select_project_dir)
         self.select_project_btn.pack(side=tk.RIGHT)
 
-        output_frame = ttk.LabelFrame(main_frame, text="💾 输出目录", padding="5")
+        output_frame = ttk.LabelFrame(config_tab, text="💾 输出目录", padding="5")
         output_frame.pack(fill=tk.X, pady=5)
         ttk.Entry(output_frame, textvariable=self.output_dir, width=70).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
         self.select_output_btn = ttk.Button(output_frame, text="浏览...", command=self._select_output_dir)
         self.select_output_btn.pack(side=tk.RIGHT)
 
-        order_frame = ttk.LabelFrame(main_frame, text="📋 订单信息", padding="5")
+        order_frame = ttk.LabelFrame(config_tab, text="📋 订单信息", padding="5")
         order_frame.pack(fill=tk.X, pady=5)
         ttk.Label(order_frame, text="格式: 前9个字符为订单号，其余为医院名").pack(anchor=tk.W)
         ttk.Entry(order_frame, textvariable=self.order_info, width=70).pack(fill=tk.X, pady=5)
 
-        version_frame = ttk.LabelFrame(main_frame, text="🔄 项目版本", padding="5")
+        version_frame = ttk.LabelFrame(config_tab, text="🔄 项目版本", padding="5")
         version_frame.pack(fill=tk.X, pady=5)
         versions = ["1.5.0", "1.5.1", "1.5.2",
                     "1.5.3", "1.5.4", "1.5.5", "1.5.6"]
@@ -812,23 +882,19 @@ class ZipBasedPackagerApp:
         self.manual_version_entry.grid(row=0, column=1, padx=5, pady=5)
         self.manual_version_entry.grid_remove()
 
-        custom_frame = ttk.LabelFrame(main_frame, text="🏷️ 自定义ZIP名称", padding="5")
+        custom_frame = ttk.LabelFrame(config_tab, text="🏷️ 自定义ZIP名称", padding="5")
         custom_frame.pack(fill=tk.X, pady=5)
         ttk.Label(custom_frame, text="（留空则自动生成或使用默认名称）").pack(anchor=tk.W)
         ttk.Entry(custom_frame, textvariable=self.custom_zip_name, width=70).pack(fill=tk.X, pady=5)
 
-        svn_frame = ttk.LabelFrame(main_frame, text="🔗 SVN自动提交", padding="5")
-        svn_frame.pack(fill=tk.X, pady=5)
-        svn_check = ttk.Checkbutton(
-            svn_frame, 
-            text="打包完成后自动提交到SVN（需要安装SVN命令行工具）",
-            variable=self.auto_commit_svn
-        )
-        svn_check.pack(anchor=tk.W, pady=5)
-        ttk.Label(svn_frame, text="提示：会自动查找输出目录及其上级目录中的SVN工作副本", foreground="gray").pack(anchor=tk.W)
+        zip_frame = ttk.LabelFrame(config_tab, text="📦 基础压缩包", padding="5")
+        zip_frame.pack(fill=tk.X, pady=5)
+        ttk.Entry(zip_frame, textvariable=self.base_zip_path, width=70).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
+        self.select_zip_btn = ttk.Button(zip_frame, text="浏览...", command=self._select_base_zip)
+        self.select_zip_btn.pack(side=tk.RIGHT)
 
-        # ✅ 新增：版本选择
-        version_type_frame = ttk.LabelFrame(main_frame, text="📌 版本类型", padding="5")
+        # 版本类型
+        version_type_frame = ttk.LabelFrame(config_tab, text="📌 版本类型", padding="5")
         version_type_frame.pack(fill=tk.X, pady=5)
         version_type_check = ttk.Checkbutton(
             version_type_frame,
@@ -838,50 +904,74 @@ class ZipBasedPackagerApp:
         version_type_check.pack(anchor=tk.W, pady=5)
         ttk.Label(version_type_frame, text="提示：勾选后仅执行 build，不执行 lib-render2，并使用新的打包结构", foreground="gray").pack(anchor=tk.W)
 
-        zip_frame = ttk.LabelFrame(main_frame, text="📦 基础压缩包", padding="5")
-        zip_frame.pack(fill=tk.X, pady=5)
-        ttk.Entry(zip_frame, textvariable=self.base_zip_path, width=70).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
-        self.select_zip_btn = ttk.Button(zip_frame, text="浏览...", command=self._select_base_zip)
-        self.select_zip_btn.pack(side=tk.RIGHT)
+        # SVN自动提交
+        svn_frame = ttk.LabelFrame(config_tab, text="🔗 SVN自动提交", padding="5")
+        svn_frame.pack(fill=tk.X, pady=5)
+        svn_check = ttk.Checkbutton(
+            svn_frame,
+            text="打包完成后自动提交到SVN（需要安装SVN命令行工具）",
+            variable=self.auto_commit_svn
+        )
+        svn_check.pack(anchor=tk.W, pady=5)
+        ttk.Label(svn_frame, text="提示：会自动查找输出目录及其上级目录中的SVN工作副本", foreground="gray").pack(anchor=tk.W)
 
-        btn_frame = ttk.Frame(main_frame)
+        # 企业微信通知
+        wechat_frame = ttk.LabelFrame(config_tab, text="📨 企业微信通知", padding="5")
+        wechat_frame.pack(fill=tk.X, pady=5)
+        wechat_check = ttk.Checkbutton(
+            wechat_frame,
+            text="打包完成后发送企业微信通知",
+            variable=self.enable_wechat_notify
+        )
+        wechat_check.pack(anchor=tk.W, pady=(0, 3))
+        webhook_row = ttk.Frame(wechat_frame)
+        webhook_row.pack(fill=tk.X)
+        ttk.Label(webhook_row, text="Webhook:").pack(side=tk.LEFT)
+        ttk.Entry(webhook_row, textvariable=self.wechat_webhook, width=70).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(5, 0))
+        ttk.Label(wechat_frame, text="提示：在企业微信群中添加群机器人，获取 Webhook 地址", foreground="gray").pack(anchor=tk.W, pady=(3, 0))
+
+        # 操作按钮
+        btn_frame = ttk.Frame(config_tab)
         btn_frame.pack(fill=tk.X, pady=10)
         self.start_btn = ttk.Button(btn_frame, text="🚀 开始打包", command=self._start_packaging, style="Accent.TButton")
         self.start_btn.pack(side=tk.LEFT, padx=(0,10))
         self.save_btn = ttk.Button(btn_frame, text="💾 保存配置", command=self._save_config)
         self.save_btn.pack(side=tk.LEFT)
 
-        log_frame = ttk.LabelFrame(main_frame, text="📝 打包日志", padding="5")
+        # ========== 标签页2：日志与历史 ==========
+        log_tab = ttk.Frame(self.notebook, padding="10")
+        self.notebook.add(log_tab, text="📝 日志与历史")
+
+        # 打包日志
+        log_frame = ttk.LabelFrame(log_tab, text="📝 打包日志", padding="5")
         log_frame.pack(fill=tk.BOTH, expand=True, pady=5)
-        self.log_text = scrolledtext.ScrolledText(log_frame, state=tk.DISABLED, wrap=tk.WORD, height=8)  # ✅ 限制日志框高度
+        self.log_text = scrolledtext.ScrolledText(log_frame, state=tk.DISABLED, wrap=tk.WORD, height=12)
         self.log_text.pack(fill=tk.BOTH, expand=True)
-        
-        # ✅ 新增：历史记录区域
-        history_frame = ttk.LabelFrame(main_frame, text="📚 打包历史记录（最近10次）", padding="5")
+
+        # 历史记录区域
+        history_frame = ttk.LabelFrame(log_tab, text="📚 打包历史记录（最近10次）", padding="5")
         history_frame.pack(fill=tk.X, pady=5)
-        
-        # 历史记录列表框
+
         listbox_frame = ttk.Frame(history_frame)
         listbox_frame.pack(fill=tk.X, pady=5)
-        
+
         self.history_listbox = tk.Listbox(listbox_frame, height=6, width=80)
         scrollbar = ttk.Scrollbar(listbox_frame, orient=tk.VERTICAL, command=self.history_listbox.yview)
         self.history_listbox.config(yscrollcommand=scrollbar.set)
-        
+
         self.history_listbox.pack(side=tk.LEFT, fill=tk.X, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        
-        # 绑定双击事件
+
+        # 绑定双击事件：直接加载并开始打包
         self.history_listbox.bind('<Double-Button-1>', self._load_history_record)
-        
-        # 按钮区域
+
         btn_history_frame = ttk.Frame(history_frame)
         btn_history_frame.pack(fill=tk.X, pady=5)
-        
+
         ttk.Button(btn_history_frame, text="📥 加载选中记录", command=self._load_history_record).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_history_frame, text="🗑️ 删除选中记录", command=self._delete_history_record).pack(side=tk.LEFT, padx=5)
-        
-        ttk.Label(history_frame, text="💡 提示：双击记录可快速加载配置", foreground="gray").pack(anchor=tk.W)
+
+        ttk.Label(history_frame, text="💡 提示：双击记录可直接加载配置并开始打包", foreground="gray").pack(anchor=tk.W)
 
     def _on_version_selected(self, combo):
         if combo.get() == "手动输入":

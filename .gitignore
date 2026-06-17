@@ -23,7 +23,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
-*.log
+*.log*
 *.exe
 *.zip
 .env.dev
