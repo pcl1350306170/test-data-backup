@@ -1,10 +1,11 @@
 {
-  "last_input_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/txt",
-  "last_output_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/txt替换后",
+  "last_input_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/txt",
+  "last_output_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/grok",
   "use_json": true,
   "use_db": true,
   "clean_chapter_titles": true,
   "remove_empty_lines": true,
-  "remove_duplicate_lines": false,
-  "filter_bracket_lines": false
+  "remove_duplicate_lines": true,
+  "filter_bracket_lines": true,
+  "replace_spaces": false
 }

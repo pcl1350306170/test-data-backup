@@ -359,38 +359,29 @@ class App:
 
     # ────────────── 拆分策略 ──────────────
     def _split(self, chapters: list[dict]) -> list[list[dict]]:
+        """贪心拆分：每组不超过 MAX_FILE_BYTES，不限制组数"""
         total = sum(c["size"] for c in chapters)
         if total <= MAX_FILE_BYTES:
             return [chapters]
 
-        n = len(chapters)
-        lo, hi = max(c["size"] for c in chapters), total
-        while lo < hi:
-            mid = (lo + hi) // 2
-            g, cur = 1, 0
-            for c in chapters:
-                if cur + c["size"] > mid and cur:
-                    g += 1
-                    cur = c["size"]
-                else:
-                    cur += c["size"]
-            if g <= 3:
-                hi = mid
-            else:
-                lo = mid + 1
-
         groups, cur_grp, cur_sz = [], [], 0
         for c in chapters:
-            if cur_sz + c["size"] > lo and cur_grp:
+            # 如果当前章节本身就超过限制，单独成组
+            if c["size"] > MAX_FILE_BYTES:
+                if cur_grp:
+                    groups.append(cur_grp)
+                    cur_grp, cur_sz = [], 0
+                groups.append([c])
+                continue
+
+            if cur_sz + c["size"] > MAX_FILE_BYTES and cur_grp:
                 groups.append(cur_grp)
                 cur_grp, cur_sz = [], 0
             cur_grp.append(c)
             cur_sz += c["size"]
+
         if cur_grp:
             groups.append(cur_grp)
-        while len(groups) > 3:
-            groups[-2].extend(groups[-1])
-            groups.pop()
         return groups
 
     # ────────────── EPUB 生成 ──────────────
