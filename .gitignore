@@ -38,3 +38,14 @@ vue.config.js
 /py/yarward/build/*
 /py/yarward/dist/*
 /py/qwen/json/config_qwen_vocab_enhancer.json
+
+# Python cache/test directories
+__pycache__/
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.coverage
+htmlcov/

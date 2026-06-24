@@ -395,6 +395,12 @@ class ZipBasedPackagerApp:
                 # ✅ 新增：发送企业微信通知
                 self._send_wechat_notify(new_zip_name)
                 
+                # ✅ 右下角弹窗提示
+                self.root.after(0, lambda: self._show_toast_notification(
+                    "打包完成",
+                    f"订单: {self.order_info.get()}\n文件: {new_zip_name}"
+                ))
+                
                 self._log("🎉 打包完成！")
 
         except Exception as e:
@@ -492,6 +498,12 @@ class ZipBasedPackagerApp:
                 
                 # ✅ 新增：发送企业微信通知
                 self._send_wechat_notify(new_zip_name)
+                
+                # ✅ 右下角弹窗提示
+                self.root.after(0, lambda: self._show_toast_notification(
+                    "打包完成",
+                    f"订单: {self.order_info.get()}\n文件: {new_zip_name}"
+                ))
                 
                 self._log("🎉 打包完成！")
 
@@ -771,6 +783,62 @@ class ZipBasedPackagerApp:
         self.is_packaging = True
         self._update_button_states()
         threading.Thread(target=self._do_packaging, daemon=True).start()
+
+    def _show_toast_notification(self, title, message, duration=60000):
+        """右下角弹窗通知，duration 毫秒后自动消失（默认60秒）"""
+        try:
+            toast = tk.Toplevel(self.root)
+            toast.withdraw()  # 先隐藏，设置好再显示
+            toast.overrideredirect(True)  # 无边框
+            toast.attributes('-topmost', True)  # 置顶
+
+            # 设置样式
+            toast.configure(bg='#2b5797', padx=2, pady=2)
+
+            # 关闭按钮
+            close_btn = tk.Label(
+                toast, text="✕", bg='#2b5797', fg='white',
+                font=('Arial', 10, 'bold'), cursor='hand2'
+            )
+            close_btn.place(relx=1.0, x=-20, y=5)
+            close_btn.bind('<Button-1>', lambda e: toast.destroy())
+
+            # 标题
+            title_label = tk.Label(
+                toast, text=f"📦 {title}", bg='#2b5797', fg='white',
+                font=('Microsoft YaHei UI', 12, 'bold'), anchor='w'
+            )
+            title_label.pack(fill=tk.X, padx=(15, 30), pady=(12, 5))
+
+            # 内容
+            msg_label = tk.Label(
+                toast, text=message, bg='#2b5797', fg='#e0e0e0',
+                font=('Microsoft YaHei UI', 9), anchor='w',
+                justify=tk.LEFT, wraplength=280
+            )
+            msg_label.pack(fill=tk.X, padx=(15, 15), pady=(0, 12))
+
+            # 点击关闭
+            for widget in [toast, title_label, msg_label]:
+                widget.bind('<Button-1>', lambda e: toast.destroy())
+
+            # 计算位置：右下角
+            toast.update_idletasks()
+            toast_width = 320
+            toast_height = 100
+            screen_width = toast.winfo_screenwidth()
+            screen_height = toast.winfo_screenheight()
+            x = screen_width - toast_width - 20
+            y = screen_height - toast_height - 60  # 留出任务栏空间
+
+            toast.geometry(f"{toast_width}x{toast_height}+{x}+{y}")
+            toast.deiconify()  # 显示弹窗
+
+            # 自动关闭（默认60秒）
+            toast.after(duration, lambda: toast.destroy() if toast.winfo_exists() else None)
+
+        except Exception as e:
+            self._log(f"弹窗通知失败: {e}", logging.WARNING)
 
     def _log(self, message, level=logging.INFO):
         logging.log(level, message)

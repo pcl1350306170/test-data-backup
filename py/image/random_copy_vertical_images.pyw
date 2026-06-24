@@ -31,7 +31,8 @@ class ImageCopyApp:
             "copy_count": 60,
             "random_skip_rate": 0.5,
             "max_per_subdir": 2,
-            "is_cut": False
+            "is_cut": False,
+            "max_image_size_kb": 500
         }
 
         # 加载配置
@@ -87,9 +88,15 @@ class ImageCopyApp:
         self.is_cut_var = tk.BooleanVar(value=self.config["is_cut"])
         ttk.Checkbutton(frame_main, text="是否剪切图片", variable=self.is_cut_var).grid(row=5, column=0, columnspan=2, sticky=tk.W, pady=5)
 
+        # 图片大小限制(KB)
+        ttk.Label(frame_main, text="图片大小上限(KB):").grid(row=6, column=0, sticky=tk.W, pady=5)
+        self.max_image_size_var = tk.IntVar(value=self.config["max_image_size_kb"])
+        ttk.Entry(frame_main, textvariable=self.max_image_size_var, width=10).grid(row=6, column=1, sticky=tk.W, pady=5)
+        ttk.Label(frame_main, text="超过此大小的图片将被跳过", foreground="gray").grid(row=6, column=2, sticky=tk.W, padx=5)
+
         # 操作按钮
         button_frame = ttk.Frame(frame_main)
-        button_frame.grid(row=6, column=0, columnspan=3, pady=20)
+        button_frame.grid(row=7, column=0, columnspan=3, pady=20)
 
         ttk.Button(button_frame, text="保存配置", command=self.save_config).pack(side=tk.LEFT, padx=10)
         ttk.Button(button_frame, text="清除历史", command=self.clear_history).pack(side=tk.LEFT, padx=10)
@@ -134,7 +141,8 @@ class ImageCopyApp:
                 "copy_count": self.copy_count_var.get(),
                 "random_skip_rate": self.skip_rate_var.get(),
                 "max_per_subdir": self.max_per_subdir_var.get(),
-                "is_cut": self.is_cut_var.get()
+                "is_cut": self.is_cut_var.get(),
+                "max_image_size_kb": self.max_image_size_var.get()
             }
 
             with open(CONFIG_FILE, "w", encoding="utf-8") as f:
@@ -230,6 +238,13 @@ class ImageCopyApp:
                 
                 # ✅ 修改：只检查文件名是否已复制过（图片名都是不重复的）
                 if file in self.history:
+                    continue
+
+                # 检查文件大小
+                max_size_kb = self.max_image_size_var.get()
+                file_size_kb = os.path.getsize(full_path) / 1024
+                if file_size_kb > max_size_kb:
+                    self.log(f"跳过（{file_size_kb:.0f}KB > {max_size_kb}KB）: {file}")
                     continue
 
                 # 检查是否为垂直图片

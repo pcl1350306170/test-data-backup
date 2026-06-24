@@ -47,8 +47,11 @@ class GitBranchCreator:
         # 创建UI
         self._create_widgets()
 
-        # 加载配置
+        # 加载配置（先加载基础配置，延迟执行网络操作）
         self._load_config()
+        
+        # 界面显示后再执行网络操作
+        self.root.after(200, self._do_initial_git_operations)
 
     def _find_git(self):
         """自动查找Git可执行文件路径"""
@@ -356,8 +359,20 @@ class GitBranchCreator:
         except Exception as e:
             self._log(f"保存配置失败: {str(e)}", logging.ERROR)
 
+    def _do_initial_git_operations(self):
+        """界面显示后执行初始Git操作（避免阻塞界面）"""
+        if self.project_path.get() and os.path.exists(os.path.join(self.project_path.get(), ".git")):
+            self._log("开始拉取最新代码...")
+            if self._pull_latest_code():
+                self._load_branches()
+                self._update_current_branch()
+            else:
+                self._load_branches()
+                self._update_current_branch()
+                self._log("拉取最新代码失败，请检查网络或仓库状态", logging.WARNING)
+
     def _load_config(self):
-        """加载配置"""
+        """加载配置（仅加载本地配置，不执行网络操作）"""
         try:
             if os.path.exists(CONFIG_PATH):
                 with open(CONFIG_PATH, "r", encoding="utf-8") as f:
@@ -369,13 +384,7 @@ class GitBranchCreator:
 
                 if "last_project_path" in config and os.path.exists(config["last_project_path"]):
                     self.project_path.set(config["last_project_path"])
-                    # 加载配置时也拉取最新代码
-                    if self._pull_latest_code():
-                        self._load_branches()
-                        self._update_current_branch()
-                    else:
-                        self._load_branches()
-                        self._update_current_branch()
+                    # 不在这里执行拉取操作，由 _do_initial_git_operations 延迟执行
 
                 if "remote_name" in config:
                     self.remote_name.set(config["remote_name"])
