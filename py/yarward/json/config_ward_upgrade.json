@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "192.168.31.97": {
+      "ssh_password": "rd2021+"
+    }
+  },
+  "last_server": "192.168.31.97",
+  "upgrade_dir": "D:/CODE/Yarward/SVN/病房/2026-1044苏州独墅湖医院前端",
+  "mysql_host": "192.168.31.97",
+  "mysql_port": 3306,
+  "mysql_db": "YHDB",
+  "mysql_password": "Yahua@3585668"
+}
