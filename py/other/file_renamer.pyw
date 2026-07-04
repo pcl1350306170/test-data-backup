@@ -2,6 +2,7 @@
 
 import os
 import sys
+import re
 import json
 import logging
 import shutil
@@ -122,18 +123,30 @@ class FileRenamerGUI:
         rule_frame.pack(fill=X, pady=5)
 
         # 模式选择
-        mode_row = Frame(rule_frame)
-        mode_row.pack(fill=X, pady=2)
-        Label(mode_row, text="重命名方式:").pack(side=LEFT)
+        mode_row1 = Frame(rule_frame)
+        mode_row1.pack(fill=X, pady=2)
+        Label(mode_row1, text="重命名方式:").pack(side=LEFT)
         self.mode_var = StringVar(value="prefix")
-        modes = [
+        modes_row1 = [
             ("添加前缀", "prefix"),
             ("添加后缀", "suffix"),
-            ("保留“-”前部分", "split_dash"),
+            ('保留“–”前部分', "split_dash"),
             ("关键字替换", "replace")
         ]
-        for text, val in modes:
-            Radiobutton(mode_row, text=text, variable=self.mode_var, value=val,
+        for text, val in modes_row1:
+            Radiobutton(mode_row1, text=text, variable=self.mode_var, value=val,
+                        command=self.on_mode_change).pack(side=LEFT, padx=(10,0))
+        
+        mode_row2 = Frame(rule_frame)
+        mode_row2.pack(fill=X, pady=2)
+        modes_row2 = [
+            ("清除括号内容", "regex_brackets"),
+            ("清除字母数字", "remove_alnum"),
+        ]
+        # 第二行用占位保持对齐
+        Label(mode_row2, text="              ").pack(side=LEFT)
+        for text, val in modes_row2:
+            Radiobutton(mode_row2, text=text, variable=self.mode_var, value=val,
                         command=self.on_mode_change).pack(side=LEFT, padx=(10,0))
 
         # 内容输入（前缀/后缀用）
@@ -204,14 +217,23 @@ class FileRenamerGUI:
         if mode == "replace":
             self.replace_frame.pack(fill=X, pady=5)
             self.content_hint.config(text="")
+        elif mode == "regex_brackets":
+            self.content_frame.pack(fill=X, pady=5)
+            self.content_entry.config(state=DISABLED)
+            self.content_hint.config(text="清除 () [] {} （） 【】 〔〕 〈〉 及其包裹内容")
+        elif mode == "remove_alnum":
+            self.content_frame.pack(fill=X, pady=5)
+            self.content_entry.config(state=DISABLED)
+            self.content_hint.config(text="清除文件名中所有英文字母和数字")
         else:
             self.content_frame.pack(fill=X, pady=5)
+            self.content_entry.config(state=NORMAL)
             if mode == "prefix":
                 self.content_hint.config(text="将添加到文件名开头")
             elif mode == "suffix":
                 self.content_hint.config(text="将添加到文件名末尾（扩展名前）")
             elif mode == "split_dash":
-                self.content_hint.config(text="自动移除“-”及之后内容")
+                self.content_hint.config(text='自动移除“–”及之后内容')
 
         self.save_config()
         self.update_preview()
@@ -282,6 +304,21 @@ class FileRenamerGUI:
                 new_stem = stem  # 不替换
             else:
                 new_stem = stem.replace(from_str, to_str)
+        elif mode == "regex_brackets":
+            # 清除所有类型括号及其包裹内容：() [] {} （） 【】 〔〕 〈〉 《》
+            new_stem = re.sub(r'\([^)]*\)', '', stem)
+            new_stem = re.sub(r'\[[^\]]*\]', '', new_stem)
+            new_stem = re.sub(r'\{[^}]*\}', '', new_stem)
+            new_stem = re.sub(r'（[^）]*）', '', new_stem)
+            new_stem = re.sub(r'【[^】]*】', '', new_stem)
+            new_stem = re.sub(r'〔[^〕]*〕', '', new_stem)
+            new_stem = re.sub(r'〈[^〉]*〉', '', new_stem)
+            new_stem = re.sub(r'《[^》]*》', '', new_stem)
+            new_stem = new_stem.strip()
+        elif mode == "remove_alnum":
+            # 清除所有英文字母和数字
+            new_stem = re.sub(r'[A-Za-z0-9]', '', stem)
+            new_stem = new_stem.strip()
         else:
             new_stem = stem
 

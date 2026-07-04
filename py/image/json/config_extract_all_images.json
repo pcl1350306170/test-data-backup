@@ -1,0 +1,7 @@
+{
+  "source_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/插图",
+  "target_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/插图s",
+  "enable_compress": true,
+  "compress_threshold_kb": 700,
+  "compress_target_kb": 300
+}

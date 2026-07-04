@@ -1,0 +1,13 @@
+{
+  "txt_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/txt替换后",
+  "cover_dir": "D:/FILES/IMG/李沁/L1-498张",
+  "img_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/插图",
+  "output_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/Ebook/epub",
+  "merge_count": 500,
+  "max_images": 1000,
+  "max_chapter_size": 160,
+  "remove_chapter_marks": false,
+  "use_custom_filename": true,
+  "custom_filename": "Xbook_{index}",
+  "last_used": "2026-07-04 15:53:36"
+}
