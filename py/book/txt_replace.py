@@ -22,7 +22,7 @@ class TxtReplacerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("TXT文本替换工具")
-        self.root.geometry("800x850")  # 高度+50适配新选项
+        self.root.geometry("900x900")  # 高度适配新选项
 
         # 初始化配置
         self.config = {
@@ -31,10 +31,11 @@ class TxtReplacerApp:
             "use_json": True,
             "use_db": True,
             "clean_chapter_titles": True,  # ✅ 新增：是否清理章节标题
-            "remove_empty_lines": False,     # ✅ 新增：是否清除空换行
+            "remove_empty_lines": True,     # ✅ 新增：是否清除空换行
             "remove_duplicate_lines": False,  # ✅ 新增：是否清除重复行
             "filter_bracket_lines": False,    # ✅ 新增：是否过滤括号行
-            "replace_spaces": False           # ✅ 新增：是否替换空格（删除所有空格）
+            "replace_spaces": False,          # ✅ 新增：是否替换空格（删除所有空格）
+            "filter_abnormal_spaces": True     # ✅ 新增：是否过滤文本间非正常空格
         }
 
         # 数据存储
@@ -111,31 +112,36 @@ class TxtReplacerApp:
             row=4, column=0, sticky=tk.W, padx=5, pady=5)
         
         # ✅ 新增：是否过滤括号行
-        self.filter_brackets = tk.BooleanVar(value=self.config["filter_bracket_lines"])
-        ttk.Checkbutton(settings_frame, text="过滤括号行（删除被括号完全包裹的行）", variable=self.filter_brackets).grid(
+        self.filter_brackets_var = tk.BooleanVar(value=self.config["filter_bracket_lines"])
+        ttk.Checkbutton(settings_frame, text="过滤括号行（删除被括号完全包裹的行）", variable=self.filter_brackets_var).grid(
             row=5, column=0, sticky=tk.W, padx=5, pady=5)
         
         # ✅ 新增：是否替换空格
-        self.replace_spaces = tk.BooleanVar(value=self.config["replace_spaces"])
-        ttk.Checkbutton(settings_frame, text="替换空格（删除TXT文件中所有空格）", variable=self.replace_spaces).grid(
+        self.replace_spaces_var = tk.BooleanVar(value=self.config["replace_spaces"])
+        ttk.Checkbutton(settings_frame, text="替换空格（删除TXT文件中所有空格）", variable=self.replace_spaces_var).grid(
             row=6, column=0, sticky=tk.W, padx=5, pady=5)
+
+        # ✅ 新增：是否过滤文本间非正常空格
+        self.filter_abnormal_spaces_var = tk.BooleanVar(value=self.config.get("filter_abnormal_spaces", False))
+        ttk.Checkbutton(settings_frame, text="过滤文本间非正常空格（删除文本之间的多余空格，保留行首缩进）", variable=self.filter_abnormal_spaces_var).grid(
+            row=7, column=0, sticky=tk.W, padx=5, pady=5)
 
         # 数据库连接测试
         ttk.Button(settings_frame, text="测试数据库连接", command=self.test_db_connection).grid(
-            row=6, column=0, padx=5, pady=10, sticky=tk.W)
+            row=8, column=0, padx=5, pady=10, sticky=tk.W)
 
         # JSON替换规则预览
         ttk.Label(settings_frame, text="JSON替换规则预览:").grid(
-            row=7, column=0, sticky=tk.NW, padx=5, pady=5)
+            row=9, column=0, sticky=tk.NW, padx=5, pady=5)
         self.json_preview = tk.Text(settings_frame, height=10, width=60)
-        self.json_preview.grid(row=8, column=0, padx=5, pady=5)
+        self.json_preview.grid(row=10, column=0, padx=5, pady=5)
         self.json_preview.config(state=tk.DISABLED)
 
         # 数据库替换规则预览
         ttk.Label(settings_frame, text="数据库替换规则预览:").grid(
-            row=9, column=0, sticky=tk.NW, padx=5, pady=5)
+            row=11, column=0, sticky=tk.NW, padx=5, pady=5)
         self.db_preview = tk.Text(settings_frame, height=10, width=60)
-        self.db_preview.grid(row=10, column=0, padx=5, pady=5)
+        self.db_preview.grid(row=12, column=0, padx=5, pady=5)
         self.db_preview.config(state=tk.DISABLED)
 
         # 3. 日志标签页
@@ -362,8 +368,9 @@ class TxtReplacerApp:
                 "clean_chapter_titles": self.clean_chapters.get(),  # ✅ 保存章节清理选项
                 "remove_empty_lines": self.remove_empty.get(),       # ✅ 保存空行清理选项
                 "remove_duplicate_lines": self.remove_duplicates.get(),  # ✅ 保存重复行清理选项
-                "filter_bracket_lines": self.filter_brackets.get(),  # ✅ 保存括号行过滤选项
-                "replace_spaces": self.replace_spaces.get()          # ✅ 保存空格替换选项
+                "filter_bracket_lines": self.filter_brackets_var.get(),  # ✅ 保存括号行过滤选项
+                "replace_spaces": self.replace_spaces_var.get(),          # ✅ 保存空格替换选项
+                "filter_abnormal_spaces": self.filter_abnormal_spaces_var.get()  # ✅ 保存非正常空格过滤选项
             }
 
             with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -519,6 +526,28 @@ class TxtReplacerApp:
             
         return new_content, original_count
 
+    def filter_abnormal_spaces(self, content):
+        """过滤文本间的非正常空格（删除文本内容之间的多余空格，保留行首缩进）
+        因为中文文本之间使用的是标点符号，所以空格是多余的
+        """
+        removed = 0
+        lines = content.split('\n')
+        result = []
+        for line in lines:
+            # 匹配行首空白（保留缩进）
+            m = re.match(r'^(\s*)', line)
+            indent = m.group(1) if m else ''
+            rest = line[len(indent):]
+            # 删除非缩进部分的所有空格
+            space_count = rest.count(' ')
+            removed += space_count
+            rest = rest.replace(' ', '')
+            result.append(indent + rest)
+        new_content = '\n'.join(result)
+        if removed > 0:
+            self.log(f"  - 共过滤 {removed} 个非正常空格")
+        return new_content, removed
+
     def replace_text_content(self, content):
         """替换文本内容（合并JSON和数据库规则）"""
         replacements = {}
@@ -586,15 +615,20 @@ class TxtReplacerApp:
                 self.log(f"  - 清除重复行后行数: {after_duplicate_line_count}（删除 {removed_duplicates} 个重复行）")
 
             # ✅ 新增：过滤括号行（如果启用）
-            if self.filter_brackets.get():
+            if self.filter_brackets_var.get():
                 content, removed_brackets = self.filter_bracket_lines(content)
                 after_bracket_line_count = len(content.splitlines())
                 self.log(f"  - 过滤括号行后行数: {after_bracket_line_count}（删除 {removed_brackets} 个括号行）")
             
             # ✅ 新增：替换空格（如果启用）
-            if self.replace_spaces.get():
+            if self.replace_spaces_var.get():
                 content, removed_spaces = self.replace_spaces(content)
                 self.log(f"  - 已删除所有空格（共 {removed_spaces} 个）")
+
+            # ✅ 新增：过滤文本间非正常空格（如果启用）
+            if self.filter_abnormal_spaces_var.get():
+                content, removed_abnormal = self.filter_abnormal_spaces(content)
+                self.log(f"  - 已过滤非正常空格（共 {removed_abnormal} 个）")
 
             # 替换内容
             new_content, count = self.replace_text_content(content)
@@ -628,8 +662,8 @@ class TxtReplacerApp:
         if self.use_db.get():
             active_rules.update(self.db_replacements)
 
-        if not active_rules and not self.clean_chapters.get() and not self.remove_empty.get() and not self.remove_duplicates.get() and not self.filter_brackets.get() and not self.replace_spaces.get():
-            if messagebox.askyesno("确认", "没有启用任何替换规则、章节清理、空行清理、重复行清理或括号行过滤，是否继续?"):
+        if not active_rules and not self.clean_chapters.get() and not self.remove_empty.get() and not self.remove_duplicates.get() and not self.filter_brackets_var.get() and not self.replace_spaces_var.get() and not self.filter_abnormal_spaces_var.get():
+            if messagebox.askyesno("确认", "没有启用任何替换规则或清理选项，是否继续?"):
                 self.log("没有启用替换规则或章节清理，直接复制文件")
             else:
                 return
