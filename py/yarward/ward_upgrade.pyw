@@ -50,6 +50,7 @@ logger = logging.getLogger()
 # 服务器路径
 WEB_REMOTE_PATH = "/home/data/web"
 WEB_BACKUP_ITEMS = ["assets", "static", "login.html", "index.html", "home.html"]
+BACKUP_BASE_PATH = "/home/data/web/bak"  # 统一备份目录
 
 # 默认密码
 DEFAULT_SSH_PASSWORDS = ["Huawei@123", "rd2021+", "yh123456"]
@@ -68,6 +69,7 @@ def load_config():
     return {
         "servers": {},
         "last_server": "",
+        "ssh_user": "root",
         "upgrade_dir": "",
         "mysql_host": "",
         "mysql_port": 3306,
@@ -140,18 +142,88 @@ def upload_dir(sftp, local_dir, remote_dir, log):
             upload_dir(sftp, local_path, remote_path, log)
 
 
+def extract_archive(archive_path, dest_dir, log):
+    """智能解压压缩包，自动尝试多种格式（先尝试 tar 系列，再尝试 zip）"""
+    errors = []
+
+    # 先通过文件头魔字节判断真实格式
+    with open(archive_path, 'rb') as f:
+        header = f.read(4)
+
+    # gzip 魔字节: 1f 8b
+    if header[:2] == b'\x1f\x8b':
+        try:
+            log("文件头识别为 gzip，尝试 tar.gz 解压...")
+            with tarfile.open(archive_path, 'r:gz') as tf:
+                tf.extractall(dest_dir)
+            return
+        except Exception as e:
+            errors.append(f"tar.gz: {e}")
+    # zip 魔字节: 50 4b (PK)
+    elif header[:2] == b'PK':
+        try:
+            log("文件头识别为 zip，解压中...")
+            with zipfile.ZipFile(archive_path, 'r') as zf:
+                zf.extractall(dest_dir)
+            return
+        except Exception as e:
+            errors.append(f"zip: {e}")
+    # bzip2 魔字节: 42 5a (BZ)
+    elif header[:2] == b'BZ':
+        try:
+            log("文件头识别为 bzip2，尝试 tar.bz2 解压...")
+            with tarfile.open(archive_path, 'r:bz2') as tf:
+                tf.extractall(dest_dir)
+            return
+        except Exception as e:
+            errors.append(f"tar.bz2: {e}")
+    else:
+        # 魔字节未匹配，依次尝试所有格式
+        log(f"文件头未识别({header[:2].hex()})，依次尝试各格式...")
+
+    # 魔字节未命中或失败时，依次尝试剩余格式
+    for fmt, open_fn, label in [
+        ('r:gz',  lambda p: tarfile.open(p, 'r:gz'),  'tar.gz'),
+        ('r:',    lambda p: tarfile.open(p, 'r:'),     'tar'),
+        ('r:bz2', lambda p: tarfile.open(p, 'r:bz2'),  'tar.bz2'),
+        ('zip',   None,                                 'zip'),
+    ]:
+        try:
+            if label == 'zip':
+                log(f"尝试 zip 格式解压...")
+                with zipfile.ZipFile(archive_path, 'r') as zf:
+                    zf.extractall(dest_dir)
+            else:
+                log(f"尝试 {label} 格式解压...")
+                with open_fn(archive_path) as tf:
+                    tf.extractall(dest_dir)
+            return
+        except Exception as e:
+            if f"{label}:" not in str(errors):
+                errors.append(f"{label}: {e}")
+
+    raise ValueError(f"无法解压文件 {os.path.basename(archive_path)}，尝试过的格式: {'; '.join(errors)}")
+
+
 # ==============================
 # Web 升级逻辑
 # ==============================
-def do_web_upgrade(host, password, web_package_path, log):
+def do_web_upgrade(host, username, password, web_package_path, log):
     """Web 前端升级：备份 → 清理 → 上传"""
-    log("正在连接服务器...")
-    with get_ssh_client(host, password=password) as ssh:
+    log(f"正在以用户 {username} 连接服务器...")
+    with get_ssh_client(host, username=username, password=password) as ssh:
         sftp = ssh.open_sftp()
 
-        # 1. 备份
+        # 1. 检查 web 目录是否存在，不存在则创建
+        try:
+            sftp.stat(WEB_REMOTE_PATH)
+        except IOError:
+            log(f"服务器不存在 {WEB_REMOTE_PATH} 目录，自动创建")
+            ensure_remote_dir(sftp, WEB_REMOTE_PATH, log)
+
+        # 2. 备份到统一目录 /home/data/web/bak
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_dir = f"{WEB_REMOTE_PATH}/backup_{timestamp}"
+        backup_dir = f"{BACKUP_BASE_PATH}/web_{timestamp}"
         ensure_remote_dir(sftp, backup_dir, log)
         log(f"备份目录: {backup_dir}")
 
@@ -160,35 +232,31 @@ def do_web_upgrade(host, password, web_package_path, log):
             try:
                 sftp.stat(remote_item)
                 log(f"备份: {item}")
-                # 通过 SSH 命令复制（保留权限）
                 stdin, stdout, stderr = ssh.exec_command(f"cp -r {remote_item} {backup_dir}/")
                 stdout.channel.recv_exit_status()
             except IOError:
                 log(f"跳过（不存在）: {item}")
 
-        # 2. 删除原文件
+        # 3. 删除原文件
         log("清理服务器文件...")
         for item in WEB_BACKUP_ITEMS:
             clear_remote_path(sftp, f"{WEB_REMOTE_PATH}/{item}")
 
-        # 3. 解压并上传
+        # 4. 解压并上传
         log("解压升级包...")
         with tempfile.TemporaryDirectory() as tmpdir:
-            if web_package_path.endswith('.zip'):
-                with zipfile.ZipFile(web_package_path, 'r') as zf:
-                    zf.extractall(tmpdir)
-            elif web_package_path.endswith('.tar.gz') or web_package_path.endswith('.tgz'):
-                with tarfile.open(web_package_path, 'r:gz') as tf:
-                    tf.extractall(tmpdir)
-            else:
-                raise ValueError(f"不支持的压缩格式: {web_package_path}")
+            extract_archive(web_package_path, tmpdir, log)
 
-            # 查找解压后的 web 内容目录
-            extracted = list(Path(tmpdir).iterdir())
-            if len(extracted) == 1 and extracted[0].is_dir():
-                web_content_dir = extracted[0]
-            else:
-                web_content_dir = Path(tmpdir)
+            # 查找解压后的 web 内容目录（持续剥掉单目录包装层）
+            web_content_dir = Path(tmpdir)
+            while True:
+                children = list(web_content_dir.iterdir())
+                if len(children) == 1 and children[0].is_dir():
+                    log(f"剥掉包装目录: {children[0].name}")
+                    web_content_dir = children[0]
+                else:
+                    break
+            log(f"实际内容目录: {web_content_dir.name}")
 
             log(f"上传文件到 {WEB_REMOTE_PATH}...")
             upload_dir(sftp, str(web_content_dir), WEB_REMOTE_PATH, log)
@@ -198,22 +266,162 @@ def do_web_upgrade(host, password, web_package_path, log):
 
 
 # ==============================
+# 看板升级逻辑
+# ==============================
+KANBAN_REMOTE_PATH = "/home/data/web/ntv"
+
+
+def do_kanban_upgrade(host, username, password, kanban_package_path, log):
+    """看板升级：备份 → 清空 → 解压上传"""
+    log(f"正在以用户 {username} 连接服务器...")
+    with get_ssh_client(host, username=username, password=password) as ssh:
+        sftp = ssh.open_sftp()
+
+        # 1. 检查 ntv 目录是否存在，不存在则创建
+        ntv_exists = True
+        try:
+            sftp.stat(KANBAN_REMOTE_PATH)
+        except IOError:
+            ntv_exists = False
+            log(f"服务器不存在 {KANBAN_REMOTE_PATH} 目录，自动创建")
+            ensure_remote_dir(sftp, KANBAN_REMOTE_PATH, log)
+
+        # 2. 备份到统一目录 /home/data/web/bak
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_dir = f"{BACKUP_BASE_PATH}/ntv_{timestamp}"
+        ensure_remote_dir(sftp, backup_dir, log)
+        log(f"看板备份目录: {backup_dir}")
+
+        if ntv_exists:
+            stdin, stdout, stderr = ssh.exec_command(f"cp -r {KANBAN_REMOTE_PATH}/. {backup_dir}/")
+            stdout.channel.recv_exit_status()
+            log(f"备份完成: {KANBAN_REMOTE_PATH}")
+        else:
+            log("跳过备份（ntv 目录刚创建，无内容）")
+
+        # 3. 清空 /home/data/web/ntv 目录内容（保留 ntv 目录本身）
+        log(f"清空目录: {KANBAN_REMOTE_PATH}")
+        for item in sftp.listdir(KANBAN_REMOTE_PATH):
+            clear_remote_path(sftp, f"{KANBAN_REMOTE_PATH}/{item}")
+            log(f"  删除: {item}")
+
+        # 4. 解压并上传 ntv 目录内容
+        log("解压看板升级包...")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            extract_archive(kanban_package_path, tmpdir, log)
+
+            # 查找解压后的 ntv 目录
+            extracted = list(Path(tmpdir).iterdir())
+            ntv_content_dir = None
+            if len(extracted) == 1 and extracted[0].is_dir() and extracted[0].name == 'ntv':
+                ntv_content_dir = extracted[0]
+            else:
+                # 递归查找 ntv 目录
+                for item in Path(tmpdir).rglob('ntv'):
+                    if item.is_dir():
+                        ntv_content_dir = item
+                        break
+                if ntv_content_dir is None:
+                    # 如果找不到 ntv 目录，使用解压根目录
+                    ntv_content_dir = Path(tmpdir)
+                    log("⚠️ 未找到 ntv 子目录，使用解压根目录")
+
+            log(f"上传看板文件到 {KANBAN_REMOTE_PATH}...")
+            upload_dir(sftp, str(ntv_content_dir), KANBAN_REMOTE_PATH, log)
+
+        sftp.close()
+    log("✅ 看板升级完成！")
+
+
+# ==============================
+# 床头/床旁 设备升级逻辑
+# ==============================
+def do_device_upgrade(host, username, password, device_name, remote_path, source_type, source_path, log):
+    """
+    床头/床旁升级通用函数
+    device_name: 设备名称（bedhead / bedside）
+    remote_path: 服务器目标目录
+    source_type: 'dir' 本地目录直接覆盖上传 或 'package' 压缩包备份→清空→解压上传
+    source_path: 本地目录路径 或 压缩包路径
+    """
+    log(f"正在以用户 {username} 连接服务器...")
+    with get_ssh_client(host, username=username, password=password) as ssh:
+        sftp = ssh.open_sftp()
+
+        # 检查目标目录是否存在，不存在则创建
+        try:
+            sftp.stat(remote_path)
+        except IOError:
+            log(f"服务器不存在 {remote_path} 目录，自动创建")
+            ensure_remote_dir(sftp, remote_path, log)
+
+        if source_type == 'dir':
+            # 本地目录模式：不备份、不清空，直接覆盖上传
+            log(f"本地目录模式，直接覆盖上传到 {remote_path}...")
+            upload_dir(sftp, source_path, remote_path, log)
+        else:
+            # 压缩包模式：备份 → 清空 → 解压上传
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_dir = f"{BACKUP_BASE_PATH}/{device_name}_{timestamp}"
+            ensure_remote_dir(sftp, backup_dir, log)
+            log(f"备份目录: {backup_dir}")
+
+            items = sftp.listdir(remote_path)
+            if items:
+                stdin, stdout, stderr = ssh.exec_command(f"cp -r {remote_path}/. {backup_dir}/")
+                stdout.channel.recv_exit_status()
+                log(f"备份完成: {remote_path}")
+            else:
+                log("目标目录为空，跳过备份")
+
+            # 清空目标目录
+            log(f"清空目录: {remote_path}")
+            for item in sftp.listdir(remote_path):
+                clear_remote_path(sftp, f"{remote_path}/{item}")
+                log(f"  删除: {item}")
+
+            # 解压并上传
+            log("解压升级包...")
+            with tempfile.TemporaryDirectory() as tmpdir:
+                extract_archive(source_path, tmpdir, log)
+
+                # 查找解压后的设备目录（持续剥掉单目录包装层）
+                content_dir = Path(tmpdir)
+                while True:
+                    children = list(content_dir.iterdir())
+                    if len(children) == 1 and children[0].is_dir():
+                        log(f"剥掉包装目录: {children[0].name}")
+                        content_dir = children[0]
+                    else:
+                        break
+
+                log(f"上传文件到 {remote_path}...")
+                upload_dir(sftp, str(content_dir), remote_path, log)
+
+        sftp.close()
+    log(f"✅ {device_name} 升级完成！")
+
+
+# ==============================
 # 菜单脚本升级逻辑
 # ==============================
 def do_menu_upgrade(host, mysql_config, upgrade_dir, log):
-    """菜单脚本升级：执行 SQL 文件到 MySQL"""
+    """菜单脚本升级：查找菜单数据/权限相关 SQL 文件并执行"""
     sql_files = []
 
-    # 查找菜单相关的 SQL 文件
+    # 查找菜单相关的 SQL 文件（以"菜单"开头，排除床头卡脚本）
     for f in Path(upgrade_dir).iterdir():
         if f.is_file() and f.suffix.lower() == '.sql':
-            name = f.name
-            if '菜单' in name or '权限' in name:
+            name = f.stem  # 不含扩展名
+            if name.startswith('菜单') and '床头卡' not in name:
                 sql_files.append(f)
 
     if not sql_files:
-        log("⚠️ 升级目录中未找到菜单相关 SQL 文件")
+        log("⚠️ 升级目录中未找到菜单相关 SQL 文件（菜单*.sql）")
         return
+
+    # 按文件名排序，确保执行顺序稳定
+    sql_files.sort(key=lambda x: x.name)
 
     log(f"找到 {len(sql_files)} 个菜单 SQL 文件:")
     for f in sql_files:
@@ -285,14 +493,121 @@ def do_menu_upgrade(host, mysql_config, upgrade_dir, log):
 
 
 # ==============================
+# 床头卡脚本升级逻辑
+# ==============================
+def _parse_sql_statements(content):
+    """解析文本中的 SQL 语句，返回语句列表"""
+    statements = []
+    current = []
+    for line in content.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith('--') or stripped.startswith('#'):
+            continue
+        current.append(line)
+        if stripped.endswith(';'):
+            stmt = '\n'.join(current).strip()
+            if stmt and stmt != ';':
+                statements.append(stmt)
+            current = []
+    # 处理最后一条没有分号的语句
+    if current:
+        stmt = '\n'.join(current).strip()
+        if stmt and stmt != ';':
+            statements.append(stmt)
+    return statements
+
+
+def _is_sql_content(content):
+    """判断文本内容是否包含 SQL 语句"""
+    upper = content.upper()
+    keywords = ['INSERT ', 'UPDATE ', 'DELETE ', 'CREATE ', 'ALTER ', 'DROP ', 'REPLACE ']
+    return any(kw in upper for kw in keywords)
+
+
+def do_bedcard_sql_upgrade(mysql_config, upgrade_dir, log):
+    """床头卡脚本升级：扫描 .txt/.sql 文件，识别并执行 SQL 语句"""
+    sql_files = []
+
+    # 查找升级目录下的 .txt 和 .sql 文件
+    for f in Path(upgrade_dir).iterdir():
+        if f.is_file() and f.suffix.lower() in ('.sql', '.txt'):
+            # 读取内容判断是否包含 SQL
+            try:
+                content = f.read_text(encoding='utf-8')
+            except UnicodeDecodeError:
+                try:
+                    content = f.read_text(encoding='gbk')
+                except Exception:
+                    continue
+            if _is_sql_content(content):
+                sql_files.append((f, content))
+
+    if not sql_files:
+        log("⚠️ 升级目录中未找到包含 SQL 语句的 .txt/.sql 文件")
+        return
+
+    log(f"找到 {len(sql_files)} 个床头卡 SQL 文件:")
+    for f, _ in sql_files:
+        log(f"  - {f.name}")
+
+    # 连接 MySQL
+    mysql_host = mysql_config['host']
+    mysql_port = mysql_config.get('port', 3306)
+    mysql_db = mysql_config.get('db', 'YHDB')
+    mysql_pwd = mysql_config['password']
+
+    log(f"连接 MySQL: {mysql_host}:{mysql_port}/{mysql_db}...")
+    conn = pymysql.connect(
+        host=mysql_host,
+        port=int(mysql_port),
+        user='root',
+        password=mysql_pwd,
+        database=mysql_db,
+        charset='utf8mb4',
+        autocommit=False
+    )
+
+    try:
+        cursor = conn.cursor()
+        total_success = 0
+        total_error = 0
+        for sql_file, content in sql_files:
+            log(f"执行 SQL: {sql_file.name}")
+            statements = _parse_sql_statements(content)
+
+            success_count = 0
+            error_count = 0
+            for stmt in statements:
+                try:
+                    cursor.execute(stmt)
+                    success_count += 1
+                except Exception as e:
+                    error_count += 1
+                    logger.warning(f"SQL 执行失败: {e}\n语句: {stmt[:100]}...")
+
+            log(f"  ✅ 成功: {success_count} 条, ⚠️ 失败: {error_count} 条")
+            total_success += success_count
+            total_error += error_count
+
+        conn.commit()
+        cursor.close()
+        log(f"✅ 床头卡脚本升级完成！共成功: {total_success} 条, 失败: {total_error} 条")
+    except Exception as e:
+        conn.rollback()
+        raise RuntimeError(f"床头卡脚本升级失败: {e}")
+    finally:
+        conn.close()
+
+
+# ==============================
 # GUI
 # ==============================
 class WardUpgradeGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("病房前端一键升级工具")
-        self.root.geometry("720x750")
-        self.root.minsize(650, 600)
+        self.root.geometry("720x780")
+        self.root.minsize(650, 630)
 
         self.config = load_config()
         self.create_widgets()
@@ -313,10 +628,17 @@ class WardUpgradeGUI:
         self.server_combo.bind("<<ComboboxSelected>>", self._on_server_selected)
         self.server_combo.bind("<KeyRelease>", self._on_server_selected)
 
-        ttk.Label(frame_server, text="SSH密码:").grid(row=1, column=0, sticky=W, pady=3)
+        ttk.Label(frame_server, text="连接用户:").grid(row=1, column=0, sticky=W, pady=3)
+        self.ssh_user_var = StringVar(value="root")
+        self.ssh_user_combo = ttk.Combobox(frame_server, textvariable=self.ssh_user_var, width=15, state="normal",
+                                           values=["root", "yahua"])
+        self.ssh_user_combo.grid(row=1, column=1, padx=5, pady=3, sticky=W)
+        ttk.Label(frame_server, text="(默认root，可选择yahua或手动输入)", foreground="gray").grid(row=1, column=2, sticky=W)
+
+        ttk.Label(frame_server, text="SSH密码:").grid(row=2, column=0, sticky=W, pady=3)
         self.pwd_var = StringVar()
-        ttk.Entry(frame_server, textvariable=self.pwd_var, width=30).grid(row=1, column=1, padx=5, pady=3, sticky=EW)
-        ttk.Label(frame_server, text="(留空则自动尝试默认密码)", foreground="gray").grid(row=1, column=2, sticky=W)
+        ttk.Entry(frame_server, textvariable=self.pwd_var, width=30).grid(row=2, column=1, padx=5, pady=3, sticky=EW)
+        ttk.Label(frame_server, text="(留空则自动尝试默认密码)", foreground="gray").grid(row=2, column=2, sticky=W)
 
         frame_server.columnconfigure(1, weight=1)
 
@@ -399,6 +721,9 @@ class WardUpgradeGUI:
         servers = self.config.get("servers", {})
         if host in servers:
             self.pwd_var.set(servers[host].get("ssh_password", ""))
+            self.ssh_user_var.set(servers[host].get("ssh_user", "root"))
+        # 服务器地址变更时，MySQL 地址自动同步
+        self.mysql_host_var.set(host)
 
     def _select_upgrade_dir(self):
         d = filedialog.askdirectory(title="选择升级文件目录")
@@ -415,9 +740,13 @@ class WardUpgradeGUI:
             self.server_var.set(last)
             if last in servers:
                 self.pwd_var.set(servers[last].get("ssh_password", ""))
+                self.ssh_user_var.set(servers[last].get("ssh_user", self.config.get("ssh_user", "root")))
 
         # 升级目录
         self.upgrade_dir_var.set(self.config.get("upgrade_dir", ""))
+
+        # SSH 用户
+        self.ssh_user_var.set(self.config.get("ssh_user", "root"))
 
         # MySQL
         self.mysql_host_var.set(self.config.get("mysql_host", ""))
@@ -429,6 +758,7 @@ class WardUpgradeGUI:
 
     def _save_config(self):
         self.config["last_server"] = self.server_var.get().strip()
+        self.config["ssh_user"] = self.ssh_user_var.get().strip()
         self.config["upgrade_dir"] = self.upgrade_dir_var.get().strip()
         self.config["mysql_host"] = self.mysql_host_var.get().strip()
         self.config["mysql_port"] = int(self.mysql_port_var.get() or 3306)
@@ -443,6 +773,7 @@ class WardUpgradeGUI:
             if host not in self.config["servers"]:
                 self.config["servers"][host] = {}
             self.config["servers"][host]["ssh_password"] = self.pwd_var.get().strip()
+            self.config["servers"][host]["ssh_user"] = self.ssh_user_var.get().strip()
 
         save_config(self.config)
         self.server_combo['values'] = list(self.config.get("servers", {}).keys())
@@ -455,23 +786,28 @@ class WardUpgradeGUI:
         self.log_text.config(state=DISABLED)
 
     # ---------- 密码测试 ----------
+    def _get_ssh_user(self):
+        """获取当前 SSH 连接用户名"""
+        return self.ssh_user_var.get().strip() or "root"
+
     def _test_ssh_password(self, host):
         """测试 SSH密码，返回成功的密码或None"""
+        username = self._get_ssh_user()
         pwd = self.pwd_var.get().strip()
         if pwd:
             try:
-                client = get_ssh_client(host, password=pwd, timeout=8)
+                client = get_ssh_client(host, username=username, password=pwd, timeout=8)
                 client.close()
                 return pwd
             except Exception:
-                self._log(f"输入的密码连接失败")
+                self._log(f"用户 {username} 输入的密码连接失败")
                 return None
 
         for p in DEFAULT_SSH_PASSWORDS:
             try:
-                self._log(f"尝试默认密码: {p}")
+                self._log(f"尝试用户 {username} 默认密码: {p}")
                 self.root.update_idletasks()
-                client = get_ssh_client(host, password=p, timeout=8)
+                client = get_ssh_client(host, username=username, password=p, timeout=8)
                 client.close()
                 self._log(f"✅ 密码验证成功: {p}")
                 self.pwd_var.set(p)
@@ -481,6 +817,7 @@ class WardUpgradeGUI:
                 if host not in self.config["servers"]:
                     self.config["servers"][host] = {}
                 self.config["servers"][host]["ssh_password"] = p
+                self.config["servers"][host]["ssh_user"] = username
                 save_config(self.config)
                 return p
             except Exception:
@@ -560,7 +897,7 @@ class WardUpgradeGUI:
         # 如果需要 Web 升级，查找升级包
         web_package = None
         if "web" in selected:
-            for name in ["web.zip", "web.tar.gz", "web.tgz"]:
+            for name in ["web.zip", "web.tar.gz", "web.tgz", "dist.tar.gz"]:
                 p = Path(upgrade_dir) / name
                 if p.exists():
                     web_package = str(p)
@@ -576,6 +913,60 @@ class WardUpgradeGUI:
                 if not web_package:
                     messagebox.showerror("错误", "未选择 Web 升级包，取消升级！")
                     return
+
+        # 如果需要看板升级，查找看板升级包
+        kanban_package = None
+        if "看板" in selected:
+            # 查找 ntv-*.tar.gz 格式的包
+            ntv_packages = sorted(Path(upgrade_dir).glob("ntv-*.tar.gz"))
+            if ntv_packages:
+                kanban_package = str(ntv_packages[-1])  # 取最新的
+                self._log(f"找到看板升级包: {ntv_packages[-1].name}")
+            else:
+                # 未自动找到，弹出文件选择
+                kanban_package = filedialog.askopenfilename(
+                    title="未自动找到看板升级包(ntv-*.tar.gz)，请手动选择",
+                    filetypes=[("压缩包", "*.tar.gz *.tgz *.zip"), ("所有文件", "*.*")],
+                    initialdir=upgrade_dir
+                )
+                if not kanban_package:
+                    messagebox.showerror("错误", "未选择看板升级包，取消升级！")
+                    return
+
+        # 床头/床旁升级源查找
+        device_sources = {}
+        for label, dir_names, pkg_prefix, remote in [
+            ("床头", ["床头", "bedhead"], "bedhead", "/home/data/web/a10/bedhead"),
+            ("床旁", ["床旁", "bedside"], "bedside", "/home/data/web/a10/bedside"),
+        ]:
+            if label not in selected:
+                continue
+            # 先查找本地目录
+            found_dir = None
+            for dn in dir_names:
+                d = Path(upgrade_dir) / dn
+                if d.is_dir():
+                    found_dir = str(d)
+                    self._log(f"找到 {label} 本地目录: {dn}")
+                    break
+            if found_dir:
+                device_sources[label] = ("dir", found_dir, remote)
+            else:
+                # 查找压缩包
+                packages = sorted(Path(upgrade_dir).glob(f"{pkg_prefix}-*.tar.gz"))
+                if packages:
+                    device_sources[label] = ("package", str(packages[-1]), remote)
+                    self._log(f"找到 {label} 升级包: {packages[-1].name}")
+                else:
+                    pkg = filedialog.askopenfilename(
+                        title=f"未自动找到 {label} 升级包({pkg_prefix}-*.tar.gz)，请手动选择",
+                        filetypes=[("压缩包", "*.tar.gz *.tgz *.zip"), ("所有文件", "*.*")],
+                        initialdir=upgrade_dir
+                    )
+                    if not pkg:
+                        messagebox.showerror("错误", f"未选择 {label} 升级包，取消升级！")
+                        return
+                    device_sources[label] = ("package", pkg, remote)
 
         # 测试 SSH 密码
         self._log(f"验证 SSH 连接...")
@@ -599,9 +990,10 @@ class WardUpgradeGUI:
             "password": mysql_pwd or ""
         }
 
+        ssh_user = self._get_ssh_user()
         thread = threading.Thread(
             target=self._run_upgrade,
-            args=(host, ssh_pwd, upgrade_dir, selected, web_package, mysql_config, need_mysql),
+            args=(host, ssh_user, ssh_pwd, upgrade_dir, selected, web_package, kanban_package, device_sources, mysql_config, need_mysql),
             daemon=True
         )
         thread.start()
@@ -609,6 +1001,7 @@ class WardUpgradeGUI:
     def _save_config_silent(self):
         """静默保存配置"""
         self.config["last_server"] = self.server_var.get().strip()
+        self.config["ssh_user"] = self.ssh_user_var.get().strip()
         self.config["upgrade_dir"] = self.upgrade_dir_var.get().strip()
         self.config["mysql_host"] = self.mysql_host_var.get().strip()
         self.config["mysql_port"] = int(self.mysql_port_var.get().strip() or 3306)
@@ -622,11 +1015,12 @@ class WardUpgradeGUI:
             if host not in self.config["servers"]:
                 self.config["servers"][host] = {}
             self.config["servers"][host]["ssh_password"] = self.pwd_var.get().strip()
+            self.config["servers"][host]["ssh_user"] = self.ssh_user_var.get().strip()
 
         save_config(self.config)
         self.server_combo['values'] = list(self.config.get("servers", {}).keys())
 
-    def _run_upgrade(self, host, ssh_pwd, upgrade_dir, selected, web_package, mysql_config, need_mysql):
+    def _run_upgrade(self, host, ssh_user, ssh_pwd, upgrade_dir, selected, web_package, kanban_package, device_sources, mysql_config, need_mysql):
         """后台执行升级"""
         try:
             def log(msg):
@@ -636,7 +1030,7 @@ class WardUpgradeGUI:
                 if item == "web":
                     log("=" * 40)
                     log("📦 开始 Web 前端升级...")
-                    do_web_upgrade(host, ssh_pwd, web_package, log)
+                    do_web_upgrade(host, ssh_user, ssh_pwd, web_package, log)
 
                 elif item == "菜单脚本":
                     if need_mysql and mysql_config["password"]:
@@ -646,17 +1040,38 @@ class WardUpgradeGUI:
                     else:
                         log("⏭️ 跳过菜单脚本升级（未配置 MySQL）")
 
-                elif item in ("床头", "床旁", "看板", "床头卡脚本"):
+                elif item == "看板":
                     log("=" * 40)
-                    log(f"⏭️ {item} 升级功能后续开发中...")
+                    log("📺 开始看板升级...")
+                    do_kanban_upgrade(host, ssh_user, ssh_pwd, kanban_package, log)
+
+                elif item == "床头":
+                    log("=" * 40)
+                    log("🛏️ 开始床头升级...")
+                    src_type, src_path, remote = device_sources["床头"]
+                    do_device_upgrade(host, ssh_user, ssh_pwd, "bedhead", remote, src_type, src_path, log)
+
+                elif item == "床旁":
+                    log("=" * 40)
+                    log("🛏️ 开始床旁升级...")
+                    src_type, src_path, remote = device_sources["床旁"]
+                    do_device_upgrade(host, ssh_user, ssh_pwd, "bedside", remote, src_type, src_path, log)
+
+                elif item == "床头卡脚本":
+                    if need_mysql and mysql_config["password"]:
+                        log("=" * 40)
+                        log("🗂️ 开始床头卡脚本升级...")
+                        do_bedcard_sql_upgrade(mysql_config, upgrade_dir, log)
+                    else:
+                        log("⏭️ 跳过床头卡脚本升级（未配置 MySQL）")
 
             log("=" * 40)
             log("🎉 所有升级任务完成！")
-            self.root.after(0, lambda: messagebox.showinfo("成功", f"服务器 {host} 升级完成！"))
+            self.root.after(0, lambda: self._show_toast("升级完成", f"服务器 {host} 升级完成！", "success"))
 
         except Exception as e:
             error_msg = f"升级失败：{str(e)}"
-            self.root.after(0, lambda: messagebox.showerror("错误", error_msg))
+            self.root.after(0, lambda: self._show_toast("升级失败", error_msg, "error"))
             logger.exception("Upgrade failed")
         finally:
             self.root.after(0, self._upgrade_finished)
@@ -664,6 +1079,49 @@ class WardUpgradeGUI:
     def _upgrade_finished(self):
         self.progress.stop()
         self.btn_start.config(state=NORMAL)
+
+    def _show_toast(self, title, message, level="info", duration_ms=180000):
+        """屏幕右下角弹出一条消息提醒，duration_ms 后自动消失（默认3分钟）"""
+        toast = Toplevel(self.root)
+        toast.withdraw()  # 先隐藏，定位后再显示
+        toast.overrideredirect(True)  # 无边框
+        toast.attributes('-topmost', True)
+
+        # 颜色和图标根据级别设置
+        colors = {
+            "success": ("#2e7d32", "#e8f5e9", "✅"),
+            "error":   ("#c62828", "#ffebee", "❌"),
+            "info":    ("#1565c0", "#e3f2fd", "ℹ️"),
+        }
+        fg, bg, icon = colors.get(level, colors["info"])
+
+        toast.configure(bg=bg)
+
+        # 标题行
+        header = Frame(toast, bg=bg)
+        header.pack(fill=X, padx=10, pady=(8, 0))
+        Label(header, text=f"{icon} {title}", font=("Microsoft YaHei UI", 11, "bold"),
+              fg=fg, bg=bg).pack(side=LEFT)
+        Label(header, text="✕", font=("Consolas", 10), fg="#999", bg=bg,
+              cursor="hand2").pack(side=RIGHT)
+        header.winfo_children()[-1].bind("<Button-1>", lambda e: toast.destroy())
+
+        # 消息内容
+        Label(toast, text=message, font=("Microsoft YaHei UI", 10),
+              fg="#333", bg=bg, wraplength=320, justify=LEFT).pack(padx=12, pady=(4, 10), anchor=W)
+
+        # 计算屏幕右下角位置
+        toast.update_idletasks()
+        w, h = toast.winfo_width(), toast.winfo_height()
+        sx = toast.winfo_screenwidth()
+        sy = toast.winfo_screenheight()
+        x = sx - w - 20
+        y = sy - h - 60  # 避开任务栏
+        toast.geometry(f"+{x}+{y}")
+        toast.deiconify()
+
+        # 自动消失
+        toast.after(duration_ms, toast.destroy)
 
 
 # ==============================
