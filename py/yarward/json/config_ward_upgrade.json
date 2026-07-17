@@ -6,11 +6,15 @@
     "192.168.31.78": {
       "ssh_password": "Huawei@123",
       "ssh_user": "yahua"
+    },
+    "192.168.31.170": {
+      "ssh_password": "Huawei@123",
+      "ssh_user": "yahua"
     }
   },
-  "last_server": "192.168.31.78",
+  "last_server": "192.168.31.170",
   "upgrade_dir": "D:/CODE/Yarward/SVN/病房/2026-1078济南中心医院东院区/前端",
-  "mysql_host": "192.168.31.78",
+  "mysql_host": "192.168.31.170",
   "mysql_port": 3306,
   "mysql_db": "YHDB",
   "mysql_password": "Yahua@3585668",

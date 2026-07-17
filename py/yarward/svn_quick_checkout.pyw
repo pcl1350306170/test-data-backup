@@ -210,6 +210,42 @@ class SVNQuickCheckoutGUI:
         self.status_label.config(text=msg, fg=color)
         self.root.update_idletasks()
 
+    def _show_toast(self, title, message, level="info", duration_ms=180000):
+        """屏幕右下角弹出消息提醒，duration_ms 后自动消失（默认3分钟）"""
+        toast = Toplevel(self.root)
+        toast.withdraw()
+        toast.overrideredirect(True)
+        toast.attributes('-topmost', True)
+
+        colors = {
+            "success": ("#2e7d32", "#e8f5e9", "✅"),
+            "error":   ("#c62828", "#ffebee", "❌"),
+            "info":    ("#1565c0", "#e3f2fd", "ℹ️"),
+        }
+        fg, bg, icon = colors.get(level, colors["info"])
+        toast.configure(bg=bg)
+
+        header = Frame(toast, bg=bg)
+        header.pack(fill=X, padx=10, pady=(8, 0))
+        Label(header, text=f"{icon} {title}", font=("Microsoft YaHei UI", 11, "bold"),
+              fg=fg, bg=bg).pack(side=LEFT)
+        close_btn = Label(header, text="✕", font=("Consolas", 10), fg="#999", bg=bg, cursor="hand2")
+        close_btn.pack(side=RIGHT)
+        close_btn.bind("<Button-1>", lambda e: toast.destroy())
+
+        Label(toast, text=message, font=("Microsoft YaHei UI", 10),
+              fg="#333", bg=bg, wraplength=320, justify=LEFT).pack(padx=12, pady=(4, 10), anchor=W)
+
+        toast.update_idletasks()
+        w, h = toast.winfo_width(), toast.winfo_height()
+        sx = toast.winfo_screenwidth()
+        sy = toast.winfo_screenheight()
+        x = sx - w - 20
+        y = sy - h - 60
+        toast.geometry(f"+{x}+{y}")
+        toast.deiconify()
+        toast.after(duration_ms, toast.destroy)
+
     def start_process(self):
         order_type = self.order_type.get()
         svn_base = self.svn_url_var.get().strip()
@@ -356,12 +392,12 @@ class SVNQuickCheckoutGUI:
             # 自动打开
             os.startfile(str(checkout_local_path))
 
-            self.root.after(0, lambda: messagebox.showinfo("成功", f"SVN 操作完成！\n已打开目录：{checkout_local_path}"))
+            self.root.after(0, lambda: self._show_toast("SVN 操作完成", f"已打开目录：{checkout_local_path}", "success"))
 
         except Exception as e:
             error_msg = f"❌ 操作失败: {str(e)}"
             self.log(error_msg)
-            self.root.after(0, lambda: messagebox.showerror("错误", error_msg))
+            self.root.after(0, lambda: self._show_toast("SVN 操作失败", error_msg, "error"))
         finally:
             self.root.after(0, lambda: self.progress.stop())
             self.root.after(0, lambda: self.progress.destroy())

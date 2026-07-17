@@ -9,7 +9,8 @@ import zipfile
 import tempfile
 from pathlib import Path
 from tkinter import *
-from tkinter import filedialog, messagebox, ttk, simpledialog
+from tkinter import filedialog, messagebox, ttk, simpledialog, scrolledtext
+from datetime import datetime
 
 # ==============================
 # 第三方库导入
@@ -293,43 +294,43 @@ class YarwardUpgradeGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Yarward 门诊前端一键升级")
-        self.root.geometry("650x580")
-        self.root.resizable(False, False)
+        self.root.geometry("700x650")
+        self.root.minsize(600, 500)
 
         self.config = load_config()
         self.create_widgets()
 
     def create_widgets(self):
-        frame_server = LabelFrame(self.root, text="服务器配置", padx=10, pady=5)
-        frame_server.pack(pady=5, padx=10, fill=X)
+        main = ttk.Frame(self.root, padding=10)
+        main.pack(fill=BOTH, expand=True)
+
+        # 服务器配置
+        frame_server = LabelFrame(main, text="服务器配置", padx=10, pady=5)
+        frame_server.pack(pady=5, fill=X)
 
         Label(frame_server, text="服务器地址:").grid(row=0, column=0, sticky=W, pady=3)
         self.server_var = StringVar()
         server_list = list(self.config.get("servers", {}).keys())
         if not server_list:
-            server_list = [""]  # 避免空列表
+            server_list = [""]
         self.server_combo = ttk.Combobox(
-            frame_server,
-            textvariable=self.server_var,
-            values=server_list,
-            width=28,
-            state="normal"  # 允许手动输入新地址
+            frame_server, textvariable=self.server_var, values=server_list,
+            width=28, state="normal"
         )
         self.server_combo.grid(row=0, column=1, padx=5, pady=3)
         self.server_combo.bind("<<ComboboxSelected>>", self.on_server_selected)
-        self.server_combo.bind("<KeyRelease>", self.on_server_typed)  # 支持手动输入
+        self.server_combo.bind("<KeyRelease>", self.on_server_typed)
 
         Label(frame_server, text="密码:").grid(row=1, column=0, sticky=W, pady=3)
         self.pwd_var = StringVar()
-        pwd_entry = Entry(frame_server, textvariable=self.pwd_var, width=30)  # 明文！
-        pwd_entry.grid(row=1, column=1, padx=5, pady=3)
-
+        Entry(frame_server, textvariable=self.pwd_var, width=30).grid(row=1, column=1, padx=5, pady=3)
         Button(frame_server, text="保存配置", command=self.save_server_config).grid(row=0, column=2, rowspan=2, padx=10)
 
-        frame_mode = LabelFrame(self.root, text="升级方式", padx=10, pady=5)
-        frame_mode.pack(pady=5, padx=10, fill=X)
+        # 升级方式
+        frame_mode = LabelFrame(main, text="升级方式", padx=10, pady=5)
+        frame_mode.pack(pady=5, fill=X)
 
-        self.upgrade_mode = StringVar(value="package")  # ✅ 默认使用压缩包升级
+        self.upgrade_mode = StringVar(value="package")
         Radiobutton(frame_mode, text="目录升级", variable=self.upgrade_mode, value="directory").pack(anchor=W)
         Radiobutton(frame_mode, text="压缩包升级", variable=self.upgrade_mode, value="package").pack(anchor=W)
 
@@ -337,19 +338,68 @@ class YarwardUpgradeGUI:
         path_frame = Frame(frame_mode)
         path_frame.pack(fill=X, pady=5)
         self.path_entry = Entry(path_frame, textvariable=self.path_var, state='readonly')
-        self.path_entry.pack(side=LEFT, fill=X, expand=True, padx=(0,5))
+        self.path_entry.pack(side=LEFT, fill=X, expand=True, padx=(0, 5))
         Button(path_frame, text="选择", command=self.select_path).pack(side=RIGHT)
 
-        btn_frame = Frame(self.root)
-        btn_frame.pack(pady=15)
-
+        # 操作按钮
+        btn_frame = Frame(main)
+        btn_frame.pack(pady=10)
         Button(btn_frame, text="开始一键升级", command=self.start_upgrade, bg="#4CAF50", fg="white", width=15, height=2).pack()
 
-        self.progress_label = Label(self.root, text="", fg="blue", wraplength=600, justify=LEFT)
-        self.progress_label.pack(pady=5)
+        # 进度条
+        self.progress = ttk.Progressbar(main, mode='indeterminate')
+        self.progress.pack(padx=20, fill=X, pady=(5, 0))
 
-        self.progress = ttk.Progressbar(self.root, mode='indeterminate')
-        self.progress.pack(padx=20, fill=X)
+        # 日志区域
+        frame_log = LabelFrame(main, text="📝 升级日志", padding=5)
+        frame_log.pack(fill=BOTH, expand=True, pady=(5, 0))
+
+        self.log_text = scrolledtext.ScrolledText(frame_log, state=DISABLED, wrap=WORD, height=10, font=("Consolas", 9))
+        self.log_text.pack(fill=BOTH, expand=True)
+
+    def _log(self, message):
+        """写入日志到 GUI 和文件"""
+        self.log_text.config(state=NORMAL)
+        self.log_text.insert(END, f"[{datetime.now():%H:%M:%S}] {message}\n")
+        self.log_text.see(END)
+        self.log_text.config(state=DISABLED)
+        logger.info(message)
+
+    def _show_toast(self, title, message, level="info", duration_ms=180000):
+        """屏幕右下角弹出消息提醒，duration_ms 后自动消失（默认3分钟）"""
+        toast = Toplevel(self.root)
+        toast.withdraw()
+        toast.overrideredirect(True)
+        toast.attributes('-topmost', True)
+
+        colors = {
+            "success": ("#2e7d32", "#e8f5e9", "✅"),
+            "error":   ("#c62828", "#ffebee", "❌"),
+            "info":    ("#1565c0", "#e3f2fd", "ℹ️"),
+        }
+        fg, bg, icon = colors.get(level, colors["info"])
+        toast.configure(bg=bg)
+
+        header = Frame(toast, bg=bg)
+        header.pack(fill=X, padx=10, pady=(8, 0))
+        Label(header, text=f"{icon} {title}", font=("Microsoft YaHei UI", 11, "bold"),
+              fg=fg, bg=bg).pack(side=LEFT)
+        close_btn = Label(header, text="✕", font=("Consolas", 10), fg="#999", bg=bg, cursor="hand2")
+        close_btn.pack(side=RIGHT)
+        close_btn.bind("<Button-1>", lambda e: toast.destroy())
+
+        Label(toast, text=message, font=("Microsoft YaHei UI", 10),
+              fg="#333", bg=bg, wraplength=320, justify=LEFT).pack(padx=12, pady=(4, 10), anchor=W)
+
+        toast.update_idletasks()
+        w, h = toast.winfo_width(), toast.winfo_height()
+        sx = toast.winfo_screenwidth()
+        sy = toast.winfo_screenheight()
+        x = sx - w - 20
+        y = sy - h - 60
+        toast.geometry(f"+{x}+{y}")
+        toast.deiconify()
+        toast.after(duration_ms, toast.destroy)
 
     def on_server_selected(self, event=None):
         """当选中已有服务器时，自动填入密码"""
@@ -426,8 +476,8 @@ class YarwardUpgradeGUI:
             final_password = None
             for pwd in DEFAULT_PASSWORDS:
                 try:
-                    self.progress_label.config(text=f"尝试默认密码: {pwd}")
-                    self.root.update()
+                    self._log(f"尝试默认密码: {pwd}")
+                    self.root.update_idletasks()
                     # 快速测试连接
                     test_client = get_ssh_client(host, password=pwd, timeout=5)
                     test_client.close()
@@ -452,7 +502,7 @@ class YarwardUpgradeGUI:
                 self.pwd_var.set(final_password)  # 记住这次输入
 
         self.progress.start(10)
-        self.progress_label.config(text="准备升级...")
+        self._log("准备升级...")
         thread = threading.Thread(
             target=self.run_upgrade,
             args=(host, password, local_path, mode),
@@ -463,21 +513,23 @@ class YarwardUpgradeGUI:
     def run_upgrade(self, host, password, local_path, mode):
         try:
             def update_status(msg):
-                self.root.after(0, lambda: self.progress_label.config(text=msg))
+                self.root.after(0, lambda: self._log(msg))
 
             if mode == "directory":
                 do_directory_upgrade(host, password, local_path, update_status)
             else:
                 do_package_upgrade(host, password, local_path, update_status)
 
-            # === 新增：调用通知接口 ===
+            # 调用通知接口
             notify_template_update(host, update_status)
 
-            self.root.after(0, lambda: messagebox.showinfo("成功", f"服务器 {host} 升级及通知完成！"))
+            self._log("=" * 40)
+            self._log(f"🎉 服务器 {host} 升级及通知完成！")
+            self.root.after(0, lambda: self._show_toast("升级完成", f"服务器 {host} 升级及通知完成！", "success"))
             logger.info(f"Full upgrade and notification succeeded for {host}")
         except Exception as e:
             error_msg = f"升级失败：{str(e)}"
-            self.root.after(0, lambda: messagebox.showerror("错误", error_msg))
+            self.root.after(0, lambda: self._show_toast("升级失败", error_msg, "error"))
             logger.exception("Upgrade failed")
         finally:
             self.root.after(0, lambda: self.progress.stop())

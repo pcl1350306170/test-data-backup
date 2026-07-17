@@ -1,6 +1,7 @@
 # jar_deployer_with_iptables.py
 
 import os
+import sys
 import json
 import logging
 from pathlib import Path
@@ -8,6 +9,7 @@ from tkinter import *
 from tkinter import filedialog, messagebox, ttk
 import paramiko
 import threading
+import subprocess
 
 # ================== 配置与常量 ==================
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
@@ -16,6 +18,9 @@ CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
 PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / f"log_{SCRIPT_NAME}.log"
+
+# 全局配置（联动升级选项）
+GLOBAL_CONFIG_PATH = SCRIPT_DIR / "json" / "global_config.json"
 
 # 日志配置
 logging.basicConfig(
@@ -34,6 +39,65 @@ DEFAULT_CONFIG = {
     "upload_dir": "/usr/local/apps/base-service",
     "server_port": "28019"
 }
+
+# ================== 全局配置 ==================
+
+def load_global_config():
+    """加载全局配置，返回 dict"""
+    if GLOBAL_CONFIG_PATH.exists():
+        try:
+            with open(GLOBAL_CONFIG_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {"linked_upgrade": False}
+
+def save_global_config(global_config):
+    """保存全局配置"""
+    try:
+        with open(GLOBAL_CONFIG_PATH, 'w', encoding='utf-8') as f:
+            json.dump(global_config, f, ensure_ascii=False, indent=4)
+    except Exception as e:
+        logging.error(f"保存全局配置失败: {e}")
+
+# ================== Toast 通知 ==================
+
+def show_toast(title, message, color="#4CAF50", duration=180000):
+    """右下角 toast 通知，duration 毫秒后自动关闭"""
+    toast = Toplevel()
+    toast.overrideredirect(True)
+    toast.attributes("-topmost", True)
+    toast.configure(bg=color)
+
+    lbl_title = Label(toast, text=title, font=("Microsoft YaHei", 11, "bold"),
+                      fg="white", bg=color, anchor="w", padx=12, pady=(8, 0))
+    lbl_title.pack(fill=X)
+    lbl_msg = Label(toast, text=message, font=("Microsoft YaHei", 9),
+                    fg="white", bg=color, anchor="w", wraplength=320, justify=LEFT,
+                    padx=12, pady=(2, 10))
+    lbl_msg.pack(fill=X)
+
+    toast.update_idletasks()
+    w, h = toast.winfo_reqwidth(), toast.winfo_reqheight()
+    sw = toast.winfo_screenwidth()
+    sh = toast.winfo_screenheight()
+    toast.geometry(f"+{sw - w - 20}+{sh - h - 60}")
+    toast.after(duration, toast.destroy)
+
+# ================== 联动升级 ==================
+
+def launch_linked_script():
+    """以独立进程启动对应的另一个升级脚本"""
+    script_path = SCRIPT_DIR / "base_web_uploader.pyw"
+    try:
+        subprocess.Popen([sys.executable, str(script_path)],
+                         cwd=str(SCRIPT_DIR),
+                         creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0)
+        logging.info(f"联动升级: 已启动 {script_path}")
+        return True
+    except Exception as e:
+        logging.error(f"联动升级启动失败: {e}")
+        return False
 
 # ================== 工具函数 ==================
 
@@ -337,6 +401,7 @@ class JARDeployerApp:
         self.root.resizable(True, True)
 
         self.config = load_or_create_config()
+        self.global_config = load_global_config()
 
         self.setup_ui()
 
@@ -378,9 +443,17 @@ class JARDeployerApp:
         self.upload_dir_var = StringVar(value=self.config["upload_dir"])
         Entry(server_frame, textvariable=self.upload_dir_var, width=45).grid(row=2, column=1, columnspan=3, padx=5, sticky=W)
 
+        # 联动升级选项（全局配置）
+        link_frame = Frame(self.root)
+        link_frame.pack(pady=(5, 5))
+        self.also_upload_web = BooleanVar(value=self.global_config.get("linked_upgrade", False))
+        Checkbutton(link_frame, text="🔗 同时升级对应前端(Web)",
+                    variable=self.also_upload_web, font=("Microsoft YaHei", 10),
+                    fg="#1565C0").pack()
+
         # 按钮区
         btn_frame = Frame(self.root)
-        btn_frame.pack(pady=20)
+        btn_frame.pack(pady=10)
 
         Button(btn_frame, text="💾 保存配置", command=self.save_config, bg="#9C27B0", fg="white", width=12).grid(row=0, column=0, padx=10)
         Button(btn_frame, text="🚀 部署运行", command=self.deploy, bg="#4CAF50", fg="white", width=12, height=2).grid(row=0, column=1, padx=10)
@@ -420,6 +493,9 @@ class JARDeployerApp:
             "server_port": self.port_var.get()
         })
         save_config(self.config)
+        # 同步保存全局配置
+        self.global_config["linked_upgrade"] = self.also_upload_web.get()
+        save_global_config(self.global_config)
         messagebox.showinfo("保存成功", "配置已保存！")
         logging.info("配置已保存")
 
@@ -460,11 +536,23 @@ class JARDeployerApp:
             )
             if success:
                 self.root.after(0, lambda: self.log_to_gui("✅ 部署完成！JAR 已在服务器后台运行。"))
-                # 显示访问地址
                 access_url = f"http://{self.config['server_host']}:{self.config['server_port']}"
                 self.root.after(0, lambda: self.log_to_gui(f"📋 可通过以下地址访问: {access_url}"))
+                self.root.after(0, lambda: show_toast("部署完成", "服务(JAR)已成功部署并运行！", "#4CAF50"))
+                # 联动升级：启动另一个脚本（独立进程）
+                if self.also_upload_web.get():
+                    self.root.after(0, lambda: self.log_to_gui("🔗 正在启动对应前端(Web)升级..."))
+                    self.root.after(0, lambda: self.update_progress("正在启动前端升级..."))
+                    launched = launch_linked_script()
+                    if launched:
+                        self.root.after(0, lambda: self.log_to_gui("✅ 前端升级脚本已启动，请查看弹出的窗口。"))
+                        self.root.after(0, lambda: self.update_progress("✅ 服务升级完成，前端升级已启动"))
+                    else:
+                        self.root.after(0, lambda: self.log_to_gui("❌ 前端升级脚本启动失败"))
+                        self.root.after(0, lambda: self.update_progress("⚠️ 服务升级完成，前端启动失败"))
             else:
                 self.root.after(0, lambda: self.log_to_gui("❌ 部署失败，请查看日志详情。"))
+                self.root.after(0, lambda: show_toast("部署失败", "JAR 包部署失败，请查看日志", "#F44336"))
 
         threading.Thread(target=run_deploy, daemon=True).start()
 
