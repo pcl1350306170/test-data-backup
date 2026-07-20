@@ -555,7 +555,7 @@ class ZipBasedPackagerApp:
             self.history_listbox.insert(tk.END, display_text)
     
     def _load_history_record(self, event=None):
-        """加载选中的历史记录（双击时直接加载并开始打包）"""
+        """加载选中的历史记录（仅加载配置，不自动打包）"""
         selection = self.history_listbox.curselection()
         if not selection:
             return
@@ -564,7 +564,7 @@ class ZipBasedPackagerApp:
         if 0 <= index < len(self.history_records):
             record = self.history_records[index]
             
-            # 直接加载配置，无需确认
+            # 加载配置到界面
             self.project_dir.set(record['project_dir'])
             self.output_dir.set(record['output_dir'])
             self.order_info.set(record['order_info'])
@@ -575,9 +575,10 @@ class ZipBasedPackagerApp:
             self.is_version_155_plus.set(record['is_version_155_plus'])
             
             self._log(f"✅ 已加载历史记录: {record['timestamp']} - {record['order_info']}")
+            self._log("ℹ️ 配置已加载，请确认后点击「🚀 开始打包」按钮执行打包")
             
-            # 自动开始打包
-            self._start_packaging()
+            # 切换到配置标签页，方便用户查看和修改
+            self.notebook.select(0)
     
     def _delete_history_record(self):
         """删除选中的历史记录"""
@@ -946,6 +947,8 @@ class ZipBasedPackagerApp:
         version_combo.bind("<<ComboboxSelected>>", lambda e: self._on_version_selected(version_combo))
 
         self.manual_version_var = tk.StringVar()
+        # 手动输入时实时同步到 project_version
+        self.manual_version_var.trace_add("write", self._sync_manual_version)
         self.manual_version_entry = ttk.Entry(version_frame, textvariable=self.manual_version_var, width=10)
         self.manual_version_entry.grid(row=0, column=1, padx=5, pady=5)
         self.manual_version_entry.grid_remove()
@@ -1039,7 +1042,7 @@ class ZipBasedPackagerApp:
         ttk.Button(btn_history_frame, text="📥 加载选中记录", command=self._load_history_record).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_history_frame, text="🗑️ 删除选中记录", command=self._delete_history_record).pack(side=tk.LEFT, padx=5)
 
-        ttk.Label(history_frame, text="💡 提示：双击记录可直接加载配置并开始打包", foreground="gray").pack(anchor=tk.W)
+        ttk.Label(history_frame, text="💡 提示：双击或点击「加载」可恢复配置，需手动点击「开始打包」执行", foreground="gray").pack(anchor=tk.W)
 
     def _on_version_selected(self, combo):
         if combo.get() == "手动输入":
@@ -1047,8 +1050,13 @@ class ZipBasedPackagerApp:
             self.manual_version_entry.focus()
         else:
             self.manual_version_entry.grid_remove()
-            if combo.get() != "手动输入":
-                self.project_version.set(combo.get())
+            self.project_version.set(combo.get())
+
+    def _sync_manual_version(self, *args):
+        """手动输入版本号时，实时同步到 project_version"""
+        val = self.manual_version_var.get().strip()
+        if val:
+            self.project_version.set(val)
 
 if __name__ == "__main__":
     root = tk.Tk()

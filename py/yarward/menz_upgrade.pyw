@@ -351,7 +351,7 @@ class YarwardUpgradeGUI:
         self.progress.pack(padx=20, fill=X, pady=(5, 0))
 
         # 日志区域
-        frame_log = LabelFrame(main, text="📝 升级日志", padding=5)
+        frame_log = LabelFrame(main, text="📝 升级日志")
         frame_log.pack(fill=BOTH, expand=True, pady=(5, 0))
 
         self.log_text = scrolledtext.ScrolledText(frame_log, state=DISABLED, wrap=WORD, height=10, font=("Consolas", 9))
