@@ -17,18 +17,27 @@ SCRIPT_NAME = "base_jar_deployer"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
-PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / f"log_{SCRIPT_NAME}.log"
 
 # 全局配置（联动升级选项）
 GLOBAL_CONFIG_PATH = SCRIPT_DIR / "json" / "global_config.json"
 
-# 日志配置
-logging.basicConfig(
-    filename=PROCESS_LOG_FILE,
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    encoding='utf-8'
-)
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 
 # 默认配置
 DEFAULT_CONFIG = {
@@ -58,7 +67,7 @@ def save_global_config(global_config):
         with open(GLOBAL_CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(global_config, f, ensure_ascii=False, indent=4)
     except Exception as e:
-        logging.error(f"保存全局配置失败: {e}")
+        logger.error(f"保存全局配置失败: {e}")
 
 # ================== Toast 通知 ==================
 
@@ -93,10 +102,10 @@ def launch_linked_script():
         subprocess.Popen([sys.executable, str(script_path)],
                          cwd=str(SCRIPT_DIR),
                          creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0)
-        logging.info(f"联动升级: 已启动 {script_path}")
+        logger.info(f"联动升级: 已启动 {script_path}")
         return True
     except Exception as e:
-        logging.error(f"联动升级启动失败: {e}")
+        logger.error(f"联动升级启动失败: {e}")
         return False
 
 # ================== 工具函数 ==================
@@ -106,26 +115,26 @@ def load_or_create_config():
         try:
             with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
                 config = json.load(f)
-            logging.info("配置文件加载成功")
+            logger.info("配置文件加载成功")
             return config
         except Exception as e:
-            logging.error(f"配置文件解析失败: {e}")
+            logger.error(f"配置文件解析失败: {e}")
             messagebox.showerror("配置错误", f"配置文件损坏，将使用默认配置。\n{e}")
 
     # 创建默认配置
     CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
         json.dump(DEFAULT_CONFIG, f, ensure_ascii=False, indent=4)
-    logging.info("已创建默认配置文件")
+    logger.info("已创建默认配置文件")
     return DEFAULT_CONFIG
 
 def save_config(config):
     try:
         with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=4)
-        logging.info("配置已保存")
+        logger.info("配置已保存")
     except Exception as e:
-        logging.error(f"保存配置失败: {e}")
+        logger.error(f"保存配置失败: {e}")
         messagebox.showerror("保存失败", f"无法保存配置：{e}")
 
 def check_port_listening(ssh, port):
@@ -169,7 +178,7 @@ def add_iptables_rule(ssh, port, progress_callback=None):
         if check_iptables_rule_exists(ssh, port):
             if progress_callback:
                 progress_callback(f"✅ iptables 端口 {port} 规则已存在")
-            logging.info(f"iptables 端口 {port} 规则已存在")
+            logger.info(f"iptables 端口 {port} 规则已存在")
             return True
 
         # 添加规则
@@ -186,13 +195,13 @@ def add_iptables_rule(ssh, port, progress_callback=None):
             save_status = stdout.channel.recv_exit_status()
 
             if save_status == 0:
-                logging.info(f"iptables 端口 {port} 规则已添加并保存")
+                logger.info(f"iptables 端口 {port} 规则已添加并保存")
                 if progress_callback:
                     progress_callback(f"✅ iptables 端口 {port} 规则已添加并保存")
                 return True
             else:
                 # 即使保存失败，规则也已生效（重启后失效）
-                logging.warning(f"iptables 规则添加成功但保存失败，重启后需重新添加")
+                logger.warning(f"iptables 规则添加成功但保存失败，重启后需重新添加")
                 if progress_callback:
                     progress_callback(f"⚠️ iptables 规则已添加，但保存失败（重启后需重新添加）")
                 return True
@@ -201,7 +210,7 @@ def add_iptables_rule(ssh, port, progress_callback=None):
             raise Exception(f"添加 iptables 规则失败: {error}")
 
     except Exception as e:
-        logging.error(f"添加 iptables 规则失败: {e}")
+        logger.error(f"添加 iptables 规则失败: {e}")
         if progress_callback:
             progress_callback(f"❌ 添加 iptables 规则失败: {e}")
         return False
@@ -228,12 +237,12 @@ def check_and_configure_firewall(ssh, port, progress_callback=None):
                     # 重新加载配置
                     stdin, stdout, stderr = ssh.exec_command("firewall-cmd --reload")
                     stdout.channel.recv_exit_status()
-                    logging.info(f"firewalld 端口 {port} 已开放")
+                    logger.info(f"firewalld 端口 {port} 已开放")
                     if progress_callback:
                         progress_callback(f"✅ firewalld 端口 {port} 已开放")
                 else:
                     error = stderr.read().decode()
-                    logging.warning(f"firewalld 配置失败: {error}")
+                    logger.warning(f"firewalld 配置失败: {error}")
                     if progress_callback:
                         progress_callback(f"⚠️ firewalld 配置失败: {error}")
             else:
@@ -250,7 +259,7 @@ def check_and_configure_firewall(ssh, port, progress_callback=None):
 
         return True
     except Exception as e:
-        logging.error(f"防火墙配置失败: {e}")
+        logger.error(f"防火墙配置失败: {e}")
         if progress_callback:
             progress_callback(f"❌ 防火墙配置失败: {e}")
         return False
@@ -275,7 +284,7 @@ def upload_and_run_jar(jar_path, server_config, progress_callback=None):
             timeout=30
         )
 
-        logging.info(f"已连接到服务器: {server_config['server_host']}")
+        logger.info(f"已连接到服务器: {server_config['server_host']}")
 
         # 创建上传目录
         sftp = ssh.open_sftp()
@@ -297,7 +306,7 @@ def upload_and_run_jar(jar_path, server_config, progress_callback=None):
         sftp.put(str(jar_file), remote_jar_path)
         sftp.close()
 
-        logging.info(f"JAR 文件已上传至: {remote_jar_path}")
+        logger.info(f"JAR 文件已上传至: {remote_jar_path}")
 
         # 停止之前的进程（如果存在）
         if progress_callback:
@@ -325,7 +334,7 @@ def upload_and_run_jar(jar_path, server_config, progress_callback=None):
         if not java_path or java_path == "":
             raise Exception("服务器上未找到 Java 命令，请确保 Java 已正确安装并添加到 PATH")
 
-        logging.info(f"找到 Java 路径: {java_path}")
+        logger.info(f"找到 Java 路径: {java_path}")
 
         # 检查并配置防火墙
         server_port = server_config.get("server_port", "8080")
@@ -341,7 +350,7 @@ def upload_and_run_jar(jar_path, server_config, progress_callback=None):
         exit_status = stdout.channel.recv_exit_status()
 
         if exit_status == 0:
-            logging.info("JAR 包启动命令已发送")
+            logger.info("JAR 包启动命令已发送")
 
             # 等待应用启动
             import time
@@ -349,7 +358,7 @@ def upload_and_run_jar(jar_path, server_config, progress_callback=None):
 
             # 检查端口是否在监听
             if check_port_listening(ssh, server_port):
-                logging.info(f"✅ JAR 包启动成功，端口 {server_port} 正在监听")
+                logger.info(f"✅ JAR 包启动成功，端口 {server_port} 正在监听")
                 if progress_callback:
                     progress_callback(f"✅ JAR 包已成功上传并后台运行！端口: {server_port}")
 
@@ -363,7 +372,7 @@ def upload_and_run_jar(jar_path, server_config, progress_callback=None):
                 # 再次检查
                 time.sleep(5)
                 if check_port_listening(ssh, server_port):
-                    logging.info(f"✅ JAR 包启动成功，端口 {server_port} 正在监听")
+                    logger.info(f"✅ JAR 包启动成功，端口 {server_port} 正在监听")
                     if progress_callback:
                         progress_callback(f"✅ JAR 包已成功上传并后台运行！端口: {server_port}")
 
@@ -374,7 +383,7 @@ def upload_and_run_jar(jar_path, server_config, progress_callback=None):
                     result = True
                 else:
                     error_msg = f"⚠️ JAR 启动后端口 {server_port} 未监听，请检查应用配置或日志文件 app.log"
-                    logging.warning(error_msg)
+                    logger.warning(error_msg)
                     if progress_callback:
                         progress_callback(error_msg)
                     result = False
@@ -386,7 +395,7 @@ def upload_and_run_jar(jar_path, server_config, progress_callback=None):
         return result
 
     except Exception as e:
-        logging.error(f"上传运行失败: {e}")
+        logger.error(f"上传运行失败: {e}")
         if progress_callback:
             progress_callback(f"❌ 失败: {e}")
         return False
@@ -481,7 +490,7 @@ class JARDeployerApp:
         if file_path:
             self.jar_path_var.set(file_path)
             self.config["jar_path"] = file_path
-            logging.info(f"选择 JAR 文件: {file_path}")
+            logger.info(f"选择 JAR 文件: {file_path}")
 
     def save_config(self):
         self.config.update({
@@ -497,7 +506,7 @@ class JARDeployerApp:
         self.global_config["linked_upgrade"] = self.also_upload_web.get()
         save_global_config(self.global_config)
         messagebox.showinfo("保存成功", "配置已保存！")
-        logging.info("配置已保存")
+        logger.info("配置已保存")
 
     def log_to_gui(self, msg):
         self.log_text.config(state=NORMAL)

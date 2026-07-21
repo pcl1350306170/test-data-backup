@@ -41,17 +41,22 @@ CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / "config_adb_device_manager.json"
 CONFIG_DIR.mkdir(exist_ok=True)
 
-LOGS_DIR = CONFIG_DIR / "logs"
-LOGS_DIR.mkdir(exist_ok=True)
-PROCESS_LOG_FILE = LOGS_DIR / "log_adb_device_manager.log"
+# ──────────── 公共日志模块（可选依赖）────────────
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
 
-# 日志配置
-logging.basicConfig(
-    filename=PROCESS_LOG_FILE,
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    encoding='utf-8'
-)
+try:
+    from log_utils import get_logger
+    logger = get_logger("adb_device_manager")
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 
 # 默认配置（无路径！）
 DEFAULT_CONFIG = {
@@ -70,25 +75,25 @@ def load_or_create_config():
                 # 兼容旧配置，补充缺失字段
                 if "history_devices" not in config:
                     config["history_devices"] = []
-                logging.info("配置文件加载成功")
+                logger.info("配置文件加载成功")
                 return config
         except Exception as e:
-            logging.error(f"配置文件解析失败: {e}")
+            logger.error(f"配置文件解析失败: {e}")
             messagebox.showerror("配置错误", f"配置文件损坏，将使用默认配置。\n{e}")
 
     # 创建默认配置
     config = DEFAULT_CONFIG.copy()
     save_config(config)
-    logging.info("已创建默认配置文件")
+    logger.info("已创建默认配置文件")
     return config
 
 def save_config(config):
     try:
         with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=4)
-        logging.info("配置已保存")
+        logger.info("配置已保存")
     except Exception as e:
-        logging.error(f"保存配置失败: {e}")
+        logger.error(f"保存配置失败: {e}")
         messagebox.showerror("保存失败", f"无法保存配置：{e}")
 
 def run_adb_command(adb_path, args, cwd=None, shell=False):
@@ -133,7 +138,7 @@ class ADBDeviceManager:
                 self.config["adb_dir"] = adb_dir_auto
                 self.config["scrcpy_exe"] = scrcpy_exe_auto
                 save_config(self.config)
-                logging.info(f"自动发现 QtScrcpy: {adb_dir_auto}")
+                logger.info(f"自动发现 QtScrcpy: {adb_dir_auto}")
 
         self.adb_executable = Path(self.config["adb_dir"]) / "adb.exe" if self.config["adb_dir"] else None
 
@@ -251,7 +256,7 @@ class ADBDeviceManager:
             self.config["adb_dir"] = folder
             save_config(self.config)
             self.update_display()
-            logging.info(f"ADB 目录更新为: {folder}")
+            logger.info(f"ADB 目录更新为: {folder}")
 
     def select_scrcpy_exe(self):
         file_path = filedialog.askopenfilename(
@@ -265,7 +270,7 @@ class ADBDeviceManager:
             self.config["scrcpy_exe"] = file_path
             save_config(self.config)
             self.update_display()
-            logging.info(f"Scrcpy 路径更新为: {file_path}")
+            logger.info(f"Scrcpy 路径更新为: {file_path}")
 
     def save_ip(self):
         ip = self.device_ip_var.get().strip()
@@ -275,7 +280,7 @@ class ADBDeviceManager:
         self.config["device_ip"] = ip
         save_config(self.config)
         self.set_status(f"IP 已保存: {ip}", "blue")
-        logging.info(f"设备IP更新为: {ip}")
+        logger.info(f"设备IP更新为: {ip}")
 
     def set_status(self, msg, color="black"):
         self.status_label.config(text=msg, fg=color)
@@ -370,11 +375,11 @@ class ADBDeviceManager:
             if code == 0:
                 msg = f"🔌 已断开 {dev_id}"
                 self.log_to_gui(msg)
-                logging.info(msg)
+                logger.info(msg)
             else:
                 msg = f"⚠️ 断开 {dev_id} 失败: {err or out}"
                 self.log_to_gui(msg)
-                logging.warning(msg)
+                logger.warning(msg)
 
         self.refresh_connected_devices()
 
@@ -398,12 +403,12 @@ class ADBDeviceManager:
             msg = f"⛔ 已断开所有设备连接（共 {count} 台）"
             self.set_status(msg, "orange")
             self.log_to_gui(msg)
-            logging.info(msg)
+            logger.info(msg)
         else:
             msg = "⚠️ 断开所有连接时出现问题"
             self.set_status(msg, "red")
             self.log_to_gui(msg)
-            logging.warning(msg)
+            logger.warning(msg)
 
         self.refresh_connected_devices()
 
@@ -420,13 +425,13 @@ class ADBDeviceManager:
             return
 
         self.set_status("正在连接设备...", "orange")
-        logging.info(f"尝试连接设备: {ip}")
+        logger.info(f"尝试连接设备: {ip}")
         code, out, err = run_adb_command(str(self.adb_executable), ["connect", ip])
         if code == 0 and "connected" in out.lower():
             msg = f"✅ 成功连接 {ip}"
             self.set_status(msg, "green")
             self.log_to_gui(msg)
-            logging.info(msg)
+            logger.info(msg)
             self.add_to_history(ip)
             # 延迟刷新已连接列表
             self.root.after(500, self.refresh_connected_devices)
@@ -434,7 +439,7 @@ class ADBDeviceManager:
             msg = f"❌ 连接失败: {err or out}"
             self.set_status(msg, "red")
             self.log_to_gui(msg)
-            logging.error(msg)
+            logger.error(msg)
             messagebox.showerror("连接失败", msg)
 
     def launch_scrcpy(self):
@@ -448,12 +453,12 @@ class ADBDeviceManager:
             msg = "✅ 已启动 QtScrcpy 投屏"
             self.set_status(msg, "green")
             self.log_to_gui(msg)
-            logging.info(msg)
+            logger.info(msg)
         except Exception as e:
             msg = f"❌ 启动失败: {e}"
             self.set_status(msg, "red")
             self.log_to_gui(msg)
-            logging.error(msg)
+            logger.error(msg)
             messagebox.showerror("启动失败", str(e))
 
     def clear_device(self):
@@ -470,7 +475,7 @@ class ADBDeviceManager:
             return
 
         self.set_status("正在清空设备...", "orange")
-        logging.info("开始执行设备清空流程")
+        logger.info("开始执行设备清空流程")
 
         # 确保连接
         run_adb_command(str(self.adb_executable), ["connect", ip])
@@ -485,7 +490,7 @@ class ADBDeviceManager:
         if code != 0:
             msg = f"⚠️ 清理配置出错: {err or out}"
             self.log_to_gui(msg)
-            logging.warning(msg)
+            logger.warning(msg)
 
         # 重启设备
         self.log_to_gui("正在重启设备...")
@@ -494,12 +499,12 @@ class ADBDeviceManager:
             msg = "✅ 设备已重启"
             self.set_status(msg, "green")
             self.log_to_gui(msg)
-            logging.info(msg)
+            logger.info(msg)
         else:
             msg = f"❌ 重启失败: {err}"
             self.set_status(msg, "red")
             self.log_to_gui(msg)
-            logging.error(msg)
+            logger.error(msg)
 
     def view_logcat(self):
         ip = self.device_ip_var.get().strip()
@@ -517,12 +522,12 @@ class ADBDeviceManager:
             msg = "✅ 已打开日志窗口"
             self.set_status(msg, "green")
             self.log_to_gui(msg)
-            logging.info(msg)
+            logger.info(msg)
         except Exception as e:
             msg = f"❌ 无法打开日志: {e}"
             self.set_status(msg, "red")
             self.log_to_gui(msg)
-            logging.error(msg)
+            logger.error(msg)
 
 # ================== 启动程序 ==================
 if __name__ == "__main__":

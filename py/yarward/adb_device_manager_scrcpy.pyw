@@ -27,19 +27,24 @@ DEFAULT_SCRCPY_DIR = r"D:\tools\scrcpy-win64-v3.3.3"
 # 运行时实际使用的 scrcpy 目录（优先用配置，其次默认，最后尝试打包内嵌）
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / "config_adb_device_manager_scrcpy.json"
-LOGS_DIR = CONFIG_DIR / "logs"
-PROCESS_LOG_FILE = LOGS_DIR / "log_adb_device_manager.log"
-
 CONFIG_DIR.mkdir(exist_ok=True)
-LOGS_DIR.mkdir(exist_ok=True)
 
-# 日志配置
-logging.basicConfig(
-    filename=PROCESS_LOG_FILE,
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    encoding='utf-8'
-)
+# ──────────── 公共日志模块（可选依赖）────────────
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger("adb_device_manager_scrcpy")
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 
 # ==============================
 # 工具函数
@@ -54,7 +59,7 @@ def get_scrcpy_dir_from_config():
                 if path and Path(path).exists():
                     return Path(path)
         except Exception as e:
-            logging.error(f"配置加载失败: {e}")
+            logger.error(f"配置加载失败: {e}")
 
     # 尝试默认路径
     if Path(DEFAULT_SCRCPY_DIR).exists():
@@ -80,7 +85,7 @@ def load_config():
                     config["scrcpy_dir"] = data.get("scrcpy_dir", "")
                     config["history_devices"] = data.get("history_devices", [])
         except Exception as e:
-            logging.error(f"配置加载失败: {e}")
+            logger.error(f"配置加载失败: {e}")
     return config
 
 
@@ -91,9 +96,9 @@ def save_config(scrcpy_dir: Path, history_devices: list = None):
             data["history_devices"] = history_devices
         with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        logging.info(f"配置已保存: scrcpy_dir={scrcpy_dir}, history={history_devices}")
+        logger.info(f"配置已保存: scrcpy_dir={scrcpy_dir}, history={history_devices}")
     except Exception as e:
-        logging.error(f"保存配置失败: {e}")
+        logger.error(f"保存配置失败: {e}")
         messagebox.showerror("错误", f"无法保存配置：{e}")
 
 
@@ -267,7 +272,7 @@ class ADBDeviceManager:
         self.log_text.insert(END, msg + "\n")
         self.log_text.see(END)
         self.log_text.config(state=DISABLED)
-        logging.info(msg)
+        logger.info(msg)
 
     # ------------------------------
     # 历史设备管理

@@ -17,17 +17,23 @@ CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
-LOG_DIR = SCRIPT_DIR / "json" / "logs"
-LOG_DIR.mkdir(exist_ok=True, parents=True)
-PROCESS_LOG_FILE = LOG_DIR / f"log_{SCRIPT_NAME}.log"
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
 
-# 日志配置
-logging.basicConfig(
-    filename=PROCESS_LOG_FILE,
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    encoding='utf-8'
-)
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 
 class GitBranchCreator:
     def __init__(self, root):
@@ -338,7 +344,7 @@ class GitBranchCreator:
 
     def _log(self, message, level=logging.INFO):
         """记录日志并更新UI"""
-        logging.log(level, message)
+        logger.log(level, message)
         self.log_text.config(state=tk.NORMAL)
         self.log_text.insert(tk.END, f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {message}\n")
         self.log_text.see(tk.END)

@@ -19,8 +19,6 @@ SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
 SCRIPT_NAME = "api_batch_tester"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
-LOGS_DIR = CONFIG_DIR / "logs"
-PROCESS_LOG_FILE = LOGS_DIR / f"log_{SCRIPT_NAME}.log"
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
 
 # 姓名库路径
@@ -29,18 +27,26 @@ FIRST_NAME_PATH = (SCRIPT_DIR.parent) / "json" / "FirstName.json"
 
 # 创建目录
 CONFIG_DIR.mkdir(exist_ok=True)
-LOGS_DIR.mkdir(exist_ok=True)
 
-# 日志配置
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(PROCESS_LOG_FILE, encoding='utf-8'),
-    ]
-)
-logger = logging.getLogger()
 
+
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 # 默认配置
 DEFAULT_CONFIG = {
     "api_url": "http://192.168.18.228:7000/clinic/api/qcss/register/made",
