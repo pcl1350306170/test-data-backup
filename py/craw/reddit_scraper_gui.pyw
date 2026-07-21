@@ -36,21 +36,28 @@ CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
-PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / f"log_{SCRIPT_NAME}.log"
-PROCESS_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 REDDIT_CHI_PATH = CONFIG_DIR / "reddit_chi.json"
 
 # 默认保存目录
 DEFAULT_SAVE_DIR = Path(r"D:\img\reddit")
 
-# 日志配置
-logging.basicConfig(
-    filename=str(PROCESS_LOG_FILE),
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s: %(message)s"
-)
-logger = logging.getLogger("reddit_scraper")
-logger.addHandler(logging.StreamHandler())  # 终端也打印
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 
 # -------------------- 帮助函数 --------------------
 def load_config():

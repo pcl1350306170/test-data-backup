@@ -1,6 +1,6 @@
 {
-  "save_dir": "G:\\图片\\v33\\Reddit",
-  "subreddit": "r/Chinesebeauty",
+  "save_dir": "D:/FILES/IMG/v33/HHQQ-2026年3月16日/reddit",
+  "subreddit": "",
   "use_praw": false,
   "praw": {
     "client_id": "",
@@ -13,11 +13,11 @@
     "gifs": true,
     "documents": false
   },
-  "start_date": "2025-01-01",
-  "end_date": "2025-12-31",
+  "start_date": "2026-01-01",
+  "end_date": "2026-06-30",
   "batch_size": 50,
   "threads": 1,
   "write_to_db": false,
-  "db_config_path": "C:\\www\\test\\py\\json\\DB_CONFIG.json",
-  "last_run": "2025-12-31T14:23:15.281111"
+  "db_config_path": "D:\\CODE\\Python\\test-data-backup\\py\\json\\DB_CONFIG.json",
+  "last_run": "2026-07-21T16:32:47.965534"
 }

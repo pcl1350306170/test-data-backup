@@ -5,7 +5,6 @@ import pymysql
 import requests
 import threading
 import logging
-from logging.handlers import RotatingFileHandler
 from queue import Queue
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -30,20 +29,16 @@ CONFIG_DIR.mkdir(exist_ok=True)
 # 数据库配置路径
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
 
-# 日志配置
-LOG_DIR = SCRIPT_DIR / "json" / "logs"
-LOG_DIR.mkdir(exist_ok=True)
-PROCESS_LOG_FILE = LOG_DIR / f"logs_{SCRIPT_NAME}.log"
-
 # 小图映射JSON路径
 SMALL_IMG_JSON = CONFIG_DIR / "imgSmallMapping.json"
+
+# 调试文件目录
+LOG_DIR = CONFIG_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
 
 # 安全停止标志
 STOP_FLAG = False
 STOP_LOCK = threading.Lock()
-
-# 新增：日志文件大小限制(1MB)
-MAX_LOG_SIZE = 1 * 1024 * 1024  # 1MB
 
 # 配置默认值 - 新增"保存日志文件"配置和爬虫模式
 DEFAULT_CONFIG = {
@@ -86,39 +81,28 @@ def save_config(config):
 
 
 # -------------------
-# 日志配置
+# 公共日志模块
 # -------------------
-def setup_logger():
-    """配置日志系统 - 增加文件大小限制和开关控制"""
-    logger = logging.getLogger(SCRIPT_NAME)
-    logger.setLevel(logging.INFO)
-    logger.handlers.clear()  # 清除已存在的处理器，避免重复输出
 
-    # 格式器
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
 
-    # 新增：根据配置决定是否添加文件处理器
-    config = load_config()
-    if config["SAVE_LOG_FILE"]:
-        # 使用RotatingFileHandler实现日志文件大小限制
-        file_handler = RotatingFileHandler(
-            PROCESS_LOG_FILE,
-            mode='a',
-            maxBytes=MAX_LOG_SIZE,
-            backupCount=3,  # 最多保留3个备份日志
-            encoding='utf-8'
-        )
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-    # 控制台处理器始终保留
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    return logger
-
-logger = setup_logger()
+try:
+    from log_utils import get_logger, get_log_file
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+    def get_log_file(name=None):
+        return Path()
+# ────────────────────────────────────────────────
 
 # 加载配置
 config = load_config()
@@ -783,14 +767,18 @@ class ImageCrawlerApp:
 
         # 重新配置日志系统
         global logger
-        logger = setup_logger()
+        try:
+            logger = get_logger(SCRIPT_NAME)
+        except Exception:
+            pass  # 导入失败时保留当前 logger
 
         messagebox.showinfo("成功", "配置已保存")
 
     def view_log_file(self):
         try:
-            if os.path.exists(PROCESS_LOG_FILE):
-                os.startfile(PROCESS_LOG_FILE)
+            log_path = get_log_file(SCRIPT_NAME)
+            if os.path.exists(log_path):
+                os.startfile(log_path)
             else:
                 messagebox.showinfo("提示", "日志文件不存在")
         except Exception as e:

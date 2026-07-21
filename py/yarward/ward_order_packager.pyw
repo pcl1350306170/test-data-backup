@@ -372,7 +372,7 @@ class WardOrderPackagerGUI:
         self.log_text.pack(fill=BOTH, expand=True)
 
         # 历史记录
-        history_frame = ttk.LabelFrame(log_tab, text="📚 打包历史记录（最近10次）", padding=5)
+        history_frame = ttk.LabelFrame(log_tab, text="📚 打包历史记录（最近100次）", padding=5)
         history_frame.pack(fill=X, pady=5)
 
         listbox_frame = ttk.Frame(history_frame)
@@ -572,7 +572,12 @@ class WardOrderPackagerGUI:
                 self._commit_to_svn(target_path, svn_work_dir, log)
 
             # 8. 添加历史记录
-            self.root.after(0, lambda: self._add_to_history(project_type, project_dir, svn_dir, package_file.name))
+            branch = ""
+            for p, b in self.matched_project_dirs:
+                if p == project_dir:
+                    branch = b
+                    break
+            self.root.after(0, lambda: self._add_to_history(project_type, project_dir, svn_dir, package_file.name, branch))
 
             log("=" * 50)
             log("🎉 打包完成！")
@@ -727,7 +732,7 @@ class WardOrderPackagerGUI:
         self.btn_scan.config(state=NORMAL)
 
     # ---------- 历史记录 ----------
-    def _add_to_history(self, project_type, project_dir, svn_dir, package_name):
+    def _add_to_history(self, project_type, project_dir, svn_dir, package_name, branch=""):
         record = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "project_type": project_type,
@@ -735,6 +740,8 @@ class WardOrderPackagerGUI:
             "svn_dir": str(svn_dir),
             "package_name": package_name,
             "keyword": self.keyword.get().strip(),
+            "auto_commit_svn": self.auto_commit_svn.get(),
+            "branch": branch,
         }
 
         history = self.config.get("history_records", [])
@@ -742,7 +749,7 @@ class WardOrderPackagerGUI:
         key = f"{record['project_dir']}_{record['svn_dir']}"
         history = [r for r in history if f"{r.get('project_dir', '')}_{r.get('svn_dir', '')}" != key]
         history.insert(0, record)
-        history = history[:10]
+        history = history[:100]
 
         self.config["history_records"] = history
         save_config(self.config)
@@ -765,10 +772,57 @@ class WardOrderPackagerGUI:
             return
 
         record = history[sel[0]]
+
+        # 恢复完整配置
         self.project_type.set(record.get("project_type", "床旁"))
         self.keyword.set(record.get("keyword", ""))
-        self._log(f"✅ 已加载历史记录: {record.get('timestamp', '')} - {record.get('project_type', '')}")
-        self._log("ℹ️ 配置已加载，请重新扫描匹配后打包")
+        self.auto_commit_svn.set(record.get("auto_commit_svn", True))
+
+        saved_proj = record.get("project_dir", "")
+        saved_svn = record.get("svn_dir", "")
+
+        # 恢复项目目录选中
+        self.selected_project_dir = None
+        if saved_proj:
+            found = False
+            for idx in range(self.proj_listbox.size()):
+                if self.proj_listbox.get(idx).startswith(saved_proj):
+                    self.proj_listbox.selection_clear(0, END)
+                    self.proj_listbox.selection_set(idx)
+                    self.proj_listbox.see(idx)
+                    self.selected_project_dir = Path(saved_proj)
+                    found = True
+                    break
+            if not found:
+                # 列表中没有该目录，直接添加显示并选中
+                branch_info = f"  (分支: {record.get('branch', '')})" if record.get('branch') else ""
+                self.proj_listbox.delete(0, END)
+                self.proj_listbox.insert(END, f"{saved_proj}{branch_info}")
+                self.proj_listbox.selection_set(0)
+                self.selected_project_dir = Path(saved_proj)
+                self.matched_project_dirs = [(Path(saved_proj), record.get('branch', ''))]
+
+        # 恢复SVN目录选中
+        self.selected_svn_dir = None
+        if saved_svn:
+            found = False
+            for idx in range(self.svn_listbox.size()):
+                if self.svn_listbox.get(idx).startswith(saved_svn):
+                    self.svn_listbox.selection_clear(0, END)
+                    self.svn_listbox.selection_set(idx)
+                    self.svn_listbox.see(idx)
+                    self.selected_svn_dir = Path(saved_svn)
+                    found = True
+                    break
+            if not found:
+                self.svn_listbox.delete(0, END)
+                self.svn_listbox.insert(END, saved_svn)
+                self.svn_listbox.selection_set(0)
+                self.selected_svn_dir = Path(saved_svn)
+                self.matched_svn_dirs = [Path(saved_svn)]
+
+        self._log(f"✅ 已加载历史记录: {record.get('timestamp', '')} | {record.get('project_type', '')} | {record.get('keyword', '')}")
+        self._log("ℹ️ 配置已恢复，可直接点击『🚀 开始打包』或重新扫描匹配")
         self.notebook.select(0)
 
     def _delete_history_record(self):

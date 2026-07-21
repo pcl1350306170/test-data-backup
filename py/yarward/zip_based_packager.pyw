@@ -540,9 +540,9 @@ class ZipBasedPackagerApp:
         # 添加到历史记录开头（最新）
         self.history_records.insert(0, record)
         
-        # 只保留最近10条
-        if len(self.history_records) > 10:
-            self.history_records = self.history_records[:10]
+        # 只保留最近50条
+        if len(self.history_records) > 50:
+            self.history_records = self.history_records[:50]
         
         # 刷新UI显示
         self._refresh_history_listbox()

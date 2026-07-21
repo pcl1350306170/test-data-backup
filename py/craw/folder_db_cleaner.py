@@ -2,7 +2,6 @@ import os
 import json
 import pymysql
 import logging
-from logging.handlers import RotatingFileHandler
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
 from pathlib import Path
@@ -15,15 +14,9 @@ SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
 SCRIPT_NAME = "folder_db_cleaner"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
-LOG_DIR = CONFIG_DIR / "logs"
-PROCESS_LOG_FILE = LOG_DIR / f"log_{SCRIPT_NAME}.log"
 
 # 创建目录
 CONFIG_DIR.mkdir(exist_ok=True)
-LOG_DIR.mkdir(exist_ok=True)
-
-# 日志配置
-MAX_LOG_SIZE = 1 * 1024 * 1024  # 1MB
 
 # 默认配置
 DEFAULT_CONFIG = {
@@ -69,38 +62,26 @@ def save_config(config):
 
 
 # ==============================
-# 日志配置
+# 公共日志模块
 # ==============================
 
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
 
-def setup_logger():
-    """配置日志系统"""
-    logger = logging.getLogger(SCRIPT_NAME)
-    logger.setLevel(logging.INFO)
-    logger.handlers.clear()
-
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-
-    config = load_config()
-    if config["SAVE_LOG_FILE"]:
-        file_handler = RotatingFileHandler(
-            PROCESS_LOG_FILE,
-            mode='a',
-            maxBytes=MAX_LOG_SIZE,
-            backupCount=3,
-            encoding='utf-8'
-        )
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    return logger
-
-
-logger = setup_logger()
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 
 # 加载配置
 config = load_config()
@@ -388,7 +369,10 @@ class FolderDbCleanerApp:
 
         # 重新配置日志
         global logger
-        logger = setup_logger()
+        try:
+            logger = get_logger(SCRIPT_NAME)
+        except Exception:
+            pass  # 导入失败时保留当前 logger
 
         messagebox.showinfo("成功", "配置已保存")
 

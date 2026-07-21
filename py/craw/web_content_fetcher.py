@@ -8,17 +8,26 @@ from pathlib import Path
 
 # 配置与常量
 SCRIPT_DIR = Path(__file__).resolve().parent
-LOG_DIR = SCRIPT_DIR / "logs"
-LOG_DIR.mkdir(exist_ok=True)
-LOG_FILE = LOG_DIR / "web_content_fetcher.log"
+SCRIPT_NAME = "web_content_fetcher"
 
-# 日志配置
-logging.basicConfig(
-    filename=LOG_FILE,
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    encoding='utf-8'
-)
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+        def log(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 
 class WebContentFetcher:
     def __init__(self, root):
@@ -69,7 +78,7 @@ class WebContentFetcher:
 
     def _log(self, message, level=logging.INFO):
         """记录日志"""
-        logging.log(level, message)
+        logger.log(level, message)
         self.status_var.set(message)
 
     def _fetch_web_content(self):
