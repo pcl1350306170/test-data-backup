@@ -21,6 +21,24 @@ DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
 # 确保目录存在
 CONFIG_DIR.mkdir(exist_ok=True)
 
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
+
 class EpubReplacerApp:
     def __init__(self, root):
         self.root = root

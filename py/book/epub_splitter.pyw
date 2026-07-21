@@ -16,9 +16,27 @@ SCRIPT_NAME = "epub_splitter"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
-PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / f"log_{SCRIPT_NAME}.log"
-PROCESS_LOG_FILE.parent.mkdir(exist_ok=True, parents=True)
 
+
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger, get_log_file
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+    def get_log_file(name=None):
+        return Path()
+# ────────────────────────────────────────────────
 # 默认配置
 DEFAULT_CONFIG = {
     "last_input_dir": "",
@@ -36,7 +54,7 @@ def load_config():
                 return json.load(f)
         return DEFAULT_CONFIG
     except Exception as e:
-        logging.error(f"加载配置文件失败: {str(e)}")
+        logger.error(f"加载配置文件失败: {str(e)}")
         return DEFAULT_CONFIG
 
 # 保存配置文件
@@ -46,7 +64,7 @@ def save_config(config):
             json.dump(config, f, ensure_ascii=False, indent=2)
         return True
     except Exception as e:
-        logging.error(f"保存配置文件失败: {str(e)}")
+        logger.error(f"保存配置文件失败: {str(e)}")
         return False
 
 # 初始化配置
@@ -63,9 +81,9 @@ def extract_epub_structure(epub_path, temp_dir):
         raise IsADirectoryError(f"请选择EPUB文件，而不是目录: {epub_path}")
     
     if not epub_path.lower().endswith('.epub'):
-        logging.warning(f"警告：文件可能不是EPUB格式: {epub_path}")
+        logger.warning(f"警告：文件可能不是EPUB格式: {epub_path}")
     
-    logging.info(f"解压 EPUB 文件：{epub_path}")
+    logger.info(f"解压 EPUB 文件：{epub_path}")
     try:
         with zipfile.ZipFile(epub_path, 'r') as zip_ref:
             zip_ref.extractall(temp_dir)
@@ -84,7 +102,7 @@ def extract_epub_structure(epub_path, temp_dir):
     if not oebps_dir:
         oebps_dir = temp_dir
     
-    logging.info(f"找到内容目录：{oebps_dir}")
+    logger.info(f"找到内容目录：{oebps_dir}")
     return oebps_dir
 
 def get_html_files_with_size(oebps_dir):
@@ -123,7 +141,7 @@ def get_html_files_with_size(oebps_dir):
                     })
                     
                 except Exception as e:
-                    logging.warning(f"处理HTML文件失败 {file}: {e}")
+                    logger.warning(f"处理HTML文件失败 {file}: {e}")
                     # 如果解析失败，只计算HTML文件大小
                     html_files.append({
                         'path': html_path,
@@ -131,7 +149,7 @@ def get_html_files_with_size(oebps_dir):
                         'img_count': 0
                     })
     
-    logging.info(f"找到 {len(html_files)} 个 HTML 文件")
+    logger.info(f"找到 {len(html_files)} 个 HTML 文件")
     return html_files
 
 def split_html_files_by_count(html_files, split_count):
@@ -181,19 +199,19 @@ def split_html_files_by_size(html_files, target_size_bytes):
     if current_group:
         groups.append(current_group)
     
-    logging.info(f"按大小拆分：目标 {target_size_bytes/1024/1024:.1f}MB/组，共 {len(groups)} 组")
+    logger.info(f"按大小拆分：目标 {target_size_bytes/1024/1024:.1f}MB/组，共 {len(groups)} 组")
     return groups
 
 def create_split_epub(original_epub_path, temp_dir, oebps_dir, html_group, output_path, index, total_groups):
     """创建拆分后的EPUB文件"""
-    logging.info(f"\n创建第 {index + 1} 部分...")
+    logger.info(f"\n创建第 {index + 1} 部分...")
     
     # 生成输出文件名：原文件名_序号.epub
     original_name = os.path.splitext(os.path.basename(original_epub_path))[0]
     output_filename = f"{original_name}_{index + 1}.epub"
     output_path = os.path.join(output_path, output_filename)
     
-    logging.info(f"输出文件：{output_filename}")
+    logger.info(f"输出文件：{output_filename}")
     
     # 创建临时目录用于构建新的EPUB
     new_epub_temp = tempfile.mkdtemp()
@@ -204,14 +222,14 @@ def create_split_epub(original_epub_path, temp_dir, oebps_dir, html_group, outpu
         mimetype_dst = os.path.join(new_epub_temp, "mimetype")
         if os.path.exists(mimetype_src):
             shutil.copy2(mimetype_src, mimetype_dst)
-            logging.info("已复制 mimetype 文件")
+            logger.info("已复制 mimetype 文件")
         
         # 复制 META-INF 目录（包含 container.xml）
         meta_inf_src = os.path.join(temp_dir, "META-INF")
         meta_inf_dst = os.path.join(new_epub_temp, "META-INF")
         if os.path.exists(meta_inf_src):
             shutil.copytree(meta_inf_src, meta_inf_dst)
-            logging.info("已复制 META-INF 目录")
+            logger.info("已复制 META-INF 目录")
         
         # 创建 OEBPS 目录
         new_oebps = os.path.join(new_epub_temp, "OEBPS")
@@ -235,9 +253,9 @@ def create_split_epub(original_epub_path, temp_dir, oebps_dir, html_group, outpu
                         if os.path.exists(img_path):
                             referenced_images.add(img_path)
             except Exception as e:
-                logging.warning(f"解析HTML图片引用失败: {e}")
+                logger.warning(f"解析HTML图片引用失败: {e}")
         
-        logging.info(f"本组HTML共引用 {len(referenced_images)} 张图片")
+        logger.info(f"本组HTML共引用 {len(referenced_images)} 张图片")
         
         # 复制选中的HTML文件
         total_imgs_in_group = 0
@@ -248,7 +266,7 @@ def create_split_epub(original_epub_path, temp_dir, oebps_dir, html_group, outpu
             os.makedirs(os.path.dirname(dest_path), exist_ok=True)
             shutil.copy2(html_file, dest_path)
             total_imgs_in_group += html_info['img_count']
-            logging.info(f"  复制HTML: {rel_path} ({html_info['img_count']}张图片)")
+            logger.info(f"  复制HTML: {rel_path} ({html_info['img_count']}张图片)")
         
         # 只复制本组HTML引用的图片、CSS等资源文件
         resource_extensions = ('.png', '.jpg', '.jpeg', '.gif', '.webp', '.css', '.svg', '.ttf', '.otf')
@@ -273,10 +291,10 @@ def create_split_epub(original_epub_path, temp_dir, oebps_dir, html_group, outpu
                         shutil.copy2(full_path, dest_path)
                         resource_count += 1
         
-        logging.info(f"已复制 {resource_count} 个资源文件，本部分共 {total_imgs_in_group} 张图片")
+        logger.info(f"已复制 {resource_count} 个资源文件，本部分共 {total_imgs_in_group} 张图片")
         
         # 重新打包EPUB
-        logging.info("开始打包EPUB...")
+        logger.info("开始打包EPUB...")
         with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as new_zip:
             # mimetype 文件要放最前面且不压缩
             if os.path.exists(mimetype_dst):
@@ -291,11 +309,11 @@ def create_split_epub(original_epub_path, temp_dir, oebps_dir, html_group, outpu
                         continue
                     new_zip.write(filepath, arcname)
         
-        logging.info(f"✅ 第 {index + 1} 部分创建完成：{output_filename}")
+        logger.info(f"✅ 第 {index + 1} 部分创建完成：{output_filename}")
         return True
         
     except Exception as e:
-        logging.error(f"创建第 {index + 1} 部分失败: {str(e)}", exc_info=True)
+        logger.error(f"创建第 {index + 1} 部分失败: {str(e)}", exc_info=True)
         return False
     finally:
         shutil.rmtree(new_epub_temp, ignore_errors=True)
@@ -303,14 +321,14 @@ def create_split_epub(original_epub_path, temp_dir, oebps_dir, html_group, outpu
 def split_epub(epub_path, split_count, output_dir, progress_callback=None, split_by_size=True, target_size_mb=50):
     """主拆分函数"""
     temp_dir = tempfile.mkdtemp()
-    logging.info(f"="*60)
-    logging.info(f"开始拆分 EPUB: {os.path.basename(epub_path)}")
-    logging.info(f"拆分模式: {'按文件大小' if split_by_size else '按HTML数量'}")
+    logger.info(f"="*60)
+    logger.info(f"开始拆分 EPUB: {os.path.basename(epub_path)}")
+    logger.info(f"拆分模式: {'按文件大小' if split_by_size else '按HTML数量'}")
     if split_by_size:
-        logging.info(f"目标大小: {target_size_mb}MB/部分")
+        logger.info(f"目标大小: {target_size_mb}MB/部分")
     else:
-        logging.info(f"拆分为 {split_count} 部分")
-    logging.info(f"输出目录: {output_dir}")
+        logger.info(f"拆分为 {split_count} 部分")
+    logger.info(f"输出目录: {output_dir}")
     
     try:
         # 步骤1：解压并分析结构
@@ -320,13 +338,13 @@ def split_epub(epub_path, split_count, output_dir, progress_callback=None, split
         html_files_info = get_html_files_with_size(oebps_dir)
         
         if not html_files_info:
-            logging.error("未找到任何HTML文件，无法拆分")
+            logger.error("未找到任何HTML文件，无法拆分")
             return False
         
         # 计算总大小
         total_size = sum(h['size'] for h in html_files_info)
         total_imgs = sum(h['img_count'] for h in html_files_info)
-        logging.info(f"总大小: {total_size/1024/1024:.1f}MB, 总图片数: {total_imgs}")
+        logger.info(f"总大小: {total_size/1024/1024:.1f}MB, 总图片数: {total_imgs}")
         
         # 步骤3：分组
         if split_by_size:
@@ -344,7 +362,7 @@ def split_epub(epub_path, split_count, output_dir, progress_callback=None, split
                 groups.append(info_group)
         
         non_empty_groups = [g for g in groups if g]
-        logging.info(f"将 {len(html_files_info)} 个HTML文件分为 {len(non_empty_groups)} 组")
+        logger.info(f"将 {len(html_files_info)} 个HTML文件分为 {len(non_empty_groups)} 组")
         
         # 步骤4：创建拆分后的EPUB
         success_count = 0
@@ -357,7 +375,7 @@ def split_epub(epub_path, split_count, output_dir, progress_callback=None, split
             # 计算本组大小
             group_size = sum(h['size'] for h in group)
             group_imgs = sum(h['img_count'] for h in group)
-            logging.info(f"\n处理进度: {i + 1}/{total_groups} (大小: {group_size/1024/1024:.1f}MB, 图片: {group_imgs}张)")
+            logger.info(f"\n处理进度: {i + 1}/{total_groups} (大小: {group_size/1024/1024:.1f}MB, 图片: {group_imgs}张)")
             
             # 更新进度回调
             if progress_callback:
@@ -370,13 +388,13 @@ def split_epub(epub_path, split_count, output_dir, progress_callback=None, split
             if success:
                 success_count += 1
         
-        logging.info(f"\n{'='*60}")
-        logging.info(f"✅ 拆分完成！成功创建 {success_count} 个文件")
-        logging.info(f"📁 输出目录: {output_dir}")
+        logger.info(f"\n{'='*60}")
+        logger.info(f"✅ 拆分完成！成功创建 {success_count} 个文件")
+        logger.info(f"📁 输出目录: {output_dir}")
         return success_count > 0
         
     except Exception as e:
-        logging.error(f"拆分过程出错: {str(e)}", exc_info=True)
+        logger.error(f"拆分过程出错: {str(e)}", exc_info=True)
         return False
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
@@ -407,14 +425,6 @@ class EpubSplitterApp:
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
         
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s [%(levelname)s] %(message)s",
-            handlers=[
-                logging.FileHandler(PROCESS_LOG_FILE, encoding="utf-8", mode='w'),
-                logging.StreamHandler()
-            ]
-        )
 
     def setup_ui(self):
         """设置用户界面"""
@@ -572,8 +582,9 @@ class EpubSplitterApp:
     def view_log(self):
         """查看日志文件"""
         try:
-            if os.path.exists(PROCESS_LOG_FILE):
-                os.startfile(PROCESS_LOG_FILE)
+            log_path = get_log_file(SCRIPT_NAME)
+            if os.path.exists(log_path):
+                os.startfile(log_path)
             else:
                 messagebox.showinfo("提示", "日志文件不存在")
         except Exception as e:
@@ -653,7 +664,7 @@ class EpubSplitterApp:
         confirm_msg += "是否继续？"
         
         if not messagebox.askyesno("确认拆分", confirm_msg):
-            logging.info("用户取消了拆分操作")
+            logger.info("用户取消了拆分操作")
             return
 
         # 重置进度
@@ -666,8 +677,8 @@ class EpubSplitterApp:
         self.log_text.delete(1.0, tk.END)
         self.log_text.configure(state=tk.DISABLED)
 
-        logging.info("="*60)
-        logging.info(f"开始拆分任务")
+        logger.info("="*60)
+        logger.info(f"开始拆分任务")
         
         # 执行拆分
         def progress_callback(current, total):

@@ -42,20 +42,28 @@ SCRIPT_NAME = "img2book"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
-LOG_DIR = CONFIG_DIR / "logs"
-LOG_DIR.mkdir(exist_ok=True, parents=True)
-PROCESS_LOG_FILE = LOG_DIR / f"log_{SCRIPT_NAME}.log"
 
+
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 IMG_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".tiff", ".tif"}
 MAX_FILE_BYTES = 300 * 1024 * 1024  # 300 MB
 
-# 日志配置
-logging.basicConfig(
-    filename=PROCESS_LOG_FILE,
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    encoding='utf-8'
-)
 
 # 默认配置
 DEFAULT_CONFIG = {
@@ -73,7 +81,7 @@ def load_config():
                 return json.load(f)
         return DEFAULT_CONFIG.copy()
     except Exception as e:
-        logging.error(f"加载配置文件失败: {str(e)}")
+        logger.error(f"加载配置文件失败: {str(e)}")
         return DEFAULT_CONFIG.copy()
 
 
@@ -84,7 +92,7 @@ def save_config(config):
             json.dump(config, f, ensure_ascii=False, indent=2)
         return True
     except Exception as e:
-        logging.error(f"保存配置文件失败: {str(e)}")
+        logger.error(f"保存配置文件失败: {str(e)}")
         return False
 
 
@@ -205,7 +213,7 @@ class App:
 
     def _log(self, message: str, level=logging.INFO):
         """同时写入日志文件和界面"""
-        logging.log(level, message)
+        logger.log(level, message)
         self._append_log(message)
 
     def _load_config(self):
@@ -228,7 +236,7 @@ class App:
             "output_format": self.var_fmt.get()
         }
         if save_config(config):
-            logging.info("配置已保存")
+            logger.info("配置已保存")
 
     def _poll(self):
         """从工作线程取结果, 在主线程更新GUI"""

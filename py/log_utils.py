@@ -153,3 +153,20 @@ def get_logger(name: str | None = None, level: int = logging.DEBUG) -> logging.L
 
     logger.debug(f"── 日志开始: {name} ── 文件: {log_file}")
     return logger
+
+
+def get_log_file(name: str | None = None) -> Path:
+    """
+    获取当前脚本的日志文件路径。
+
+    参数:
+        name: 脚本名称，None 时自动取调用脚本的文件名
+
+    返回:
+        日志文件的 Path 对象（可能尚未创建）
+    """
+    if name is None:
+        name = _get_script_name()
+    today_month = datetime.now().strftime("%Y-%m")
+    today_day = datetime.now().strftime("%Y-%m-%d")
+    return LOG_BASE_DIR / today_month / f"{name}_{today_day}.log"

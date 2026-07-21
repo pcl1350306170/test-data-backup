@@ -19,17 +19,25 @@ JSON_PATH = r"C:\www\test\py\book\json\novelMapping.json"  # 替换规则JSON文
 # 创建输出目录
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-# ========== 日志配置 ==========
-log_file = os.path.join(OUTPUT_DIR, f"txt2epub_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log")
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(log_file, encoding="utf-8"),
-        logging.StreamHandler()
-    ]
-)
-log = logging.getLogger(__name__)
+# ──────────── 公共日志模块（可选依赖）────────────
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "txt_to_epub_with_cover"
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
 
 # ========== 工具函数 (保留epub_image_in.py中的核心功能) ==========
 def is_chinese_punctuation(char):
@@ -52,7 +60,7 @@ def merge_paragraphs(soup):
             continue
         i += 1
     if merged_count > 0:
-        log.info(f"合并了 {merged_count} 个段落")
+        logger.info(f"合并了 {merged_count} 个段落")
     return soup
 
 def insert_images_randomly(soup, image_paths):
@@ -78,7 +86,7 @@ def insert_images_randomly(soup, image_paths):
         img_tag.append(img)
         paragraphs[idx].insert_after(img_tag)
         images_used += 1
-        log.info(f"在第 {idx+1} 个段落后插入图片：{os.path.basename(img_path)}")
+        logger.info(f"在第 {idx+1} 个段落后插入图片：{os.path.basename(img_path)}")
 
     return images_used, soup
 
@@ -86,7 +94,7 @@ def load_replacement_rules(json_path):
     """加载替换规则"""
     try:
         if not os.path.exists(json_path):
-            log.error(f"替换规则文件不存在: {json_path}")
+            logger.error(f"替换规则文件不存在: {json_path}")
             return {}
 
         with open(json_path, 'r', encoding='utf-8-sig') as f:  # 使用utf-8-sig处理BOM
@@ -94,16 +102,16 @@ def load_replacement_rules(json_path):
 
         # 验证规则格式
         if not isinstance(rules, dict):
-            log.error("替换规则必须是JSON对象（键值对）")
+            logger.error("替换规则必须是JSON对象（键值对）")
             return {}
 
-        log.info(f"成功加载替换规则，共 {len(rules)} 条")
+        logger.info(f"成功加载替换规则，共 {len(rules)} 条")
         return rules
     except json.JSONDecodeError as e:
-        log.error(f"JSON格式错误: {str(e)}")
+        logger.error(f"JSON格式错误: {str(e)}")
         return {}
     except Exception as e:
-        log.error(f"加载替换规则失败: {str(e)}")
+        logger.error(f"加载替换规则失败: {str(e)}")
         return {}
 
 def replace_text(content, rules):
@@ -121,7 +129,7 @@ def replace_text(content, rules):
         if old_str in content:
             replaced_count = content.count(old_str)
             content = content.replace(old_str, new_str)
-            log.debug(f"替换 '{old_str}' 为 '{new_str}'，共 {replaced_count} 处")
+            logger.debug(f"替换 '{old_str}' 为 '{new_str}'，共 {replaced_count} 处")
 
     return content
 
@@ -144,14 +152,14 @@ def process_txt_content(txt_path, chapter_title, replacement_rules):
             with open(txt_path, 'r', encoding='gbk') as f:
                 text = f.read()
         except UnicodeDecodeError as e:
-            log.error(f"无法解码文件 {txt_path}: {str(e)}")
+            logger.error(f"无法解码文件 {txt_path}: {str(e)}")
             text = ""
 
     # 应用文本替换规则
     original_length = len(text)
     text = replace_text(text, replacement_rules)
     if len(text) != original_length:
-        log.info(f"文件 {os.path.basename(txt_path)} 替换完成，长度变化: {original_length} -> {len(text)}")
+        logger.info(f"文件 {os.path.basename(txt_path)} 替换完成，长度变化: {original_length} -> {len(text)}")
 
     # 分割段落（简单处理，可根据实际情况优化）
     paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
@@ -225,7 +233,7 @@ def txts_to_epub(txt_files, output_path, cover_dir, image_paths, replacement_rul
                 # 获取章节标题（文件名无扩展名）
                 txt_basename = os.path.splitext(os.path.basename(txt_path))[0]
                 chapter_title = f"第{i}章 {txt_basename}"
-                log.info(f"处理章节：{chapter_title}")
+                logger.info(f"处理章节：{chapter_title}")
 
                 # 生成章节XHTML内容
                 chapter_content = process_txt_content(txt_path, chapter_title, replacement_rules)
@@ -358,10 +366,10 @@ def txts_to_epub(txt_files, output_path, cover_dir, image_paths, replacement_rul
                         arcname = os.path.relpath(file_path, temp_dir)
                         epub.write(file_path, arcname)
 
-            log.info(f"成功生成EPUB: {output_path}")
+            logger.info(f"成功生成EPUB: {output_path}")
             return True
     except Exception as e:
-        log.error(f"转换失败: {str(e)}")
+        logger.error(f"转换失败: {str(e)}")
         return False
 
 # ========== 主程序 ==========
@@ -369,7 +377,7 @@ def main():
     # 加载替换规则
     replacement_rules = load_replacement_rules(JSON_PATH)
     if not replacement_rules:
-        log.warning("未加载到任何替换规则，将跳过文本替换步骤")
+        logger.warning("未加载到任何替换规则，将跳过文本替换步骤")
 
     # 获取所有图片（限制在100张以内）
     image_extensions = ('.png', '.jpg', '.jpeg', '.gif')
@@ -379,7 +387,7 @@ def main():
                       if f.lower().endswith(image_extensions)
                   ][:100]  # 限制最多100张图片
     random.shuffle(image_files)
-    log.info(f"加载了 {len(image_files)} 张图片")
+    logger.info(f"加载了 {len(image_files)} 张图片")
 
     # 获取所有TXT文件
     txt_files = [
@@ -389,10 +397,10 @@ def main():
     ]
 
     if not txt_files:
-        log.warning("没有找到TXT文件")
+        logger.warning("没有找到TXT文件")
         return
 
-    log.info(f"找到 {len(txt_files)} 个TXT文件，开始转换...")
+    logger.info(f"找到 {len(txt_files)} 个TXT文件，开始转换...")
 
     # 生成EPUB文件名（使用目录名作为书名）
     book_title = os.path.basename(A_DIR)  # 使用HH作为书名
@@ -409,7 +417,7 @@ def main():
     # 转换多个TXT为一个EPUB
     txts_to_epub(txt_files, epub_path, COVER_DIR, image_files, replacement_rules, book_title)
 
-    log.info("所有文件处理完成")
+    logger.info("所有文件处理完成")
 
 if __name__ == "__main__":
     main()

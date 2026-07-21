@@ -17,9 +17,27 @@ SCRIPT_NAME = "epub_image_in"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
+
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger, get_log_file
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+    def get_log_file(name=None):
+        return Path()
+# ────────────────────────────────────────────────
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
-PROCESS_LOG_FILE = SCRIPT_DIR / "json" / "logs" / f"log_{SCRIPT_NAME}.log"
-PROCESS_LOG_FILE.parent.mkdir(exist_ok=True, parents=True)
 
 # 默认配置
 DEFAULT_CONFIG = {
@@ -36,7 +54,7 @@ def load_config():
                 return json.load(f)
         return DEFAULT_CONFIG
     except Exception as e:
-        logging.error(f"加载配置文件失败: {str(e)}")
+        logger.error(f"加载配置文件失败: {str(e)}")
         return DEFAULT_CONFIG
 
 # 保存配置文件
@@ -46,7 +64,7 @@ def save_config(config):
             json.dump(config, f, ensure_ascii=False, indent=2)
         return True
     except Exception as e:
-        logging.error(f"保存配置文件失败: {str(e)}")
+        logger.error(f"保存配置文件失败: {str(e)}")
         return False
 
 # 初始化配置
@@ -73,7 +91,7 @@ def merge_paragraphs(soup):
             continue
         i += 1
     if merged_count > 0:
-        logging.info(f"合并了 {merged_count} 个段落。")
+        logger.info(f"合并了 {merged_count} 个段落。")
     return merged_count
 
 def insert_images_randomly(soup, image_paths):
@@ -99,13 +117,13 @@ def insert_images_randomly(soup, image_paths):
         img_tag.append(img)
         paragraphs[idx].insert_after(img_tag)
         images_used += 1
-        logging.info(f"在第 {idx+1} 个段落后插入图片：{os.path.basename(img_path)}")
+        logger.info(f"在第 {idx+1} 个段落后插入图片：{os.path.basename(img_path)}")
 
     return images_used
 
 def process_epub(epub_path, images_dir, output_epub_path):
     temp_dir = tempfile.mkdtemp()
-    logging.info(f"解压 EPUB 文件：{epub_path}")
+    logger.info(f"解压 EPUB 文件：{epub_path}")
     try:
         with zipfile.ZipFile(epub_path, 'r') as zip_ref:
             zip_ref.extractall(temp_dir)
@@ -114,10 +132,10 @@ def process_epub(epub_path, images_dir, output_epub_path):
         image_files = [os.path.join(images_dir, f) for f in os.listdir(images_dir)
                        if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))]
         random.shuffle(image_files)
-        logging.info(f"共加载 {len(image_files)} 张插图资源。")
+        logger.info(f"共加载 {len(image_files)} 张插图资源。")
 
         if not image_files:
-            logging.warning("未找到任何图片文件，请检查图片目录")
+            logger.warning("未找到任何图片文件，请检查图片目录")
             return False
 
         html_count = 0
@@ -126,7 +144,7 @@ def process_epub(epub_path, images_dir, output_epub_path):
         # 查找或创建 OEBPS 目录
         oebps_dir = os.path.join(temp_dir, "OEBPS")
         os.makedirs(oebps_dir, exist_ok=True)
-        logging.info(f"使用 OEBPS 目录：{oebps_dir}")
+        logger.info(f"使用 OEBPS 目录：{oebps_dir}")
 
         # 处理所有 HTML/XHTML 文件
         for root, dirs, files in os.walk(oebps_dir):
@@ -134,7 +152,7 @@ def process_epub(epub_path, images_dir, output_epub_path):
                 if file.lower().endswith((".xhtml", ".html")):
                     html_path = os.path.join(root, file)
                     html_count += 1
-                    logging.info(f"\n处理文件：{html_path}")
+                    logger.info(f"\n处理文件：{html_path}")
 
                     try:
                         with open(html_path, "r", encoding="utf-8") as f:
@@ -156,7 +174,7 @@ def process_epub(epub_path, images_dir, output_epub_path):
                     with open(html_path, "w", encoding="utf-8") as f:
                         f.write(str(soup))
 
-                    logging.info(f"完成文件：{file}，插入 {inserted} 张图片。")
+                    logger.info(f"完成文件：{file}，插入 {inserted} 张图片。")
 
         # 复制图片到 OEBPS 目录
         for img in image_files:
@@ -170,10 +188,10 @@ def process_epub(epub_path, images_dir, output_epub_path):
                 dest_path = os.path.join(oebps_dir, img_filename)
                 counter += 1
             shutil.copy(img, dest_path)
-        logging.info(f"已复制 {len(image_files)} 张图片到 EPUB OEBPS 文件夹。")
+        logger.info(f"已复制 {len(image_files)} 张图片到 EPUB OEBPS 文件夹。")
 
         # 重新打包 EPUB
-        logging.info("开始重新打包 EPUB 文件...")
+        logger.info("开始重新打包 EPUB 文件...")
         with zipfile.ZipFile(output_epub_path, "w", zipfile.ZIP_DEFLATED) as new_zip:
             # mimetype 文件要放最前面且不压缩
             mimetype_path = os.path.join(temp_dir, "mimetype")
@@ -188,12 +206,12 @@ def process_epub(epub_path, images_dir, output_epub_path):
                         continue
                     new_zip.write(filepath, arcname)
 
-        logging.info(f"\n✅ EPUB 随机插图处理完成！输出文件：{output_epub_path}")
-        logging.info(f"📄 日志文件已保存：{PROCESS_LOG_FILE}")
+        logger.info(f"\n✅ EPUB 随机插图处理完成！输出文件：{output_epub_path}")
+        logger.info(f"📄 日志文件已保存：{get_log_file(SCRIPT_NAME)}")
         return True
 
     except Exception as e:
-        logging.error(f"处理过程出错: {str(e)}", exc_info=True)
+        logger.error(f"处理过程出错: {str(e)}", exc_info=True)
         return False
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
@@ -216,14 +234,6 @@ class EpubImageApp:
 
     def setup_logging(self):
         """配置日志系统"""
-        logging.basicConfig(
-            level=logging.INFO,
-            format="%(asctime)s [%(levelname)s] %(message)s",
-            handlers=[
-                logging.FileHandler(PROCESS_LOG_FILE, encoding="utf-8"),
-                logging.StreamHandler()
-            ]
-        )
 
     def setup_ui(self):
         """设置用户界面"""
@@ -335,8 +345,9 @@ class EpubImageApp:
     def view_log(self):
         """查看日志文件"""
         try:
-            if os.path.exists(PROCESS_LOG_FILE):
-                os.startfile(PROCESS_LOG_FILE)
+            log_path = get_log_file(SCRIPT_NAME)
+            if os.path.exists(log_path):
+                os.startfile(log_path)
             else:
                 messagebox.showinfo("提示", "日志文件不存在")
         except Exception as e:
@@ -379,8 +390,8 @@ class EpubImageApp:
                 return
 
         # 开始处理
-        logging.info("="*50)
-        logging.info(f"开始处理EPUB: {epub_path}")
+        logger.info("="*50)
+        logger.info(f"开始处理EPUB: {epub_path}")
         self.root.update()  # 更新UI显示
 
         success = process_epub(epub_path, cover_dir, output_path)

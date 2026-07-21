@@ -29,6 +29,24 @@ CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"{SCRIPT_NAME}_config.json"
 CONFIG_DIR.mkdir(exist_ok=True)
 
+# ──────────── 公共日志模块（可选依赖）────────────
+import sys
+_PY_DIR = str(SCRIPT_DIR.parent)
+if _PY_DIR not in sys.path:
+    sys.path.insert(0, _PY_DIR)
+
+try:
+    from log_utils import get_logger
+    logger = get_logger(SCRIPT_NAME)
+except Exception:
+    class _DummyLogger:
+        def info(self, *a, **kw): pass
+        def warning(self, *a, **kw): pass
+        def error(self, *a, **kw): pass
+        def debug(self, *a, **kw): pass
+    logger = _DummyLogger()
+# ────────────────────────────────────────────────
+
 class ConvertThread(QThread):
     """转换线程，用于后台处理文件转换，不阻塞UI"""
     progress_updated = pyqtSignal(int, str)  # 进度值，当前阶段
@@ -43,8 +61,6 @@ class ConvertThread(QThread):
         self.cover_path = cover_path
         self.image_paths = image_paths
         self.config = config
-        self.log_file = None
-        self.logger = None
         # 保存原始文件名用于生成目录
         self.original_filenames = [os.path.splitext(os.path.basename(f))[0] for f in txt_files]
 
@@ -226,24 +242,8 @@ class ConvertThread(QThread):
         return sub_chapters
 
     def init_logger(self):
-        """初始化日志记录器"""
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        self.log_file = os.path.join(self.output_dir, f"txt2epub_{timestamp}.log")
-
-        self.logger = logging.getLogger("epub_converter")
-        self.logger.setLevel(logging.INFO)
-
-        # 清除现有处理器
-        if self.logger.handlers:
-            self.logger.handlers = []
-
-        # 添加文件处理器
-        file_handler = logging.FileHandler(self.log_file, encoding="utf-8")
-        formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
-        file_handler.setFormatter(formatter)
-        self.logger.addHandler(file_handler)
-
-        self.log_updated.emit(f"日志文件已创建: {self.log_file}")
+        """初始化日志记录器（使用公共 log_utils 模块）"""
+        self.log_updated.emit(f"日志已就绪，记录器: {SCRIPT_NAME}")
 
     def sort_files(self, file_paths):
         """根据配置排序文件"""
