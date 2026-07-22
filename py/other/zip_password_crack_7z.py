@@ -1,13 +1,19 @@
 # zip_password_crack_7z.py
 
 import os
+import sys
 import json
 import time
 import shutil
 import subprocess
+import threading
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, scrolledtext
+
+# 修复 Windows GBK 控制台无法输出 emoji 的问题
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(errors='replace')
 
 # ================== 配置与常量 ==================
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
@@ -163,15 +169,22 @@ class ZipPasswordCrackerApp:
         btn_frame = tk.Frame(list_frame)
         btn_frame.pack(fill=tk.X, pady=5)
         tk.Button(btn_frame, text="添加密码", command=self.add_password).pack(side=tk.LEFT, padx=2)
+        tk.Button(btn_frame, text="编辑选中", command=self.edit_password).pack(side=tk.LEFT, padx=2)
         tk.Button(btn_frame, text="删除选中", command=self.delete_password).pack(side=tk.LEFT, padx=2)
+
+        # 双击编辑
+        self.password_listbox.bind('<Double-1>', lambda e: self.edit_password())
 
         # 操作按钮
         action_frame = tk.Frame(mid_frame)
         action_frame.pack(side=tk.RIGHT, padx=20, fill=tk.Y)
-        tk.Button(action_frame, text="尝试解压\n(使用7z)", command=self.try_all_passwords,
-                  bg="#4CAF50", fg="white", font=("微软雅黑", 10), width=12, height=3).pack(pady=10)
+        self.crack_btn = tk.Button(action_frame, text="尝试解压\n(使用7z)", command=self.start_crack,
+                  bg="#4CAF50", fg="white", font=("微软雅黑", 10), width=12, height=3)
+        self.crack_btn.pack(pady=10)
         tk.Button(action_frame, text="重置密码库", command=self.reset_passwords,
                   bg="#f44336", fg="white", font=("微软雅黑", 10), width=12).pack(pady=10)
+
+        self._crack_thread = None
 
         # 日志
         log_frame = tk.Frame(self.root)
@@ -224,6 +237,30 @@ class ZipPasswordCrackerApp:
         else:
             messagebox.showwarning("警告", "密码不能为空")
 
+    def edit_password(self):
+        sel = self.password_listbox.curselection()
+        if not sel:
+            messagebox.showwarning("警告", "请先选择一个密码")
+            return
+        idx = sel[0]
+        old_pwd = self.passwords[idx]
+        new_pwd = simpledialog.askstring("编辑密码", "修改密码:", initialvalue=old_pwd)
+        if new_pwd is None:
+            return
+        new_pwd = new_pwd.strip()
+        if not new_pwd:
+            messagebox.showwarning("警告", "密码不能为空")
+            return
+        if new_pwd == old_pwd:
+            return
+        if new_pwd in self.passwords:
+            messagebox.showinfo("提示", "该密码已存在")
+            return
+        self.passwords[idx] = new_pwd
+        self.update_ui()
+        save_config(self.zip_path, self.passwords, self.seven_zip_path)
+        self.append_log(f"编辑密码: {old_pwd} -> {new_pwd}")
+
     def delete_password(self):
         sel = self.password_listbox.curselection()
         if not sel:
@@ -243,7 +280,11 @@ class ZipPasswordCrackerApp:
             save_config(self.zip_path, self.passwords, self.seven_zip_path)
             self.append_log("密码库已重置为默认")
 
-    def try_all_passwords(self):
+    def start_crack(self):
+        """启动后台线程执行破解，避免界面卡死"""
+        if self._crack_thread and self._crack_thread.is_alive():
+            messagebox.showinfo("提示", "正在尝试中，请稍候...")
+            return
         if not self.zip_path or not Path(self.zip_path).exists():
             messagebox.showerror("错误", "请选择有效的 ZIP 文件")
             return
@@ -254,19 +295,26 @@ class ZipPasswordCrackerApp:
             messagebox.showwarning("警告", "密码库为空")
             return
 
-        self.append_log(f"开始使用 7z 尝试解压: {Path(self.zip_path).name}")
+        self.crack_btn.config(state='disabled', text="尝试中...\n请稍候")
+        self._crack_thread = threading.Thread(target=self._crack_worker, daemon=True)
+        self._crack_thread.start()
+
+    def _crack_worker(self):
+        """后台线程：逐个密码尝试解压"""
+        passwords = list(self.passwords)  # 拷贝，避免线程不安全
+        zip_path = self.zip_path
+        seven_zip_path = self.seven_zip_path
+
+        self._ui_log(f"开始使用 7z 尝试解压: {Path(zip_path).name}")
         success = False
         correct_password = None
 
-        # 创建临时目录用于解压测试
         temp_dir = SCRIPT_DIR / "temp_unzip"
         temp_dir.mkdir(exist_ok=True)
 
         try:
-            for i, pwd in enumerate(self.passwords, 1):
-                msg = f"尝试 ({i}/{len(self.passwords)}): {pwd}"
-                self.append_log(msg)
-                self.root.update_idletasks()
+            for i, pwd in enumerate(passwords, 1):
+                self._ui_log(f"尝试 ({i}/{len(passwords)}): {pwd}")
 
                 # 清空临时目录
                 if temp_dir.exists():
@@ -274,27 +322,39 @@ class ZipPasswordCrackerApp:
                 temp_dir.mkdir()
 
                 try:
-                    ok, output = try_extract_with_7z(self.zip_path, pwd, self.seven_zip_path, temp_dir)
-                    if ok and any(temp_dir.iterdir()):  # 确保有文件解出
+                    ok, output = try_extract_with_7z(zip_path, pwd, seven_zip_path, temp_dir)
+                    if ok and any(temp_dir.iterdir()):
                         success = True
                         correct_password = pwd
-                        self.append_log(f"✅ 成功！密码: {pwd}，文件已解压至: {temp_dir}")
+                        self._ui_log(f"[OK] 成功! 密码: {pwd}, 文件已解压至: {temp_dir}")
                         break
                     else:
-                        self.append_log(f"❌ 失败: {pwd} | 7z 输出: {output[:200]}...")
+                        brief = output[:150].replace('\n', ' ') if output else ''
+                        self._ui_log(f"[X] 失败: {pwd} | {brief}")
                 except Exception as e:
-                    self.append_log(f"⚠️ 异常: {pwd} | 错误: {e}")
-
+                    self._ui_log(f"[!] 异常: {pwd} | 错误: {e}")
         finally:
-            # 可选：不解压成功也保留 temp_dir 供检查；这里选择只保留成功的
             if not success and temp_dir.exists():
-                shutil.rmtree(temp_dir)
+                try:
+                    shutil.rmtree(temp_dir)
+                except Exception:
+                    pass
 
+        # 回到主线程更新 UI
+        self.root.after(0, self._crack_done, success, correct_password, str(temp_dir))
+
+    def _crack_done(self, success, correct_password, temp_dir_str):
+        """主线程：破解完成后恢复按钮并弹窗"""
+        self.crack_btn.config(state='normal', text="尝试解压\n(使用7z)")
         if success:
-            messagebox.showinfo("成功", f"密码正确！\n密码: {correct_password}\n\n解压结果保存在:\n{temp_dir}")
+            messagebox.showinfo("成功", f"密码正确!\n密码: {correct_password}\n\n解压结果保存在:\n{temp_dir_str}")
         else:
-            self.append_log("❌ 所有密码均失败。")
+            self.append_log("所有密码均失败。")
             messagebox.showinfo("结果", "所有密码都尝试过了，没有成功。")
+
+    def _ui_log(self, msg):
+        """线程安全地写日志到 GUI"""
+        self.root.after(0, self.append_log, msg)
 
     def append_log(self, msg):
         timestamp = time.strftime("%H:%M:%S")
