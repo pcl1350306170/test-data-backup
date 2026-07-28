@@ -63,6 +63,7 @@ class ImageCropperApp:
         self.auto_open_dir = tk.BooleanVar(value=False)  # 是否自动打开目录
         self.overwrite_original = tk.BooleanVar(value=False)  # 是否覆盖原文件
         self.reuse_last_crop = tk.BooleanVar(value=False)  # 是否复用上次裁剪区域
+        self.auto_execute = tk.BooleanVar(value=False)  # 一键执行：裁剪后自动保存并清空
         self.last_crop_ratios = None  # 上次裁剪区域相对坐标 (x1%, y1%, x2%, y2%)
         self.dnd_queue = queue.Queue()  # 拖拽文件队列（线程安全）
 
@@ -179,7 +180,7 @@ class ImageCropperApp:
         self.preset_combo = ttk.Combobox(
             preset_frame,
             textvariable=self.crop_preset,
-            values=["自由裁剪", "1920×1080", "1080×1920", "2160×3840", "3840×1920"],
+            values=["自由裁剪", "1:1", "16:9", "9:16", "1920×1080", "1080×1920", "2160×3840", "3840×1920"],
             state="readonly", width=14
         )
         self.preset_combo.pack(side=tk.LEFT, padx=(0, 5))
@@ -207,6 +208,12 @@ class ImageCropperApp:
             opt_frame,
             text="加载新图时复用上次裁剪区域",
             variable=self.reuse_last_crop
+        ).pack(side=tk.LEFT, padx=5)
+
+        ttk.Checkbutton(
+            opt_frame,
+            text="⚡ 一键执行(裁剪后自动保存并清空)",
+            variable=self.auto_execute
         ).pack(side=tk.LEFT, padx=5)
 
         if not HAS_WINDND and not HAS_DND2:
@@ -684,15 +691,20 @@ class ImageCropperApp:
         self.save_btn.config(state=tk.NORMAL)
         logger.info(f"裁剪完成，新尺寸={crop_size}")
 
+        # 一键执行：自动保存并清空
+        if self.auto_execute.get():
+            saved = self.save_image()
+            if saved:
+                self.clear_image()
+
     def save_image(self):
-        """保存裁剪后的图片"""
+        """保存裁剪后的图片，返回是否保存成功"""
         if not self.original_image:
-            return
+            return False
 
         # 如果勾选了覆盖原文件，直接保存
         if self.overwrite_original.get() and self.image_path:
-            self._do_save(self.image_path)
-            return
+            return self._do_save(self.image_path)
 
         # 否则弹出保存对话框
         # 生成默认文件名
@@ -722,10 +734,11 @@ class ImageCropperApp:
         )
 
         if save_path:
-            self._do_save(save_path)
+            return self._do_save(save_path)
+        return False
 
     def _do_save(self, save_path):
-        """执行保存操作"""
+        """执行保存操作，返回是否成功"""
         try:
             # 根据文件扩展名选择保存格式
             if save_path.lower().endswith('.png'):
@@ -746,11 +759,13 @@ class ImageCropperApp:
             # 如果勾选了自动打开目录
             if self.auto_open_dir.get():
                 self._open_directory(save_dir)
+            return True
 
         except Exception as e:
             logger.error(f"保存图片失败: {save_path} | {e}")
             messagebox.showerror("错误", f"保存图片失败: {str(e)}")
             self.status_label.config(text="保存图片失败")
+            return False
 
     def _show_toast(self, title, message, duration_ms=3000):
         """右下角弹窗通知"""
@@ -841,9 +856,14 @@ class ImageCropperApp:
         if preset == "自由裁剪":
             return
 
-        # 解析预设尺寸
+        # 解析预设尺寸/比例
         try:
-            w_str, h_str = preset.replace("×", "x").split("x")
+            if ":" in preset:
+                # 比例格式，如 "16:9"
+                w_str, h_str = preset.split(":")
+            else:
+                # 尺寸格式，如 "1920×1080"
+                w_str, h_str = preset.replace("×", "x").split("x")
             target_w = int(w_str)
             target_h = int(h_str)
         except (ValueError, IndexError):

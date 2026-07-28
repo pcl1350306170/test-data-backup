@@ -85,6 +85,33 @@ def save_config(config):
         logger.error(f"保存配置失败: {e}")
         messagebox.showerror("保存失败", f"无法保存配置：{e}")
 
+
+# ==============================
+# testServer.json 公共服务器配置
+# ==============================
+TEST_SERVER_PATH = CONFIG_DIR / "testServer.json"
+
+
+def load_test_servers():
+    """从 testServer.json 加载服务器配置"""
+    if TEST_SERVER_PATH.exists():
+        try:
+            with open(TEST_SERVER_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"加载 testServer.json 失败: {e}")
+    return {}
+
+
+def save_test_servers(data):
+    """保存服务器配置到 testServer.json"""
+    try:
+        with open(TEST_SERVER_PATH, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        logger.info("服务器配置已保存到 testServer.json")
+    except Exception as e:
+        logger.error(f"保存 testServer.json 失败: {e}")
+
 def should_exclude(path, exclude_patterns):
     """判断路径是否应被排除"""
     path_str = str(path).replace("\\", "/")
@@ -426,12 +453,12 @@ def show_toast(title, message, color="#4CAF50", duration=180000):
     toast.configure(bg=color)
 
     lbl_title = Label(toast, text=title, font=("Microsoft YaHei", 11, "bold"),
-                      fg="white", bg=color, anchor="w", padx=12, pady=(8, 0))
+                      fg="white", bg=color, anchor="w", padx=12, pady=8)
     lbl_title.pack(fill=X)
     lbl_msg = Label(toast, text=message, font=("Microsoft YaHei", 9),
                     fg="white", bg=color, anchor="w", wraplength=320, justify=LEFT,
-                    padx=12, pady=(2, 10))
-    lbl_msg.pack(fill=X)
+                    padx=12, pady=2)
+    lbl_msg.pack(fill=X, pady=(0, 10))
 
     toast.update_idletasks()
     w = toast.winfo_reqwidth() + 20
@@ -463,6 +490,17 @@ class WebUploaderApp:
         self.root.resizable(True, True)
 
         self.config = load_or_create_config()
+
+        # 从 testServer.json 加载服务器列表
+        self.test_servers = load_test_servers()
+
+        # 如果当前配置的服务器在 testServer.json 中，自动同步用户名密码
+        current_host = self.config.get("server_host", "")
+        if current_host and current_host in self.test_servers:
+            srv = self.test_servers[current_host]
+            self.config["server_username"] = srv.get("name", "root")
+            self.config["server_password"] = srv.get("password", "")
+
         self.setup_ui()
 
     def setup_ui(self):
@@ -488,7 +526,11 @@ class WebUploaderApp:
 
         Label(server_frame, text="主机:", font=("Arial", 10)).grid(row=0, column=0, sticky=W, padx=5)
         self.host_var = StringVar(value=self.config["server_host"])
-        Entry(server_frame, textvariable=self.host_var, width=15).grid(row=0, column=1, padx=5)
+        server_list = list(self.test_servers.keys())
+        self.host_combo = ttk.Combobox(server_frame, textvariable=self.host_var,
+                                       values=server_list, width=15, state="normal")
+        self.host_combo.grid(row=0, column=1, padx=5)
+        self.host_combo.bind("<<ComboboxSelected>>", self._on_server_selected)
 
         Label(server_frame, text="用户名:", font=("Arial", 10)).grid(row=0, column=2, sticky=W, padx=5)
         self.username_var = StringVar(value=self.config["server_username"])
@@ -580,6 +622,29 @@ class WebUploaderApp:
         if file_path:
             self.jar_path_var.set(file_path)
 
+    def _on_server_selected(self, event=None):
+        """选中服务器时，自动填充用户名和密码"""
+        host = self.host_var.get().strip()
+        if host in self.test_servers:
+            srv = self.test_servers[host]
+            self.username_var.set(srv.get("name", "root"))
+            self.password_var.set(srv.get("password", ""))
+
+    def _sync_to_test_server(self):
+        """将当前服务器信息同步到 testServer.json"""
+        host = self.host_var.get().strip()
+        if not host:
+            return
+        username = self.username_var.get().strip() or "root"
+        password = self.password_var.get().strip()
+        if host not in self.test_servers:
+            self.test_servers[host] = {"link": host}
+        self.test_servers[host]["name"] = username
+        self.test_servers[host]["password"] = password
+        save_test_servers(self.test_servers)
+        # 更新下拉列表
+        self.host_combo['values'] = list(self.test_servers.keys())
+
     def save_config(self):
         exclude_list = [x.strip() for x in self.exclude_var.get().split(",") if x.strip()]
         self.config.update({
@@ -595,6 +660,8 @@ class WebUploaderApp:
             "also_deploy_jar": self.also_deploy_jar.get()
         })
         save_config(self.config)
+        # 同步服务器信息到 testServer.json
+        self._sync_to_test_server()
         messagebox.showinfo("保存成功", "配置已保存！")
         logger.info("配置已保存")
 

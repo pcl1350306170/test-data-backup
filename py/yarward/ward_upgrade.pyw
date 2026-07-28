@@ -97,6 +97,33 @@ def save_config(data):
 
 
 # ==============================
+# testServer.json 公共服务器配置
+# ==============================
+TEST_SERVER_PATH = CONFIG_DIR / "testServer.json"
+
+
+def load_test_servers():
+    """从 testServer.json 加载服务器配置"""
+    if TEST_SERVER_PATH.exists():
+        try:
+            with open(TEST_SERVER_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"加载 testServer.json 失败: {e}")
+    return {}
+
+
+def save_test_servers(data):
+    """保存服务器配置到 testServer.json"""
+    try:
+        with open(TEST_SERVER_PATH, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        logger.info("服务器配置已保存到 testServer.json")
+    except Exception as e:
+        logger.error(f"保存 testServer.json 失败: {e}")
+
+
+# ==============================
 # SSH/SFTP 工具函数
 # ==============================
 def get_ssh_client(host, username="root", password="", timeout=10):
@@ -619,6 +646,7 @@ class WardUpgradeGUI:
         self.root.minsize(650, 630)
 
         self.config = load_config()
+        self.test_servers = {}  # 公共服务器配置（testServer.json）
         self.create_widgets()
         self._load_ui_from_config()
 
@@ -727,10 +755,9 @@ class WardUpgradeGUI:
     # ---------- 事件处理 ----------
     def _on_server_selected(self, event=None):
         host = self.server_var.get().strip()
-        servers = self.config.get("servers", {})
-        if host in servers:
-            self.pwd_var.set(servers[host].get("ssh_password", ""))
-            self.ssh_user_var.set(servers[host].get("ssh_user", "root"))
+        if host in self.test_servers:
+            self.pwd_var.set(self.test_servers[host].get("password", ""))
+            self.ssh_user_var.set(self.test_servers[host].get("name", "root"))
         # 服务器地址变更时，MySQL 地址自动同步
         self.mysql_host_var.set(host)
 
@@ -740,16 +767,31 @@ class WardUpgradeGUI:
             self.upgrade_dir_var.set(d)
 
     def _load_ui_from_config(self):
-        # 服务器列表
-        servers = self.config.get("servers", {})
-        server_list = list(servers.keys())
+        # 从 testServer.json 加载服务器列表
+        self.test_servers = load_test_servers()
+
+        # 迁移：如果旧配置中有服务器但 testServer.json 为空，则迁移过去
+        old_servers = self.config.get("servers", {})
+        if old_servers and not self.test_servers:
+            for host, info in old_servers.items():
+                self.test_servers[host] = {
+                    "link": host,
+                    "name": info.get("ssh_user", "root"),
+                    "password": info.get("ssh_password", "")
+                }
+            save_test_servers(self.test_servers)
+            self.config.pop("servers", None)
+            save_config(self.config)
+            self._log(f"已从旧配置迁移 {len(self.test_servers)} 个服务器到 testServer.json")
+
+        server_list = list(self.test_servers.keys())
         self.server_combo['values'] = server_list
         last = self.config.get("last_server", "")
         if last:
             self.server_var.set(last)
-            if last in servers:
-                self.pwd_var.set(servers[last].get("ssh_password", ""))
-                self.ssh_user_var.set(servers[last].get("ssh_user", self.config.get("ssh_user", "root")))
+            if last in self.test_servers:
+                self.pwd_var.set(self.test_servers[last].get("password", ""))
+                self.ssh_user_var.set(self.test_servers[last].get("name", self.config.get("ssh_user", "root")))
 
         # 升级目录
         self.upgrade_dir_var.set(self.config.get("upgrade_dir", ""))
@@ -774,18 +816,17 @@ class WardUpgradeGUI:
         self.config["mysql_db"] = self.mysql_db_var.get().strip()
         self.config["mysql_password"] = self.mysql_pwd_var.get().strip()
 
-        # 保存当前服务器的 SSH 密码
+        # 保存当前服务器到 testServer.json
         host = self.server_var.get().strip()
         if host:
-            if "servers" not in self.config:
-                self.config["servers"] = {}
-            if host not in self.config["servers"]:
-                self.config["servers"][host] = {}
-            self.config["servers"][host]["ssh_password"] = self.pwd_var.get().strip()
-            self.config["servers"][host]["ssh_user"] = self.ssh_user_var.get().strip()
+            if host not in self.test_servers:
+                self.test_servers[host] = {"link": host}
+            self.test_servers[host]["name"] = self.ssh_user_var.get().strip()
+            self.test_servers[host]["password"] = self.pwd_var.get().strip()
+            save_test_servers(self.test_servers)
+            self.server_combo['values'] = list(self.test_servers.keys())
 
         save_config(self.config)
-        self.server_combo['values'] = list(self.config.get("servers", {}).keys())
         messagebox.showinfo("成功", "配置已保存！")
 
     def _log(self, message):
@@ -820,14 +861,12 @@ class WardUpgradeGUI:
                 client.close()
                 self._log(f"✅ 密码验证成功: {p}")
                 self.pwd_var.set(p)
-                # 保存到配置
-                if "servers" not in self.config:
-                    self.config["servers"] = {}
-                if host not in self.config["servers"]:
-                    self.config["servers"][host] = {}
-                self.config["servers"][host]["ssh_password"] = p
-                self.config["servers"][host]["ssh_user"] = username
-                save_config(self.config)
+                # 保存到 testServer.json
+                if host not in self.test_servers:
+                    self.test_servers[host] = {"link": host}
+                self.test_servers[host]["name"] = username
+                self.test_servers[host]["password"] = p
+                save_test_servers(self.test_servers)
                 return p
             except Exception:
                 continue
@@ -1017,17 +1056,17 @@ class WardUpgradeGUI:
         self.config["mysql_db"] = self.mysql_db_var.get().strip()
         self.config["mysql_password"] = self.mysql_pwd_var.get().strip()
 
+        # 保存服务器到 testServer.json
         host = self.server_var.get().strip()
         if host:
-            if "servers" not in self.config:
-                self.config["servers"] = {}
-            if host not in self.config["servers"]:
-                self.config["servers"][host] = {}
-            self.config["servers"][host]["ssh_password"] = self.pwd_var.get().strip()
-            self.config["servers"][host]["ssh_user"] = self.ssh_user_var.get().strip()
+            if host not in self.test_servers:
+                self.test_servers[host] = {"link": host}
+            self.test_servers[host]["name"] = self.ssh_user_var.get().strip()
+            self.test_servers[host]["password"] = self.pwd_var.get().strip()
+            save_test_servers(self.test_servers)
+            self.server_combo['values'] = list(self.test_servers.keys())
 
         save_config(self.config)
-        self.server_combo['values'] = list(self.config.get("servers", {}).keys())
 
     def _run_upgrade(self, host, ssh_user, ssh_pwd, upgrade_dir, selected, web_package, kanban_package, device_sources, mysql_config, need_mysql):
         """后台执行升级"""

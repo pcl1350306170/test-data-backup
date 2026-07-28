@@ -79,6 +79,33 @@ def save_config(data):
     except Exception as e:
         logger.error(f"Failed to save config: {e}")
 
+
+# ==============================
+# testServer.json 公共服务器配置
+# ==============================
+TEST_SERVER_PATH = CONFIG_DIR / "testServer.json"
+
+
+def load_test_servers():
+    """从 testServer.json 加载服务器配置"""
+    if TEST_SERVER_PATH.exists():
+        try:
+            with open(TEST_SERVER_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"加载 testServer.json 失败: {e}")
+    return {}
+
+
+def save_test_servers(data):
+    """保存服务器配置到 testServer.json"""
+    try:
+        with open(TEST_SERVER_PATH, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        logger.info("服务器配置已保存到 testServer.json")
+    except Exception as e:
+        logger.error(f"保存 testServer.json 失败: {e}")
+
 def get_ssh_client(host, username="root", password="", timeout=10):
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -303,6 +330,25 @@ class YarwardUpgradeGUI:
         self.root.minsize(600, 500)
 
         self.config = load_config()
+
+        # 从 testServer.json 加载服务器列表，并迁移旧配置
+        self.test_servers = load_test_servers()
+        old_servers = self.config.get("servers", {})
+        if old_servers:
+            migrated = False
+            for host, pwd in old_servers.items():
+                if host not in self.test_servers:
+                    self.test_servers[host] = {
+                        "link": host,
+                        "name": "root",
+                        "password": pwd if isinstance(pwd, str) else ""
+                    }
+                    migrated = True
+            if migrated:
+                save_test_servers(self.test_servers)
+            self.config.pop("servers", None)
+            save_config(self.config)
+
         self.create_widgets()
 
     def create_widgets(self):
@@ -315,7 +361,7 @@ class YarwardUpgradeGUI:
 
         Label(frame_server, text="服务器地址:").grid(row=0, column=0, sticky=W, pady=3)
         self.server_var = StringVar()
-        server_list = list(self.config.get("servers", {}).keys())
+        server_list = list(self.test_servers.keys())
         if not server_list:
             server_list = [""]
         self.server_combo = ttk.Combobox(
@@ -409,18 +455,16 @@ class YarwardUpgradeGUI:
     def on_server_selected(self, event=None):
         """当选中已有服务器时，自动填入密码"""
         host = self.server_var.get().strip()
-        servers = self.config.get("servers", {})
-        if host in servers:
-            self.pwd_var.set(servers[host])
+        if host in self.test_servers:
+            self.pwd_var.set(self.test_servers[host].get("password", ""))
         else:
             self.pwd_var.set("")
 
     def on_server_typed(self, event=None):
         """当手动输入服务器时，清空密码（除非恰好匹配已存）"""
         host = self.server_var.get().strip()
-        servers = self.config.get("servers", {})
-        if host in servers:
-            self.pwd_var.set(servers[host])
+        if host in self.test_servers:
+            self.pwd_var.set(self.test_servers[host].get("password", ""))
         else:
             self.pwd_var.set("")
 
@@ -432,13 +476,14 @@ class YarwardUpgradeGUI:
             return
         self.config["last_server"] = server
         self.config["common_password"] = pwd
-        if "servers" not in self.config:
-            self.config["servers"] = {}
-        self.config["servers"][server] = pwd
+        # 保存到 testServer.json
+        if server not in self.test_servers:
+            self.test_servers[server] = {"link": server, "name": "root"}
+        self.test_servers[server]["password"] = pwd
+        save_test_servers(self.test_servers)
         save_config(self.config)
         # 更新下拉框选项
-        current_values = list(self.config["servers"].keys())
-        self.server_combo['values'] = current_values
+        self.server_combo['values'] = list(self.test_servers.keys())
         messagebox.showinfo("成功", "服务器配置已保存！")
 
     def select_path(self):
@@ -488,6 +533,11 @@ class YarwardUpgradeGUI:
                     test_client.close()
                     final_password = pwd
                     self.pwd_var.set(pwd)  # 填入成功密码
+                    # 保存到 testServer.json
+                    if host not in self.test_servers:
+                        self.test_servers[host] = {"link": host, "name": "root"}
+                    self.test_servers[host]["password"] = pwd
+                    save_test_servers(self.test_servers)
                     break
                 except Exception as e:
                     logger.warning(f"密码 {pwd} 连接失败: {e}")
@@ -505,6 +555,11 @@ class YarwardUpgradeGUI:
                     return
                 final_password = pwd_input
                 self.pwd_var.set(final_password)  # 记住这次输入
+                # 保存到 testServer.json
+                if host not in self.test_servers:
+                    self.test_servers[host] = {"link": host, "name": "root"}
+                self.test_servers[host]["password"] = final_password
+                save_test_servers(self.test_servers)
 
         self.progress.start(10)
         self._log("准备升级...")

@@ -324,23 +324,31 @@ class WardOrderPackagerGUI:
         proj_frame = ttk.LabelFrame(config_tab, text="📁 匹配到的项目目录（选择要打包的目录）", padding=8)
         proj_frame.pack(fill=X, pady=(0, 8))
 
-        self.proj_listbox = Listbox(proj_frame, height=4, width=80)
-        proj_scroll = ttk.Scrollbar(proj_frame, orient=VERTICAL, command=self.proj_listbox.yview)
+        proj_list_frame = ttk.Frame(proj_frame)
+        proj_list_frame.pack(fill=X, expand=True)
+        self.proj_listbox = Listbox(proj_list_frame, height=4, width=80)
+        proj_scroll = ttk.Scrollbar(proj_list_frame, orient=VERTICAL, command=self.proj_listbox.yview)
         self.proj_listbox.config(yscrollcommand=proj_scroll.set)
         self.proj_listbox.pack(side=LEFT, fill=X, expand=True)
         proj_scroll.pack(side=RIGHT, fill=Y)
         self.proj_listbox.bind("<<ListboxSelect>>", self._on_project_selected)
+        self.btn_manual_proj = ttk.Button(proj_frame, text="📂 手动选择打包目录", command=self._manual_select_project_dir)
+        self.btn_manual_proj.pack(anchor=W, pady=(5, 0))
 
         # --- 匹配到的SVN目录 ---
         svn_frame = ttk.LabelFrame(config_tab, text="💾 匹配到的SVN目录（选择目标目录）", padding=8)
         svn_frame.pack(fill=X, pady=(0, 8))
 
-        self.svn_listbox = Listbox(svn_frame, height=4, width=80)
-        svn_scroll = ttk.Scrollbar(svn_frame, orient=VERTICAL, command=self.svn_listbox.yview)
+        svn_list_frame = ttk.Frame(svn_frame)
+        svn_list_frame.pack(fill=X, expand=True)
+        self.svn_listbox = Listbox(svn_list_frame, height=4, width=80)
+        svn_scroll = ttk.Scrollbar(svn_list_frame, orient=VERTICAL, command=self.svn_listbox.yview)
         self.svn_listbox.config(yscrollcommand=svn_scroll.set)
         self.svn_listbox.pack(side=LEFT, fill=X, expand=True)
         svn_scroll.pack(side=RIGHT, fill=Y)
         self.svn_listbox.bind("<<ListboxSelect>>", self._on_svn_selected)
+        self.btn_manual_svn = ttk.Button(svn_frame, text="📂 手动选择SVN目录", command=self._manual_select_svn_dir)
+        self.btn_manual_svn.pack(anchor=W, pady=(5, 0))
 
         # --- SVN选项 ---
         svn_opt_frame = ttk.LabelFrame(config_tab, text="🔗 SVN选项", padding=8)
@@ -488,6 +496,58 @@ class WardOrderPackagerGUI:
         if sel and sel[0] < len(self.matched_svn_dirs):
             self.selected_svn_dir = self.matched_svn_dirs[sel[0]]
             self._log(f"选中SVN目录: {self.selected_svn_dir}")
+
+    def _manual_select_project_dir(self):
+        """手动选择打包项目目录"""
+        initial_dir = str(CODE_BASE_DIR) if CODE_BASE_DIR.exists() else None
+        dir_path = filedialog.askdirectory(
+            title="选择打包项目目录（包含 deploy.sh 的目录）",
+            initialdir=initial_dir
+        )
+        if not dir_path:
+            return
+
+        dir_path = Path(dir_path)
+        if not dir_path.exists():
+            messagebox.showerror("错误", f"目录不存在: {dir_path}")
+            return
+
+        # 获取git分支名（如果有）
+        branch = get_git_branch(dir_path)
+        branch_info = f"  (分支: {branch})" if branch else "  (非Git目录)"
+
+        # 清空列表并添加手动选择的目录
+        self.proj_listbox.delete(0, END)
+        self.proj_listbox.insert(END, f"{dir_path}{branch_info}")
+        self.proj_listbox.selection_set(0)
+        self.matched_project_dirs = [(dir_path, branch)]
+        self.selected_project_dir = dir_path
+
+        self._log(f"📂 手动选择项目目录: {dir_path}{branch_info}")
+
+    def _manual_select_svn_dir(self):
+        """手动选择SVN目标目录"""
+        initial_dir = str(SVN_BASE_DIR) if SVN_BASE_DIR.exists() else None
+        dir_path = filedialog.askdirectory(
+            title="选择SVN目标目录",
+            initialdir=initial_dir
+        )
+        if not dir_path:
+            return
+
+        dir_path = Path(dir_path)
+        if not dir_path.exists():
+            messagebox.showerror("错误", f"目录不存在: {dir_path}")
+            return
+
+        # 清空列表并添加手动选择的目录
+        self.svn_listbox.delete(0, END)
+        self.svn_listbox.insert(END, str(dir_path))
+        self.svn_listbox.selection_set(0)
+        self.matched_svn_dirs = [dir_path]
+        self.selected_svn_dir = dir_path
+
+        self._log(f"📂 手动选择SVN目录: {dir_path}")
 
     # ---------- 开始打包 ----------
     def _start_package(self):

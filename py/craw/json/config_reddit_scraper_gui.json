@@ -19,5 +19,5 @@
   "threads": 1,
   "write_to_db": false,
   "db_config_path": "D:\\CODE\\Python\\test-data-backup\\py\\json\\DB_CONFIG.json",
-  "last_run": "2026-07-21T16:32:47.965534"
+  "last_run": "2026-07-23T16:08:50.210200"
 }
