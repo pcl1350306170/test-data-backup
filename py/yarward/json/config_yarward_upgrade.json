@@ -1,4 +1,25 @@
 {
   "last_server": "192.168.18.228",
-  "common_password": "Yahua3585668"
+  "common_password": "Yahua3585668",
+  "history_server": [
+    {
+      "timestamp": "2026-07-28 11:03:39",
+      "server": "192.168.18.228",
+      "username": "root",
+      "war_path": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-1288重庆儿童医院宜宾院区\\服务端\\YM-801S-OSCS-V1.5.261288.01001-CQYBETYY-BE.war",
+      "war_name": "YM-801S-OSCS-V1.5.261288.01001-CQYBETYY-BE.war"
+    }
+  ],
+  "history_frontend": [
+    {
+      "timestamp": "2026-07-28 15:09:02",
+      "server": "192.168.31.163",
+      "username": "root",
+      "zip_paths": [
+        "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-1288重庆儿童医院宜宾院区\\前端\\YM-801S-KIOSKS-V1.5.6.261288.01001-CQET-FE.zip"
+      ],
+      "zip_names": "YM-801S-KIOSKS-V1.5.6.261288.01001-CQET-FE.zip",
+      "svn_dir": "2026-1288重庆儿童医院宜宾院区"
+    }
+  ]
 }

@@ -67,7 +67,7 @@ DEFAULT_CONFIG = {
 }
 
 # ================== 工具函数 ==================
-def load_or_create_config():
+def load_or_create_config(root=None):
     if CONFIG_PATH.exists():
         try:
             with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
@@ -79,28 +79,44 @@ def load_or_create_config():
                 return config
         except Exception as e:
             logger.error(f"配置文件解析失败: {e}")
-            messagebox.showerror("配置错误", f"配置文件损坏，将使用默认配置。\n{e}")
+            _show_msg(None, "配置错误", f"配置文件损坏，将使用默认配置。\n{e}", "error")
 
     # 创建默认配置
     config = DEFAULT_CONFIG.copy()
-    save_config(config)
+    save_config(config, root)
     logger.info("已创建默认配置文件")
     return config
 
-def save_config(config):
+def save_config(config, root=None):
     try:
         with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(config, f, ensure_ascii=False, indent=4)
         logger.info("配置已保存")
     except Exception as e:
         logger.error(f"保存配置失败: {e}")
-        messagebox.showerror("保存失败", f"无法保存配置：{e}")
+        _show_msg(root, "保存失败", f"无法保存配置：{e}", "error")
 
-def run_adb_command(adb_path, args, cwd=None, shell=False):
+def _show_msg(root, title, msg, level="info"):
+    """模块级消息显示：优先 Toast，无 root 时降级为 messagebox"""
+    if root is not None:
+        try:
+            app = root._app_ref
+            app.show_toast(title, msg, level)
+            return
+        except Exception:
+            pass
+    if level == "error":
+        messagebox.showerror(title, msg)
+    elif level == "warning":
+        messagebox.showwarning(title, msg)
+    else:
+        messagebox.showinfo(title, msg)
+
+def run_adb_command(adb_path, args, cwd=None, shell=False, timeout=30):
     try:
         cmd = [adb_path] + args
         result = subprocess.run(
-            cmd, cwd=cwd, capture_output=True, text=True, encoding='utf-8', shell=shell, timeout=30
+            cmd, cwd=cwd, capture_output=True, text=True, encoding='utf-8', shell=shell, timeout=timeout
         )
         return result.returncode, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
@@ -126,10 +142,11 @@ class ADBDeviceManager:
     def __init__(self, root):
         self.root = root
         self.root.title("📱 ADB 设备管理器 - QtScrcpy 集成版")
-        self.root.geometry("720x700")
+        self.root.geometry("720x850")
         self.root.resizable(True, True)
+        self.root._app_ref = self  # 供模块级函数调用 show_toast
 
-        self.config = load_or_create_config()
+        self.config = load_or_create_config(self.root)
 
         # 尝试自动填充路径（如果配置为空）
         if not self.config["adb_dir"] or not self.config["scrcpy_exe"]:
@@ -160,11 +177,9 @@ class ADBDeviceManager:
 
         if not (valid_adb and valid_scrcpy):
             self.set_status("⚠️ 未找到 ADB 或 QtScrcpy，请设置路径", "orange")
-            messagebox.showwarning(
-                "路径缺失",
-                "未检测到有效的 ADB 或 QtScrcpy 路径。\n"
-                "请通过下方按钮选择 ADB 目录和 QtScrcpy.exe。"
-            )
+            self.show_toast("路径缺失",
+                            "未检测到有效的 ADB 或 QtScrcpy 路径。\n"
+                            "请通过下方按钮选择 ADB 目录和 QtScrcpy.exe。", "warning")
 
     def setup_ui(self):
         # ADB 路径设置
@@ -226,6 +241,43 @@ class ADBDeviceManager:
         Button(conn_btn_frame, text="🔄 刷新列表", command=self.refresh_connected_devices,
                bg="#607D8B", fg="white", width=12).pack(side=LEFT, padx=10)
 
+        # ---- APK 安装区域 ----
+        apk_frame = LabelFrame(self.root, text="📦 安装 APK", padx=10, pady=10)
+        apk_frame.pack(fill=X, padx=20, pady=5)
+
+        # APK 文件选择行
+        apk_select_row = Frame(apk_frame)
+        apk_select_row.pack(fill=X, pady=(0, 5))
+        self.apk_path_var = StringVar(value="")
+        self.apk_entry = Entry(apk_select_row, textvariable=self.apk_path_var, font=("Consolas", 9), width=50)
+        self.apk_entry.pack(side=LEFT, padx=5, fill=X, expand=True)
+        Button(apk_select_row, text="📂 选择 APK", command=self.browse_apk, width=12).pack(side=LEFT, padx=5)
+
+        # 拖拽区域
+        self.apk_drop_label = Label(
+            apk_frame,
+            text="📥  将 APK 文件拖拽到此处  📥",
+            font=("Arial", 12), fg="#888", bg="#f0f8ff",
+            relief="groove", bd=2, height=2
+        )
+        self.apk_drop_label.pack(fill=X, pady=(0, 5))
+        # 绑定拖拽事件（需要 tkinterdnd2）
+        self._setup_apk_dnd()
+
+        # 安装按钮行：目标设备 + 安装按钮
+        apk_install_row = Frame(apk_frame)
+        apk_install_row.pack(fill=X)
+        Label(apk_install_row, text="目标设备:", font=("Arial", 10)).pack(side=LEFT, padx=5)
+        self.apk_device_combo = ttk.Combobox(apk_install_row, state="readonly", width=28, font=("Consolas", 10))
+        self.apk_device_combo.pack(side=LEFT, padx=5)
+        Button(apk_install_row, text="🔄", command=self.refresh_apk_device_list, width=3).pack(side=LEFT, padx=2)
+        self.install_apk_btn = Button(
+            apk_install_row, text="📲 安装 APK 到选中设备",
+            command=self.install_apk, bg="#4CAF50", fg="white",
+            font=("Arial", 10, "bold"), width=22, height=1
+        )
+        self.install_apk_btn.pack(side=RIGHT, padx=5)
+
         # 状态显示
         self.status_label = Label(self.root, text="就绪", fg="green", font=("Arial", 12))
         self.status_label.pack(pady=5)
@@ -251,10 +303,10 @@ class ADBDeviceManager:
         if folder:
             adb_exe = Path(folder) / "adb.exe"
             if not adb_exe.exists():
-                messagebox.showerror("无效目录", "所选目录中未找到 adb.exe！")
+                self.show_toast("无效目录", "所选目录中未找到 adb.exe！", "error")
                 return
             self.config["adb_dir"] = folder
-            save_config(self.config)
+            save_config(self.config, self.root)
             self.update_display()
             logger.info(f"ADB 目录更新为: {folder}")
 
@@ -266,19 +318,19 @@ class ADBDeviceManager:
         )
         if file_path:
             if not file_path.endswith("QtScrcpy.exe"):
-                messagebox.showwarning("注意", "建议选择 QtScrcpy.exe 文件以确保兼容性。")
+                self.show_toast("注意", "建议选择 QtScrcpy.exe 文件以确保兼容性。", "warning")
             self.config["scrcpy_exe"] = file_path
-            save_config(self.config)
+            save_config(self.config, self.root)
             self.update_display()
             logger.info(f"Scrcpy 路径更新为: {file_path}")
 
     def save_ip(self):
         ip = self.device_ip_var.get().strip()
         if not ip:
-            messagebox.showwarning("输入错误", "设备IP不能为空！")
+            self.show_toast("输入错误", "设备IP不能为空！", "warning")
             return
         self.config["device_ip"] = ip
-        save_config(self.config)
+        save_config(self.config, self.root)
         self.set_status(f"IP 已保存: {ip}", "blue")
         logger.info(f"设备IP更新为: {ip}")
 
@@ -291,6 +343,48 @@ class ADBDeviceManager:
         self.log_text.insert(END, msg + "\n")
         self.log_text.see(END)
         self.log_text.config(state=DISABLED)
+
+    def show_toast(self, title, message, level="info"):
+        """右下角 Toast 通知（非阻塞），替代 messagebox.show*"""
+        color_map = {"info": "#2196F3", "warning": "#FF9800", "error": "#f44336", "success": "#4CAF50"}
+        bg = color_map.get(level, "#2196F3")
+
+        toast = Toplevel(self.root)
+        toast.overrideredirect(True)
+        toast.attributes("-topmost", True)
+        toast.configure(bg=bg)
+
+        # 标题栏
+        title_lbl = Label(toast, text=title, bg=bg, fg="white",
+                          font=("Microsoft YaHei UI", 10, "bold"), anchor="w")
+        title_lbl.pack(fill=X, padx=12, pady=(8, 0))
+        # 内容
+        msg_lbl = Label(toast, text=message, bg=bg, fg="white",
+                        font=("Microsoft YaHei UI", 9), wraplength=320, justify=LEFT, anchor="w")
+        msg_lbl.pack(fill=X, padx=12, pady=(4, 10))
+
+        # 先放到屏幕外避免闪烁
+        sw = self.root.winfo_screenwidth()
+        sh = self.root.winfo_screenheight()
+        toast.geometry(f"+{sw+100}+{sh+100}")
+        toast.update_idletasks()
+
+        tw = toast.winfo_reqwidth()
+        th = toast.winfo_reqheight()
+        x = sw - tw - 20
+        y = sh - th - 60
+
+        def _position_and_dismiss():
+            try:
+                toast.geometry(f"+{x}+{y}")
+                toast.attributes("-topmost", True)
+                toast.focus_force()
+                toast.after(3500, lambda: toast.destroy())
+            except Exception:
+                pass
+
+        toast.bind("<Button-1>", lambda e: toast.destroy())
+        self.root.after(50, _position_and_dismiss)
 
     # ------------------------------
     # 历史设备管理
@@ -310,7 +404,7 @@ class ADBDeviceManager:
         if len(self.history_devices) > self.MAX_HISTORY:
             self.history_devices = self.history_devices[:self.MAX_HISTORY]
         self.config["history_devices"] = self.history_devices
-        save_config(self.config)
+        save_config(self.config, self.root)
         self.refresh_history_dropdown()
 
     def on_history_selected(self, event=None):
@@ -356,11 +450,11 @@ class ADBDeviceManager:
         """断开选中的设备"""
         selection = self.connected_listbox.curselection()
         if not selection:
-            messagebox.showinfo("提示", "请先选择要断开的设备")
+            self.show_toast("提示", "请先选择要断开的设备", "info")
             return
 
         if not self.adb_executable or not self.adb_executable.exists():
-            messagebox.showerror("ADB 未设置", "请先设置有效的 ADB 路径！")
+            self.show_toast("ADB 未设置", "请先设置有效的 ADB 路径！", "error")
             return
 
         # 收集要断开的设备 ID
@@ -386,12 +480,12 @@ class ADBDeviceManager:
     def disconnect_all(self):
         """断开所有连接"""
         if not self.adb_executable or not self.adb_executable.exists():
-            messagebox.showerror("ADB 未设置", "请先设置有效的 ADB 路径！")
+            self.show_toast("ADB 未设置", "请先设置有效的 ADB 路径！", "error")
             return
 
         count = self.connected_listbox.size()
         if count == 0:
-            messagebox.showinfo("提示", "当前没有已连接的设备")
+            self.show_toast("提示", "当前没有已连接的设备", "info")
             return
 
         confirm = messagebox.askyesno("确认", f"确定要断开所有 {count} 台设备的连接吗？")
@@ -418,10 +512,10 @@ class ADBDeviceManager:
     def connect_device(self):
         ip = self.device_ip_var.get().strip()
         if not ip:
-            messagebox.showerror("错误", "请先输入设备IP！")
+            self.show_toast("错误", "请先输入设备IP！", "error")
             return
         if not self.adb_executable or not self.adb_executable.exists():
-            messagebox.showerror("ADB 未设置", "请先设置有效的 ADB 路径！")
+            self.show_toast("ADB 未设置", "请先设置有效的 ADB 路径！", "error")
             return
 
         self.set_status("正在连接设备...", "orange")
@@ -440,12 +534,12 @@ class ADBDeviceManager:
             self.set_status(msg, "red")
             self.log_to_gui(msg)
             logger.error(msg)
-            messagebox.showerror("连接失败", msg)
+            self.show_toast("连接失败", msg, "error")
 
     def launch_scrcpy(self):
         scrcpy_exe = self.scrcpy_exe_var.get()
         if not scrcpy_exe or not Path(scrcpy_exe).exists():
-            messagebox.showerror("文件不存在", "请先设置有效的 QtScrcpy.exe 路径！")
+            self.show_toast("文件不存在", "请先设置有效的 QtScrcpy.exe 路径！", "error")
             return
         try:
             exe_path = Path(scrcpy_exe)
@@ -459,15 +553,15 @@ class ADBDeviceManager:
             self.set_status(msg, "red")
             self.log_to_gui(msg)
             logger.error(msg)
-            messagebox.showerror("启动失败", str(e))
+            self.show_toast("启动失败", str(e), "error")
 
     def clear_device(self):
         ip = self.device_ip_var.get().strip()
         if not ip:
-            messagebox.showerror("错误", "请先输入设备IP！")
+            self.show_toast("错误", "请先输入设备IP！", "error")
             return
         if not self.adb_executable or not self.adb_executable.exists():
-            messagebox.showerror("ADB 未设置", "请先设置有效的 ADB 路径！")
+            self.show_toast("ADB 未设置", "请先设置有效的 ADB 路径！", "error")
             return
 
         confirm = messagebox.askyesno("确认操作", "此操作将清除设备配置并重启！\n确定继续？")
@@ -506,13 +600,135 @@ class ADBDeviceManager:
             self.log_to_gui(msg)
             logger.error(msg)
 
+    # ------------------------------
+    # APK 拖拽支持
+    # ------------------------------
+    def _setup_apk_dnd(self):
+        """尝试初始化拖拽支持（tkinterdnd2），不可用时仅保留按钮选择"""
+        try:
+            from tkinterdnd2 import DND_FILES, TkinterDnD
+            # 如果走到了这里说明 tkinterdnd2 可用
+            # 需要把 root 替换为 TkinterDnD.Tk 的窗口 —— 但此时 root 已创建
+            # 退而求其次：仅对 Label 做 drop_target_register
+            self.apk_drop_label.drop_target_register(DND_FILES)
+            self.apk_drop_label.dnd_bind('<<Drop>>', self._on_apk_drop)
+            self._dnd_available = True
+            logger.info("APK 拖拽功能已启用 (tkinterdnd2)")
+        except Exception:
+            self._dnd_available = False
+            # 降级：双击拖拽区域也能打开文件选择
+            self.apk_drop_label.bind("<Double-Button-1>", lambda e: self.browse_apk())
+            self.apk_drop_label.config(text="📥  双击此处选择 APK 文件  📥")
+            logger.info("tkinterdnd2 不可用，APK 拖拽降级为双击选择")
+
+    def _on_apk_drop(self, event):
+        """拖拽释放回调"""
+        data = event.data
+        # tkinterdnd2 在 Windows 上可能返回 {path} 格式（带花括号）
+        file_path = data.strip().strip('{}')
+        # 有时多个文件用空格分隔，只取第一个
+        if ' ' in file_path and not os.path.exists(file_path):
+            file_path = file_path.split()[0]
+        if file_path.lower().endswith('.apk') and os.path.exists(file_path):
+            self.apk_path_var.set(file_path)
+            self.log_to_gui(f"📥 已选择 APK: {os.path.basename(file_path)}")
+        else:
+            self.show_toast("无效文件", "请拖入 .apk 格式的文件！", "warning")
+
+    # ------------------------------
+    # APK 安装
+    # ------------------------------
+    def browse_apk(self):
+        """弹出文件选择对话框选择 APK"""
+        file_path = filedialog.askopenfilename(
+            title="选择 APK 文件",
+            filetypes=[("APK files", "*.apk"), ("All files", "*.*")],
+            initialdir=EXE_DIR
+        )
+        if file_path:
+            self.apk_path_var.set(file_path)
+            self.log_to_gui(f"📂 已选择 APK: {os.path.basename(file_path)}")
+
+    def refresh_apk_device_list(self):
+        """刷新 APK 安装目标设备下拉列表"""
+        if not self.adb_executable or not self.adb_executable.exists():
+            self.show_toast("ADB 未设置", "请先设置有效的 ADB 路径！", "error")
+            return
+        code, out, _ = run_adb_command(str(self.adb_executable), ["devices"])
+        devices = []
+        if code == 0:
+            for line in out.strip().split('\n'):
+                line = line.strip()
+                if '\t' in line:
+                    parts = line.split('\t')
+                    if len(parts) >= 2 and parts[1] == 'device':
+                        devices.append(parts[0])
+        self.apk_device_combo["values"] = devices
+        if devices:
+            self.apk_device_combo.current(0)
+            self.log_to_gui(f"📋 可用安装设备: {', '.join(devices)}")
+        else:
+            self.log_to_gui("⚠️ 当前无可用设备，请先连接设备")
+
+    def install_apk(self):
+        """安装 APK 到选中设备（后台线程）"""
+        apk_path = self.apk_path_var.get().strip()
+        if not apk_path:
+            self.show_toast("提示", "请先选择 APK 文件！", "warning")
+            return
+        if not os.path.exists(apk_path):
+            self.show_toast("文件不存在", f"APK 文件不存在：\n{apk_path}", "error")
+            return
+        if not self.adb_executable or not self.adb_executable.exists():
+            self.show_toast("ADB 未设置", "请先设置有效的 ADB 路径！", "error")
+            return
+
+        device_serial = self.apk_device_combo.get().strip()
+        if not device_serial:
+            self.show_toast("提示", "请先选择目标设备！\n点击 🔄 刷新设备列表。", "warning")
+            return
+
+        apk_name = os.path.basename(apk_path)
+        self.set_status(f"正在安装 {apk_name} 到 {device_serial} ...", "orange")
+        self.install_apk_btn.config(state=DISABLED, text="⏳ 安装中...")
+        self.log_to_gui(f"📲 开始安装: {apk_name} → {device_serial}")
+        logger.info(f"开始安装 APK: {apk_path} → {device_serial}")
+
+        def _do_install():
+            code, out, err = run_adb_command(
+                str(self.adb_executable),
+                ["-s", device_serial, "install", "-r", "-d", apk_path],
+                timeout=120
+            )
+            # 回到主线程更新 UI
+            self.root.after(0, lambda: self._on_install_done(code, out, err, apk_name, device_serial))
+
+        threading.Thread(target=_do_install, daemon=True).start()
+
+    def _on_install_done(self, code, out, err, apk_name, device_serial):
+        """安装完成回调（主线程）"""
+        self.install_apk_btn.config(state=NORMAL, text="📲 安装 APK 到选中设备")
+        output = (out + err).strip()
+        if code == 0 and "success" in output.lower():
+            msg = f"✅ {apk_name} 安装成功 → {device_serial}"
+            self.set_status(msg, "green")
+            self.log_to_gui(msg)
+            logger.info(msg)
+            self.show_toast("安装成功", msg, "success")
+        else:
+            msg = f"❌ {apk_name} 安装失败 → {device_serial}\n{output}"
+            self.set_status(f"安装失败: {apk_name}", "red")
+            self.log_to_gui(msg)
+            logger.error(f"APK 安装失败: {output}")
+            self.show_toast("安装失败", msg, "error")
+
     def view_logcat(self):
         ip = self.device_ip_var.get().strip()
         if not ip:
-            messagebox.showerror("错误", "请先输入设备IP！")
+            self.show_toast("错误", "请先输入设备IP！", "error")
             return
         if not self.adb_executable or not self.adb_executable.exists():
-            messagebox.showerror("ADB 未设置", "请先设置有效的 ADB 路径！")
+            self.show_toast("ADB 未设置", "请先设置有效的 ADB 路径！", "error")
             return
 
         run_adb_command(str(self.adb_executable), ["connect", ip])
