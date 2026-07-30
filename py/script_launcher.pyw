@@ -13,8 +13,9 @@ class ScriptLauncher:
         self.root.geometry("800x600")
         self.root.minsize(600, 400)
 
-        # 配置文件路径
-        self.config_path = "script_launcher.ini"
+        # 配置文件路径（基于脚本所在目录，避免运行目录不同导致读错文件）
+        self.script_dir_base = os.path.dirname(os.path.abspath(__file__))
+        self.config_path = os.path.join(self.script_dir_base, "script_launcher.ini")
 
         # 加载配置
         self.config = configparser.ConfigParser()
@@ -36,11 +37,22 @@ class ScriptLauncher:
             self.python_path = "python"
             self.script_dir = "."
 
+        # 加载使用频率统计，规范化key
+        self.usage_counts = {}
+        if self.config.has_section("UsageCount"):
+            for key, value in self.config.items("UsageCount"):
+                try:
+                    self.usage_counts[key.replace("/", "\\").lower()] = int(value)
+                except ValueError:
+                    self.usage_counts[key.replace("/", "\\").lower()] = 0
+
         # 确保路径有效
+        if not os.path.isabs(self.script_dir):
+            self.script_dir = os.path.normpath(os.path.join(self.script_dir_base, self.script_dir))
         if not os.path.isfile(self.python_path) and not self.is_command_available(self.python_path):
             self.python_path = self.select_python_path()
         if not os.path.isdir(self.script_dir):
-            self.script_dir = filedialog.askdirectory(title="选择脚本目录") or "."
+            self.script_dir = filedialog.askdirectory(title="选择脚本目录") or self.script_dir_base
 
         # 保存配置
         self.save_config()
@@ -51,6 +63,11 @@ class ScriptLauncher:
             self.config.add_section("Settings")
         self.config.set("Settings", "python_path", self.python_path)
         self.config.set("Settings", "script_dir", self.script_dir)
+        # 保存使用频率
+        if not self.config.has_section("UsageCount"):
+            self.config.add_section("UsageCount")
+        for key, value in self.usage_counts.items():
+            self.config.set("UsageCount", key, str(value))
         with open(self.config_path, "w", encoding="utf-8") as f:
             self.config.write(f)
 
@@ -164,10 +181,11 @@ class ScriptLauncher:
         for item in self.script_tree.get_children():
             self.script_tree.delete(item)
 
-        # 读取脚本描述配置
+        # 读取脚本描述配置，规范化key（统一为小写+反斜杠）
         script_descriptions = {}
         if self.config.has_section("Descriptions"):
-            script_descriptions = dict(self.config.items("Descriptions"))
+            for key, value in self.config.items("Descriptions"):
+                script_descriptions[key.replace("/", "\\").lower()] = value
 
         # 收集所有脚本并分组
         scripts_by_category = {}
@@ -178,7 +196,9 @@ class ScriptLauncher:
                     if file.endswith((".py", ".pyw")):
                         script_path = os.path.join(root, file)
                         relative_path = os.path.relpath(script_path, self.script_dir)
-                        description = script_descriptions.get(relative_path, os.path.splitext(file)[0])
+                        # 规范化路径用于匹配描述
+                        norm_path = relative_path.replace("/", "\\").lower()
+                        description = script_descriptions.get(norm_path, os.path.splitext(file)[0])
 
                         # 过滤包含【废弃】的描述
                         if "【废弃】" in description:
@@ -197,11 +217,23 @@ class ScriptLauncher:
             messagebox.showerror("错误", f"加载脚本失败: {str(e)}")
             return
 
+        # 按使用频率排序分类（频率高的靠前），同频率按名称排序
+        category_freq = {}
+        for category, scripts in scripts_by_category.items():
+            total_freq = sum(self.usage_counts.get(rel_path.replace("/", "\\").lower(), 0) for _, rel_path, _ in scripts)
+            category_freq[category] = total_freq
+
+        sorted_categories = sorted(scripts_by_category.keys(), key=lambda c: (-category_freq[c], c))
+
         # 插入分组节点和子项
-        for category in sorted(scripts_by_category.keys()):
+        for category in sorted_categories:
             category_id = self.script_tree.insert("", tk.END, text=category, open=True)
-            for display_name, rel_path, ftype in sorted(scripts_by_category[category], key=lambda x: x[0]):
-                self.script_tree.insert(category_id, tk.END, values=(rel_path, ftype), text=display_name)
+            # 分类内按使用频率排序（频率高的靠前），同频率按名称排序
+            sorted_scripts = sorted(scripts_by_category[category], key=lambda x: (-self.usage_counts.get(x[1].replace("/", "\\").lower(), 0), x[0]))
+            for display_name, rel_path, ftype in sorted_scripts:
+                count = self.usage_counts.get(rel_path.replace("/", "\\").lower(), 0)
+                suffix = f"  [{count}次]" if count > 0 else ""
+                self.script_tree.insert(category_id, tk.END, values=(rel_path, ftype), text=display_name + suffix)
 
     def run_selected_script(self, event=None):
         """执行选中的脚本（隐藏黑框）"""
@@ -236,6 +268,13 @@ class ScriptLauncher:
             if sys.platform == "win32":
                 creationflags = subprocess.CREATE_NO_WINDOW
 
+            # 记录使用频率
+            norm_path = script_relative_path.replace("/", "\\").lower()
+            if norm_path not in self.usage_counts:
+                self.usage_counts[norm_path] = 0
+            self.usage_counts[norm_path] += 1
+            self.save_config()
+
             # 直接后台执行，不显示任何窗口
             subprocess.Popen(
                 popen_args,
@@ -264,6 +303,9 @@ class ScriptLauncher:
 
         script_relative_path = self.script_tree.item(selected_item, "values")[0]
         current_desc = self.script_tree.item(selected_item, "text")
+        # 去掉使用频率后缀 如 "  [3次]"
+        if "  [" in current_desc and current_desc.endswith("次]"):
+            current_desc = current_desc[:current_desc.rfind("  [")]
 
         # 尝试还原原始描述（含大类）
         original_desc = current_desc

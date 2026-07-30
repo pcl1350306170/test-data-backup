@@ -1,13 +1,24 @@
 {
-  "project_dir": "D:/CODE/Yarward/门诊/template1.5.4",
-  "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-1257北京大学第三医院秦皇岛宁海院区\\前端",
-  "order_info": "2026-1257北京大学第三医院秦皇岛宁海院区",
-  "project_version": "1.5.4",
-  "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-1257北京大学第三医院秦皇岛宁海院区/前端/YM-801S-TLSS-V1.5.4.261257.01001-BJDXDSYYQHDNHYQ-FE.zip",
+  "project_dir": "D:/CODE/Yarward/门诊/template1.5.6",
+  "output_dir": "D:/CODE/Yarward/SVN/0门诊/2026-1289山西省中西医结合医院-前端",
+  "order_info": "2026-1289山西省中西医结合医院",
+  "project_version": "1.5.6",
+  "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-1289山西省中西医结合医院-前端/YM-801S-TLSS-V1.5.6.261289.01001-SXSZXYJHYY-FE.zip",
   "custom_zip_name": "",
   "auto_commit_svn": true,
   "is_version_155_plus": true,
   "history_records": [
+    {
+      "timestamp": "2026-07-30 14:39:30",
+      "project_dir": "D:/CODE/Yarward/门诊/template1.5.6",
+      "output_dir": "D:/CODE/Yarward/SVN/0门诊/2026-1289山西省中西医结合医院-前端",
+      "order_info": "2026-1289山西省中西医结合医院",
+      "project_version": "1.5.6",
+      "base_zip_path": "D:/CODE/Yarward/SVN/0门诊/2026-1289山西省中西医结合医院-前端/YM-801S-TLSS-V1.5.6.261289.01001-SXSZXYJHYY-FE.zip",
+      "custom_zip_name": "",
+      "auto_commit_svn": true,
+      "is_version_155_plus": true
+    },
     {
       "timestamp": "2026-07-27 10:34:59",
       "project_dir": "D:/CODE/Yarward/门诊/template1.5.4",

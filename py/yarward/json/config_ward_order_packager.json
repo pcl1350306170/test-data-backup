@@ -4,14 +4,24 @@
   "auto_commit_svn": true,
   "history_records": [
     {
-      "timestamp": "2026-07-28 10:26:22",
+      "timestamp": "2026-07-29 10:33:02",
       "project_type": "床头",
       "project_dir": "D:\\CODE\\Yarward\\病房\\床头\\床头3.4",
       "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\0A通用\\3.4.4-前端-package",
-      "package_name": "bedhead-3.4.4_202607281025.tar.gz",
+      "package_name": "bedhead-3.4.4_202607291032.tar.gz",
       "keyword": "3.4.4",
       "auto_commit_svn": true,
       "branch": "3.4.4"
+    },
+    {
+      "timestamp": "2026-07-28 16:07:07",
+      "project_type": "护理看板",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\看板\\看板3.1",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026年7月28日-济南中心医院东院区-首页空数据显示调整",
+      "package_name": "ntv-3.2.1-济南市中心医院东院区_202607281606.tar.gz",
+      "keyword": "济南",
+      "auto_commit_svn": true,
+      "branch": "3.2.1-济南市中心医院东院区"
     },
     {
       "timestamp": "2026-07-20 19:35:59",
