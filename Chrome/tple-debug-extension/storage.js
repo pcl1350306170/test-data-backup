@@ -4,7 +4,13 @@ const ConfigManager = {
         targetHost: 'localhost',
         targetPort: '8080',
         debugPath: '/tpleditor/resource/triagetable/#/sbIndex',
-        autoRedirectPath: '/tpleditor/resource/html/iframeIndex2.html'
+        autoRedirectPath: '/tpleditor/resource/html/iframeIndex2.html',
+        batchApiPath: '/clinic/api/qcss/register/made',
+        batchCallTimes: 10,
+        batchStartId: 1,
+        btnImageCollapsed: '',
+        btnImageExpanded: '',
+        autoCollapseTimeout: 10
     },
 
     async getConfig() {

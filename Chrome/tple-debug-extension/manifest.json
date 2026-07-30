@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
   "name": "门诊 web 调试页面加载",
-  "version": "1.2",
-  "description": "在 7000 端口项目页面添加调试入口按钮，并支持 iframeIndex2 自动跳转",
+  "version": "2.0",
+  "description": "在 7000 端口项目页面添加调试工具菜单，支持打开调试页面、复制localStorage、模拟批量挂号（手动输入Headers和参数）",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["activeTab", "storage"],
+  "permissions": ["activeTab", "storage", "clipboardWrite"],
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
@@ -16,5 +16,11 @@
       "css": ["button.css"]
     }
   ],
-  "options_page": "options.html"
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg", "*.webp"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ]
 }

@@ -8,7 +8,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         targetHost: document.getElementById('targetHost'),
         targetPort: document.getElementById('targetPort'),
         debugPath: document.getElementById('debugPath'),
-        autoRedirectPath: document.getElementById('autoRedirectPath')
+        autoRedirectPath: document.getElementById('autoRedirectPath'),
+        btnImageCollapsed: document.getElementById('btnImageCollapsed'),
+        btnImageExpanded: document.getElementById('btnImageExpanded'),
+        autoCollapseTimeout: document.getElementById('autoCollapseTimeout')
     };
 
     // 加载配置
@@ -19,6 +22,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     inputs.targetPort.value = config.targetPort;
     inputs.debugPath.value = config.debugPath;
     inputs.autoRedirectPath.value = config.autoRedirectPath;
+    inputs.btnImageCollapsed.value = config.btnImageCollapsed || '';
+    inputs.btnImageExpanded.value = config.btnImageExpanded || '';
+    inputs.autoCollapseTimeout.value = config.autoCollapseTimeout ?? 10;
 
     // 保存配置
     form.addEventListener('submit', async (e) => {
@@ -29,7 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             targetHost: inputs.targetHost.value,
             targetPort: inputs.targetPort.value,
             debugPath: inputs.debugPath.value,
-            autoRedirectPath: inputs.autoRedirectPath.value
+            autoRedirectPath: inputs.autoRedirectPath.value,
+            btnImageCollapsed: inputs.btnImageCollapsed.value.trim(),
+            btnImageExpanded: inputs.btnImageExpanded.value.trim(),
+            autoCollapseTimeout: parseInt(inputs.autoCollapseTimeout.value) || 0
         };
 
         await ConfigManager.setConfig(newConfig);
@@ -45,6 +54,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         inputs.targetPort.value = defaultConfig.targetPort;
         inputs.debugPath.value = defaultConfig.debugPath;
         inputs.autoRedirectPath.value = defaultConfig.autoRedirectPath;
+        inputs.btnImageCollapsed.value = '';
+        inputs.btnImageExpanded.value = '';
+        inputs.autoCollapseTimeout.value = 10;
 
         showMessage('已恢复默认配置', 'success');
     });

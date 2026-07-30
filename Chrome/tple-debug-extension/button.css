@@ -1,33 +1,322 @@
-#tple-debug-button {
+/* ===== 浮动菜单容器 ===== */
+#tple-float-menu {
     position: fixed;
-    top: 60px;
+    bottom: 20px;
     right: 20px;
     z-index: 2147483647;
-    padding: 10px 16px;
-    background-color: #4CAF50;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ===== 主按钮 ===== */
+#tple-toggle-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease, box-shadow 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#tple-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+#tple-toggle-btn.expanded {
+    transform: rotate(45deg);
+    background: linear-gradient(135deg, #f44336, #c62828);
+}
+
+#tple-toggle-btn.expanded:hover {
+    transform: rotate(45deg) scale(1.1);
+}
+
+#tple-toggle-btn.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    transition: none;
+}
+
+/* ===== 自定义图片按钮 ===== */
+#tple-toggle-btn.has-custom-image {
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+#tple-toggle-btn.has-custom-image.expanded {
+    transform: none;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+#tple-toggle-btn.has-custom-image.expanded:hover {
+    transform: scale(1.1);
+}
+
+/* ===== 菜单项 ===== */
+.tple-menu-item {
+    padding: 8px 16px;
+    background: white;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    pointer-events: none;
+    color: #333;
+    border: 1px solid #e0e0e0;
+}
+
+.tple-menu-item.visible {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+}
+
+.tple-menu-item:hover {
+    background: #f0f0f0;
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.tple-menu-item:active {
+    transform: scale(0.98) !important;
+}
+
+/* ===== 批量挂号面板 ===== */
+#tple-batch-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    bottom: 20px;
+    z-index: 2147483646;
+    width: 480px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    animation: tple-slide-in 0.25s ease-out;
+}
+
+@keyframes tple-slide-in {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.panel-header {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
+    flex-shrink: 0;
+}
+
+.panel-header-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-header-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.panel-header-btn:hover {
+    background: rgba(255,255,255,0.35);
+}
+
+.panel-close {
+    cursor: pointer;
+    font-size: 18px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.panel-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.panel-body {
+    padding: 16px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.panel-body label {
+    display: block;
+    margin-bottom: 4px;
+    color: #555;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.panel-body input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.panel-body input:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.panel-body textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    resize: vertical;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+}
+
+.panel-body textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.panel-row {
+    display: flex;
+    gap: 10px;
+}
+
+.panel-row > div {
+    flex: 1;
+}
+
+.panel-btn {
+    width: 100%;
+    padding: 10px;
+    background: #4CAF50;
     color: white;
     border: none;
     border-radius: 6px;
     font-size: 14px;
-    font-weight: bold;
-    cursor: move;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    transition: background-color 0.2s, transform 0.1s;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 4px;
 }
 
-#tple-debug-button:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
+.panel-btn:hover {
+    background: #43a047;
 }
 
-#tple-debug-button:active {
-    transform: translateY(0);
+.panel-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
 }
-#tple-debug-button.dragging {
-    opacity: 0.8;
-    cursor: grabbing;
+
+/* ===== 进度条 ===== */
+.tple-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    margin: 12px 0 8px;
+    overflow: hidden;
 }
+
+.tple-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #66BB6A);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+/* ===== 结果日志 ===== */
+.tple-result-log {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 10px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 12px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    background: #fafafa;
+}
+
+.tple-result-item {
+    padding: 3px 0;
+    border-bottom: 1px solid #f0f0f0;
+    line-height: 1.5;
+}
+
+.tple-result-item:last-child {
+    border-bottom: none;
+}
+
+.tple-result-item.success { color: #2E7D32; }
+.tple-result-item.error { color: #c62828; }
+.tple-result-item.info { color: #1565C0; }
+
+/* ===== Toast 提示 ===== */
+#tple-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    z-index: 2147483647;
+    padding: 10px 24px;
+    background: #333;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
+#tple-toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+#tple-toast.success { background: #2E7D32; }
+#tple-toast.error { background: #c62828; }

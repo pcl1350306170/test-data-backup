@@ -135,6 +135,20 @@
             color: #888;
             margin-top: 5px;
         }
+
+        .img-config-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .img-config-item {
+            flex: 1;
+        }
+
+        .img-config-item label {
+            font-size: 13px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -168,6 +182,27 @@
             <label for="autoRedirectPath">自动跳转路径</label>
             <input type="text" id="autoRedirectPath" required>
             <p class="help-text">匹配此路径时会自动跳转到目标服务器</p>
+        </div>
+
+        <div class="form-group">
+            <label>按钮自定义图片（支持远程URL）</label>
+            <div class="img-config-row">
+                <div class="img-config-item">
+                    <label for="btnImageCollapsed">收缩态图片（未展开时显示）</label>
+                    <input type="text" id="btnImageCollapsed" placeholder="如 https://raw.githubusercontent.com/.../btn.png，留空使用默认纯色按钮">
+                </div>
+                <div class="img-config-item">
+                    <label for="btnImageExpanded">展开态图片（菜单展开时显示）</label>
+                    <input type="text" id="btnImageExpanded" placeholder="如 https://raw.githubusercontent.com/.../btn.png，留空使用默认纯色按钮">
+                </div>
+            </div>
+            <p class="help-text">填写图片URL（支持远程链接），留空则使用默认绿色按钮</p>
+        </div>
+
+        <div class="form-group">
+            <label for="autoCollapseTimeout">菜单自动收起时间（秒）</label>
+            <input type="number" id="autoCollapseTimeout" min="0" max="300" step="1">
+            <p class="help-text">展开菜单后多少秒自动收起，填 0 表示不自动收起</p>
         </div>
 
         <div class="btn-group">
