@@ -139,13 +139,13 @@
 <body>
 <div class="container">
     <h1>🏥 病房 web 开发辅助工具</h1>
-    <p class="subtitle">配置工具生效端口和按钮外观</p>
+    <p class="subtitle">配置请求接口和按钮外观</p>
 
     <form id="configForm">
         <div class="form-group">
-            <label for="debugPort">生效端口（检测的页面端口）</label>
-            <input type="number" id="debugPort" required min="1" max="65535">
-            <p class="help-text">只有访问这个端口的页面才会显示工具菜单</p>
+            <label for="apiBaseUrl">请求接口地址</label>
+            <input type="text" id="apiBaseUrl" placeholder="如 http://192.168.18.228:28019">
+            <p class="help-text">数据库操作、localStorage上传等功能的请求目标地址</p>
         </div>
 
         <div class="form-group">

@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resetBtn = document.getElementById('resetBtn');
 
     const inputs = {
-        debugPort: document.getElementById('debugPort'),
+        apiBaseUrl: document.getElementById('apiBaseUrl'),
         btnImageCollapsed: document.getElementById('btnImageCollapsed'),
         btnImageExpanded: document.getElementById('btnImageExpanded'),
         autoCollapseTimeout: document.getElementById('autoCollapseTimeout')
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 加载配置
     const config = await ConfigManager.getConfig();
 
-    inputs.debugPort.value = config.debugPort;
+    inputs.apiBaseUrl.value = config.apiBaseUrl;
     inputs.btnImageCollapsed.value = config.btnImageCollapsed || '';
     inputs.btnImageExpanded.value = config.btnImageExpanded || '';
     inputs.autoCollapseTimeout.value = config.autoCollapseTimeout ?? 10;
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
 
         const newConfig = {
-            debugPort: inputs.debugPort.value,
+            apiBaseUrl: inputs.apiBaseUrl.value.trim(),
             btnImageCollapsed: inputs.btnImageCollapsed.value.trim(),
             btnImageExpanded: inputs.btnImageExpanded.value.trim(),
             autoCollapseTimeout: parseInt(inputs.autoCollapseTimeout.value) || 0
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     resetBtn.addEventListener('click', async () => {
         const defaultConfig = await ConfigManager.resetConfig();
 
-        inputs.debugPort.value = defaultConfig.debugPort;
+        inputs.apiBaseUrl.value = defaultConfig.apiBaseUrl;
         inputs.btnImageCollapsed.value = '';
         inputs.btnImageExpanded.value = '';
         inputs.autoCollapseTimeout.value = 10;

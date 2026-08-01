@@ -299,3 +299,114 @@
     background: #d1ecf1;
     color: #0c5460;
 }
+
+/* ====================== */
+/* 批量创建设备弹窗样式    */
+/* ====================== */
+.ward-device-dialog {
+    width: 680px;
+    max-height: 85vh;
+}
+.ward-device-body {
+    max-height: calc(85vh - 50px);
+    overflow-y: auto;
+}
+.ward-section-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    margin: 12px 0 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #eee;
+}
+.ward-advanced-toggle {
+    cursor: pointer;
+    color: #409eff;
+    user-select: none;
+}
+.ward-advanced-toggle:hover {
+    color: #66b1ff;
+}
+.ward-mono {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: monospace;
+    resize: vertical;
+    box-sizing: border-box;
+}
+.ward-radio-group {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding-top: 4px;
+}
+.ward-radio-group label {
+    cursor: pointer;
+    font-size: 13px;
+}
+.ward-device-dialog select {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+.ward-device-dialog input[type="number"] {
+    -moz-appearance: textfield;
+}
+/* 进度条 */
+.ward-device-progress {
+    margin-top: 12px;
+}
+.ward-progress-bar {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.ward-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #409eff, #67c23a);
+    transition: width 0.3s;
+    border-radius: 4px;
+}
+.ward-progress-text {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+/* 结果列表 */
+.ward-device-results {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 6px;
+}
+.ward-result-item {
+    padding: 3px 0;
+    font-size: 12px;
+}
+.ward-result-success {
+    color: #67c23a;
+}
+.ward-result-error {
+    color: #f56c6c;
+}
+.ward-fetch-org-btn {
+    background: #409eff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.ward-fetch-org-btn:hover {
+    background: #66b1ff;
+}

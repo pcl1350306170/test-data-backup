@@ -50,6 +50,7 @@ DEFAULT_CONFIG = {
     "jar_path": r"C:\www\gitee\my-blog-api\target\base-service-3.0.0-SNAPSHOT.jar",
     "jar_upload_dir": "/usr/local/apps/base-service",
     "jar_server_port": "28019",
+    "jar_active_profile": "prod",
     "also_deploy_jar": False
 }
 
@@ -398,8 +399,10 @@ def deploy_jar(config, ssh=None, progress_callback=None):
         # 启动 JAR
         if progress_callback:
             progress_callback(f"正在启动 JAR... (端口: {server_port})")
-        run_cmd = (f"cd {upload_dir} && nohup {java_path} -Djava.net.preferIPv4Stack=false "
-                   f"-jar {jar_file.name} --server.address=0.0.0.0 --server.port={server_port} > app.log 2>&1 &")
+        active_profile = config.get("jar_active_profile", "prod")
+        run_cmd = (f"cd {upload_dir} && setsid nohup {java_path} -Djava.net.preferIPv4Stack=false "
+                   f"-jar {jar_file.name} --spring.profiles.active={active_profile} "
+                   f"--server.address=0.0.0.0 --server.port={server_port} > app.log 2>&1 &")
         stdin, stdout, stderr = ssh.exec_command(run_cmd)
         exit_status = stdout.channel.recv_exit_status()
 
@@ -570,6 +573,9 @@ class WebUploaderApp:
         Label(jar_row2, text="应用端口:", font=("Arial", 10)).pack(side=LEFT, padx=(20, 5))
         self.jar_port_var = StringVar(value=self.config.get("jar_server_port", "28019"))
         Entry(jar_row2, textvariable=self.jar_port_var, width=8).pack(side=LEFT, padx=5)
+        Label(jar_row2, text="配置:", font=("Arial", 10)).pack(side=LEFT, padx=(20, 5))
+        self.jar_profile_var = StringVar(value=self.config.get("jar_active_profile", "prod"))
+        Entry(jar_row2, textvariable=self.jar_profile_var, width=10).pack(side=LEFT, padx=5)
 
         # 初始状态根据复选框决定
         self.toggle_jar_frame()
@@ -657,6 +663,7 @@ class WebUploaderApp:
             "jar_path": self.jar_path_var.get(),
             "jar_upload_dir": self.jar_upload_dir_var.get(),
             "jar_server_port": self.jar_port_var.get(),
+            "jar_active_profile": self.jar_profile_var.get(),
             "also_deploy_jar": self.also_deploy_jar.get()
         })
         save_config(self.config)

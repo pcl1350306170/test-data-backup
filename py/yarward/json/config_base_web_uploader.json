@@ -11,5 +11,6 @@
     "jar_path": "D:/CODE/Java/my-blog-api/target/base-service-3.0.0-SNAPSHOT.jar",
     "jar_upload_dir": "/usr/local/apps/base-service",
     "jar_server_port": "28019",
-    "also_deploy_jar": true
+    "also_deploy_jar": true,
+    "jar_active_profile": "prod"
 }

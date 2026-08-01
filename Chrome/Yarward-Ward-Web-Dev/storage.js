@@ -1,6 +1,6 @@
 const ConfigManager = {
     DEFAULT_CONFIG: {
-        debugPort: '7000',
+        apiBaseUrl: 'http://192.168.18.228:28019',
         btnImageCollapsed: '',
         btnImageExpanded: '',
         autoCollapseTimeout: 10
