@@ -1,0 +1,301 @@
+/* ===== 浮动菜单容器 ===== */
+#tple-float-menu {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2147483647;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ===== 主按钮 ===== */
+#tple-toggle-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease, box-shadow 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#tple-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+
+#tple-toggle-btn.expanded {
+    transform: rotate(45deg);
+    background: linear-gradient(135deg, #f44336, #c62828);
+}
+
+#tple-toggle-btn.expanded:hover {
+    transform: rotate(45deg) scale(1.1);
+}
+
+#tple-toggle-btn.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    transition: none;
+}
+
+/* ===== 自定义图片按钮 ===== */
+#tple-toggle-btn.has-custom-image {
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+#tple-toggle-btn.has-custom-image.expanded {
+    transform: none;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+#tple-toggle-btn.has-custom-image.expanded:hover {
+    transform: scale(1.1);
+}
+
+/* ===== 菜单项 ===== */
+.tple-menu-item {
+    padding: 8px 16px;
+    background: white;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    /* 收起时完全不占空间 */
+    height: 0;
+    padding: 0 16px;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    margin: 0;
+    transform: scale(0.8) translateY(10px);
+}
+
+.tple-menu-item.visible {
+    height: auto;
+    padding: 8px 16px;
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    pointer-events: auto;
+    overflow: visible;
+}
+
+.tple-menu-item:hover {
+    background: #f0f0f0;
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.tple-menu-item:active {
+    transform: scale(0.98) !important;
+}
+
+/* ===== Toast 提示 ===== */
+#tple-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    z-index: 2147483647;
+    padding: 10px 24px;
+    background: #333;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
+#tple-toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+#tple-toast.success { background: #2E7D32; }
+#tple-toast.error { background: #c62828; }
+#tple-toast.info { background: #1565C0; }
+
+/* ===== 操作弹窗 ===== */
+#ward-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2147483646;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ward-dialog {
+    background: white;
+    border-radius: 12px;
+    width: 480px;
+    max-height: 80vh;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    animation: ward-fade-in 0.2s ease;
+}
+
+@keyframes ward-fade-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.ward-dialog-header {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    color: white;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 12px 12px 0 0;
+    flex-shrink: 0;
+}
+
+.ward-dialog-close {
+    cursor: pointer;
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.ward-dialog-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.ward-dialog-body {
+    padding: 16px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.ward-form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.ward-form-row > .ward-form-group {
+    flex: 1;
+}
+
+.ward-form-group {
+    margin-bottom: 12px;
+}
+
+.ward-form-group label {
+    display: block;
+    margin-bottom: 4px;
+    color: #555;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.ward-form-group input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.ward-form-group input[type="text"]:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.ward-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ward-checkbox-row label {
+    margin-bottom: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ward-hint {
+    font-size: 12px;
+    color: #999;
+}
+
+.ward-submit-btn {
+    width: 100%;
+    padding: 10px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 4px;
+}
+
+.ward-submit-btn:hover {
+    background: #43a047;
+}
+
+.ward-submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.ward-result {
+    margin-top: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.6;
+    word-break: break-all;
+}
+
+.ward-result-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.ward-result-error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.ward-result-info {
+    background: #d1ecf1;
+    color: #0c5460;
+}

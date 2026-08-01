@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "病房 web 开发辅助工具",
+  "version": "1.0",
+  "description": "病房项目 Web 开发辅助工具，支持添加用户、管理设备、护理标签等操作",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["activeTab", "storage", "clipboardWrite"],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["storage.js", "content.js"],
+      "css": ["button.css"]
+    }
+  ],
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": ["*.png", "*.jpg", "*.jpeg", "*.gif", "*.svg", "*.webp"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ]
+}
