@@ -282,8 +282,10 @@ class ScriptLauncher:
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
-            # 可选：成功启动提示（建议注释掉以完全静默）
-            # messagebox.showinfo("执行", f"已启动脚本: {script_name}")
+
+            # 刷新列表以反映最新使用频率排序
+            self.load_scripts()
+            self.root.update()
 
         except Exception as e:
             messagebox.showerror("错误", f"执行脚本失败: {str(e)}")
