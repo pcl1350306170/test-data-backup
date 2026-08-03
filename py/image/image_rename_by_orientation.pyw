@@ -85,6 +85,11 @@ class ImageRenameApp:
         # 格式: [{"old_path": ..., "new_path": ...}, ...]
         self._undo_records = None
 
+        # 监听相关
+        self.monitoring = False          # 是否正在监听
+        self._monitor_thread = None      # 监听线程
+        self._known_files = set()        # 已知文件集合（用于检测新增文件）
+
         # 创建UI
         self._create_widgets()
 
@@ -108,6 +113,8 @@ class ImageRenameApp:
         ttk.Button(dir_frame, text="选择目录", command=self._select_dir).pack(side=tk.LEFT, padx=2)
         ttk.Button(dir_frame, text="开始重命名", command=self._start_rename).pack(side=tk.LEFT, padx=2)
         ttk.Button(dir_frame, text="↩ 一键撤销", command=self._undo_rename).pack(side=tk.LEFT, padx=2)
+        self.monitor_btn = ttk.Button(dir_frame, text="▶ 开始监听", command=self._toggle_monitor)
+        self.monitor_btn.pack(side=tk.LEFT, padx=2)
 
         # ── 说明区 ──
         hint_frame = ttk.Frame(main_frame, padding="5")
@@ -405,6 +412,172 @@ class ImageRenameApp:
             logger.error(f"撤销过程出错: {e}")
         finally:
             self.running = False
+
+    # ──────────────── 目录监听 ────────────────
+
+    def _toggle_monitor(self):
+        """切换监听状态"""
+        if self.monitoring:
+            # 停止监听
+            self.monitoring = False
+            self.monitor_btn.config(text="▶ 开始监听")
+            self._log("已停止目录监听")
+            self._update_status("监听已停止")
+        else:
+            # 开始监听
+            dir_path = self.target_dir.get()
+            if not dir_path or not os.path.isdir(dir_path):
+                messagebox.showwarning("提示", "请先选择一个有效的目录")
+                return
+            self.monitoring = True
+            self.monitor_btn.config(text="■ 停止监听")
+            self._known_files = set()
+            self._log(f"开始监听目录: {dir_path}")
+            self._log("将检查所有已有文件及新增文件，不符合命名规则的自动重命名")
+            self._update_status(f"正在监听: {dir_path}")
+            # 启动监听线程
+            self._monitor_thread = threading.Thread(
+                target=self._monitor_worker, args=(dir_path,), daemon=True)
+            self._monitor_thread.start()
+
+    def _snapshot_files(self, dir_path):
+        """快照目录下所有图片文件路径"""
+        files = []
+        for dirpath, _, filenames in os.walk(dir_path):
+            for fname in filenames:
+                ext = os.path.splitext(fname)[1].lower()
+                if ext in IMAGE_EXTS:
+                    files.append(os.path.join(dirpath, fname))
+        return files
+
+    def _monitor_worker(self, dir_path):
+        """监听工作线程：先扫描所有已有文件，再持续监听新增文件，不符合命名规则的自动重命名"""
+        from PIL import Image
+
+        poll_interval = 2  # 轮询间隔（秒）
+        rename_count = 0
+
+        self._log(f"监听线程已启动（每 {poll_interval} 秒检查一次）")
+
+        # ── 第一轮：扫描目录下所有已有文件，不符合规则的全部重命名 ──
+        self._log("正在扫描目录下所有已有文件...")
+        try:
+            all_files = self._snapshot_files(dir_path)
+            to_check = [f for f in all_files if not self._is_already_renamed(f)]
+            self._log(f"共 {len(all_files)} 个图片，其中 {len(to_check)} 个不符合命名规则，开始处理...")
+
+            for img_path in to_check:
+                if not self.monitoring:
+                    break
+                if not self._wait_file_stable(img_path):
+                    continue
+                try:
+                    new_path = self._do_rename(img_path)
+                    if new_path:
+                        rename_count += 1
+                except Exception as e:
+                    self._log(f"  ✗ [扫描] 处理失败: {os.path.basename(img_path)} | {e}")
+
+            if rename_count > 0:
+                self._log(f"[扫描阶段] 共重命名 {rename_count} 个文件")
+            else:
+                self._log("[扫描阶段] 所有文件均已符合命名规则，无需处理")
+        except Exception as e:
+            self._log(f"  ✗ [扫描] 出错: {e}")
+
+        # 扫描完成后，快照当前文件集合，后续只处理新增
+        self._known_files = set(self._snapshot_files(dir_path))
+
+        # ── 后续轮询：只监听新增文件 ──
+        while self.monitoring:
+            try:
+                current_files = self._snapshot_files(dir_path)
+                current_set = set(current_files)
+
+                # 找出新增的文件
+                new_files = current_set - self._known_files
+
+                for new_file in new_files:
+                    if not self.monitoring:
+                        break
+
+                    # 跳过已按规则命名的文件
+                    if self._is_already_renamed(new_file):
+                        continue
+
+                    # 等待文件写入完成（文件大小不再变化）
+                    if not self._wait_file_stable(new_file):
+                        continue
+
+                    try:
+                        new_path = self._do_rename(new_file)
+                        if new_path:
+                            rename_count += 1
+                    except Exception as e:
+                        self._log(f"  ✗ [监听] 处理失败: {os.path.basename(new_file)} | {e}")
+
+                # 重新快照以包含重命名后的新文件
+                self._known_files = set(self._snapshot_files(dir_path))
+
+            except Exception as e:
+                self._log(f"  ✗ [监听] 扫描出错: {e}")
+
+            # 等待下一次轮询
+            for _ in range(poll_interval * 10):
+                if not self.monitoring:
+                    break
+                threading.Event().wait(0.1)
+
+        self._log(f"监听线程已停止，本次共自动重命名 {rename_count} 个文件")
+
+    def _wait_file_stable(self, file_path, timeout=5):
+        """等待文件写入完成（文件大小稳定），返回 True 表示稳定"""
+        try:
+            prev_size = -1
+            for _ in range(timeout * 10):
+                if not os.path.isfile(file_path):
+                    return False
+                curr_size = os.path.getsize(file_path)
+                if curr_size == prev_size and curr_size > 0:
+                    return True
+                prev_size = curr_size
+                threading.Event().wait(0.1)
+            return prev_size > 0
+        except Exception:
+            return False
+
+    def _do_rename(self, img_path):
+        """对单个图片文件执行重命名，返回新路径；失败或跳过返回 None"""
+        orientation = self._get_orientation(img_path)
+
+        if orientation == 'landscape':
+            label = LABEL_LANDSCAPE
+        elif orientation == 'portrait':
+            label = LABEL_PORTRAIT
+        else:
+            label = LABEL_AVATAR
+
+        img_dir = os.path.dirname(img_path)
+        folder_name = os.path.basename(img_dir) or "root"
+        _, ext = os.path.splitext(img_path)
+        ext = ext.lower()
+
+        new_name = f"{label}-{folder_name}-{random_suffix()}{ext}"
+        new_path = os.path.join(img_dir, new_name)
+
+        retry = 0
+        while os.path.exists(new_path) and retry < 10:
+            new_name = f"{label}-{folder_name}-{random_suffix()}{ext}"
+            new_path = os.path.join(img_dir, new_name)
+            retry += 1
+
+        if os.path.exists(new_path):
+            self._log(f"  ⚠ 文件名冲突过多，跳过: {os.path.basename(img_path)}")
+            return None
+
+        os.rename(img_path, new_path)
+        self._log(f"  [监听] → {os.path.basename(img_path)}  ➜  {new_name}")
+        return new_path
 
     # ──────────────── 工具方法 ────────────────
 

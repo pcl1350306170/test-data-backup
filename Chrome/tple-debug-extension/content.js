@@ -93,8 +93,8 @@
     // 加载自定义按钮图片
     // ==============================
     function applyButtonImages(toggleBtn, config) {
-        const collapsedUrl = config.btnImageCollapsed;
-        const expandedUrl = config.btnImageExpanded;
+        const collapsedUrl = config.btnImageCollapsed || ConfigManager.DEFAULT_CONFIG.btnImageCollapsed;
+        const expandedUrl = config.btnImageExpanded || ConfigManager.DEFAULT_CONFIG.btnImageExpanded;
         if (!collapsedUrl && !expandedUrl) return;
 
         // 尝试加载收缩态图片

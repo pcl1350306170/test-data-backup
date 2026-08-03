@@ -10,6 +10,7 @@ import os
 import json
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+import configparser
 
 # 支持的图片扩展名
 IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.ico', '.tiff', '.tif'}
@@ -19,13 +20,44 @@ class ImageRawUrlBuilder:
     def __init__(self, root):
         self.root = root
         self.root.title("Git项目图片Raw地址拼接工具")
-        self.root.geometry("800x560")
+        self.root.geometry("900x560")
         self.root.minsize(700, 480)
+
+        # 配置文件路径
+        self._config_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "git_image_raw_url_builder.ini")
 
         self.git_dir = tk.StringVar()
         self.url_prefix = tk.StringVar(value="https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/")
 
+        # 加载上次配置
+        self._load_config()
+
         self._build_ui()
+
+    def _load_config(self):
+        """从配置文件加载上次的git目录和前缀"""
+        if os.path.exists(self._config_path):
+            cfg = configparser.ConfigParser()
+            cfg.read(self._config_path, encoding='utf-8')
+            if cfg.has_section('State'):
+                self.git_dir.set(cfg.get('State', 'git_dir', fallback=''))
+                prefix = cfg.get('State', 'url_prefix', fallback='')
+                if prefix:
+                    self.url_prefix.set(prefix)
+
+    def _save_config(self):
+        """保存当前git目录和前缀到配置文件"""
+        cfg = configparser.ConfigParser()
+        if not cfg.has_section('State'):
+            cfg.add_section('State')
+        cfg.set('State', 'git_dir', self.git_dir.get())
+        cfg.set('State', 'url_prefix', self.url_prefix.get())
+        try:
+            with open(self._config_path, 'w', encoding='utf-8') as f:
+                cfg.write(f)
+        except Exception:
+            pass
 
     def _build_ui(self):
         # --- 顶部配置区 ---
@@ -57,12 +89,14 @@ class ImageRawUrlBuilder:
         result_frame = ttk.LabelFrame(self.root, text="扫描结果", padding=5)
         result_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=(5, 10))
 
-        columns = ("source", "address")
+        columns = ("dirname", "source", "address")
         self.tree = ttk.Treeview(result_frame, columns=columns, show="headings", selectmode="extended")
-        self.tree.heading("source", text="相对目录 (source)")
+        self.tree.heading("dirname", text="目录名")
+        self.tree.heading("source", text="相对路径 (source)")
         self.tree.heading("address", text="Raw地址 (address)")
+        self.tree.column("dirname", width=120, minwidth=80)
         self.tree.column("source", width=220, minwidth=120)
-        self.tree.column("address", width=540, minwidth=200)
+        self.tree.column("address", width=520, minwidth=200)
 
         scrollbar = ttk.Scrollbar(result_frame, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
@@ -70,12 +104,63 @@ class ImageRawUrlBuilder:
         self.tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.results = []  # [{"source": ..., "address": ...}, ...]
+        self.results = []  # [{"dirname": ..., "source": ..., "address": ...}, ...]
+
+        # 右键菜单
+        self._ctx_menu = tk.Menu(self.tree, tearoff=0)
+        self._ctx_menu.add_command(label="复制选中地址", command=self._copy_selected_urls)
+        self._ctx_menu.add_command(label="复制该目录所有地址", command=self._copy_dir_urls)
+        self.tree.bind("<Button-3>", self._show_context_menu)
 
     def _select_dir(self):
         d = filedialog.askdirectory(title="选择Git项目根目录")
         if d:
             self.git_dir.set(d)
+            self._save_config()
+
+    # ──────────────── 右键菜单 & 复制 ────────────────
+
+    def _show_context_menu(self, event):
+        row = self.tree.identify_row(event.y)
+        if row:
+            # 确保右键的行被选中
+            selected = set(self.tree.selection())
+            if row not in selected:
+                self.tree.selection_set(row)
+            self._ctx_menu.post(event.x_root, event.y_root)
+
+    def _copy_selected_urls(self):
+        """复制选中行的地址到剪贴板"""
+        selected = self.tree.selection()
+        if not selected:
+            return
+        urls = []
+        for item_id in selected:
+            vals = self.tree.item(item_id, "values")
+            if vals and len(vals) >= 3:
+                urls.append(vals[2])  # address 列
+        if urls:
+            self.root.clipboard_clear()
+            self.root.clipboard_append("\n".join(urls))
+            self.status_label.config(text=f"已复制 {len(urls)} 条地址")
+
+    def _copy_dir_urls(self):
+        """复制选中行所在目录的所有地址"""
+        selected = self.tree.selection()
+        if not selected:
+            return
+        # 获取选中行的目录名集合
+        target_dirs = set()
+        for item_id in selected:
+            vals = self.tree.item(item_id, "values")
+            if vals:
+                target_dirs.add(vals[0])  # dirname 列
+        # 收集该目录的所有地址
+        urls = [r["address"] for r in self.results if r["dirname"] in target_dirs]
+        if urls:
+            self.root.clipboard_clear()
+            self.root.clipboard_append("\n".join(urls))
+            self.status_label.config(text=f"已复制 {len(urls)} 条地址（{len(target_dirs)} 个目录）")
 
     def _scan(self):
         git_dir = self.git_dir.get().strip()
@@ -113,17 +198,22 @@ class ImageRawUrlBuilder:
                     source_dir = os.path.relpath(root_path, git_dir)
                     if source_dir == '.':
                         source_dir = ''
-                    source_display = source_dir if not source_dir else source_dir
+                    # 取最近一级目录名
+                    dirname = os.path.basename(root_path)
+                    if not dirname or dirname == '.':
+                        dirname = '(根目录)'
 
                     address = prefix + url_path
                     self.results.append({
-                        "source": source_display,
+                        "dirname": dirname,
+                        "source": source_dir,
                         "address": address
                     })
-                    self.tree.insert("", tk.END, values=(source_display, address))
+                    self.tree.insert("", tk.END, values=(dirname, source_dir, address))
                     count += 1
 
         self.status_label.config(text=f"共扫描到 {count} 张图片")
+        self._save_config()  # 扫描时保存当前配置
 
     def _save(self):
         if not self.results:

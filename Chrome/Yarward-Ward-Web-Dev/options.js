@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const config = await ConfigManager.getConfig();
 
     inputs.apiBaseUrl.value = config.apiBaseUrl;
-    inputs.btnImageCollapsed.value = config.btnImageCollapsed || '';
-    inputs.btnImageExpanded.value = config.btnImageExpanded || '';
+    inputs.btnImageCollapsed.value = config.btnImageCollapsed || ConfigManager.DEFAULT_CONFIG.btnImageCollapsed;
+    inputs.btnImageExpanded.value = config.btnImageExpanded || ConfigManager.DEFAULT_CONFIG.btnImageExpanded;
     inputs.autoCollapseTimeout.value = config.autoCollapseTimeout ?? 10;
 
     // 保存配置
@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const defaultConfig = await ConfigManager.resetConfig();
 
         inputs.apiBaseUrl.value = defaultConfig.apiBaseUrl;
-        inputs.btnImageCollapsed.value = '';
-        inputs.btnImageExpanded.value = '';
+        inputs.btnImageCollapsed.value = ConfigManager.DEFAULT_CONFIG.btnImageCollapsed;
+        inputs.btnImageExpanded.value = ConfigManager.DEFAULT_CONFIG.btnImageExpanded;
         inputs.autoCollapseTimeout.value = 10;
 
         showMessage('已恢复默认配置', 'success');

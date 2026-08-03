@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     inputs.targetPort.value = config.targetPort;
     inputs.debugPath.value = config.debugPath;
     inputs.autoRedirectPath.value = config.autoRedirectPath;
-    inputs.btnImageCollapsed.value = config.btnImageCollapsed || '';
-    inputs.btnImageExpanded.value = config.btnImageExpanded || '';
+    inputs.btnImageCollapsed.value = config.btnImageCollapsed || ConfigManager.DEFAULT_CONFIG.btnImageCollapsed;
+    inputs.btnImageExpanded.value = config.btnImageExpanded || ConfigManager.DEFAULT_CONFIG.btnImageExpanded;
     inputs.autoCollapseTimeout.value = config.autoCollapseTimeout ?? 10;
 
     // 保存配置
@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         inputs.targetPort.value = defaultConfig.targetPort;
         inputs.debugPath.value = defaultConfig.debugPath;
         inputs.autoRedirectPath.value = defaultConfig.autoRedirectPath;
-        inputs.btnImageCollapsed.value = '';
-        inputs.btnImageExpanded.value = '';
+        inputs.btnImageCollapsed.value = ConfigManager.DEFAULT_CONFIG.btnImageCollapsed;
+        inputs.btnImageExpanded.value = ConfigManager.DEFAULT_CONFIG.btnImageExpanded;
         inputs.autoCollapseTimeout.value = 10;
 
         showMessage('已恢复默认配置', 'success');
