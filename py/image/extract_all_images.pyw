@@ -1,6 +1,8 @@
 import os
 import json
 import shutil
+import threading
+import queue
 from PIL import Image
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
@@ -20,6 +22,8 @@ class ExtractImagesApp:
         self.root = root
         self.root.title("图片提取工具")
         self.root.geometry("650x500")
+        self._running = False  # 防止重复点击
+        self._msg_queue = queue.Queue()
 
         self.config = {
             "source_dir": "",
@@ -31,6 +35,7 @@ class ExtractImagesApp:
 
         self.load_config()
         self.create_widgets()
+        self._poll_queue()  # 启动队列轮询
 
     def create_widgets(self):
         notebook = ttk.Notebook(self.root)
@@ -73,7 +78,8 @@ class ExtractImagesApp:
         btn_frame = ttk.Frame(frame_main)
         btn_frame.grid(row=5, column=0, columnspan=3, pady=20)
         ttk.Button(btn_frame, text="保存配置", command=self.save_config).pack(side=tk.LEFT, padx=10)
-        ttk.Button(btn_frame, text="开始提取", command=self.execute_extract).pack(side=tk.LEFT, padx=10)
+        self.extract_btn = ttk.Button(btn_frame, text="开始提取", command=self.execute_extract)
+        self.extract_btn.pack(side=tk.LEFT, padx=10)
 
         # ---- 进度/日志页 ----
         frame_status = ttk.Frame(notebook)
@@ -128,17 +134,44 @@ class ExtractImagesApp:
             messagebox.showerror("错误", f"保存配置失败: {e}")
 
     def log(self, message):
-        self.log_text.config(state=tk.NORMAL)
-        self.log_text.insert(tk.END, message + "\n")
-        self.log_text.see(tk.END)
-        self.log_text.config(state=tk.DISABLED)
-        self.root.update_idletasks()
+        """线程安全：通过队列发送日志消息"""
+        self._msg_queue.put(("log", message))
 
     def set_progress(self, current, total):
-        pct = (current / total * 100) if total > 0 else 0
-        self.progress_var.set(pct)
-        self.progress_label.config(text=f"进度: {current}/{total}  ({pct:.1f}%)")
-        self.root.update_idletasks()
+        """线程安全：通过队列发送进度消息"""
+        self._msg_queue.put(("progress", (current, total)))
+
+    def _poll_queue(self):
+        """主线程轮询消息队列，更新 UI"""
+        try:
+            while True:
+                msg_type, data = self._msg_queue.get_nowait()
+                if msg_type == "log":
+                    self.log_text.config(state=tk.NORMAL)
+                    self.log_text.insert(tk.END, data + "\n")
+                    self.log_text.see(tk.END)
+                    self.log_text.config(state=tk.DISABLED)
+                elif msg_type == "progress":
+                    current, total = data
+                    pct = (current / total * 100) if total > 0 else 0
+                    self.progress_var.set(pct)
+                    self.progress_label.config(text=f"进度: {current}/{total}  ({pct:.1f}%)")
+                elif msg_type == "done":
+                    self._on_task_done(data)
+                    break
+        except Exception:
+            pass
+        self.root.after(50, self._poll_queue)
+
+    def _on_task_done(self, result):
+        """后台任务完成后在主线程中处理结果"""
+        self._running = False
+        self.extract_btn.config(text="开始提取", state=tk.NORMAL)
+        copied, compressed, skipped, target_dir = result
+        if copied == 0 and compressed == 0 and skipped == 0:
+            messagebox.showinfo("提示", "源目录下未找到任何图片")
+        else:
+            messagebox.showinfo("完成", f"提取完成！\n复制: {copied} 张\n压缩: {compressed} 张\n跳过: {skipped} 张")
 
     # ---------- 压缩逻辑 ----------
     @staticmethod
@@ -164,26 +197,9 @@ class ExtractImagesApp:
         img.save(dst_path, quality=best_quality, optimize=True)
         img.close()
 
-    # ---------- 核心提取 ----------
-    def execute_extract(self):
-        source_dir = self.source_dir_var.get()
-        target_dir = self.target_dir_var.get()
-
-        if not source_dir:
-            messagebox.showerror("错误", "请选择源目录")
-            return
-        if not target_dir:
-            messagebox.showerror("错误", "请选择目标目录")
-            return
-        if not os.path.isdir(source_dir):
-            messagebox.showerror("错误", "源目录不存在")
-            return
-
-        enable_compress = self.enable_compress_var.get()
-        threshold_kb = self.compress_threshold_var.get()
-        target_kb = self.compress_target_var.get()
-
-        # 收集所有图片
+    # ---------- 核心提取（后台线程） ----------
+    def _extract_worker(self, source_dir, target_dir, enable_compress, threshold_kb, target_kb):
+        """在后台线程中执行提取，通过队列与 UI 通信"""
         self.log("正在扫描目录...")
         all_images = []
         for root_dir, _dirs, files in os.walk(source_dir):
@@ -194,7 +210,7 @@ class ExtractImagesApp:
         total = len(all_images)
         if total == 0:
             self.log("未找到任何图片")
-            messagebox.showinfo("提示", "源目录下未找到任何图片")
+            self._msg_queue.put(("done", (0, 0, 0, target_dir)))
             return
 
         self.log(f"共找到 {total} 张图片，开始提取...")
@@ -212,11 +228,8 @@ class ExtractImagesApp:
                 file_size_kb = os.path.getsize(img_path) / 1024
 
                 if enable_compress and file_size_kb > threshold_kb:
-                    # 需要压缩
                     _, ext = os.path.splitext(filename)
-                    # 如果目标格式不支持压缩(JPEG)，仍然尝试保存为原格式
                     if ext.lower() in ('.png', '.bmp', '.gif', '.tiff', '.tif', '.webp'):
-                        # PNG 等无损格式，先尝试转 JPEG 压缩
                         compress_dst = os.path.join(target_dir, os.path.splitext(filename)[0] + '.jpg')
                         try:
                             self.compress_image(img_path, compress_dst, target_kb, '.jpg')
@@ -224,23 +237,19 @@ class ExtractImagesApp:
                             copied += 1
                             self.log(f"[{idx}/{total}] 压缩并转换: {filename} -> {os.path.basename(compress_dst)}")
                         except Exception as e:
-                            # 转换失败则直接复制原文件
                             shutil.copy2(img_path, dst_path)
                             copied += 1
                             self.log(f"[{idx}/{total}] 压缩失败，直接复制: {filename} ({e})")
                     else:
-                        # JPEG 格式直接压缩
                         self.compress_image(img_path, dst_path, target_kb, ext)
                         compressed += 1
                         copied += 1
                         self.log(f"[{idx}/{total}] 压缩: {filename}")
                 else:
-                    # 直接剪切(复制覆盖)
                     shutil.copy2(img_path, dst_path)
                     copied += 1
                     self.log(f"[{idx}/{total}] 复制: {filename}")
 
-                # 剪切：删除原文件
                 os.remove(img_path)
 
             except Exception as e:
@@ -251,7 +260,48 @@ class ExtractImagesApp:
 
         self.log(f"\n✅ 提取完成！共处理 {copied} 张，压缩 {compressed} 张，跳过 {skipped} 张")
         self.log(f"📁 目标目录: {target_dir}")
-        messagebox.showinfo("完成", f"提取完成！\n复制: {copied} 张\n压缩: {compressed} 张\n跳过: {skipped} 张")
+        self._msg_queue.put(("done", (copied, compressed, skipped, target_dir)))
+
+    def execute_extract(self):
+        """校验参数后启动后台线程"""
+        if self._running:
+            return
+
+        source_dir = self.source_dir_var.get()
+        target_dir = self.target_dir_var.get()
+
+        if not source_dir:
+            messagebox.showerror("错误", "请选择源目录")
+            return
+        if not target_dir:
+            messagebox.showerror("错误", "请选择目标目录")
+            return
+        if not os.path.isdir(source_dir):
+            messagebox.showerror("错误", "源目录不存在")
+            return
+
+        enable_compress = self.enable_compress_var.get()
+        threshold_kb = self.compress_threshold_var.get()
+        target_kb = self.compress_target_var.get()
+
+        # 重置进度
+        self.progress_var.set(0)
+        self.progress_label.config(text="处理中...")
+        self.log_text.config(state=tk.NORMAL)
+        self.log_text.delete("1.0", tk.END)
+        self.log_text.config(state=tk.DISABLED)
+
+        self._running = True
+        self.extract_btn.config(text="处理中...", state=tk.DISABLED)
+
+        # 创建消息队列并启动后台线程
+        self._msg_queue = queue.Queue()
+        t = threading.Thread(
+            target=self._extract_worker,
+            args=(source_dir, target_dir, enable_compress, threshold_kb, target_kb),
+            daemon=True,
+        )
+        t.start()
 
 
 if __name__ == "__main__":

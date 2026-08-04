@@ -25,6 +25,7 @@ yarn-error.log*
 *.sw?
 *.log*
 *.exe
+*.pth
 *.zip
 .env.dev
 public/version.md
@@ -38,6 +39,9 @@ vue.config.js
 /py/yarward/build/*
 /py/yarward/dist/*
 /py/qwen/json/config_qwen_vocab_enhancer.json
+
+# AI model weights (large files, auto-download on first run)
+/py/image/weights/
 
 # Python cache/test directories
 __pycache__/
