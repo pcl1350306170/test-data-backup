@@ -48,7 +48,26 @@ CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = CONFIG_DIR / "config_image_enhancer.json"
 
 # 模型权重目录和下载地址
-WEIGHTS_DIR = SCRIPT_DIR / "weights"
+# 优先级：配置文件指定 > D:/.models/ > ~/AppData/Local/ > 脚本目录（旧兼容）
+def _resolve_weights_dir():
+    """解析模型权重目录：优先非系统盘，重装系统不丢失"""
+    # 1. 检查配置文件中的自定义路径
+    cfg = CONFIG_DIR / "config_image_enhancer.json"
+    if cfg.exists():
+        try:
+            with open(cfg, 'r', encoding='utf-8') as f:
+                custom = json.load(f).get('weights_dir', '')
+            if custom and os.path.isdir(custom):
+                return Path(custom)
+        except Exception:
+            pass
+    # 2. 优先使用非系统盘（重装系统不丢）
+    if os.path.isdir('D:\\'):
+        return Path('D:/.models/image_enhancer')
+    # 3. 回退到用户目录
+    return Path.home() / '.image_enhancer' / 'weights'
+
+WEIGHTS_DIR = _resolve_weights_dir()
 MODEL_URLS = {
     'RealESRGAN_x4plus.pth': 'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth',
     'GFPGANv1.4.pth': 'https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.4.pth',
@@ -71,6 +90,7 @@ class ImageEnhancerApp:
         # 初始化变量
         self.input_dir = tk.StringVar()
         self.output_dir = tk.StringVar()
+        self.weights_dir = tk.StringVar(value=str(WEIGHTS_DIR))
         self.upscale_factor = tk.IntVar(value=2)
         self.face_enhance = tk.BooleanVar(value=True)
         self.thread_count = tk.IntVar(value=1)
@@ -115,6 +135,11 @@ class ImageEnhancerApp:
         ttk.Label(input_frame, text="导出目录:").grid(row=1, column=0, sticky=tk.W, padx=(0, 5), pady=(10, 0))
         ttk.Entry(input_frame, textvariable=self.output_dir, width=60).grid(row=1, column=1, padx=5, pady=(10, 0))
         ttk.Button(input_frame, text="选择目录", command=self.select_output_dir).grid(row=1, column=2, padx=5, pady=(10, 0))
+
+        # 模型目录选择
+        ttk.Label(input_frame, text="模型目录:").grid(row=2, column=0, sticky=tk.W, padx=(0, 5), pady=(10, 0))
+        ttk.Entry(input_frame, textvariable=self.weights_dir, width=60).grid(row=2, column=1, padx=5, pady=(10, 0))
+        ttk.Button(input_frame, text="选择目录", command=self.select_weights_dir).grid(row=2, column=2, padx=5, pady=(10, 0))
 
         # 增强参数设置
         param_frame = ttk.LabelFrame(main_frame, text="增强参数", padding="10")
@@ -215,6 +240,12 @@ class ImageEnhancerApp:
             self.output_dir.set(directory)
             logger.info(f"选择输出目录: {directory}")
 
+    def select_weights_dir(self):
+        directory = filedialog.askdirectory(title="选择模型文件存放目录")
+        if directory:
+            self.weights_dir.set(directory)
+            logger.info(f"选择模型目录: {directory}")
+
     def load_config(self):
         """加载配置文件"""
         try:
@@ -223,6 +254,9 @@ class ImageEnhancerApp:
                     config = json.load(f)
                     self.input_dir.set(config.get('input_dir', ''))
                     self.output_dir.set(config.get('output_dir', ''))
+                    wdir = config.get('weights_dir', '')
+                    if wdir and os.path.isdir(wdir):
+                        self.weights_dir.set(wdir)
                     self.upscale_factor.set(config.get('upscale_factor', 2))
                     self.face_enhance.set(config.get('face_enhance', True))
                     self.thread_count.set(config.get('thread_count', 1))
@@ -236,6 +270,7 @@ class ImageEnhancerApp:
             config = {
                 'input_dir': self.input_dir.get(),
                 'output_dir': self.output_dir.get(),
+                'weights_dir': self.weights_dir.get(),
                 'upscale_factor': self.upscale_factor.get(),
                 'face_enhance': self.face_enhance.get(),
                 'thread_count': self.thread_count.get()
@@ -269,8 +304,10 @@ class ImageEnhancerApp:
     def _download_model(self, filename, url):
         """下载模型文件（带进度显示）"""
         import urllib.request
-        WEIGHTS_DIR.mkdir(parents=True, exist_ok=True)
-        dest = WEIGHTS_DIR / filename
+        # 使用用户在界面选择的目录（运行时解析）
+        weights_dir = Path(self.weights_dir.get())
+        weights_dir.mkdir(parents=True, exist_ok=True)
+        dest = weights_dir / filename
         if dest.exists():
             return str(dest)
         
