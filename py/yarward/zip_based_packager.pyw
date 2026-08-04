@@ -540,9 +540,9 @@ class ZipBasedPackagerApp:
         # 添加到历史记录开头（最新）
         self.history_records.insert(0, record)
         
-        # 只保留最近50条
-        if len(self.history_records) > 50:
-            self.history_records = self.history_records[:50]
+        # 只保留最近100条
+        if len(self.history_records) > 100:
+            self.history_records = self.history_records[:100]
         
         # 刷新UI显示
         self._refresh_history_listbox()
@@ -1026,7 +1026,7 @@ class ZipBasedPackagerApp:
         self.log_text.pack(fill=tk.BOTH, expand=True)
 
         # 历史记录区域
-        history_frame = ttk.LabelFrame(log_tab, text="📚 打包历史记录（最近10次）", padding="5")
+        history_frame = ttk.LabelFrame(log_tab, text="📚 打包历史记录（最近100次）", padding="5")
         history_frame.pack(fill=tk.X, pady=5)
 
         listbox_frame = ttk.Frame(history_frame)

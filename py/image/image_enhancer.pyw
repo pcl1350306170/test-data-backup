@@ -297,6 +297,46 @@ class ImageEnhancerApp:
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.log_queue.put(f"[{timestamp}] {message}")
 
+    def _show_toast(self, title, message, level="info", duration_ms=3500):
+        """右下角 Toast 通知，duration_ms 毫秒后自动消失"""
+        try:
+            toast = tk.Toplevel(self.root)
+            toast.withdraw()
+            toast.overrideredirect(True)
+            toast.attributes('-topmost', True)
+
+            colors = {
+                "success": ("#2e7d32", "#e8f5e9", "✅"),
+                "error":   ("#c62828", "#ffebee", "❌"),
+                "info":    ("#1565c0", "#e3f2fd", "ℹ️"),
+                "warning": ("#e65100", "#fff3e0", "⚠️"),
+            }
+            fg, bg, icon = colors.get(level, colors["info"])
+            toast.configure(bg=bg)
+
+            header = tk.Frame(toast, bg=bg)
+            header.pack(fill=tk.X, padx=10, pady=8)
+            tk.Label(header, text=f"{icon} {title}", font=("Microsoft YaHei UI", 11, "bold"),
+                     fg=fg, bg=bg).pack(side=tk.LEFT)
+            close_btn = tk.Label(header, text="✕", font=("Consolas", 10), fg="#999", bg=bg, cursor="hand2")
+            close_btn.pack(side=tk.RIGHT)
+            close_btn.bind("<Button-1>", lambda e: toast.destroy())
+
+            tk.Label(toast, text=message, font=("Microsoft YaHei UI", 10),
+                     fg="#333", bg=bg, wraplength=320, justify=tk.LEFT).pack(padx=12, pady=(4, 10), anchor=tk.W)
+
+            toast.update_idletasks()
+            w, h = toast.winfo_width(), toast.winfo_height()
+            sx = toast.winfo_screenwidth()
+            sy = toast.winfo_screenheight()
+            x = sx - w - 20
+            y = sy - h - 60
+            toast.geometry(f"+{x}+{y}")
+            toast.deiconify()
+            toast.after(duration_ms, toast.destroy)
+        except Exception:
+            pass
+
     def clear_log(self):
         """清空日志显示"""
         self.log_text.delete(1.0, tk.END)
@@ -541,7 +581,8 @@ class ImageEnhancerApp:
                 self.log(f"⚠️ 处理已停止。已处理: {success_count + fail_count}/{total} (成功: {success_count}, 失败: {fail_count})")
             else:
                 self.log(f"✅ 处理完成！成功: {success_count}, 失败: {fail_count}")
-                self.root.after(0, lambda: messagebox.showinfo("完成", f"图片增强完成！\n成功: {success_count}\n失败: {fail_count}"))
+                msg = f"成功: {success_count}，失败: {fail_count}"
+                self.root.after(0, lambda: self._show_toast("图片增强完成", msg, "success"))
 
         except Exception as e:
             logger.error(f"批量处理出错: {e}")
@@ -557,6 +598,43 @@ class ImageEnhancerApp:
             self._stop_event.clear()
             self.root.after(0, lambda: self.start_btn.config(state=tk.NORMAL))
             self.root.after(0, lambda: self.stop_btn.config(state=tk.DISABLED))
+
+    def _enhance_with_retry(self, img):
+        """增强图片，tile模式失败时自动回退到整图模式重试"""
+        # 第一次尝试：tile 分块模式（内存友好）
+        try:
+            if self.face_enhance.get() and self.face_enhancer:
+                _, _, output = self.face_enhancer.enhance(
+                    img, has_aligned=False, only_center_face=False,
+                    paste_back=True, weight=0.5
+                )
+            else:
+                output, _ = self.upsampler.enhance(
+                    img, outscale=self.upscale_factor.get()
+                )
+            return output
+        except RuntimeError as e:
+            if 'tile' not in str(e).lower() and 'size' not in str(e).lower():
+                raise  # 非 tile 相关错误，直接抛出
+            logger.warning(f"tile 模式处理失败，回退到整图模式重试: {e}")
+            self.log("⚠️ 分块模式失败，切换整图模式重试（内存占用较大）...")
+
+        # 第二次尝试：关闭 tile，整图处理
+        original_tile = self.upsampler.tile
+        try:
+            self.upsampler.tile = 0
+            if self.face_enhance.get() and self.face_enhancer:
+                _, _, output = self.face_enhancer.enhance(
+                    img, has_aligned=False, only_center_face=False,
+                    paste_back=True, weight=0.5
+                )
+            else:
+                output, _ = self.upsampler.enhance(
+                    img, outscale=self.upscale_factor.get()
+                )
+            return output
+        finally:
+            self.upsampler.tile = original_tile
 
     def _process_single_image(self, image_path, output_dir):
         """处理单张图片，返回是否成功"""
@@ -578,21 +656,7 @@ class ImageEnhancerApp:
             logger.debug(f"处理图片: {os.path.basename(image_path)} 原始尺寸: {w}x{h}")
             self.log(f"⏳ 正在处理 {os.path.basename(image_path)} ({w}x{h})，CPU 模式较慢请耐心等待...")
 
-            # 使用 GFPGAN（如果启用且可用）
-            if self.face_enhance.get() and self.face_enhancer:
-                _, _, output = self.face_enhancer.enhance(
-                    img,
-                    has_aligned=False,
-                    only_center_face=False,
-                    paste_back=True,
-                    weight=0.5
-                )
-            else:
-                # 仅使用 Real-ESRGAN
-                output, _ = self.upsampler.enhance(
-                    img,
-                    outscale=self.upscale_factor.get()
-                )
+            output = self._enhance_with_retry(img)
 
             # 生成输出路径
             rel_path = os.path.relpath(image_path, self.input_dir.get())
@@ -618,6 +682,7 @@ class ImageEnhancerApp:
 
         except Exception as e:
             logger.error(f"处理失败: {image_path} | {e}")
+            self.log(f"❌ {os.path.basename(image_path)}: {e}")
             return False
 
 

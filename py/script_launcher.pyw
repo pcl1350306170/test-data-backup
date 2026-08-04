@@ -24,8 +24,15 @@ class ScriptLauncher:
         # 创建UI
         self.create_widgets()
 
+        # Java服务状态
+        self.java_service_running = False
+        self.java_service_process = None
+
         # 加载脚本列表
         self.load_scripts()
+
+        # 定时检查Java服务状态
+        self.check_java_service_status()
 
     def load_config(self):
         """加载配置文件，获取Python路径和脚本目录"""
@@ -134,6 +141,8 @@ class ScriptLauncher:
         btn_frame.pack(fill=tk.X)
         ttk.Button(btn_frame, text="执行选中脚本", command=self.run_selected_script).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="添加脚本描述", command=self.add_script_description).pack(side=tk.LEFT, padx=5)
+        self.java_service_btn = ttk.Button(btn_frame, text="启动Java服务", command=self.start_java_service)
+        self.java_service_btn.pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="退出", command=self.root.quit).pack(side=tk.RIGHT, padx=5)
 
     def browse_python(self):
@@ -289,6 +298,85 @@ class ScriptLauncher:
 
         except Exception as e:
             messagebox.showerror("错误", f"执行脚本失败: {str(e)}")
+
+    def check_java_service_status(self):
+        """定时检查Java服务是否正在运行（通过检测cmd.exe是否运行start-base-service.bat）"""
+        try:
+            result = subprocess.run(
+                ['wmic', 'process', 'where',
+                 "name='cmd.exe' and commandline like '%start-base-service.bat%'",
+                 'get', 'processid'],
+                capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW
+            )
+            # 如果输出中包含数字PID（排除空行和标题行），说明服务正在运行
+            lines = [line.strip() for line in result.stdout.strip().split('\n') if line.strip() and line.strip() != 'ProcessId']
+            is_running = len(lines) > 0
+        except Exception:
+            is_running = False
+
+        self.java_service_running = is_running
+        if is_running:
+            self.java_service_btn.config(text="停止Java服务")
+        else:
+            self.java_service_btn.config(text="启动Java服务")
+
+        # 每3秒检查一次
+        self.root.after(3000, self.check_java_service_status)
+
+    def start_java_service(self):
+        """根据当前状态直接启动或停止Java服务"""
+        if self.java_service_running:
+            self.stop_java_service()
+        else:
+            self.launch_java_service()
+
+    def launch_java_service(self):
+        """启动Java服务"""
+        bat_path = r"C:\Users\PCL13\Desktop\start-base-service.bat"
+        if not os.path.exists(bat_path):
+            messagebox.showerror("错误", f"批处理文件不存在: {bat_path}")
+            return
+        try:
+            self.java_service_process = subprocess.Popen(
+                [bat_path],
+                cwd=os.path.dirname(bat_path),
+                creationflags=subprocess.CREATE_NEW_CONSOLE,
+            )
+            self.java_service_running = True
+            self.java_service_btn.config(text="停止Java服务")
+        except Exception as e:
+            messagebox.showerror("错误", f"启动Java服务失败: {str(e)}")
+
+    def stop_java_service(self):
+        """停止Java服务（终止运行start-base-service.bat的cmd.exe进程树）"""
+        try:
+            # 先尝试终止我们通过Popen启动的进程
+            if self.java_service_process and self.java_service_process.poll() is None:
+                subprocess.run(
+                    ['taskkill', '/F', '/T', '/PID', str(self.java_service_process.pid)],
+                    creationflags=subprocess.CREATE_NO_WINDOW
+                )
+                self.java_service_process = None
+
+            # 通过wmic查找运行start-base-service.bat的cmd.exe进程并终止
+            result = subprocess.run(
+                ['wmic', 'process', 'where',
+                 "name='cmd.exe' and commandline like '%start-base-service.bat%'",
+                 'get', 'processid'],
+                capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW
+            )
+            for line in result.stdout.strip().split('\n'):
+                pid = line.strip()
+                if pid and pid.isdigit():
+                    subprocess.run(
+                        ['taskkill', '/F', '/T', '/PID', pid],
+                        creationflags=subprocess.CREATE_NO_WINDOW
+                    )
+
+            self.java_service_running = False
+            self.java_service_btn.config(text="启动Java服务")
+        except Exception as e:
+            messagebox.showerror("错误", f"停止Java服务失败: {str(e)}")
 
     def add_script_description(self):
         """为选中的脚本添加描述"""
