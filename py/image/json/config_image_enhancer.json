@@ -1,8 +1,8 @@
 {
-  "input_dir": "D:\\FILES\\IMG\\A临时\\已处理",
+  "input_dir": "D:\\FILES\\IMG\\A临时\\临时保存",
   "output_dir": "D:\\FILES\\IMG\\A临时\\批量放大",
   "weights_dir": "D:\\dev\\image_enhancer",
-  "upscale_factor": 4,
+  "upscale_factor": 2,
   "face_enhance": true,
   "thread_count": 2
 }

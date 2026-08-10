@@ -27,19 +27,14 @@ except Exception:
     logger = _DummyLogger()
 # ────────────────────────────────────────────────
 
-# 尝试导入超分辨率库
-try:
-    from realesrgan import RealESRGANer
-    from basicsr.archs.rrdbnet_arch import RRDBNet
-    HAS_REALESRGAN = True
-except ImportError:
-    HAS_REALESRGAN = False
+# 增强库状态（None=加载中，True=已加载，False=不可用）
+HAS_REALESRGAN = None
+HAS_GFPGAN = None
 
-try:
-    from gfpgan import GFPGANer
-    HAS_GFPGAN = True
-except ImportError:
-    HAS_GFPGAN = False
+# 延迟导入的库模块引用
+_RealESRGANer = None
+_RRDBNet = None
+_GFPGANer = None
 
 # 配置文件路径
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -111,6 +106,9 @@ class ImageEnhancerApp:
         # 启动日志队列轮询
         self._poll_log_queue()
 
+        # 后台加载增强库（不阻塞 UI）
+        threading.Thread(target=self._load_enhance_libs, daemon=True).start()
+
         logger.info("图片放大增强工具启动")
 
     def create_widgets(self):
@@ -171,23 +169,11 @@ class ImageEnhancerApp:
             variable=self.face_enhance
         ).grid(row=1, column=0, columnspan=4, sticky=tk.W, pady=(10, 0))
 
-        # 检测库状态提示
-        lib_status = []
-        if HAS_REALESRGAN:
-            lib_status.append("✅ Real-ESRGAN")
-        if HAS_GFPGAN:
-            lib_status.append("✅ GFPGAN")
-        
-        if lib_status:
-            status_text = "可用增强库: " + " | ".join(lib_status)
-            status_color = "green"
-        else:
-            status_text = "⚠️ 未安装增强库（pip install realesrgan gfpgan basicsr facexlib）"
-            status_color = "red"
-
-        ttk.Label(param_frame, text=status_text, foreground=status_color, font=("SimHei", 8)).grid(
-            row=2, column=0, columnspan=4, sticky=tk.W, pady=(5, 0)
+        # 库状态提示（初始显示加载中）
+        self.lib_status_label = ttk.Label(
+            param_frame, text="⏳ 正在加载增强库...", foreground="gray", font=("SimHei", 8)
         )
+        self.lib_status_label.grid(row=2, column=0, columnspan=4, sticky=tk.W, pady=(5, 0))
 
         # 技术说明
         tech_desc = "技术方案: Real-ESRGAN（通用超分辨率）+ GFPGAN（人脸专用增强）"
@@ -341,6 +327,58 @@ class ImageEnhancerApp:
         """清空日志显示"""
         self.log_text.delete(1.0, tk.END)
 
+    def _load_enhance_libs(self):
+        """后台加载增强库，不阻塞 UI"""
+        global HAS_REALESRGAN, HAS_GFPGAN, _RealESRGANer, _RRDBNet, _GFPGANer
+
+        # 加载 Real-ESRGAN
+        try:
+            from realesrgan import RealESRGANer
+            from basicsr.archs.rrdbnet_arch import RRDBNet
+            _RealESRGANer = RealESRGANer
+            _RRDBNet = RRDBNet
+            HAS_REALESRGAN = True
+            logger.info("Real-ESRGAN 库加载完成")
+        except ImportError:
+            HAS_REALESRGAN = False
+            logger.warning("Real-ESRGAN 库未安装")
+
+        # 加载 GFPGAN
+        try:
+            from gfpgan import GFPGANer
+            _GFPGANer = GFPGANer
+            HAS_GFPGAN = True
+            logger.info("GFPGAN 库加载完成")
+        except ImportError:
+            HAS_GFPGAN = False
+            logger.warning("GFPGAN 库未安装")
+
+        # 更新 UI 状态
+        self.root.after(0, self._update_lib_status)
+
+    def _update_lib_status(self):
+        """更新界面库状态显示"""
+        self.lib_status_label.config(foreground="gray", text="⏳ 正在加载增强库...")
+        
+        lib_status = []
+        if HAS_REALESRGAN:
+            lib_status.append("✅ Real-ESRGAN")
+        if HAS_GFPGAN:
+            lib_status.append("✅ GFPGAN")
+
+        if lib_status:
+            self.lib_status_label.config(
+                text="可用增强库: " + " | ".join(lib_status),
+                foreground="green"
+            )
+        elif HAS_REALESRGAN is False and HAS_GFPGAN is False:
+            self.lib_status_label.config(
+                text="⚠️ 未安装增强库（pip install realesrgan gfpgan basicsr facexlib）",
+                foreground="red"
+            )
+        else:
+            self.lib_status_label.config(text="⏳ 正在加载增强库...", foreground="gray")
+
     def _download_model(self, filename, url):
         """下载模型文件（带进度显示）"""
         import urllib.request
@@ -390,8 +428,8 @@ class ImageEnhancerApp:
             )
 
             # 初始化 Real-ESRGAN
-            model = RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32)
-            self.upsampler = RealESRGANer(
+            model = _RRDBNet(num_in_ch=3, num_out_ch=3, num_feat=64, num_block=23, num_grow_ch=32)
+            self.upsampler = _RealESRGANer(
                 scale=4,  # 模型默认 4x
                 model_path=str(realesrgan_weight),
                 model=model,
@@ -413,7 +451,7 @@ class ImageEnhancerApp:
                     MODEL_URLS['GFPGANv1.4.pth']
                 )
 
-                self.face_enhancer = GFPGANer(
+                self.face_enhancer = _GFPGANer(
                     model_path=str(gfpgan_weight),
                     upscale=self.upscale_factor.get(),
                     arch='clean',
@@ -444,7 +482,10 @@ class ImageEnhancerApp:
             messagebox.showerror("错误", "请选择导出目录")
             return
 
-        # 检查库是否安装
+        # 检查库是否安装（None=还在加载中）
+        if HAS_REALESRGAN is None:
+            messagebox.showinfo("提示", "增强库正在加载中，请稍后再试...")
+            return
         if not HAS_REALESRGAN:
             messagebox.showerror("错误", "未安装 Real-ESRGAN\n请执行: pip install realesrgan basicsr facexlib")
             return
@@ -658,14 +699,10 @@ class ImageEnhancerApp:
 
             output = self._enhance_with_retry(img)
 
-            # 生成输出路径
+            # 生成输出路径（保留原文件名）
             rel_path = os.path.relpath(image_path, self.input_dir.get())
             output_path = os.path.join(output_dir, rel_path)
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-            # 修改文件名，添加 _enhanced 后缀
-            base, ext = os.path.splitext(output_path)
-            output_path = f"{base}_enhanced{ext}"
 
             # 保存（支持中文路径）
             ext = os.path.splitext(output_path)[1]
