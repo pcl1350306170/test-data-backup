@@ -669,7 +669,7 @@ class WebUploaderApp:
         save_config(self.config)
         # 同步服务器信息到 testServer.json
         self._sync_to_test_server()
-        messagebox.showinfo("保存成功", "配置已保存！")
+        # messagebox.showinfo("保存成功", "配置已保存！")
         logger.info("配置已保存")
 
     def log_to_gui(self, msg):

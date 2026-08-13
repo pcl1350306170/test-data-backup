@@ -328,3 +328,28 @@
 
 #tple-toast.success { background: #2E7D32; }
 #tple-toast.error { background: #c62828; }
+
+/* ===== 呼叫患者面板 ===== */
+#tple-call-patient-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    bottom: 20px;
+    z-index: 2147483646;
+    width: 480px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    animation: tple-slide-in 0.25s ease-out;
+}
+
+/* ===== 呼叫患者面板提示文本 ===== */
+.tple-call-hint {
+    font-size: 12px;
+    color: #888;
+    margin: -8px 0 12px;
+    padding: 0;
+}

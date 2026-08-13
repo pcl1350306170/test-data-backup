@@ -157,7 +157,8 @@
             { text: '🔍 打开调试页面', action: () => openDebugPage(config) },
             { text: '📋 复制 localStorage', action: () => copyLocalStorage() },
             { text: '🏥 模拟批量挂号', action: () => showBatchPanel(config) },
-            { text: '🔎 打印 Storage 内容', action: () => dumpAllStorage() }
+            { text: '🔎 打印 Storage 内容', action: () => dumpAllStorage() },
+            { text: '📢 第三方呼叫患者', action: () => showCallPatientPanel(config) }
         ];
 
         const itemEls = [];
@@ -552,6 +553,127 @@ clientid: e5cd7e4891bf95d1d19206ce24a7b32e`;
         item.textContent = text;
         container.appendChild(item);
         container.scrollTop = container.scrollHeight;
+    }
+
+    // ==============================
+    // 功能 5：第三方呼叫患者
+    // ==============================
+    const DEFAULT_CALL_PATIENT_BODY = JSON.stringify({
+        "ip": "192.168.3.222",
+        "voiceText": "请张三到诊室一就诊，请李四到诊室一候诊。请张三到诊室一就诊，请李四到诊室一候诊。"
+    }, null, 2);
+
+    function showCallPatientPanel(config) {
+        const existing = document.getElementById('tple-call-patient-panel');
+        if (existing) existing.remove();
+
+        // 从 storage 读取上次使用的值
+        chrome.storage.local.get(['tple_call_patient_server', 'tple_call_patient_body'], (result) => {
+            const savedServer = result.tple_call_patient_server || `${url.protocol}//${url.host}`;
+            const savedBody = result.tple_call_patient_body || DEFAULT_CALL_PATIENT_BODY;
+            buildCallPatientPanel(savedServer, savedBody);
+        });
+    }
+
+    function buildCallPatientPanel(serverUrl, savedBody) {
+        const panel = document.createElement('div');
+        panel.id = 'tple-call-patient-panel';
+        panel.innerHTML = `
+            <div class="panel-header">
+                <span>📢 第三方呼叫患者</span>
+                <div class="panel-header-btns">
+                    <button class="panel-header-btn" id="tple-call-save-config" title="保存配置">💾</button>
+                    <span class="panel-close" id="tple-call-panel-close">✕</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                <label>服务地址</label>
+                <input type="text" id="tple-call-server" value="${serverUrl}" placeholder="如: http://192.168.18.228:7000">
+                <p class="tple-call-hint">接口路径: /clinic/api/qcss/his/callPatient</p>
+                <label>请求体 (JSON)</label>
+                <textarea id="tple-call-body" rows="8" placeholder="粘贴 JSON 请求体...">${savedBody}</textarea>
+                <button class="panel-btn" id="tple-call-start">📢 发送呼叫</button>
+                <div class="tple-result-log" id="tple-call-result" style="display:none"></div>
+            </div>
+        `;
+        document.body.appendChild(panel);
+
+        // 关闭
+        panel.querySelector('#tple-call-panel-close').addEventListener('click', (e) => {
+            e.stopPropagation();
+            panel.remove();
+        });
+
+        // 保存配置
+        panel.querySelector('#tple-call-save-config').addEventListener('click', (e) => {
+            e.stopPropagation();
+            const server = panel.querySelector('#tple-call-server').value.trim();
+            const body = panel.querySelector('#tple-call-body').value.trim();
+            chrome.storage.local.set({ tple_call_patient_server: server, tple_call_patient_body: body });
+            showToast('✅ 配置已保存', 'success');
+        });
+
+        // 发送呼叫
+        panel.querySelector('#tple-call-start').addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const server = panel.querySelector('#tple-call-server').value.trim();
+            const bodyStr = panel.querySelector('#tple-call-body').value.trim();
+            const resultLog = panel.querySelector('#tple-call-result');
+            const btn = panel.querySelector('#tple-call-start');
+
+            if (!server) {
+                showToast('❌ 请填写服务地址', 'error');
+                return;
+            }
+
+            let body;
+            try {
+                body = JSON.parse(bodyStr);
+            } catch (err) {
+                showToast('❌ 请求体 JSON 格式错误: ' + err.message, 'error');
+                return;
+            }
+
+            // 自动保存
+            chrome.storage.local.set({ tple_call_patient_server: server, tple_call_patient_body: bodyStr });
+
+            const apiUrl = `${server.replace(/\/+$/, '')}/clinic/api/qcss/his/callPatient`;
+
+            btn.disabled = true;
+            btn.textContent = '⏳ 发送中...';
+            resultLog.style.display = 'block';
+            resultLog.innerHTML = '';
+
+            addResultItem(resultLog, `📋 请求地址: ${apiUrl}`, 'info');
+            addResultItem(resultLog, `📤 请求体: ${JSON.stringify(body)}`, 'info');
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+                    body: JSON.stringify(body),
+                    credentials: 'include'
+                });
+
+                const respText = await response.text();
+                const statusIcon = response.ok ? '✅' : '⚠️';
+                const statusClass = response.ok ? 'success' : 'error';
+                addResultItem(resultLog, `${statusIcon} 响应 [${response.status}]: ${respText.substring(0, 200)}`, statusClass);
+
+                if (response.ok) {
+                    showToast('✅ 呼叫请求已发送', 'success');
+                } else {
+                    showToast('⚠️ 请求失败，状态码: ' + response.status, 'error');
+                }
+            } catch (err) {
+                console.error('[TPLE] 呼叫请求失败:', err);
+                addResultItem(resultLog, `❌ 请求失败: ${err.message}`, 'error');
+                showToast('❌ 请求失败: ' + err.message, 'error');
+            }
+
+            btn.disabled = false;
+            btn.textContent = '📢 发送呼叫';
+        });
     }
 
     // ===== 启动 =====
