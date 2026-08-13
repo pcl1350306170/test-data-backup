@@ -1,0 +1,34 @@
+{
+    "root_dirs": [
+        "D:\\CODE\\Yarward",
+        "D:\\FILES\\IMG\\AI自定义",
+        "D:\\FILES\\IMG\\AI临时",
+        "D:\\FILES\\IMG",
+        "D:\\CODE\\Python\\test-data-backup"
+    ],
+    "exclude_dirs": [
+        "node_modules",
+        ".git",
+        ".svn",
+        "__pycache__",
+        ".idea",
+        ".vs",
+        ".vscode",
+        "venv",
+        ".venv",
+        "env",
+        "dist",
+        "build",
+        "packages",
+        "bin",
+        "obj",
+        ".cache",
+        ".tmp",
+        "libs",
+        "lib",
+        "packages"
+    ],
+    "max_depth": 4,
+    "max_results": 30,
+    "cache_minutes": 10
+}

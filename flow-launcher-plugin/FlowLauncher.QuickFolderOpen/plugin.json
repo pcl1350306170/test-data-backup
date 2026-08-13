@@ -1,0 +1,13 @@
+{
+    "ID": "B4E3C9D2F5A6480B0C7D1E2F3A4B5C6D",
+    "ActionKeyword": "ml",
+    "Name": "Quick Folder Open",
+    "Description": "快速打开指定目录下的子文件夹，支持模糊搜索",
+    "Author": "PCL",
+    "Version": "1.0.0",
+    "Language": "python",
+    "Website": "https://github.com/Flow-Launcher/Flow.Launcher",
+    "IcoPath": "Images\\icon.png",
+    "ExecuteFileName": "main.py",
+    "MinimumAppVersion": "1.8.0"
+}

@@ -1,0 +1,408 @@
+{
+    "python_exe": "D:\\dev\\python\\pythonw.exe",
+    "script_dir": "D:\\CODE\\Python\\test-data-backup\\py",
+    "commands": [
+        {
+            "name": "指定分辨率浏览器",
+            "keywords": [
+                "res",
+                "browser"
+            ],
+            "script": "yarward\\resolution_browser.pyw",
+            "description": "开启一个指定分辨率的浏览器"
+        },
+        {
+            "name": "门诊打包（关键字匹配）",
+            "keywords": [
+                "mzdb"
+            ],
+            "script": "yarward\\menz_order_packager.pyw",
+            "description": "门诊-打包（关键字匹配）"
+        },
+        {
+            "name": "门诊升级",
+            "keywords": [
+                "mcsj"
+            ],
+            "script": "yarward\\menz_upgrade.pyw",
+            "description": "门诊-升级"
+        },
+        {
+            "name": "门诊批量挂号",
+            "keywords": [
+                "mcpgh",
+                "gh"
+            ],
+            "script": "yarward\\api_batch_tester.pyw",
+            "description": "门诊-批量挂号"
+        },
+        {
+            "name": "病房打包（关键字匹配）",
+            "keywords": [
+                "bfdb"
+            ],
+            "script": "yarward\\ward_order_packager.pyw",
+            "description": "病房-打包并提svn"
+        },
+        {
+            "name": "病房升级",
+            "keywords": [
+                "bfsj"
+            ],
+            "script": "yarward\\ward_upgrade.pyw",
+            "description": "病房-前端升级"
+        },
+        {
+            "name": "病房床头卡SQL",
+            "keywords": [
+                "bfcdk"
+            ],
+            "script": "yarward\\bed_card_sql_generator.pyw",
+            "description": "病房-生成床头卡SQL"
+        },
+        {
+            "name": "ADB设备管理【scrcpy版】",
+            "keywords": [
+                "adb",
+                "scrcpy"
+            ],
+            "script": "yarward\\adb_device_manager_scrcpy.pyw",
+            "description": "adb连接设备【scrcpy版】"
+        },
+        {
+            "name": "快速创建Git分支",
+            "keywords": [
+                "git",
+                "branch"
+            ],
+            "script": "yarward\\git_branch_creator.pyw",
+            "description": "快速创建git分支"
+        },
+        {
+            "name": "创建svn目录并检出",
+            "keywords": [
+                "svn"
+            ],
+            "script": "yarward\\svn_quick_checkout.pyw",
+            "description": "创建svn目录并检出"
+        },
+        {
+            "name": "部署Baseio-Web工具",
+            "keywords": [
+                "web"
+            ],
+            "script": "yarward\\base_web_uploader.pyw",
+            "description": "部署我的web工具"
+        },
+        {
+            "name": "图片裁剪（生成新文件）",
+            "keywords": [
+                "tp1"
+            ],
+            "script": "image\\crop_logo_recursive.pyw",
+            "description": "裁剪图片【生成新文件，单任务】"
+        },
+        {
+            "name": "图片裁剪并替换原图",
+            "keywords": [
+                "tp2"
+            ],
+            "script": "image\\crop_logo_recursive_replace.pyw",
+            "description": "裁剪并替换原图【单任务】"
+        },
+        {
+            "name": "可视化图片裁剪任务",
+            "keywords": [
+                "tp3"
+            ],
+            "script": "image\\crop_logo_advanced.pyw",
+            "description": "可视化图片裁剪任务"
+        },
+        
+        {
+            "name": "随机复制图片",
+            "keywords": [
+                "tp8"
+            ],
+            "script": "image\\random_copy_vertical_images.pyw",
+            "description": "从A目录复制X张到B目录"
+        },
+       
+        
+        {
+            "name": "可视化裁剪工具",
+            "keywords": [
+                "tp11"
+            ],
+            "script": "image\\image_cropper_app.pyw",
+            "description": "可视化裁剪工具"
+        },
+     
+        {
+            "name": "图片格式转换",
+            "keywords": [
+                "tp13"
+            ],
+            "script": "image\\image_format_converter.pyw",
+            "description": "图片格式转换"
+        },
+     
+        {
+            "name": "图片横竖重命名",
+            "keywords": [
+                "tp20"
+            ],
+            "script": "image\\image_rename_by_orientation.pyw",
+            "description": "按横竖屏重命名"
+        },
+        {
+            "name": "图片提取并压缩",
+            "keywords": [
+                "tp21"
+            ],
+            "script": "image\\extract_all_images.pyw",
+            "description": "目录下的图片并压缩"
+        },
+        {
+            "name": "批量AI裁剪",
+            "keywords": [
+                "tp22"
+            ],
+            "script": "image\\batch_image_cropper.pyw",
+            "description": "批量裁剪[AI识图]"
+        },
+        {
+            "name": "AI图片放大增强",
+            "keywords": [
+                "tp23"
+            ],
+            "script": "image\\image_enhancer.pyw",
+            "description": "AI放大增强[Real-ESRGAN+GFPGAN]"
+        },
+     
+        {
+            "name": "PDF转图片",
+            "keywords": [
+                "tp25"
+            ],
+            "script": "image\\pdf_to_images.pyw",
+            "description": "pdf转images"
+        },
+        {
+            "name": "按关键词删除文件",
+            "keywords": [
+                "tp26"
+            ],
+            "script": "image\\file_keyword_deleter.pyw",
+            "description": "根据关键词删除文件"
+        },
+        {
+            "name": "文件按个数分组",
+            "keywords": [
+                "wj1"
+            ],
+            "script": "other\\group_files_by_num.pyw",
+            "description": "把目录下的文件按照个数分组"
+        },
+        {
+            "name": "批量重命名【过滤章节回标点等】",
+            "keywords": [
+                "wj2"
+            ],
+            "script": "other\\batch_renamer.pyw",
+            "description": "批量重命名【过滤章节回标点等】"
+        },
+        {
+            "name": "移动文件",
+            "keywords": [
+                "wj3"
+            ],
+            "script": "other\\file_mover.pyw",
+            "description": "移动文件"
+        },
+        {
+            "name": "批量打包ZIP加密",
+            "keywords": [
+                "wj4"
+            ],
+            "script": "image\\batch_zipper.pyw",
+            "description": "批量打包zip可加密"
+        },
+        {
+            "name": "清理空目录",
+            "keywords": [
+                "wj5"
+            ],
+            "script": "other\\clean_empty_dirs.pyw",
+            "description": "清理空目录"
+        },
+        {
+            "name": "压缩包密码破解",
+            "keywords": [
+                "wj6"
+            ],
+            "script": "other\\zip_password_crack_7z.py",
+            "description": "尝试压缩包密码"
+        },
+        {
+            "name": "文件重命名【增加前缀、后缀】",
+            "keywords": [
+                "wj7"
+            ],
+            "script": "other\\file_renamer.pyw",
+            "description": "重命名增加前缀、后缀"
+        },
+        {
+            "name": "按后缀名移动文件",
+            "keywords": [
+                "wj8"
+            ],
+            "script": "other\\audio_mover.pyw",
+            "description": "根据后缀名移动文件"
+        },
+        {
+            "name": "PPT转图片和PDF",
+            "keywords": [
+                "wj9"
+            ],
+            "script": "other\\ppt_to_imagesandpdf.pyw",
+            "description": "ppt转图片和pdf"
+        },
+        {
+            "name": "图片转PDF",
+            "keywords": [
+                "wj10"
+            ],
+            "script": "other\\images_to_pdf.pyw",
+            "description": "图片转pdf"
+        },
+        {
+            "name": "PDF合并",
+            "keywords": [
+                "wj11"
+            ],
+            "script": "other\\merge_pdfs.pyw",
+            "description": "PDF合并"
+        },
+        {
+            "name": "文件重命名为数字",
+            "keywords": [
+                "wj12"
+            ],
+            "script": "other\\rename_by_mtime.pyw",
+            "description": "重命名为数字"
+        },
+        {
+            "name": "按子目录同名清理",
+            "keywords": [
+                "wj13"
+            ],
+            "script": "other\\imgfile_del.pyw",
+            "description": "根据子目录相同文件名清理文件"
+        },
+        {
+            "name": "Git图片Raw地址拼接",
+            "keywords": [
+                "wj14"
+            ],
+            "script": "other\\git_image_raw_url_builder.pyw",
+            "description": "Git项目图片Raw地址拼接工具"
+        },
+        {
+            "name": "MP4转MP3",
+            "keywords": [
+                "qt1"
+            ],
+            "script": "other\\mp4_to_mp3_converter.pyw",
+            "description": "mp4转mp3"
+        },
+        {
+            "name": "PC录音",
+            "keywords": [
+                "qt2"
+            ],
+            "script": "other\\record_system_audio.pyw",
+            "description": "pc录音【需要配置声音源】"
+        },
+        {
+            "name": "PC自动录音",
+            "keywords": [
+                "qt3"
+            ],
+            "script": "other\\auto_record_vad_gui.pyw",
+            "description": "pc自动录音"
+        },
+        {
+            "name": "音频转视频",
+            "keywords": [
+                "qt4"
+            ],
+            "script": "other\\audio_to_video.pyw",
+            "description": "音频转视频"
+        },
+        {
+            "name": "TXT文本替换",
+            "keywords": [
+                "dz1"
+            ],
+            "script": "book\\txt_replace.pyw",
+            "description": "txt文本替换（库和配置）"
+        },
+        {
+            "name": "可视化TXT转EPUB",
+            "keywords": [
+                "dz2"
+            ],
+            "script": "book\\txt_to_epub_img.pyw",
+            "description": "可视化txt转epub"
+        },
+        {
+            "name": "EPUB替换封面和关键字",
+            "keywords": [
+                "dz3"
+            ],
+            "script": "book\\epub_replace_txt_cover.pyw",
+            "description": "epub替换封面和关键字"
+        },
+        {
+            "name": "快速创建TXT",
+            "keywords": [
+                "dz4"
+            ],
+            "script": "book\\create_txt_file.pyw",
+            "description": "快速创建txt文件"
+        },
+        {
+            "name": "快速粘贴创建TXT",
+            "keywords": [
+                "dz5"
+            ],
+            "script": "book\\clipboard_collector.pyw",
+            "description": "快速粘贴并创建txt"
+        },
+        {
+            "name": "批量合并TXT为EPUB",
+            "keywords": [
+                "dz6"
+            ],
+            "script": "book\\batch_txt_to_epub.pyw",
+            "description": "批量合并txt为epub"
+        },
+        {
+            "name": "图片整合为EPUB",
+            "keywords": [
+                "dz7"
+            ],
+            "script": "book\\img2book.py",
+            "description": "图片整合为epub"
+        },
+        {
+            "name": "TXT文件合并",
+            "keywords": [
+                "dz8"
+            ],
+            "script": "book\\txt_merge.pyw",
+            "description": "TXT文件合并工具"
+        }
+    ]
+}

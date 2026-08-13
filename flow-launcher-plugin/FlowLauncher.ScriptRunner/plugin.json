@@ -1,0 +1,13 @@
+{
+    "ID": "A3F2B8C1D4E5479A9B6C0E1F2D3A4B5C",
+    "ActionKeyword": "yyy",
+    "Name": "Script Runner",
+    "Description": "通过命令快捷运行本地 Python 脚本",
+    "Author": "PCL",
+    "Version": "1.0.0",
+    "Language": "python",
+    "Website": "https://github.com/Flow-Launcher/Flow.Launcher",
+    "IcoPath": "Images\\icon.jpg",
+    "ExecuteFileName": "main.py",
+    "MinimumAppVersion": "1.8.0"
+}
