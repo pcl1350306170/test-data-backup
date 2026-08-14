@@ -69,7 +69,7 @@ class ScriptRunner(FlowLauncher):
             results.append({
                 "Title": cmd["name"],
                 "SubTitle": f"运行 {script_name}" + (f"  |  关键词: {keywords_display}" if keywords_display else ""),
-                "IcoPath": "Images\\icon.jpg",
+                "IcoPath": "Images\\icon.png",
                 "JsonRPCAction": {
                     "method": "run_script",
                     "parameters": [script_path]
@@ -81,7 +81,7 @@ class ScriptRunner(FlowLauncher):
             results.append({
                 "Title": "未找到匹配的命令",
                 "SubTitle": f"查询: {query}  |  请在 commands.json 中添加命令配置",
-                "IcoPath": "Images\\icon.jpg"
+                "IcoPath": "Images\\icon.png"
             })
 
         return results

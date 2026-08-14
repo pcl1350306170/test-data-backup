@@ -413,6 +413,15 @@
             ],
             "script": "book\\txt_merge.pyw",
             "description": "TXT文件合并工具"
+        },
+        {
+            "name": "目录联接创建工具",
+            "keywords": [
+                "jj",
+                "junction"
+            ],
+            "script": "other\\junction_creator.pyw",
+            "description": "创建目录联接(Junction)"
         }
     ]
 }

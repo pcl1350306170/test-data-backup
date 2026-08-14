@@ -7,7 +7,7 @@ import subprocess
 from flowlauncher import FlowLauncher
 
 PLUGIN_DIR = os.path.abspath(os.path.dirname(__file__))
-ICON_PATH = os.path.join("Images", "icon.jpg")
+ICON_PATH = os.path.join("Images", "icon.png")
 
 
 class QuickFolderOpen(FlowLauncher):

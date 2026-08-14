@@ -19,7 +19,7 @@ class QoderProjects(FlowLauncher):
     def __init__(self):
         self.settings = Settings()
         self.reader = QoderHistoryReader(
-            projects_json_path=self.settings.qoder_projects_path,
+            db_path=self.settings.state_db_path,
             cache_minutes=self.settings.cache_minutes,
         )
         super().__init__()
@@ -29,11 +29,11 @@ class QoderProjects(FlowLauncher):
     def query(self, query):
         query = query.strip()
 
-        # 检查数据文件是否存在
-        if not os.path.isfile(self.settings.qoder_projects_path):
+        # 检查数据库是否存在
+        if not os.path.isfile(self.settings.state_db_path):
             return [{
-                "Title": "未找到 Qoder 项目历史文件",
-                "SubTitle": f"期望路径: {self.settings.qoder_projects_path}",
+                "Title": "未找到 Qoder 数据库文件",
+                "SubTitle": f"期望路径: {self.settings.state_db_path}",
                 "IcoPath": ICON_PATH,
             }]
 
@@ -95,8 +95,9 @@ class QoderProjects(FlowLauncher):
         """调用 Qoder CLI 打开项目"""
         cli = self.settings.qoder_cli
         try:
+            # Windows 下 .cmd 文件需通过 cmd /c 调用
             subprocess.Popen(
-                [cli, project_path],
+                ["cmd", "/c", cli, project_path],
                 creationflags=subprocess.CREATE_NO_WINDOW,
             )
         except FileNotFoundError:
@@ -145,9 +146,6 @@ class QoderProjects(FlowLauncher):
             except Exception:
                 pass
 
-    def remove_project(self, project_path):
-        """从历史列表中移除项目"""
-        self.reader.remove_project(project_path)
 
     # ── 收藏管理 ──────────────────────────────────────────
 

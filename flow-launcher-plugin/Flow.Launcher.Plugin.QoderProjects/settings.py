@@ -10,8 +10,10 @@ PLUGIN_DIR = os.path.abspath(os.path.dirname(__file__))
 _DEFAULTS = {
     # Qoder 项目历史文件路径（相对于 %APPDATA%）
     "qoder_projects_rel": r"Qoder\SharedClientCache\qoderProjects.json",
+    # state.vscdb 路径（相对于 %APPDATA%）
+    "state_db_rel": r"QoderCN\User\globalStorage\state.vscdb",
     # Qoder CLI 命令
-    "qoder_cli": "qoder",
+    "qoder_cli": "qoder-cn",
     # 最大显示数量
     "max_results": 30,
     # 缓存刷新间隔（分钟）
@@ -35,6 +37,14 @@ class Settings:
     def qoder_projects_path(self) -> str:
         """qoderProjects.json 的绝对路径"""
         rel = self._data.get("qoder_projects_rel", _DEFAULTS["qoder_projects_rel"])
+        if os.path.isabs(rel):
+            return rel
+        return os.path.join(os.environ.get("APPDATA", ""), rel)
+
+    @property
+    def state_db_path(self) -> str:
+        """state.vscdb 的绝对路径"""
+        rel = self._data.get("state_db_rel", _DEFAULTS["state_db_rel"])
         if os.path.isabs(rel):
             return rel
         return os.path.join(os.environ.get("APPDATA", ""), rel)

@@ -7,7 +7,7 @@
     "Version": "1.0.0",
     "Language": "python",
     "Website": "https://github.com/Flow-Launcher/Flow.Launcher",
-    "IcoPath": "Images\\icon.jpg",
+    "IcoPath": "Images\\icon.png",
     "ExecuteFileName": "main.py",
     "MinimumAppVersion": "1.8.0"
 }
