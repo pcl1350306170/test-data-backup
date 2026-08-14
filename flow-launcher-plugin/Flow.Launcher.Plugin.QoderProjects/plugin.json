@@ -1,0 +1,13 @@
+{
+    "ID": "E7A8B9C0D1E2F3A4B5C6D7E8F9A0B1C2",
+    "ActionKeyword": "qoder",
+    "Name": "Qoder Projects",
+    "Description": "快速打开 Qoder 曾经打开过的项目",
+    "Author": "PCL",
+    "Version": "1.0.0",
+    "Language": "python",
+    "Website": "https://github.com/Flow-Launcher/Flow.Launcher",
+    "IcoPath": "Images\\icon.png",
+    "ExecuteFileName": "main.py",
+    "MinimumAppVersion": "1.8.0"
+}
