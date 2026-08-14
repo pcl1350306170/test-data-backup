@@ -21,6 +21,7 @@ class QuickFolderOpen(FlowLauncher):
         self.max_depth = 3
         self.max_results = 30
         self.cache_minutes = 10
+        self.file_shortcuts = []
         self._load_config()
         super().__init__()
 
@@ -39,6 +40,7 @@ class QuickFolderOpen(FlowLauncher):
             self.max_depth = cfg.get("max_depth", 3)
             self.max_results = cfg.get("max_results", 30)
             self.cache_minutes = cfg.get("cache_minutes", 10)
+            self.file_shortcuts = cfg.get("file_shortcuts", [])
         except Exception:
             self.root_dirs = []
 
@@ -101,6 +103,22 @@ class QuickFolderOpen(FlowLauncher):
 
     # ── 查询 ──────────────────────────────────────────────
 
+    def _match_shortcut(self, query, shortcut):
+        """匹配文件快捷方式：名称子串/模糊匹配，或关键词精确包含"""
+        q_lower = query.lower()
+        name_lower = shortcut["name"].lower()
+        # 名称子串匹配
+        if q_lower in name_lower:
+            return 0
+        # 关键词包含匹配
+        for kw in shortcut.get("keywords", []):
+            if q_lower in kw.lower():
+                return 0
+        # 名称模糊匹配
+        if self._fuzzy_match(q_lower, name_lower):
+            return 1
+        return -1
+
     def query(self, query):
         query = query.strip()
         self._ensure_index()
@@ -108,33 +126,47 @@ class QuickFolderOpen(FlowLauncher):
         # 无输入 → 提示用法
         if not query:
             return [{
-                "Title": "输入关键字搜索子文件夹",
+                "Title": "输入关键字搜索子文件夹或文件快捷方式",
                 "SubTitle": f"已索引 {len(self.dirs)} 个目录  |  "
-                            f"根目录: {', '.join(os.path.basename(r) for r in self.root_dirs)}",
+                            f"{len(self.file_shortcuts)} 个文件快捷方式",
                 "IcoPath": ICON_PATH,
             }]
 
         results = []
         q_lower = query.lower()
 
+        # ── 文件快捷方式（优先级最高）
+        for sc in self.file_shortcuts:
+            score = self._match_shortcut(query, sc)
+            if score < 0:
+                continue
+            results.append({
+                "Title": sc["name"],
+                "SubTitle": f"📄 {sc['path']}",
+                "IcoPath": "Images\\icon.png",
+                "JsonRPCAction": {
+                    "method": "open_file",
+                    "parameters": [sc["path"]],
+                },
+                "_score": score,
+                "_name": sc["name"].lower(),
+            })
+
+        # ── 文件夹匹配
+        folder_results = []
         for name_lower, full_path, root_label in self.dirs:
-            # 优先子串匹配，其次模糊匹配
             if q_lower in name_lower:
-                score = 0   # 子串优先排前面
+                score = 0
             elif self._fuzzy_match(q_lower, name_lower):
                 score = 1
             else:
                 continue
+            folder_results.append((score, name_lower, full_path, root_label))
 
-            results.append((score, name_lower, full_path, root_label))
+        folder_results.sort(key=lambda x: (x[0], x[1]))
 
-        # 排序：子串匹配优先 → 名称字母序
-        results.sort(key=lambda x: (x[0], x[1]))
-
-        matched = results[:self.max_results]
-
-        return [
-            {
+        for _, _, full_path, _ in folder_results[:self.max_results]:
+            results.append({
                 "Title": os.path.basename(full_path),
                 "SubTitle": full_path,
                 "IcoPath": "Images\\icon.png",
@@ -142,9 +174,14 @@ class QuickFolderOpen(FlowLauncher):
                     "method": "open_folder",
                     "parameters": [full_path],
                 },
-            }
-            for _, _, full_path, _ in matched
-        ]
+                "_score": 2,  # 文件夹排在快捷方式之后
+                "_name": os.path.basename(full_path).lower(),
+            })
+
+        # 统一排序：快捷方式优先 → 子串优先 → 名称字母序
+        results.sort(key=lambda x: (x.pop("_score"), x.pop("_name")))
+
+        return results[:self.max_results]
 
     # ── 动作 ──────────────────────────────────────────────
 
@@ -155,6 +192,11 @@ class QuickFolderOpen(FlowLauncher):
                 ["explorer", folder_path],
                 creationflags=subprocess.CREATE_NO_WINDOW,
             )
+
+    def open_file(self, file_path):
+        """用系统默认程序打开文件"""
+        if os.path.isfile(file_path):
+            os.startfile(file_path)
 
 
 if __name__ == "__main__":

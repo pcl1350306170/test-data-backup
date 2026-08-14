@@ -10,7 +10,14 @@ import os
 import json
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-import configparser
+from pathlib import Path
+
+# ================== 配置与常量 ==================
+SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
+SCRIPT_NAME = "git_image_raw_url_builder"
+CONFIG_DIR = SCRIPT_DIR / "json"
+CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
+CONFIG_DIR.mkdir(exist_ok=True)
 
 # 支持的图片扩展名
 IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.svg', '.ico', '.tiff', '.tif'}
@@ -23,10 +30,6 @@ class ImageRawUrlBuilder:
         self.root.geometry("900x560")
         self.root.minsize(700, 480)
 
-        # 配置文件路径
-        self._config_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "git_image_raw_url_builder.ini")
-
         self.git_dir = tk.StringVar()
         self.url_prefix = tk.StringVar(value="https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/")
 
@@ -37,25 +40,26 @@ class ImageRawUrlBuilder:
 
     def _load_config(self):
         """从配置文件加载上次的git目录和前缀"""
-        if os.path.exists(self._config_path):
-            cfg = configparser.ConfigParser()
-            cfg.read(self._config_path, encoding='utf-8')
-            if cfg.has_section('State'):
-                self.git_dir.set(cfg.get('State', 'git_dir', fallback=''))
-                prefix = cfg.get('State', 'url_prefix', fallback='')
-                if prefix:
-                    self.url_prefix.set(prefix)
+        if CONFIG_PATH.exists():
+            try:
+                with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+                    config = json.load(f)
+                if 'git_dir' in config:
+                    self.git_dir.set(config['git_dir'])
+                if 'url_prefix' in config:
+                    self.url_prefix.set(config['url_prefix'])
+            except Exception:
+                pass
 
     def _save_config(self):
         """保存当前git目录和前缀到配置文件"""
-        cfg = configparser.ConfigParser()
-        if not cfg.has_section('State'):
-            cfg.add_section('State')
-        cfg.set('State', 'git_dir', self.git_dir.get())
-        cfg.set('State', 'url_prefix', self.url_prefix.get())
+        config = {
+            "git_dir": self.git_dir.get(),
+            "url_prefix": self.url_prefix.get()
+        }
         try:
-            with open(self._config_path, 'w', encoding='utf-8') as f:
-                cfg.write(f)
+            with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=2)
         except Exception:
             pass
 

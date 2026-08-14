@@ -311,6 +311,7 @@ class WardOrderPackagerGUI:
         kw_frame.pack(fill=X, pady=(0, 8))
         kw_entry = ttk.Entry(kw_frame, textvariable=self.keyword, width=30)
         kw_entry.pack(side=LEFT, padx=5)
+        kw_entry.bind('<Return>', lambda e: self._start_scan())
         ttk.Label(kw_frame, text="输入关键字模糊匹配git分支名和SVN目录（如：济南）", foreground="gray").pack(side=LEFT, padx=10)
 
         # --- 扫描按钮 ---

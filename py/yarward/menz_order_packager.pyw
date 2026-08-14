@@ -8,6 +8,7 @@ import subprocess
 import shutil
 import zipfile
 import re
+import time
 from pathlib import Path
 from datetime import datetime
 from tkinter import *
@@ -164,6 +165,11 @@ class MenzOrderPackagerGUI:
         self.config = load_config()
         self.is_packaging = False
 
+        # 连续Enter键检测（3次触发打包）
+        self._enter_press_count = 0
+        self._last_enter_time = 0
+        self._enter_time_threshold = 1.0  # 秒内连按有效
+
         # 匹配结果
         self.matched_svn_dirs = []       # [path, ...]
         self.matched_git_dirs = []       # [(path, branch_name), ...]
@@ -185,9 +191,13 @@ class MenzOrderPackagerGUI:
         self.is_version_155_plus = BooleanVar(value=self.config.get("is_version_155_plus", False))
         self.history_records = self.config.get("history_records", [])
 
+        # 快捷键：连续3次Enter触发打包
+        self.root.bind('<Return>', self._on_enter_press)
+
         self.create_widgets()
         self._refresh_history_listbox()
         self._log("配置已加载")
+        self._log("💡 快捷键：连续按3次 Enter 可直接开始打包")
 
     def create_widgets(self):
         # Notebook 双标签页
@@ -234,6 +244,7 @@ class MenzOrderPackagerGUI:
         kw_frame.pack(fill=X, pady=(0, 8))
         kw_entry = ttk.Entry(kw_frame, textvariable=self.keyword, width=20)
         kw_entry.pack(side=LEFT, padx=(0, 5))
+        kw_entry.bind('<Return>', lambda e: self._start_search())
         self.btn_search = ttk.Button(kw_frame, text="🔍 搜索", command=self._start_search)
         self.btn_search.pack(side=LEFT, padx=(0, 10))
         ttk.Label(kw_frame, text="输入关键字搜索SVN目录和Git项目（如：阳泉）", foreground="gray").pack(side=LEFT)
@@ -364,6 +375,26 @@ class MenzOrderPackagerGUI:
         ttk.Button(btn_hist_frame, text="📥 加载选中记录", command=self._load_history_record).pack(side=LEFT, padx=5)
         ttk.Button(btn_hist_frame, text="🗑️ 删除选中记录", command=self._delete_history_record).pack(side=LEFT, padx=5)
         ttk.Label(history_frame, text="💡 提示：双击记录可恢复配置", foreground="gray").pack(anchor=W)
+
+    # ==================== 快捷键 ====================
+    def _on_enter_press(self, event):
+        """连续按3次Enter键触发打包"""
+        # 如果正在打包中，忽略
+        if self.is_packaging:
+            return 'break'
+
+        now = time.time()
+        if now - self._last_enter_time <= self._enter_time_threshold:
+            self._enter_press_count += 1
+        else:
+            self._enter_press_count = 1
+        self._last_enter_time = now
+
+        if self._enter_press_count >= 3:
+            self._enter_press_count = 0
+            self._log("⚡ 检测到连续3次Enter，开始打包...")
+            self._start_packaging()
+            return 'break'
 
     # ==================== 滚轮处理 ====================
     def _on_svn_listbox_mousewheel(self, event):

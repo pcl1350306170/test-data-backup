@@ -30,5 +30,12 @@
     ],
     "max_depth": 4,
     "max_results": 30,
-    "cache_minutes": 10
+    "cache_minutes": 10,
+    "file_shortcuts": [
+        {
+            "name": "前端升级说明",
+            "keywords": ["sj", "sm"],
+            "path": "D:\\CODE\\Python\\test-data-backup\\data_bak\\前端升级说明.docx"
+        }
+    ]
 }

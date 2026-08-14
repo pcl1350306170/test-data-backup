@@ -321,6 +321,11 @@ class YarwardUpgradeGUI:
             self.config.pop("servers", None)
             save_config(self.config)
 
+        # 连续Enter键检测（3次触发升级）
+        self._enter_press_count = 0
+        self._last_enter_time = 0
+        self._enter_time_threshold = 1.0  # 秒内连按有效
+
         # 前端升级相关变量
         self.front_matched_dirs = []  # 前端关键字搜索匹配的目录列表
         self.front_found_zip_files = []  # 找到的 zip 包列表
@@ -331,6 +336,9 @@ class YarwardUpgradeGUI:
         self.matched_dirs = []  # 关键字搜索匹配的目录列表
         self.found_war_files = []  # 找到的 war 包列表
         self.server_svn_dir_name = ""  # 服务端当前匹配的SVN目录名称
+
+        # 快捷键：连续3次Enter触发升级
+        self.root.bind('<Return>', self._on_enter_press)
 
         self.create_widgets()
 
@@ -419,6 +427,8 @@ class YarwardUpgradeGUI:
         Label(row2, text="关键字搜索:").pack(side=LEFT)
         self.front_keyword_var = StringVar()
         Entry(row2, textvariable=self.front_keyword_var, width=20).pack(side=LEFT, padx=5)
+        self._front_kw_entry = row2.winfo_children()[1]
+        self._front_kw_entry.bind('<Return>', lambda e: self.search_front_by_keyword())
         Button(row2, text="🔍 搜索", command=self.search_front_by_keyword).pack(side=LEFT, padx=5)
         Label(row2, text=f"(在 {SVN_MENZ_BASE_DIR.name} 下搜索)", foreground="gray").pack(side=LEFT)
 
@@ -464,6 +474,8 @@ class YarwardUpgradeGUI:
         Label(row2, text="关键字搜索:").pack(side=LEFT)
         self.war_keyword_var = StringVar()
         Entry(row2, textvariable=self.war_keyword_var, width=20).pack(side=LEFT, padx=5)
+        self._server_kw_entry = row2.winfo_children()[1]
+        self._server_kw_entry.bind('<Return>', lambda e: self.search_war_by_keyword())
         Button(row2, text="🔍 搜索", command=self.search_war_by_keyword).pack(side=LEFT, padx=5)
         Label(row2, text=f"(在 {SVN_MENZ_BASE_DIR.name} 下搜索)", foreground="gray").pack(side=LEFT)
 
@@ -577,6 +589,34 @@ class YarwardUpgradeGUI:
         toast.geometry(f"+{x}+{y}")
         toast.deiconify()
         toast.after(duration_ms, toast.destroy)
+
+    # ==============================
+    # 快捷键
+    # ==============================
+    def _on_enter_press(self, event):
+        """连续按3次Enter键触发升级"""
+        # 如果焦点在关键字输入框，由关键字绑定处理搜索（不消耗此次计数）
+        focused = self.root.focus_get()
+        if focused in (self._front_kw_entry, self._server_kw_entry):
+            return
+
+        now = time.time()
+        if now - self._last_enter_time <= self._enter_time_threshold:
+            self._enter_press_count += 1
+        else:
+            self._enter_press_count = 1
+        self._last_enter_time = now
+
+        if self._enter_press_count >= 3:
+            self._enter_press_count = 0
+            current_tab = self.notebook.index(self.notebook.select())
+            if current_tab == 0:
+                self._log("⚡ 检测到连续3次Enter，开始前端升级...")
+                self.start_frontend_upgrade()
+            elif current_tab == 1:
+                self._log("⚡ 检测到连续3次Enter，开始服务端升级...")
+                self.start_server_upgrade()
+            return 'break'
 
     # ==============================
     # 服务器配置相关
@@ -725,9 +765,14 @@ class YarwardUpgradeGUI:
 
         self._log(f"找到 {len(matched)} 个匹配目录")
 
-        # 如果只有一个目录，自动展开查找 zip 包
-        if len(matched) == 1:
-            self._find_front_zips_in_dir(matched[0])
+        # 自动选中修改时间最新的目录并展开查找 zip 包
+        if matched:
+            latest_idx = max(range(len(matched)), key=lambda i: os.path.getmtime(matched[i]))
+            latest_time = datetime.fromtimestamp(os.path.getmtime(matched[latest_idx]))
+            self._log(f"ℹ️ 自动选中最新目录: {matched[latest_idx].name} ({latest_time:%Y-%m-%d %H:%M})")
+            self.front_search_listbox.selection_set(latest_idx)
+            self.front_search_listbox.see(latest_idx)
+            self._find_front_zips_in_dir(matched[latest_idx])
 
     def on_front_search_result_selected(self, event=None):
         """双击搜索结果目录，查找其中的 zip 包"""
@@ -887,9 +932,14 @@ class YarwardUpgradeGUI:
 
         self._log(f"找到 {len(matched)} 个匹配目录")
 
-        # 如果只有一个目录，自动展开查找 war 包
-        if len(matched) == 1:
-            self._find_wars_in_dir(matched[0])
+        # 自动选中修改时间最新的目录并展开查找 war 包
+        if matched:
+            latest_idx = max(range(len(matched)), key=lambda i: os.path.getmtime(matched[i]))
+            latest_time = datetime.fromtimestamp(os.path.getmtime(matched[latest_idx]))
+            self._log(f"ℹ️ 自动选中最新目录: {matched[latest_idx].name} ({latest_time:%Y-%m-%d %H:%M})")
+            self.search_result_listbox.selection_set(latest_idx)
+            self.search_result_listbox.see(latest_idx)
+            self._find_wars_in_dir(matched[latest_idx])
 
     def on_search_result_selected(self, event=None):
         """双击搜索结果目录，查找其中的 war 包"""
@@ -1047,8 +1097,20 @@ class YarwardUpgradeGUI:
             # 恢复前端升级配置
             zip_paths = record.get("zip_paths", [])
             if zip_paths:
-                self.front_zip_path_var.set(", ".join(Path(z).name for z in zip_paths))
+                # 恢复完整路径列表，供升级流程直接使用
+                self.front_found_zip_files = [Path(z) for z in zip_paths]
                 self.front_selected_zips = zip_paths
+                self.front_zip_path_var.set(", ".join(Path(z).name for z in zip_paths))
+                # 刷新 zip 包列表显示
+                self.front_zip_listbox.delete(0, END)
+                for zp in zip_paths:
+                    self.front_zip_listbox.insert(END, Path(zp).name)
+                # 验证文件是否仍存在
+                missing = [z for z in zip_paths if not Path(z).is_file()]
+                if missing:
+                    self._log(f"⚠️ 以下文件已不存在，请重新选择：{', '.join(Path(z).name for z in missing)}")
+                else:
+                    self._log(f"✅ 已恢复 {len(zip_paths)} 个 ZIP 包路径")
             self.notebook.select(0)
             self._log(f"已加载前端升级历史: {record.get('timestamp', '')}")
         else:
