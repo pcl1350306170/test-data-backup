@@ -6,11 +6,15 @@ import logging
 from pathlib import Path
 import os
 
+# ──────────── QWebEngine 启动优化（必须在 QApplication 之前）────────────
+os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-gpu --no-sandbox --disable-software-rasterizer"
+# ─────────────────────────────────────────────────────────────────────
+
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QLineEdit, QPushButton, QCheckBox, QMessageBox, QFormLayout
 )
-from PyQt5.QtCore import QUrl, Qt, QPoint
+from PyQt5.QtCore import QUrl, Qt, QPoint, QTimer
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 # ========================
@@ -198,9 +202,15 @@ class ControlPanel(QWidget):
 class BrowserWindow(DraggableFramelessWindow):
     def __init__(self):
         super().__init__()
+        self.web_view = None  # 延迟创建，避免构造时立即启动 Chromium
+        self.control_panel = None
+        self._init_web_view()  # 在事件循环前创建，但 URL 延后加载
+
+    def _init_web_view(self):
+        """延迟初始化 QWebEngineView，加载 about:blank 预热 Chromium"""
         self.web_view = QWebEngineView()
         self.setCentralWidget(self.web_view)
-        self.control_panel = None
+        self.web_view.setUrl(QUrl("about:blank"))
 
     def update_window(self, config):
         # 先关闭旧窗口属性
@@ -242,6 +252,10 @@ def main():
     control.setWindowTitle("分辨率浏览器 - 控制面板")
     control.resize(400, 300)
     control.show()
+
+    # 事件循环启动后延迟加载实际 URL，避免初始化阶段阻塞
+    config = control.config
+    QTimer.singleShot(200, lambda: browser.web_view.setUrl(QUrl(config.get("url", "http://localhost:3000"))))
 
     logger.info("程序启动成功")
 

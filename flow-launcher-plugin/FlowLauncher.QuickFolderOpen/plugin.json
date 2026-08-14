@@ -1,6 +1,6 @@
 {
     "ID": "B4E3C9D2F5A6480B0C7D1E2F3A4B5C6D",
-    "ActionKeyword": "ml",
+    "ActionKeyword": "kl",
     "Name": "Quick Folder Open",
     "Description": "快速打开指定目录下的子文件夹，支持模糊搜索",
     "Author": "PCL",

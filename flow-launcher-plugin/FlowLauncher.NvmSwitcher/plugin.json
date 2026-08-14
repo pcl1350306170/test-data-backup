@@ -1,6 +1,6 @@
 {
     "ID": "C5D6E7F8A9B0C1D2E3F4A5B6C7D8E9F0",
-    "ActionKeyword": "nvm",
+    "ActionKeyword": "nv",
     "Name": "NVM Switcher",
     "Description": "快速切换 Node.js 版本（基于 nvm-windows）",
     "Author": "PCL",

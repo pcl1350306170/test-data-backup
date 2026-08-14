@@ -85,18 +85,21 @@ def save_config(data):
 # ==============================
 def get_git_branch(directory):
     """获取指定目录的当前git分支名"""
+    _no_window = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
     try:
         result = subprocess.run(
             ["git", "branch", "--show-current"],
             cwd=str(directory),
-            capture_output=True, text=True, encoding='utf-8', timeout=10
+            capture_output=True, text=True, encoding='utf-8', timeout=10,
+            creationflags=_no_window
         )
         if result.returncode == 0 and result.stdout.strip():
             return result.stdout.strip()
         result = subprocess.run(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
             cwd=str(directory),
-            capture_output=True, text=True, encoding='utf-8', timeout=10
+            capture_output=True, text=True, encoding='utf-8', timeout=10,
+            creationflags=_no_window
         )
         if result.returncode == 0:
             return result.stdout.strip()
@@ -141,8 +144,8 @@ def find_base_zip_in_svn_dir(svn_dir):
 
 
 def extract_version_from_branch(branch_name):
-    """从分支名中提取版本号，如 1.5.0_xxx -> 1.5.0"""
-    match = re.match(r'(\d+\.\d+\.\d+)', branch_name)
+    """从分支名中提取版本号，分支格式: dev_xxxx_医院名称，如 dev_1.5.1_某某医院 -> 1.5.1"""
+    match = re.search(r'dev_(\d+\.\d+\.\d+)_', branch_name)
     if match:
         return match.group(1)
     return ""
@@ -155,7 +158,7 @@ class MenzOrderPackagerGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("📦 门诊订单打包工具")
-        self.root.geometry("900x1050")
+        self.root.state('zoomed')  # 启动时最大化
         self.root.minsize(800, 800)
 
         self.config = load_config()
@@ -438,6 +441,19 @@ class MenzOrderPackagerGUI:
         for p in matched_svn:
             self.svn_listbox.insert(END, str(p))
 
+        # 自动选中：1条直接选中，多条选最近更新的
+        if matched_svn:
+            if len(matched_svn) == 1:
+                auto_idx = 0
+            else:
+                auto_idx = max(range(len(matched_svn)),
+                               key=lambda i: os.path.getmtime(matched_svn[i]))
+                latest_time = datetime.fromtimestamp(os.path.getmtime(matched_svn[auto_idx]))
+                self._log(f"ℹ️ 共 {len(matched_svn)} 条结果，自动选中最近更新的: {matched_svn[auto_idx].name} ({latest_time:%Y-%m-%d %H:%M})")
+            self.svn_listbox.selection_set(auto_idx)
+            self.svn_listbox.see(auto_idx)
+            self._on_svn_double_click()
+
     def _update_git_list(self, matched_git):
         self.matched_git_dirs = matched_git
         self.selected_git_dir = None
@@ -445,6 +461,19 @@ class MenzOrderPackagerGUI:
         self.git_listbox.delete(0, END)
         for p, b in matched_git:
             self.git_listbox.insert(END, f"{p}  (分支: {b})")
+
+        # 自动选中：1条直接选中，多条选最近更新的
+        if matched_git:
+            if len(matched_git) == 1:
+                auto_idx = 0
+            else:
+                auto_idx = max(range(len(matched_git)),
+                               key=lambda i: os.path.getmtime(matched_git[i][0]))
+                latest_time = datetime.fromtimestamp(os.path.getmtime(matched_git[auto_idx][0]))
+                self._log(f"ℹ️ 共 {len(matched_git)} 条结果，自动选中最近更新的: {matched_git[auto_idx][0].name} ({latest_time:%Y-%m-%d %H:%M})")
+            self.git_listbox.selection_set(auto_idx)
+            self.git_listbox.see(auto_idx)
+            self._on_git_double_click()
 
     # ==================== 双击选中处理 ====================
     def _on_svn_double_click(self, event=None):
@@ -635,7 +664,10 @@ class MenzOrderPackagerGUI:
     def _check_node_version(self, log):
         """检查当前Node版本"""
         try:
-            result = subprocess.check_output(["node", "-v"], text=True, encoding='utf-8')
+            result = subprocess.check_output(
+                ["node", "-v"], text=True, encoding='utf-8',
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+            )
             current_version = result.strip()
             log(f"当前Node版本: {current_version}")
             version_match = re.search(r'v(\d+)', current_version)
@@ -676,7 +708,8 @@ class MenzOrderPackagerGUI:
                 stderr=subprocess.STDOUT,
                 text=True,
                 encoding='utf-8',
-                shell=plat.system() == "Windows"
+                shell=plat.system() == "Windows",
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
             )
             while process.poll() is None:
                 if process.stdout:
@@ -901,7 +934,8 @@ class MenzOrderPackagerGUI:
                 result = subprocess.run(
                     ["svn", "add", str(zip_path)],
                     cwd=svn_working_copy,
-                    capture_output=True, text=True, encoding='utf-8', timeout=30
+                    capture_output=True, text=True, encoding='utf-8', timeout=30,
+                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
                 )
                 if result.returncode == 0:
                     log(f"✅ SVN Add成功: {result.stdout.strip()}")
@@ -917,7 +951,8 @@ class MenzOrderPackagerGUI:
             result = subprocess.run(
                 ["svn", "commit", "-m", commit_message, str(zip_path)],
                 cwd=svn_working_copy,
-                capture_output=True, text=True, encoding='utf-8', timeout=60
+                capture_output=True, text=True, encoding='utf-8', timeout=60,
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
             )
 
             if result.returncode == 0:

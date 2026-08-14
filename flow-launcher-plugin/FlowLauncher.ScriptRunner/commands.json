@@ -61,6 +61,16 @@
             "description": "病房-生成床头卡SQL"
         },
         {
+            "name": "ADB设备管理【QTscrcpy版】",
+            "keywords": [
+                "adb",
+                "qt",
+                "scrcpy"
+            ],
+            "script": "yarward\\adb_device_manager.pyw",
+            "description": "adb连接设备【qt-scrcpy版】"
+        },
+        {
             "name": "ADB设备管理【scrcpy版】",
             "keywords": [
                 "adb",
