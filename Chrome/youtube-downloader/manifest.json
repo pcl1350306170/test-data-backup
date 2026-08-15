@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "YouTube 视频下载助手",
-  "version": "1.0",
-  "description": "在 YouTube 视频页面添加下载按钮，支持多种清晰度选择",
+  "version": "2.0",
+  "description": "直接从 YouTube 页面提取视频流并下载，无需第三方服务",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
@@ -10,11 +10,13 @@
   },
   "permissions": [
     "activeTab",
+    "downloads",
     "storage"
   ],
   "host_permissions": [
     "https://www.youtube.com/*",
-    "https://youtube.com/*"
+    "https://youtube.com/*",
+    "https://*.googlevideo.com/*"
   ],
   "background": {
     "service_worker": "background.js"

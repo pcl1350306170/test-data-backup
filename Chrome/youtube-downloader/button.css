@@ -7,6 +7,15 @@
     margin-left: 8px;
 }
 
+/* 当按钮直接挂在 body 上时，使用固定浮动定位 */
+body > .ytd-download-wrapper {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 2147483647;
+    margin-left: 0;
+}
+
 /* 下载按钮 */
 .ytd-download-btn {
     display: inline-flex;
@@ -54,6 +63,13 @@
     font-family: 'Roboto', 'Arial', sans-serif;
     animation: ytd-slide-in 0.25s ease;
     overflow: hidden;
+}
+
+/* 浮动按钮模式：面板显示在按钮上方 */
+.ytd-panel.ytd-panel-floating {
+    top: auto;
+    bottom: 140px;
+    right: 20px;
 }
 
 @keyframes ytd-slide-in {
@@ -140,6 +156,37 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* 下载服务行 */
+.ytd-service-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #f8f8f8;
+    border-radius: 8px;
+}
+
+.ytd-service-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+.ytd-switch-btn {
+    padding: 4px 12px;
+    background: #409eff;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ytd-switch-btn:hover {
+    background: #66b1ff;
 }
 
 /* 清晰度列表 */
@@ -251,6 +298,14 @@ html[dark] .ytd-quality-item:active {
 }
 
 html[dark] .ytd-quality-label {
+    color: #eee;
+}
+
+html[dark] .ytd-service-row {
+    background: #3a3a3a;
+}
+
+html[dark] .ytd-service-name {
     color: #eee;
 }
 

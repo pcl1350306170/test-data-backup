@@ -1,26 +1,28 @@
 // ===== YouTube 视频下载助手 - Background Service Worker =====
 
-// 默认下载服务地址（可修改为其他服务）
-const DOWNLOAD_SERVICES = {
-    // y2mate - 常用 YouTube 下载服务
-    y2mate: 'https://www.y2mate.com/youtube/{videoId}',
-    // savefrom
-    savefrom: 'https://en.savefrom.net/1-youtube-video-downloader-{videoId}/',
-    // ytbss
-    ytbss: 'https://www.ytbs.com/video/{videoId}',
-    // ssyoutube (savefrom 短链)
-    ssyoutube: 'https://ssyoutube.com/watch?v={videoId}'
-};
+// 下载服务地址列表（按优先级排序，前面的不可用时自动切换后面的）
+const DOWNLOAD_SERVICES = [
+    { name: 'cobalt', url: 'https://cobalt.tools/' },
+    { name: 'savefrom', url: 'https://en.savefrom.net/1-youtube-video-downloader-{videoId}/' },
+    { name: 'ssyoutube', url: 'https://ssyoutube.com/watch?v={videoId}' },
+    { name: 'y2mate', url: 'https://www.y2mate.com/youtube/{videoId}' }
+];
 
-// 默认使用的服务
-const DEFAULT_SERVICE = 'y2mate';
+// 当前使用的服务索引
+let currentServiceIndex = 0;
 
 /**
  * 根据 videoId 构造下载服务 URL
+ * 如果指定了 serviceIndex 则使用对应服务，否则使用当前可用的服务
  */
-function buildDownloadUrl(videoId, serviceName) {
-    const service = DOWNLOAD_SERVICES[serviceName] || DOWNLOAD_SERVICES[DEFAULT_SERVICE];
-    return service.replace('{videoId}', videoId);
+function buildDownloadUrl(videoId, serviceIndex) {
+    const idx = serviceIndex !== undefined ? serviceIndex : currentServiceIndex;
+    const service = DOWNLOAD_SERVICES[idx] || DOWNLOAD_SERVICES[0];
+    return {
+        url: service.url.replace('{videoId}', videoId),
+        name: service.name,
+        index: idx
+    };
 }
 
 /**
@@ -28,41 +30,53 @@ function buildDownloadUrl(videoId, serviceName) {
  */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'download' && message.videoId) {
-        const url = buildDownloadUrl(message.videoId, message.service);
+        const serviceIndex = message.serviceIndex !== undefined ? message.serviceIndex : currentServiceIndex;
+        const result = buildDownloadUrl(message.videoId, serviceIndex);
 
         // 在新标签页中打开下载服务
-        chrome.tabs.create({ url: url, active: true }, (tab) => {
+        chrome.tabs.create({ url: result.url, active: true }, (tab) => {
             if (chrome.runtime.lastError) {
                 sendResponse({ success: false, error: chrome.runtime.lastError.message });
             } else {
-                sendResponse({ success: true, tabId: tab.id });
+                sendResponse({ success: true, tabId: tab.id, serviceName: result.name, serviceIndex: result.index });
             }
         });
 
         return true; // 保持消息通道异步开放
     }
 
-    // 获取配置
-    if (message.action === 'getConfig') {
-        chrome.storage.sync.get({ downloadService: DEFAULT_SERVICE }, (items) => {
-            sendResponse({ service: items.downloadService });
+    // 切换下载服务
+    if (message.action === 'switchService') {
+        currentServiceIndex = (currentServiceIndex + 1) % DOWNLOAD_SERVICES.length;
+        sendResponse({
+            success: true,
+            serviceName: DOWNLOAD_SERVICES[currentServiceIndex].name,
+            serviceIndex: currentServiceIndex
         });
         return true;
     }
 
-    // 保存配置
-    if (message.action === 'setConfig') {
-        chrome.storage.sync.set({ downloadService: message.service }, () => {
-            sendResponse({ success: true });
+    // 获取服务列表
+    if (message.action === 'getServices') {
+        sendResponse({
+            services: DOWNLOAD_SERVICES.map((s, i) => ({ name: s.name, index: i })),
+            currentIndex: currentServiceIndex
+        });
+        return true;
+    }
+
+    // 获取当前配置
+    if (message.action === 'getConfig') {
+        sendResponse({
+            serviceName: DOWNLOAD_SERVICES[currentServiceIndex].name,
+            serviceIndex: currentServiceIndex
         });
         return true;
     }
 });
 
-// 安装时设置默认配置
+// 安装时初始化
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.storage.sync.set({
-        downloadService: DEFAULT_SERVICE
-    });
-    console.log('[YT-Download] 扩展已安装，默认下载服务:', DEFAULT_SERVICE);
+    currentServiceIndex = 0;
+    console.log('[YT-Download] 扩展已安装，默认下载服务:', DOWNLOAD_SERVICES[0].name);
 });

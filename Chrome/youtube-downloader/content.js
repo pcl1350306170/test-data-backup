@@ -77,6 +77,7 @@
 
     // ===== 下载面板 =====
     let currentPanel = null;
+    let isFloatingButton = false;
 
     function closePanel() {
         if (currentPanel) {
@@ -91,9 +92,18 @@
             return;
         }
 
+        // 检测按钮是否为浮动模式
+        const wrapper = document.getElementById('ytd-download-wrapper');
+        isFloatingButton = wrapper && wrapper.parentNode === document.body;
+
         const panel = document.createElement('div');
         panel.className = 'ytd-panel';
         currentPanel = panel;
+
+        // 浮动按钮时，面板显示在按钮上方
+        if (isFloatingButton) {
+            panel.classList.add('ytd-panel-floating');
+        }
 
         // 标题
         const header = document.createElement('div');
@@ -119,6 +129,44 @@
         info.appendChild(titleSpan);
         panel.appendChild(info);
 
+        // 下载服务选择
+        const serviceSection = document.createElement('div');
+        serviceSection.className = 'ytd-panel-section';
+        serviceSection.innerHTML = '<div class="ytd-section-label">下载服务</div>';
+
+        const serviceRow = document.createElement('div');
+        serviceRow.className = 'ytd-service-row';
+
+        const serviceLabel = document.createElement('span');
+        serviceLabel.className = 'ytd-service-name';
+        serviceLabel.textContent = '加载中...';
+
+        const switchBtn = document.createElement('button');
+        switchBtn.className = 'ytd-switch-btn';
+        switchBtn.textContent = '🔄 切换';
+        switchBtn.title = '切换到下一个下载服务';
+
+        // 获取当前服务
+        chrome.runtime.sendMessage({ action: 'getConfig' }, (config) => {
+            if (config && config.serviceName) {
+                serviceLabel.textContent = config.serviceName;
+            }
+        });
+
+        switchBtn.addEventListener('click', () => {
+            chrome.runtime.sendMessage({ action: 'switchService' }, (res) => {
+                if (res && res.success) {
+                    serviceLabel.textContent = res.serviceName;
+                    showToast('✅ 已切换到 ' + res.serviceName, 'success');
+                }
+            });
+        });
+
+        serviceRow.appendChild(serviceLabel);
+        serviceRow.appendChild(switchBtn);
+        serviceSection.appendChild(serviceRow);
+        panel.appendChild(serviceSection);
+
         // 清晰度选择
         const qualitySection = document.createElement('div');
         qualitySection.className = 'ytd-panel-section';
@@ -136,17 +184,22 @@
                 <span class="ytd-quality-arrow">→</span>
             `;
             item.addEventListener('click', () => {
-                chrome.runtime.sendMessage({
-                    action: 'download',
-                    videoId: videoInfo.videoId,
-                    quality: opt.value,
-                    title: videoInfo.title
-                }, (response) => {
-                    if (response && response.success) {
-                        showToast('✅ 已打开下载页面', 'success');
-                    } else {
-                        showToast('❌ ' + (response?.error || '打开下载页失败'), 'error');
-                    }
+                // 获取当前服务索引
+                chrome.runtime.sendMessage({ action: 'getConfig' }, (config) => {
+                    const serviceIndex = config?.serviceIndex;
+                    chrome.runtime.sendMessage({
+                        action: 'download',
+                        videoId: videoInfo.videoId,
+                        quality: opt.value,
+                        title: videoInfo.title,
+                        serviceIndex: serviceIndex
+                    }, (response) => {
+                        if (response && response.success) {
+                            showToast('✅ 已打开 ' + response.serviceName + ' 下载页', 'success');
+                        } else {
+                            showToast('❌ ' + (response?.error || '打开下载页失败'), 'error');
+                        }
+                    });
                 });
                 closePanel();
             });
@@ -159,7 +212,7 @@
         // 提示
         const tip = document.createElement('div');
         tip.className = 'ytd-panel-tip';
-        tip.textContent = '💡 点击清晰度后将在新标签页打开下载服务，按页面提示即可完成下载';
+        tip.textContent = ' 点击清晰度后将在新标签页打开下载服务，按页面提示即可完成下载';
         panel.appendChild(tip);
 
         // 关闭按钮事件
@@ -177,32 +230,12 @@
     }
 
     // ===== 创建下载按钮 =====
+    let buttonCreated = false;
+
     function createDownloadButton(videoInfo) {
         // 移除旧按钮
         const old = document.getElementById('ytd-download-wrapper');
         if (old) old.remove();
-
-        // 查找插入位置：视频标题下方区域（#top-level-buttons-computed 或 #actions 区域）
-        const targetSelectors = [
-            '#top-level-buttons-computed',
-            'ytd-watch-metadata #actions',
-            '#menu-container #top-level-buttons',
-            'ytd-video-primary-info-renderer #menu-container'
-        ];
-
-        let target = null;
-        for (const sel of targetSelectors) {
-            target = document.querySelector(sel);
-            if (target) break;
-        }
-
-        if (!target) {
-            // 如果找不到精确位置，插入到视频播放器下方
-            target = document.querySelector('#above-the-fold') ||
-                     document.querySelector('#primary-inner') ||
-                     document.querySelector('ytd-watch-flexy #content');
-        }
-        if (!target) return;
 
         const wrapper = document.createElement('div');
         wrapper.id = 'ytd-download-wrapper';
@@ -227,7 +260,35 @@
         });
 
         wrapper.appendChild(btn);
-        target.appendChild(wrapper);
+
+        // 优先尝试插入到视频操作按钮区域（点赞/分享按钮旁边）
+        const targetSelectors = [
+            '#top-level-buttons-computed',
+            'ytd-watch-metadata #actions',
+            '#menu-container #top-level-buttons',
+            'ytd-video-primary-info-renderer #menu-container',
+            '#actions-inner',
+            'ytd-menu-renderer'
+        ];
+
+        let inserted = false;
+        for (const sel of targetSelectors) {
+            const target = document.querySelector(sel);
+            if (target) {
+                target.appendChild(wrapper);
+                inserted = true;
+                console.log('[YT-Download] 按钮已插入到:', sel);
+                break;
+            }
+        }
+
+        // 如果找不到操作按钮区域，则使用固定浮动按钮
+        if (!inserted) {
+            document.body.appendChild(wrapper);
+            console.log('[YT-Download] 未找到操作按钮区域，使用浮动按钮');
+        }
+
+        buttonCreated = true;
     }
 
     // ===== 初始化 =====
@@ -239,14 +300,14 @@
     }
 
     // ===== 等待 ytInitialPlayerResponse 就绪 =====
-    function waitForPlayerData(callback, maxRetries = 20) {
+    function waitForPlayerData(callback, maxRetries = 30) {
         let retries = 0;
         const check = () => {
             if (window.ytInitialPlayerResponse || retries >= maxRetries) {
                 callback();
             } else {
                 retries++;
-                setTimeout(check, 300);
+                setTimeout(check, 500);
             }
         };
         check();
@@ -260,6 +321,7 @@
         if (videoId && videoId !== lastVideoId) {
             lastVideoId = videoId;
             closePanel();
+            buttonCreated = false;
             waitForPlayerData(() => init());
         }
     }
@@ -270,21 +332,21 @@
 
     history.pushState = function () {
         originalPushState.apply(this, arguments);
-        setTimeout(onVideoChange, 100);
+        setTimeout(onVideoChange, 500);
     };
     history.replaceState = function () {
         originalReplaceState.apply(this, arguments);
-        setTimeout(onVideoChange, 100);
+        setTimeout(onVideoChange, 500);
     };
 
-    window.addEventListener('popstate', () => setTimeout(onVideoChange, 100));
+    window.addEventListener('popstate', () => setTimeout(onVideoChange, 500));
 
     // 同时使用 MutationObserver 监听页面内容变化
     const pageObserver = new MutationObserver(() => {
-        setTimeout(onVideoChange, 300);
+        setTimeout(onVideoChange, 500);
     });
 
-    // 观察 yt-page-manager 或 title 变化
+    // 观察 title 变化
     const observeTarget = document.querySelector('title') || document.head;
     if (observeTarget) {
         pageObserver.observe(observeTarget, { childList: true, characterData: true, subtree: true });
