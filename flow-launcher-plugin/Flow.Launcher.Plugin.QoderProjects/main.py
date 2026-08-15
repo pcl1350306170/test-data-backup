@@ -7,6 +7,7 @@ from flowlauncher import FlowLauncher
 
 from models import ProjectItem
 from qoder_history_reader import QoderHistoryReader
+from git_project_scanner import GitProjectScanner
 from settings import Settings
 
 PLUGIN_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -20,6 +21,9 @@ class QoderProjects(FlowLauncher):
         self.settings = Settings()
         self.reader = QoderHistoryReader(
             db_path=self.settings.state_db_path,
+            cache_minutes=self.settings.cache_minutes,
+        )
+        self.scanner = GitProjectScanner(
             cache_minutes=self.settings.cache_minutes,
         )
         super().__init__()
@@ -37,11 +41,15 @@ class QoderProjects(FlowLauncher):
                 "IcoPath": ICON_PATH,
             }]
 
-        # 搜索或列出全部
+        # 搜索或列出全部（三个数据源合并）
         if query:
             projects = self.reader.search(query)
+            # 合并扫描的 Git 项目
+            projects.extend(self.scanner.search(query, self.settings.scan_dirs))
         else:
             projects = self.reader.get_all()
+            # 合并扫描的 Git 项目
+            projects.extend(self.scanner.get_all(self.settings.scan_dirs))
 
         # 收藏项目（合并到列表头部，去重）
         favorites = self._get_favorite_projects()
@@ -50,6 +58,9 @@ class QoderProjects(FlowLauncher):
             for fav in favorites:
                 if fav.path not in existing_paths:
                     projects.insert(0, fav)
+
+        # 按路径去重（保留首次出现的）
+        projects = self._deduplicate(projects)
 
         max_results = self.settings.max_results
 
@@ -181,6 +192,17 @@ class QoderProjects(FlowLauncher):
                 path=fav.get("path", ""),
                 last_opened=int(time.time() * 1000),  # 收藏项目排最前
             ))
+        return result
+
+    @staticmethod
+    def _deduplicate(projects: list) -> list:
+        """按路径去重，保留首次出现的项目"""
+        seen = set()
+        result = []
+        for proj in projects:
+            if proj.path not in seen:
+                seen.add(proj.path)
+                result.append(proj)
         return result
 
 

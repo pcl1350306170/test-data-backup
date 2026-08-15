@@ -36,6 +36,22 @@
             "name": "前端升级说明",
             "keywords": ["sj", "sm"],
             "path": "D:\\CODE\\Python\\test-data-backup\\data_bak\\前端升级说明.docx"
+        },{
+            "name": "快速启动java服务",
+            "keywords": ["java", "服务"],
+            "path": "D:\\CODE\\Python\\test-data-backup\\data_bak\\start-base-service.bat"
+        },{
+            "name": "启动HOST目录",
+            "keywords": ["host", "hs"],
+            "path": "C:\\Windows\\System32\\drivers\\etc"
+        },{
+            "name": "启动GitHub备份的图片目录",
+            "keywords": ["备份", "Miscellaneous"],
+            "path": "D:\\CODE\\Miscellaneous"
+        },{
+            "name": "在线头像目录",
+            "keywords": ["tt", "头像"],
+            "path": "D:\\CODE\\Python\\test-data-backup\\img\\T"
         }
     ]
 }

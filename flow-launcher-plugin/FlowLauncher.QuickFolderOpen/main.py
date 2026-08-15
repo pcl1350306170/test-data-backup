@@ -140,12 +140,15 @@ class QuickFolderOpen(FlowLauncher):
             score = self._match_shortcut(query, sc)
             if score < 0:
                 continue
+            is_dir = os.path.isdir(sc["path"])
+            icon = "📁" if is_dir else "📄"
+            method = "open_file"  # open_file 内部会自动判断文件/目录
             results.append({
                 "Title": sc["name"],
-                "SubTitle": f"📄 {sc['path']}",
+                "SubTitle": f"{icon} {sc['path']}",
                 "IcoPath": "Images\\icon.png",
                 "JsonRPCAction": {
-                    "method": "open_file",
+                    "method": method,
                     "parameters": [sc["path"]],
                 },
                 "_score": score,
@@ -194,8 +197,13 @@ class QuickFolderOpen(FlowLauncher):
             )
 
     def open_file(self, file_path):
-        """用系统默认程序打开文件"""
-        if os.path.isfile(file_path):
+        """用系统默认程序打开文件，若为目录则在资源管理器中打开"""
+        if os.path.isdir(file_path):
+            subprocess.Popen(
+                ["explorer", file_path],
+                creationflags=subprocess.CREATE_NO_WINDOW,
+            )
+        elif os.path.isfile(file_path):
             os.startfile(file_path)
 
 

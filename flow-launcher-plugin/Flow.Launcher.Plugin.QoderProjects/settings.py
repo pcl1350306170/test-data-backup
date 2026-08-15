@@ -20,6 +20,10 @@ _DEFAULTS = {
     "cache_minutes": 5,
     # 收藏项目（手动添加，永久保留）
     "favorites": [],
+    # 要扫描 Git 项目的目录列表
+    # 每项: {"path": "D:\\CODE", "depth": 1}
+    # depth: 扫描子目录深度，默认 1（仅直接子目录）
+    "scan_dirs": [],
 }
 
 
@@ -65,6 +69,11 @@ class Settings:
     def favorites(self) -> list:
         """收藏项目列表（每项为 {"name": ..., "path": ...}）"""
         return self._data.get("favorites", _DEFAULTS["favorites"])
+
+    @property
+    def scan_dirs(self) -> list:
+        """要扫描 Git 项目的目录列表（每项为 {"path": ..., "depth": ...}）"""
+        return self._data.get("scan_dirs", _DEFAULTS["scan_dirs"])
 
     # ── 读写 ──────────────────────────────────────────────
 

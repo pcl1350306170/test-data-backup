@@ -1,0 +1,11 @@
+{
+  "scan_dirs": [
+    {"path": "D:\\CODE\\Yarward\\门诊", "depth": 1},
+    {"path": "D:\\CODE\\Yarward\\病房", "depth": 2},
+    {"path": "D:\\CODE\\Yarward\\server", "depth": 2},
+    {"path": "D:\\CODE\\FontEnd", "depth": 1},
+    {"path": "D:\\CODE\\Python", "depth": 1},
+    {"path": "D:\\CODE\\Java", "depth": 1},
+    {"path": "D:\\CODE\\Server", "depth": 2}
+  ]
+}
