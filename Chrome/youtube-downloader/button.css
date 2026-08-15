@@ -1,0 +1,264 @@
+/* ===== YouTube 视频下载助手 - 样式 ===== */
+
+/* 下载按钮容器 */
+.ytd-download-wrapper {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+}
+
+/* 下载按钮 */
+.ytd-download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #cc0000;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Roboto', 'Arial', sans-serif;
+    white-space: nowrap;
+    line-height: 1;
+}
+
+.ytd-download-btn:hover {
+    background: #aa0000;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(204, 0, 0, 0.3);
+}
+
+.ytd-download-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(204, 0, 0, 0.2);
+}
+
+.ytd-download-btn svg {
+    flex-shrink: 0;
+}
+
+/* ===== 下载面板 ===== */
+.ytd-panel {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    width: 340px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 2147483647;
+    font-family: 'Roboto', 'Arial', sans-serif;
+    animation: ytd-slide-in 0.25s ease;
+    overflow: hidden;
+}
+
+@keyframes ytd-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* 面板头部 */
+.ytd-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #cc0000, #990000);
+    color: #ffffff;
+}
+
+.ytd-panel-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.ytd-panel-close {
+    cursor: pointer;
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+    line-height: 1;
+}
+
+.ytd-panel-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 视频信息 */
+.ytd-panel-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ytd-panel-thumb {
+    width: 80px;
+    height: 45px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #f0f0f0;
+    flex-shrink: 0;
+}
+
+.ytd-panel-video-title {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* 清晰度选择区域 */
+.ytd-panel-section {
+    padding: 12px 16px;
+}
+
+.ytd-section-label {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* 清晰度列表 */
+.ytd-quality-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ytd-quality-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ytd-quality-item:hover {
+    background: #f5f5f5;
+}
+
+.ytd-quality-item:active {
+    background: #eeeeee;
+    transform: scale(0.98);
+}
+
+.ytd-quality-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.ytd-quality-label {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.ytd-quality-arrow {
+    color: #ccc;
+    font-size: 16px;
+    transition: color 0.15s, transform 0.15s;
+}
+
+.ytd-quality-item:hover .ytd-quality-arrow {
+    color: #cc0000;
+    transform: translateX(3px);
+}
+
+/* 提示信息 */
+.ytd-panel-tip {
+    padding: 10px 16px 14px;
+    font-size: 12px;
+    color: #999;
+    line-height: 1.5;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* ===== Toast 提示 ===== */
+.ytd-toast-show {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    z-index: 2147483647;
+    padding: 10px 24px;
+    background: #333;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Roboto', 'Arial', sans-serif;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
+    opacity: 1;
+}
+
+.ytd-toast-show.ytd-toast-success {
+    background: #2e7d32;
+}
+
+.ytd-toast-show.ytd-toast-error {
+    background: #c62828;
+}
+
+/* ===== 暗色主题适配 ===== */
+html[dark] .ytd-panel {
+    background: #282828;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+html[dark] .ytd-panel-info {
+    border-bottom-color: #404040;
+}
+
+html[dark] .ytd-panel-video-title {
+    color: #eee;
+}
+
+html[dark] .ytd-quality-item:hover {
+    background: #3a3a3a;
+}
+
+html[dark] .ytd-quality-item:active {
+    background: #444444;
+}
+
+html[dark] .ytd-quality-label {
+    color: #eee;
+}
+
+html[dark] .ytd-panel-tip {
+    border-top-color: #404040;
+    color: #aaa;
+}
+
+html[dark] .ytd-section-label {
+    color: #aaa;
+}

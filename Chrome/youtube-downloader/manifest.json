@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube 视频下载助手",
+  "version": "1.0",
+  "description": "在 YouTube 视频页面添加下载按钮，支持多种清晰度选择",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://youtube.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.youtube.com/*",
+        "https://youtube.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["button.css"]
+    }
+  ]
+}
