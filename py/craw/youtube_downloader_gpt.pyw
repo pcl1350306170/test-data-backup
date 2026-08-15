@@ -36,6 +36,9 @@ from functools import partial
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import shutil
+import subprocess
+import ctypes
+import struct
 
 # Try imports
 try:
@@ -84,7 +87,8 @@ DEFAULT_CONFIG = {
     "retry_count": 3,
     "urls": [],
     "ffmpeg_path": "",  # 新增ffmpeg路径配置
-    "cookie_path": ""   # 新增cookie路径配置
+    "cookie_path": "",   # 新增cookie路径配置
+    "auto_extract_chrome_cookies": False  # 自动从Chrome提取Cookie
 }
 
 # ---------------------- 工具函数 ----------------------
@@ -162,45 +166,91 @@ class DownloadTask:
         return False
 
     def _download(self, progress_callback=None):
-        if yt_dlp is None:
+        """使用 subprocess 调用 yt-dlp CLI 进行下载（CLI 能正确处理 JS 运行时）"""
+        opts = self.options
+        cmd = [sys.executable, '-m', 'yt_dlp']
+
+        # 格式
+        fmt = opts.get('format', 'bestvideo+bestaudio/best')
+        cmd.extend(['-f', fmt])
+
+        # 输出模板
+        if opts.get('outtmpl'):
+            cmd.extend(['-o', opts['outtmpl']])
+
+        # Cookie
+        if opts.get('cookiesfrombrowser'):
+            cmd.extend(['--cookies-from-browser', 'chrome'])
+        elif opts.get('cookiefile'):
+            cmd.extend(['--cookies', opts['cookiefile']])
+
+        # FFmpeg 路径
+        if opts.get('ffmpeg_location'):
+            cmd.extend(['--ffmpeg-location', opts['ffmpeg_location']])
+
+        # JS 运行时（YouTube 签名解密需要）
+        js_runtime = opts.get('js_runtime', '')
+        if js_runtime:
+            cmd.extend(['--js-runtimes', js_runtime])
+        else:
+            # 自动检测：优先 deno，其次 node
+            if shutil.which('deno'):
+                pass  # deno 是 yt-dlp 默认运行时，无需额外参数
+            elif shutil.which('node'):
+                cmd.extend(['--js-runtimes', 'node'])
+                logger.info('未找到 deno，使用 Node.js 作为 JS 运行时')
+            else:
+                logger.warning('未找到 deno 或 node，YouTube 下载可能失败！建议安装 deno')
+
+        # 其他选项
+        if opts.get('noplaylist'):
+            cmd.append('--no-playlist')
+        if opts.get('extractaudio'):
+            cmd.append('--extract-audio')
+            if opts.get('audioformat'):
+                cmd.extend(['--audio-format', opts['audioformat']])
+            if opts.get('audioquality'):
+                cmd.extend(['--audio-quality', opts['audioquality']])
+
+        cmd.append(self.url)
+
+        logger.info(f"执行命令: {' '.join(cmd)}")
+
+        try:
+            proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                encoding='utf-8',
+                errors='replace',
+                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
+            )
+
+            for line in proc.stdout:
+                line = line.rstrip()
+                if not line:
+                    continue
+                logger.info(f"[yt-dlp] {line}")
+                # 解析进度
+                if '[download]' in line and '%' in line:
+                    try:
+                        pct_str = line.split('%')[0].split()[-1]
+                        self.progress = float(pct_str) / 100.0
+                        if progress_callback:
+                            progress_callback(self.url, self.progress, {'status': 'downloading'})
+                    except (ValueError, IndexError):
+                        pass
+
+            proc.wait()
+            if proc.returncode == 0:
+                self.status = 'success'
+                logger.info(f"下载成功：{self.url}")
+            else:
+                self.status = 'failed'
+                raise RuntimeError(f"yt-dlp 退出码: {proc.returncode}")
+        except FileNotFoundError:
             raise RuntimeError("yt-dlp 未安装，请先运行: pip install yt-dlp")
-
-        ydl_opts = self.options.copy()
-        # 添加 progress hook
-        def progress_hook(d):
-            # d 包含 status, downloaded_bytes, total_bytes, tmpfilename 等
-            if d.get('status') == 'downloading':
-                if d.get('total_bytes'):
-                    self.progress = d.get('downloaded_bytes', 0) / max(1, d.get('total_bytes', 1))
-                else:
-                    # 估算
-                    self.progress = 0.0
-                if progress_callback:
-                    progress_callback(self.url, self.progress, d)
-            elif d.get('status') == 'finished':
-                self.progress = 1.0
-                if progress_callback:
-                    progress_callback(self.url, self.progress, d)
-                logger.info(f"下载完成(未转码)：{self.url}")
-            # 检查暂停事件；在 hook 内做粗粒度暂停
-            while self._pause_event.is_set() and not self._stop_event.is_set():
-                self.status = 'paused'
-                time.sleep(0.2)
-            if self._stop_event.is_set():
-                raise yt_dlp.utils.DownloadError('stopped by user')
-
-        ydl_opts.setdefault('progress_hooks', []).append(progress_hook)
-        # 强制使用 ffmpeg 进行合并/转码（若需要）
-        ydl_opts.setdefault('format', ydl_opts.get('format', 'best'))
-
-        # 开始下载
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            self._ydl = ydl
-            info = ydl.extract_info(self.url, download=True)
-            self._info = info
-            # 如果选择 audio 且需要转换格式，yt-dlp 已在 postprocessors 处理中
-            self.status = 'success'
-            logger.info(f"下载成功：{self.url}")
 
     def pause(self):
         logger.info(f"请求暂停：{self.url}")
@@ -291,14 +341,18 @@ class App:
         frm = ttk.Frame(self.root, padding=8)
         frm.pack(fill=tk.BOTH, expand=True)
 
+        # 左右均分：使用 PanedWindow
+        paned = ttk.PanedWindow(frm, orient=tk.HORIZONTAL)
+        paned.pack(fill=tk.BOTH, expand=True)
+
         # 左侧：输入与设置
-        left = ttk.Frame(frm)
-        left.pack(side=tk.LEFT, fill=tk.Y)
+        left = ttk.Frame(paned)
+        paned.add(left, weight=1)
 
         # URLs 文本框
         ttk.Label(left, text="视频 URL (每行一个):").pack(anchor=tk.W)
-        self.txt_urls = tk.Text(left, width=50, height=10)
-        self.txt_urls.pack()
+        self.txt_urls = tk.Text(left, height=8)
+        self.txt_urls.pack(fill=tk.X)
         # 加载已有 urls
         if self.cfg.get('urls'):
             self.txt_urls.insert('1.0', '\n'.join(self.cfg.get('urls', [])))
@@ -329,12 +383,21 @@ class App:
         ttk.Button(ffmpegfrm, text="浏览", command=self._browse_ffmpeg).pack(side=tk.LEFT)
 
         # Cookie 路径
-        cookiefrm = ttk.Frame(settings)
-        cookiefrm.pack(fill=tk.X, pady=2)
-        ttk.Label(cookiefrm, text="Cookie 文件路径:").pack(side=tk.LEFT)
+        self.cookie_check_frame = ttk.Frame(settings)
+        self.cookie_check_frame.pack(fill=tk.X, pady=2)
+        self.var_auto_chrome_cookie = tk.BooleanVar(value=self.cfg.get('auto_extract_chrome_cookies', False))
+        ttk.Checkbutton(self.cookie_check_frame, text="自动从Chrome提取Cookie", variable=self.var_auto_chrome_cookie).pack(side=tk.LEFT)
+        # Cookie文件路径行（当未勾选自动提取时显示）
+        self.cookie_path_frame = ttk.Frame(settings)
+        self.cookie_path_frame.pack(fill=tk.X, pady=2)
+        ttk.Label(self.cookie_path_frame, text="Cookie 文件路径:").pack(side=tk.LEFT)
         self.var_cookie = tk.StringVar(value=self.cfg.get('cookie_path', ''))
-        ttk.Entry(cookiefrm, textvariable=self.var_cookie, width=30).pack(side=tk.LEFT, padx=4)
-        ttk.Button(cookiefrm, text="浏览", command=self._browse_cookie).pack(side=tk.LEFT)
+        ttk.Entry(self.cookie_path_frame, textvariable=self.var_cookie, width=30).pack(side=tk.LEFT, padx=4)
+        ttk.Button(self.cookie_path_frame, text="浏览", command=self._browse_cookie).pack(side=tk.LEFT)
+        # 根据初始状态控制显示
+        if self.var_auto_chrome_cookie.get():
+            self.cookie_path_frame.pack_forget()
+        self.var_auto_chrome_cookie.trace_add('write', self._toggle_cookie_controls)
 
         # Threads
         thfrm = ttk.Frame(settings)
@@ -385,8 +448,8 @@ class App:
         ttk.Button(opfrm, text='停止', command=self._stop_all).pack(side=tk.LEFT, padx=4)
 
         # 右侧：任务表格
-        right = ttk.Frame(frm)
-        right.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        right = ttk.Frame(paned)
+        paned.add(right, weight=1)
 
         columns = ('url', 'status', 'progress')
         self.tree = ttk.Treeview(right, columns=columns, show='headings')
@@ -398,10 +461,10 @@ class App:
         self.tree.column('progress', width=100)
         self.tree.pack(fill=tk.BOTH, expand=True)
 
-        # 底部日志视图
+        # 底部日志视图（增加高度）
         logframe = ttk.LabelFrame(self.root, text='日志')
-        logframe.pack(fill=tk.BOTH)
-        self.txt_log = tk.Text(logframe, height=8)
+        logframe.pack(fill=tk.BOTH, expand=True)
+        self.txt_log = tk.Text(logframe, height=14)
         self.txt_log.pack(fill=tk.BOTH)
 
         # 将 logger 输出也写到 GUI
@@ -422,14 +485,41 @@ class App:
         th.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
         logger.addHandler(th)
 
+    # ---------------- 通知（右下角 Toast）----------------
+    def _notify(self, title, message, duration=3000):
+        """Windows 右下角 Toast 通知"""
+        try:
+            from ctypes import wintypes
+            user32 = ctypes.WinDLL('user32', use_last_error=True)
+            # 使用 Windows 10+ Toast 通知（通过 PowerShell）
+            import subprocess as _sp
+            ps_cmd = (
+                f'[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null; '
+                f'[Windows.Data.Xml.Dom.XmlDocument, Windows.Data.Xml.Dom.XmlDocument, ContentType = WindowsRuntime] | Out-Null; '
+                f'$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02); '
+                f'$textNodes = $template.GetElementsByTagName("text"); '
+                f'$textNodes.Item(0).AppendChild($template.CreateTextNode("{title}")) | Out-Null; '
+                f'$textNodes.Item(1).AppendChild($template.CreateTextNode("{message}")) | Out-Null; '
+                f'$toast = [Windows.UI.Notifications.ToastNotification]::new($template); '
+                f'$notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("YouTube 下载器"); '
+                f'$notifier.Show($toast);'
+            )
+            _sp.Popen(['powershell', '-Command', ps_cmd],
+                      stdout=_sp.DEVNULL, stderr=_sp.DEVNULL,
+                      creationflags=_sp.CREATE_NO_WINDOW)
+        except Exception:
+            # 降级：用 messagebox
+            messagebox.showinfo(title, message)
+
     # ---------------- UI 行为 ----------------
     def _add_clipboard(self):
         try:
             s = self.root.clipboard_get()
             if s:
                 self.txt_urls.insert(tk.END, s + '\n')
+                self._notify('剪贴板', '已添加 URL 到列表')
         except Exception:
-            messagebox.showinfo('信息', '剪贴板为空或不可用')
+            self._notify('提示', '剪贴板为空或不可用')
 
     def _browse_out(self):
         d = filedialog.askdirectory(initialdir=self.var_out.get() or str(SCRIPT_DIR))
@@ -454,11 +544,20 @@ class App:
         if d:
             self.var_cookie.set(d)
 
+    def _toggle_cookie_controls(self, *args):
+        """根据是否勾选自动提取Chrome Cookie，切换Cookie文件路径区域的显示/隐藏"""
+        if self.var_auto_chrome_cookie.get():
+            self.cookie_path_frame.pack_forget()
+        else:
+            # 重新插入到复选框行之后
+            self.cookie_path_frame.pack(fill=tk.X, pady=2, after=self.cookie_check_frame)
+
     def _load_cfg(self):
         self.cfg = load_config()
         self.var_out.set(self.cfg.get('output_dir'))
         self.var_ffmpeg.set(self.cfg.get('ffmpeg_path', find_ffmpeg()))
         self.var_cookie.set(self.cfg.get('cookie_path', ''))
+        self.var_auto_chrome_cookie.set(self.cfg.get('auto_extract_chrome_cookies', False))
         self.var_threads.set(self.cfg.get('threads'))
         self.var_type.set(self.cfg.get('download_type'))
         self.var_afmt.set(self.cfg.get('audio_format'))
@@ -467,7 +566,7 @@ class App:
         urls = self.cfg.get('urls', [])
         self.txt_urls.delete('1.0', tk.END)
         self.txt_urls.insert('1.0', '\n'.join(urls))
-        messagebox.showinfo('已加载', f'配置已从 {CONFIG_PATH} 加载')
+        self._notify('配置加载', f'已从 {CONFIG_PATH.name} 加载配置')
 
     def _save_cfg(self):
         urls = [line.strip() for line in self.txt_urls.get('1.0', tk.END).splitlines() if line.strip()]
@@ -475,6 +574,7 @@ class App:
             'output_dir': self.var_out.get(),
             'ffmpeg_path': self.var_ffmpeg.get(),
             'cookie_path': self.var_cookie.get(),
+            'auto_extract_chrome_cookies': self.var_auto_chrome_cookie.get(),
             'threads': int(self.var_threads.get()),
             'download_type': self.var_type.get(),
             'audio_format': self.var_afmt.get(),
@@ -483,12 +583,12 @@ class App:
             'urls': urls
         }
         save_config(cfg)
-        messagebox.showinfo('已保存', f'配置已保存到 {CONFIG_PATH}')
+        self._notify('配置保存', f'已保存到 {CONFIG_PATH.name}')
 
     def _start(self):
         urls = [line.strip() for line in self.txt_urls.get('1.0', tk.END).splitlines() if line.strip()]
         if not urls:
-            messagebox.showwarning('警告', '请先输入至少一个 URL')
+            self._notify('警告', '请先输入至少一个 URL')
             return
         outdir = self.var_out.get()
         ensure_dir(outdir)
@@ -510,12 +610,14 @@ class App:
         # 检查FFmpeg路径
         ffmpeg_path = cfg['ffmpeg_path'] or find_ffmpeg()
         if not ffmpeg_path:
-            messagebox.showerror('错误', '未找到FFmpeg，请手动设置路径')
+            self._notify('错误', '未找到 FFmpeg，请手动设置路径')
             return
 
-        # 检查Cookie文件是否存在（如果设置了）
-        if cfg['cookie_path'] and not os.path.exists(cfg['cookie_path']):
-            messagebox.showerror('错误', f'Cookie文件不存在: {cfg["cookie_path"]}')
+        # Cookie处理：优先使用Chrome自动提取，否则使用Cookie文件
+        use_chrome_cookie = self.var_auto_chrome_cookie.get()
+        cookie_path = cfg.get('cookie_path', '')
+        if not use_chrome_cookie and cookie_path and not os.path.exists(cookie_path):
+            self._notify('错误', f'Cookie 文件不存在: {cookie_path}')
             return
 
         # 清空表格 & 创建任务
@@ -526,27 +628,32 @@ class App:
         ydl_base_opts = {
             'outtmpl': os.path.join(outdir, '%(title)s - %(id)s.%(ext)s'),
             'noplaylist': True,
-            'quiet': True,
-            'no_warnings': True,
-            'retries': 3,
-            # 设置ffmpeg路径
             'ffmpeg_location': ffmpeg_path,
-            # progress hook will be appended in DownloadTask
         }
 
-        # 如果设置了Cookie文件，则添加到选项中
-        if cfg['cookie_path']:
+        # 自动检测 JS 运行时
+        if shutil.which('deno'):
+            logger.info('检测到 deno，将使用 deno 作为 JS 运行时')
+        elif shutil.which('node'):
+            ydl_base_opts['js_runtime'] = 'node'
+            logger.info('未找到 deno，将使用 Node.js 作为 JS 运行时')
+        else:
+            logger.warning('未找到 deno 或 node！YouTube 下载可能失败，建议安装 deno')
+
+        # Cookie处理：优先使用Chrome自动提取，否则使用Cookie文件
+        if self.var_auto_chrome_cookie.get():
+            ydl_base_opts['cookiesfrombrowser'] = True
+            logger.info('将自动从Chrome浏览器提取Cookie')
+        elif cfg.get('cookie_path'):
             ydl_base_opts['cookiefile'] = cfg['cookie_path']
 
-        # 根据选择设置 postprocessors
+        # 根据选择设置格式和音频选项
         if cfg['download_type'] == 'audio':
             ydl_base_opts.update({
                 'format': 'bestaudio/best',
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': cfg['audio_format'],
-                    'preferredquality': '192'
-                }]
+                'extractaudio': True,
+                'audioformat': cfg['audio_format'],
+                'audioquality': '192',
             })
         else:
             # video, quality
@@ -554,11 +661,11 @@ class App:
             if q.isdigit():
                 ydl_base_opts['format'] = f'bestvideo[height<={q}]+bestaudio/best[height<={q}]'
             elif q == 'best':
-                ydl_base_opts['format'] = 'best'
+                ydl_base_opts['format'] = 'bestvideo+bestaudio/best'
             elif q == 'worst':
-                ydl_base_opts['format'] = 'worst'
+                ydl_base_opts['format'] = 'worstvideo+worstaudio/worst'
             else:
-                ydl_base_opts['format'] = 'best'
+                ydl_base_opts['format'] = 'bestvideo+bestaudio/best'
 
         for u in urls:
             task = DownloadTask(u, ydl_base_opts, retries=cfg['retry_count'])
@@ -612,6 +719,10 @@ class App:
                 logger.info('所有任务完成')
                 self.btn_pause.config(state=tk.DISABLED)
                 self.btn_resume.config(state=tk.DISABLED)
+                # 统计结果
+                success = sum(1 for t in self.manager.tasks if t.status == 'success')
+                failed = sum(1 for t in self.manager.tasks if t.status == 'failed')
+                self._notify('下载完成', f'成功: {success}, 失败: {failed}', 5000)
                 break
             time.sleep(0.8)
 
@@ -648,7 +759,9 @@ def main():
 
     root = tk.Tk()
     app = App(root)
-    root.geometry('1000x600')
+    root.geometry('1200x750')
+    # 启动时最大化
+    root.state('zoomed')
     root.mainloop()
 
 

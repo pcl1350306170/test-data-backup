@@ -422,6 +422,15 @@
             ],
             "script": "other\\junction_creator.pyw",
             "description": "创建目录联接(Junction)"
+        },
+        {
+            "name": "youtube视频下载",
+            "keywords": [
+                "youtube",
+                "craw"
+            ],
+            "script": "craw\\youtube_downloader_gpt.pyw",
+            "description": "youtube视频下载"
         }
     ]
 }
