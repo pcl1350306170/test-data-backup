@@ -6,7 +6,7 @@ import time
 from flowlauncher import FlowLauncher
 
 from models import ProjectItem
-from qoder_history_reader import QoderHistoryReader
+from idea_history_reader import IdeaHistoryReader
 from git_project_scanner import GitProjectScanner
 from settings import Settings
 
@@ -14,13 +14,13 @@ PLUGIN_DIR = os.path.abspath(os.path.dirname(__file__))
 ICON_PATH = os.path.join("Images", "icon.png")
 
 
-class QoderProjects(FlowLauncher):
-    """Flow Launcher 插件：快速打开 Qoder 曾经打开过的项目"""
+class IdeaProjects(FlowLauncher):
+    """Flow Launcher 插件：快速打开 IntelliJ IDEA 项目"""
 
     def __init__(self):
         self.settings = Settings()
-        self.reader = QoderHistoryReader(
-            db_path=self.settings.state_db_path,
+        self.reader = IdeaHistoryReader(
+            jetbrains_dir=self.settings.idea_recent_path,
             cache_minutes=self.settings.cache_minutes,
         )
         self.scanner = GitProjectScanner(
@@ -32,14 +32,6 @@ class QoderProjects(FlowLauncher):
 
     def query(self, query):
         query = query.strip()
-
-        # 检查数据库是否存在
-        if not os.path.isfile(self.settings.state_db_path):
-            return [{
-                "Title": "未找到 Qoder 数据库文件",
-                "SubTitle": f"期望路径: {self.settings.state_db_path}",
-                "IcoPath": ICON_PATH,
-            }]
 
         # 解析两段式查询："项目关键字 分支关键字"
         project_query, branch_query = self._parse_query(query)
@@ -169,25 +161,17 @@ class QoderProjects(FlowLauncher):
     # ── 打开项目 ──────────────────────────────────────────
 
     def open_project(self, project_path):
-        """调用 Qoder CLI 打开项目"""
-        cli = self.settings.qoder_cli
+        """调用 IDEA CLI 打开项目"""
+        cli = self.settings.idea_cli
         try:
-            # Windows 下 .cmd 文件需通过 cmd /c 调用
-            subprocess.Popen(
-                ["cmd", "/c", cli, project_path],
-                creationflags=subprocess.CREATE_NO_WINDOW,
-            )
-        except FileNotFoundError:
-            # CLI 未安装时尝试直接用 explorer 打开
+            # 直接调用 exe，列表传参正确处理空格路径
+            subprocess.Popen([cli, project_path])
+        except Exception:
+            # 失败时尝试用资源管理器打开
             try:
-                subprocess.Popen(
-                    ["explorer", project_path],
-                    creationflags=subprocess.CREATE_NO_WINDOW,
-                )
+                os.startfile(project_path)
             except Exception:
                 pass
-        except Exception:
-            pass
 
     def open_project_with_branch(self, project_path: str, branch: str):
         """打开项目并可选自动 checkout 分支"""
@@ -292,4 +276,4 @@ class QoderProjects(FlowLauncher):
 
 
 if __name__ == "__main__":
-    QoderProjects()
+    IdeaProjects()
