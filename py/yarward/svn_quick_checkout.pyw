@@ -6,6 +6,9 @@ import json
 import logging
 import subprocess
 import threading
+import ctypes
+import ctypes.wintypes
+import time as _time
 from pathlib import Path
 from tkinter import *
 from tkinter import filedialog, messagebox, ttk
@@ -91,22 +94,121 @@ def save_config(config):
     except Exception as e:
         logger.error(f"保存配置失败: {e}")
 
-def run_svn_command(args, cwd=None, timeout=30):
+# 缓存 SVN 版本信息，用于日志排查
+_svn_version_cached = None
+
+def _get_svn_version():
+    global _svn_version_cached
+    if _svn_version_cached is not None:
+        return _svn_version_cached
     try:
+        r = subprocess.run(
+            ['svn', '--version', '--quiet'],
+            capture_output=True, text=True, encoding='utf-8',
+            timeout=10
+        )
+        _svn_version_cached = r.stdout.strip() or 'unknown'
+    except Exception:
+        _svn_version_cached = 'unknown'
+    return _svn_version_cached
+
+def _try_hide_console(pid, max_wait=3.0):
+    """后台线程：高频轮询查找指定 PID 的控制台窗口并立即隐藏"""
+    user32 = ctypes.windll.user32
+    EnumWindows = user32.EnumWindows
+    GetWindowThreadProcessId = user32.GetWindowThreadProcessId
+    ShowWindow = user32.ShowWindow
+    IsWindowVisible = user32.IsWindowVisible
+    SW_HIDE = 0
+    found = [False]
+    _ENUM_PROC = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+
+    def _enum_cb(hwnd, _):
+        if found[0]:
+            return True
+        proc_id = ctypes.wintypes.DWORD()
+        GetWindowThreadProcessId(hwnd, ctypes.byref(proc_id))
+        if proc_id.value == pid and IsWindowVisible(hwnd):
+            ShowWindow(hwnd, SW_HIDE)
+            found[0] = True
+        return True
+
+    deadline = _time.time() + max_wait
+    while _time.time() < deadline and not found[0]:
+        EnumWindows(_ENUM_PROC(_enum_cb), 0)
+        if not found[0]:
+            _time.sleep(0.001)  # 1ms 轮询，最小化闪烁
+
+# SVN 公共参数（非交互式 + 信任自签名证书）
+_SVN_COMMON_ARGS = [
+    '--non-interactive',
+    '--trust-server-cert',
+]
+
+def _ensure_console_hidden():
+    """为当前进程分配控制台并立即隐藏窗口，使子进程（SVN）继承隐藏的控制台"""
+    kernel32 = ctypes.windll.kernel32
+    user32 = ctypes.windll.user32
+
+    # AllocConsole：如果当前进程没有控制台则创建一个；已有则失败（无害）
+    if kernel32.AllocConsole():
+        logger.info("AllocConsole 成功，正在隐藏控制台窗口")
+        hwnd = kernel32.GetConsoleWindow()
+        if hwnd:
+            user32.ShowWindow(hwnd, 0)  # SW_HIDE = 0
+            logger.info("控制台窗口已隐藏")
+        else:
+            logger.warning("GetConsoleWindow 返回空")
+    else:
+        # 已有控制台，尝试找到并隐藏
+        hwnd = kernel32.GetConsoleWindow()
+        if hwnd and user32.IsWindowVisible(hwnd):
+            user32.ShowWindow(hwnd, 0)
+            logger.info("已有控制台窗口，已隐藏")
+        else:
+            logger.info("控制台已存在且不可见，无需处理")
+
+def run_svn_command(args, cwd=None, timeout=60):
+    try:
+        full_cmd = ['svn'] + args
+        logger.info(f"SVN 执行: svn {args[0]} (timeout={timeout}s)")
         env = os.environ.copy()
         env['SVN_SSL_NO_VERIFY'] = '1'
-        result = subprocess.run(
-            ['svn'] + args,
-            capture_output=True,
+
+        # ① 为父进程分配控制台并立即隐藏 —— SVN 继承此隐藏控制台，不再弹出黑框
+        _ensure_console_hidden()
+
+        # ② 正常启动 SVN（不使用 STARTUPINFO / creationflags，避免 SVN 超时）
+        proc = subprocess.Popen(
+            full_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True,
             encoding='utf-8',
             cwd=cwd,
-            timeout=timeout,
-            env=env
+            env=env,
         )
-        return result.returncode, result.stdout, result.stderr
-    except subprocess.TimeoutExpired:
-        return -1, "", "命令超时"
+
+        # ③ 后台线程安全网：万一 SVN 仍创建了可见窗口，立即隐藏
+        hide_thread = threading.Thread(
+            target=_try_hide_console,
+            args=(proc.pid,),
+            daemon=True
+        )
+        hide_thread.start()
+
+        # 等待进程完成
+        try:
+            stdout, stderr = proc.communicate(timeout=timeout)
+            return proc.returncode, stdout, stderr
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            stdout, stderr = proc.communicate()
+            leftover = (stdout or '') + (stderr or '')
+            msg = f"命令超时（{timeout}s）"
+            if leftover.strip():
+                msg += f"\n已收到输出: {leftover.strip()}"
+            return -1, "", msg
     except FileNotFoundError:
         return -2, "", "未找到 svn 命令，请确保已安装 SVN 客户端并加入 PATH"
     except Exception as e:
@@ -299,6 +401,8 @@ class SVNQuickCheckoutGUI:
 
     def do_svn_workflow(self, order_type, svn_base, username, password, order_name, local_dir):
         try:
+            svn_ver = _get_svn_version()
+            self.log(f"SVN 客户端版本: {svn_ver}")
             hospital_name = order_name[9:]  # 提取医院名
 
             if order_type == "病房":
@@ -309,12 +413,11 @@ class SVNQuickCheckoutGUI:
                 self.log(f"病房模式：订单目录 = {target_url}")
 
                 # 1. 检查并创建医院目录
-                code, _, _ = run_svn_command([
+                code, _, err = run_svn_command([
                     "info", hospital_url,
                     "--username", username,
                     "--password", password,
-                    "--non-interactive",
-                    "--trust-server-cert"
+                    *_SVN_COMMON_ARGS
                 ])
                 if code != 0:
                     self.log("📁 医院目录不存在，正在创建...")
@@ -322,19 +425,17 @@ class SVNQuickCheckoutGUI:
                         "mkdir", hospital_url, "-m", f"Auto create hospital dir for {hospital_name}",
                         "--username", username,
                         "--password", password,
-                        "--non-interactive",
-                        "--trust-server-cert"
-                    ])
+                        *_SVN_COMMON_ARGS
+                    ], timeout=60)
                     if mkdir_code != 0:
                         raise Exception(f"创建医院目录失败: {err or out}")
 
                 # 2. 检查并创建订单目录（在医院目录下）
-                code, _, _ = run_svn_command([
+                code, _, err = run_svn_command([
                     "info", target_url,
                     "--username", username,
                     "--password", password,
-                    "--non-interactive",
-                    "--trust-server-cert"
+                    *_SVN_COMMON_ARGS
                 ])
                 if code != 0:
                     self.log("📁 订单目录不存在，正在创建...")
@@ -342,9 +443,8 @@ class SVNQuickCheckoutGUI:
                         "mkdir", target_url, "-m", f"Auto create for {order_name}",
                         "--username", username,
                         "--password", password,
-                        "--non-interactive",
-                        "--trust-server-cert"
-                    ])
+                        *_SVN_COMMON_ARGS
+                    ], timeout=60)
                     if mkdir_code != 0:
                         raise Exception(f"创建订单目录失败: {err or out}")
                 else:
@@ -355,12 +455,11 @@ class SVNQuickCheckoutGUI:
                 self.log(f"门诊模式：订单目录 = {target_url}")
 
                 # 检查并创建订单目录
-                code, _, _ = run_svn_command([
+                code, _, err = run_svn_command([
                     "info", target_url,
                     "--username", username,
                     "--password", password,
-                    "--non-interactive",
-                    "--trust-server-cert"
+                    *_SVN_COMMON_ARGS
                 ])
                 if code != 0:
                     self.log("📁 订单目录不存在，正在创建...")
@@ -368,9 +467,8 @@ class SVNQuickCheckoutGUI:
                         "mkdir", target_url, "-m", f"Auto create for {order_name}",
                         "--username", username,
                         "--password", password,
-                        "--non-interactive",
-                        "--trust-server-cert"
-                    ])
+                        *_SVN_COMMON_ARGS
+                    ], timeout=60)
                     if mkdir_code != 0:
                         raise Exception(f"创建订单目录失败: {err or out}")
                 else:
@@ -384,9 +482,8 @@ class SVNQuickCheckoutGUI:
                 "checkout", target_url, str(checkout_local_path),
                 "--username", username,
                 "--password", password,
-                "--non-interactive",
-                "--trust-server-cert"
-            ])
+                *_SVN_COMMON_ARGS
+            ], timeout=300)
 
             if co_code != 0:
                 raise Exception(f"检出失败: {co_err or co_out}")

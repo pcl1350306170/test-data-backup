@@ -4,6 +4,7 @@ import os
 import json
 import logging
 import subprocess
+import ctypes
 import sys
 from pathlib import Path
 from tkinter import *
@@ -40,6 +41,17 @@ except Exception:
         def debug(self, *a, **kw): pass
     logger = _DummyLogger()
 # ────────────────────────────────────────────────
+
+# 隐藏子进程控制台窗口（.pyw 无控制台，子进程会创建新控制台导致黑框闪烁）
+if sys.platform == 'win32':
+    try:
+        ctypes.windll.kernel32.AllocConsole()
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd:
+            ctypes.windll.user32.ShowWindow(hwnd, 0)
+    except Exception:
+        pass
+
 # 默认配置
 DEFAULT_CONFIG = {
     "target_commit": "710548f5ed90a1d60123af04b45c061c642bee5f",

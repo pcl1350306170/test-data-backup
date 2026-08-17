@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import ctypes
 import json
 import re
 from pathlib import Path
@@ -34,6 +35,16 @@ except Exception:
         def debug(self, *a, **kw): pass
     logger = _DummyLogger()
 # ────────────────────────────────────────────────
+
+# 隐藏子进程控制台窗口（.pyw 无控制台，子进程会创建新控制台导致黑框闪烁）
+if sys.platform == 'win32':
+    try:
+        ctypes.windll.kernel32.AllocConsole()
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd:
+            ctypes.windll.user32.ShowWindow(hwnd, 0)
+    except Exception:
+        pass
 
 class GitBranchCreator:
     def __init__(self, root):

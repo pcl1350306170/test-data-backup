@@ -39,6 +39,7 @@ import shutil
 import subprocess
 import ctypes
 import struct
+import re
 
 # Try imports
 try:
@@ -58,6 +59,9 @@ CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
+
+# 下载归档文件名（记录已下载视频 ID，避免重复下载）
+DOWNLOAD_ARCHIVE_FILENAME = 'download_archive.txt'
 
 # ──────────── 公共日志模块（可选依赖）────────────
 import sys
@@ -92,6 +96,20 @@ DEFAULT_CONFIG = {
 }
 
 # ---------------------- 工具函数 ----------------------
+
+def _extract_video_id(url):
+    """从 YouTube URL 中提取视频 ID"""
+    patterns = [
+        r'(?:youtube\.com/watch\?v=)([a-zA-Z0-9_-]{11})',
+        r'(?:youtu\.be/)([a-zA-Z0-9_-]{11})',
+        r'(?:youtube\.com/shorts/)([a-zA-Z0-9_-]{11})',
+        r'(?:youtube\.com/embed/)([a-zA-Z0-9_-]{11})',
+    ]
+    for p in patterns:
+        m = re.search(p, url)
+        if m:
+            return m.group(1)
+    return None
 
 def load_config():
     if CONFIG_PATH.exists():
@@ -201,6 +219,10 @@ class DownloadTask:
                 logger.info('未找到 deno，使用 Node.js 作为 JS 运行时')
             else:
                 logger.warning('未找到 deno 或 node，YouTube 下载可能失败！建议安装 deno')
+
+        # 下载归档（避免重复下载）
+        if opts.get('download_archive'):
+            cmd.extend(['--download-archive', opts['download_archive']])
 
         # 其他选项
         if opts.get('noplaylist'):
@@ -620,15 +642,25 @@ class App:
             self._notify('错误', f'Cookie 文件不存在: {cookie_path}')
             return
 
-        # 清空表格 & 创建任务
+        # 清空表格
         for i in self.tree.get_children():
             self.tree.delete(i)
 
+        # ── 文件存在性预检：扫描输出目录中已下载的文件 ──
+        existing_video_ids = set()
+        if os.path.isdir(outdir):
+            for fname in os.listdir(outdir):
+                vid_id = _extract_video_id(fname)
+                if vid_id:
+                    existing_video_ids.add(vid_id)
+
         tasks = []
+        skipped_count = 0
         ydl_base_opts = {
             'outtmpl': os.path.join(outdir, '%(title)s - %(id)s.%(ext)s'),
             'noplaylist': True,
             'ffmpeg_location': ffmpeg_path,
+            'download_archive': os.path.join(outdir, DOWNLOAD_ARCHIVE_FILENAME),
         }
 
         # 自动检测 JS 运行时
@@ -668,9 +700,27 @@ class App:
                 ydl_base_opts['format'] = 'bestvideo+bestaudio/best'
 
         for u in urls:
+            vid_id = _extract_video_id(u)
+            if vid_id and vid_id in existing_video_ids:
+                # 文件已存在，跳过下载
+                self.tree.insert('', tk.END, iid=u, values=(u, '已存在', '100%'))
+                skipped_count += 1
+                logger.info(f'文件已存在，跳过: {u}')
+                continue
             task = DownloadTask(u, ydl_base_opts, retries=cfg['retry_count'])
             tasks.append(task)
             self.tree.insert('', tk.END, iid=u, values=(u, task.status, f"{int(task.progress*100)}%"))
+
+        # 通知跳过的文件
+        if skipped_count > 0:
+            logger.info(f'已跳过 {skipped_count} 个已下载的视频')
+            if len(tasks) == 0:
+                self._notify('提示', f'所有 {skipped_count} 个视频均已下载过，无需重复下载', 5000)
+                self.btn_pause.config(state=tk.DISABLED)
+                self.btn_resume.config(state=tk.DISABLED)
+                return
+            else:
+                self._notify('提示', f'已跳过 {skipped_count} 个已下载视频，开始下载剩余 {len(tasks)} 个', 5000)
 
         # 创建 manager
         self.manager = DownloadManager(max_workers=cfg['threads'])
