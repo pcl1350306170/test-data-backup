@@ -34,7 +34,7 @@ if _PY_DIR not in sys.path:
     sys.path.insert(0, _PY_DIR)
 
 try:
-    from log_utils import get_logger
+    from log_utils import get_logger  # noqa — 运行时由 _PY_DIR 加入 sys.path
     logger = get_logger(SCRIPT_NAME)
 except Exception:
     class _DummyLogger:
@@ -222,6 +222,34 @@ def is_valid_order_name(name: str):
     if not name[9:].strip():
         return False
     return True
+
+
+def _svn_list_dirs(url, username, password):
+    """列出 SVN 服务器上指定 URL 下的所有目录名"""
+    code, stdout, stderr = run_svn_command([
+        "list", url,
+        "--username", username,
+        "--password", password,
+        *_SVN_COMMON_ARGS
+    ], timeout=60)
+    if code != 0:
+        logger.warning(f"svn list 失败: {stderr or stdout}")
+        return []
+    dirs = [line.rstrip('/') for line in stdout.strip().splitlines() if line.strip()]
+    return dirs
+
+
+def _find_matching_order(server_dirs, order_name):
+    """根据订单号前缀（YYYY-NNNN）在服务器目录列表中模糊匹配"""
+    if len(order_name) < 9:
+        return None
+    prefix = order_name[:9]
+    for d in server_dirs:
+        if len(d) >= 9 and d[:9] == prefix:
+            logger.info(f"模糊匹配成功: 用户输入 '{order_name}' → 服务器已有 '{d}'")
+            return d
+    return None
+
 
 # ==============================
 # GUI 主类
@@ -412,7 +440,7 @@ class SVNQuickCheckoutGUI:
                 self.log(f"病房模式：医院目录 = {hospital_url}")
                 self.log(f"病房模式：订单目录 = {target_url}")
 
-                # 1. 检查并创建医院目录
+                # 1. 检查并创建医院目录（支持按订单号前缀模糊匹配）
                 code, _, err = run_svn_command([
                     "info", hospital_url,
                     "--username", username,
@@ -420,17 +448,44 @@ class SVNQuickCheckoutGUI:
                     *_SVN_COMMON_ARGS
                 ])
                 if code != 0:
-                    self.log("📁 医院目录不存在，正在创建...")
-                    mkdir_code, out, err = run_svn_command([
-                        "mkdir", hospital_url, "-m", f"Auto create hospital dir for {hospital_name}",
-                        "--username", username,
-                        "--password", password,
-                        *_SVN_COMMON_ARGS
-                    ], timeout=60)
-                    if mkdir_code != 0:
-                        raise Exception(f"创建医院目录失败: {err or out}")
+                    # 精确查找失败，列出所有目录按前缀匹配
+                    self.log("🔍 医院目录精确匹配失败，正在搜索同编号目录...")
+                    server_dirs = _svn_list_dirs(svn_base.rstrip('/'), username, password)
+                    matched = _find_matching_order(server_dirs, hospital_name)
+                    if matched:
+                        self.log(f"⚠️ 找到相似医院目录：{matched}")
+                        confirm_result = [None]
+                        confirm_event = threading.Event()
+                        def _ask():
+                            r = messagebox.askyesno(
+                                "发现已有订单",
+                                f"服务器上已存在相似医院目录：\n\n「{matched}」\n\n"
+                                f"您输入的是：「{hospital_name}」\n\n"
+                                f"是否使用该已有目录？"
+                            )
+                            confirm_result[0] = r
+                            confirm_event.set()
+                        self.root.after(0, _ask)
+                        confirm_event.wait()
+                        if not confirm_result[0]:
+                            self.log("❌ 用户取消操作")
+                            return
+                        hospital_name = matched
+                        hospital_url = f"{svn_base.rstrip('/')}/{hospital_name}"
+                        target_url = f"{hospital_url}/{order_name}"
+                        self.log(f"✅ 使用已有医院目录：{hospital_url}")
+                    else:
+                        self.log("📁 医院目录不存在，正在创建...")
+                        mkdir_code, out, err = run_svn_command([
+                            "mkdir", hospital_url, "-m", f"Auto create hospital dir for {hospital_name}",
+                            "--username", username,
+                            "--password", password,
+                            *_SVN_COMMON_ARGS
+                        ], timeout=60)
+                        if mkdir_code != 0:
+                            raise Exception(f"创建医院目录失败: {err or out}")
 
-                # 2. 检查并创建订单目录（在医院目录下）
+                # 2. 检查并创建订单目录（在医院目录下，支持按订单号前缀模糊匹配）
                 code, _, err = run_svn_command([
                     "info", target_url,
                     "--username", username,
@@ -438,23 +493,49 @@ class SVNQuickCheckoutGUI:
                     *_SVN_COMMON_ARGS
                 ])
                 if code != 0:
-                    self.log("📁 订单目录不存在，正在创建...")
-                    mkdir_code, out, err = run_svn_command([
-                        "mkdir", target_url, "-m", f"Auto create for {order_name}",
-                        "--username", username,
-                        "--password", password,
-                        *_SVN_COMMON_ARGS
-                    ], timeout=60)
-                    if mkdir_code != 0:
-                        raise Exception(f"创建订单目录失败: {err or out}")
+                    # 精确查找失败，列出医院目录下所有子目录按前缀匹配
+                    self.log("🔍 订单目录精确匹配失败，正在搜索同编号订单...")
+                    server_dirs = _svn_list_dirs(hospital_url, username, password)
+                    matched = _find_matching_order(server_dirs, order_name)
+                    if matched:
+                        self.log(f"⚠️ 找到相似订单目录：{matched}")
+                        confirm_result = [None]
+                        confirm_event = threading.Event()
+                        def _ask():
+                            r = messagebox.askyesno(
+                                "发现已有订单",
+                                f"服务器上已存在相似订单目录：\n\n「{matched}」\n\n"
+                                f"您输入的是：「{order_name}」\n\n"
+                                f"是否使用该已有目录？"
+                            )
+                            confirm_result[0] = r
+                            confirm_event.set()
+                        self.root.after(0, _ask)
+                        confirm_event.wait()
+                        if not confirm_result[0]:
+                            self.log("❌ 用户取消操作")
+                            return
+                        order_name = matched
+                        target_url = f"{hospital_url}/{order_name}"
+                        self.log(f"✅ 使用已有订单目录：{target_url}")
+                    else:
+                        self.log("📁 订单目录不存在，正在创建...")
+                        mkdir_code, out, err = run_svn_command([
+                            "mkdir", target_url, "-m", f"Auto create for {order_name}",
+                            "--username", username,
+                            "--password", password,
+                            *_SVN_COMMON_ARGS
+                        ], timeout=60)
+                        if mkdir_code != 0:
+                            raise Exception(f"创建订单目录失败: {err or out}")
                 else:
-                    self.log("✅ 订单目录已存在")
+                    self.log("✅ 订单目录已存在（精确匹配）")
 
             else:  # 门诊
                 target_url = f"{svn_base.rstrip('/')}/{order_name}"
                 self.log(f"门诊模式：订单目录 = {target_url}")
 
-                # 检查并创建订单目录
+                # 检查并创建订单目录（支持按订单号前缀模糊匹配）
                 code, _, err = run_svn_command([
                     "info", target_url,
                     "--username", username,
@@ -462,17 +543,43 @@ class SVNQuickCheckoutGUI:
                     *_SVN_COMMON_ARGS
                 ])
                 if code != 0:
-                    self.log("📁 订单目录不存在，正在创建...")
-                    mkdir_code, out, err = run_svn_command([
-                        "mkdir", target_url, "-m", f"Auto create for {order_name}",
-                        "--username", username,
-                        "--password", password,
-                        *_SVN_COMMON_ARGS
-                    ], timeout=60)
-                    if mkdir_code != 0:
-                        raise Exception(f"创建订单目录失败: {err or out}")
+                    # 精确查找失败，列出所有目录按前缀匹配
+                    self.log("🔍 订单目录精确匹配失败，正在搜索同编号订单...")
+                    server_dirs = _svn_list_dirs(svn_base.rstrip('/'), username, password)
+                    matched = _find_matching_order(server_dirs, order_name)
+                    if matched:
+                        self.log(f"⚠️ 找到相似订单目录：{matched}")
+                        confirm_result = [None]
+                        confirm_event = threading.Event()
+                        def _ask():
+                            r = messagebox.askyesno(
+                                "发现已有订单",
+                                f"服务器上已存在相似订单目录：\n\n「{matched}」\n\n"
+                                f"您输入的是：「{order_name}」\n\n"
+                                f"是否使用该已有目录？"
+                            )
+                            confirm_result[0] = r
+                            confirm_event.set()
+                        self.root.after(0, _ask)
+                        confirm_event.wait()
+                        if not confirm_result[0]:
+                            self.log("❌ 用户取消操作")
+                            return
+                        order_name = matched
+                        target_url = f"{svn_base.rstrip('/')}/{order_name}"
+                        self.log(f"✅ 使用已有订单目录：{target_url}")
+                    else:
+                        self.log("📁 订单目录不存在，正在创建...")
+                        mkdir_code, out, err = run_svn_command([
+                            "mkdir", target_url, "-m", f"Auto create for {order_name}",
+                            "--username", username,
+                            "--password", password,
+                            *_SVN_COMMON_ARGS
+                        ], timeout=60)
+                        if mkdir_code != 0:
+                            raise Exception(f"创建订单目录失败: {err or out}")
                 else:
-                    self.log("✅ 订单目录已存在")
+                    self.log("✅ 订单目录已存在（精确匹配）")
 
             # 检出到本地
             checkout_local_path = Path(local_dir) / order_name

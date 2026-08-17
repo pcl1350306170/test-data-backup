@@ -3,6 +3,7 @@
     "scrcpy_exe": "D:/TOOLS/QtScrcpy-win-x86-v3.3.1/QtScrcpy.exe",
     "device_ip": "192.168.18.144",
     "history_devices": [
+        "192.168.16.16",
         "192.168.18.144",
         "192.168.16.136",
         "192.168.16.128",
