@@ -64,6 +64,10 @@ class QuickFolderOpen(FlowLauncher):
                     dirnames.clear()
                     continue
 
+                # Git 项目边界：检测到 .git 则不再递归子目录
+                if ".git" in dirnames:
+                    dirnames.clear()
+
                 # 排除过滤（原地修改 dirnames 阻止 os.walk 递归进入）
                 dirnames[:] = [
                     d for d in dirnames

@@ -1,11 +1,7 @@
 {
-    "root_dirs": [
-        "D:\\CODE\\Yarward",
-        "D:\\CODE\\FontEnd",
-        "D:\\CODE\\Server",
-        "D:\\CODE\\Java",
-        "D:\\FILES\\IMG\\AI自定义",
-        "D:\\FILES\\IMG\\AI临时",
+    "root_dirs": [      
+        "D:\\CODE",        
+        "D:\\FILES\\糖蛋蛋(＾Ｕ＾)ノ~ＹＯ",
         "D:\\FILES\\IMG",
         "D:\\CODE\\Python\\test-data-backup"
     ],
@@ -37,23 +33,74 @@
     "file_shortcuts": [
         {
             "name": "前端升级说明",
-            "keywords": ["sj", "sm"],
+            "keywords": [
+                "sj",
+                "sm"
+            ],
             "path": "D:\\CODE\\Python\\test-data-backup\\data_bak\\前端升级说明.docx"
-        },{
-            "name": "快速启动java服务",
-            "keywords": ["java", "服务"],
+        },
+        {
+            "name": "启动blog-java服务",
+            "keywords": [
+                "java",
+                "blog",
+                "start",
+                "服务"
+            ],
             "path": "D:\\CODE\\Python\\test-data-backup\\data_bak\\start-base-service.bat"
-        },{
+        },
+        {
+            "name": "启动geeker-java服务",
+            "keywords": [
+                "java",
+                "geeker-admin",
+                "start",
+                "服务"
+            ],
+            "path": "D:\\CODE\\Python\\test-data-backup\\data_bak\\start-geeker-service.bat"
+        },
+        {
             "name": "启动HOST目录",
-            "keywords": ["host", "hs"],
+            "keywords": [
+                "host",
+                "hs"
+            ],
             "path": "C:\\Windows\\System32\\drivers\\etc"
-        },{
-            "name": "启动GitHub备份的图片目录",
-            "keywords": ["备份", "Miscellaneous"],
+        },
+        {
+            "name": "旧GitHub备份的图片目录",
+            "keywords": [
+                "备份",
+                "图片",
+                "Miscellaneous",
+                "image"
+            ],
             "path": "D:\\CODE\\Miscellaneous"
-        },{
+        },
+        {
+            "name": "图片GitHub备份-cdn",
+            "keywords": [
+                "备份",
+                "cdn",
+                "图片",
+                "image"
+            ],
+            "path": "D:\\CODE\\image-cdn"
+        },
+        {
+            "name": "下载文件夹",
+            "keywords": [
+                "下载",
+                "download"
+            ],
+            "path": "C:\\Users\\PCL13\\Downloads"
+        },
+        {
             "name": "在线头像目录",
-            "keywords": ["tt", "头像"],
+            "keywords": [
+                "tt",
+                "头像"
+            ],
             "path": "D:\\CODE\\Python\\test-data-backup\\img\\T"
         }
     ]
