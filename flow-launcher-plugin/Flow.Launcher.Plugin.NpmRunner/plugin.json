@@ -1,0 +1,13 @@
+{
+    "ID": "A1B2C3D4E5F60718293A4B5C6D7E8F90",
+    "ActionKeyword": "npm",
+    "Name": "NPM Runner",
+    "Description": "快速运行/打包前端项目，自动切换 node 版本并启动 PowerShell",
+    "Author": "PCL",
+    "Version": "1.0.0",
+    "Language": "python",
+    "Website": "https://github.com/Flow-Launcher/Flow.Launcher",
+    "IcoPath": "Images\\icon.png",
+    "ExecuteFileName": "main.py",
+    "MinimumAppVersion": "1.8.0"
+}

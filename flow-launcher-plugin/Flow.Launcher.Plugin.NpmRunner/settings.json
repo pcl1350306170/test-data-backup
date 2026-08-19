@@ -1,0 +1,24 @@
+{
+  "scan_dirs": [
+    {"path": "D:\\CODE\\Yarward\\病房", "depth": 2},
+    {"path": "D:\\CODE\\Yarward\\门诊", "depth": 1},
+    {"path": "D:\\CODE\\Server\\Node", "depth": 1},
+    {"path": "D:\\CODE\\FontEnd", "depth": 1}
+  ],
+  "default_node": "14.19.1",
+  "package_manager": "auto",
+  "nvm_home": "",
+  "chrome_path": "C:\\Users\\PCL13\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe",
+  "default_script": "dev",
+  "max_results": 30,
+  "cache_minutes": 5,
+  "projects": {
+    "D:\\CODE\\Yarward\\门诊\\template1.5.0": {"node": "14.19.1"},
+    "D:\\CODE\\Yarward\\门诊\\template1.5.2": {"node": "14.19.1"},
+    "D:\\CODE\\FontEnd\\mage": {"node": "24.11.0"},
+    "D:\\CODE\\FontEnd\\CeruMusic": {"node": "24.11.0"},
+    "D:\\CODE\\Server\\Node\\Node-Ghost": {"node": "24.11.0"},
+    "D:\\CODE\\Server\\Node\\directus": {"node": "22.21.1"},
+    "D:\\CODE\\FontEnd\\Geeker-Admin": {"node": "22.21.1", "pm": "pnpm"}
+  }
+}

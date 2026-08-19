@@ -1,6 +1,6 @@
 # Flow Launcher 插件合集
 
-本目录包含 3 个自研 Flow Launcher 插件，均为 Python 编写。
+本目录包含 4 个自研 Flow Launcher 插件，均为 Python 编写。
 
 ---
 
@@ -177,3 +177,66 @@
 | | 批量合并TXT为EPUB | dz6 | 多个 TXT 合并 EPUB |
 | | 图片整合为EPUB | dz7 | 图片生成 EPUB |
 | | TXT文件合并 | dz8 | TXT 文件合并 |
+
+---
+
+## 4. NPM Runner — 前端项目一键运行/打包
+
+**触发关键字：** `npm`
+
+### 功能
+
+扫描配置目录下的前端项目（含 `package.json`），输入关键字快速匹配，按项目配置的 **node 版本自动切换**，选择 `run dev` / `run build` 等脚本后，启动一个**可见的 PowerShell 窗口**运行。无需手动 `nvm use`。支持 **npm / pnpm**（可配置，配置了 pnpm 则优先用 pnpm）。
+
+### node 版本切换原理
+
+不使用 `nvm use`（需管理员权限、改全局软链），而是把目标版本目录（如 `D:\dev\nvm\v14.19.1`）**前置到该 PowerShell 窗口的 `PATH`**，使窗口内的 `node/npm` 即为指定版本。**免提权、不影响全局**。
+
+### 使用方法
+
+| 操作 | 说明 |
+|------|------|
+| `npm` | 列出所有扫描到的前端项目（副标题显示 node 版本 + 包管理器） |
+| `npm template` | 按关键字匹配项目（如 `template1.5.0`、`template1.5.2`） |
+| 选中项目 **回车** | 进入该项目的**命令选择列表**（默认脚本置顶） |
+| 命令列表再 **回车** | 用配置的 node 版本 + 包管理器执行命令（新开 PowerShell 窗口） |
+| 命令列表选 `↩ 返回项目列表` | 返回上一级（退格删除路径也能回到搜索） |
+| `npm template build` | 末尾直接指定脚本，回车**跳过列表直接执行**（支持 `dev`/`d`/`build`/`b`/`serve`/`s`/`start`） |
+| 选中项目 **右键/上下文菜单键** | 同样可弹出脚本列表（备用入口） |
+
+> 命令列表默认把 `dev`（或项目配置的脚本）置顶，**连续两次回车即可直接运行**；无 `dev` 时依次取 `serve`、`start`。
+
+### 配置说明
+
+编辑插件目录下的 `settings.json`：
+
+```json
+{
+    "scan_dirs": [                          // 要扫描前端项目的目录
+        {"path": "D:\\CODE\\Yarward\\门诊", "depth": 1}
+    ],
+    "default_node": "14.19.1",             // 未单独配置的项目使用的默认 node 版本
+    "package_manager": "auto",             // 包管理器：auto / pnpm / npm
+    "nvm_home": "",                        // nvm 安装目录，为空则自动读 NVM_HOME 环境变量
+    "chrome_path": "C:\\Users\\...\\chrome.exe", // 自动打开的浏览器（尽力而为，可留空）
+    "default_script": "dev",               // 兜底默认脚本
+    "max_results": 30,
+    "cache_minutes": 5,
+    "projects": {                          // 每个项目单独指定 node 版本 / 包管理器
+        "D:\\CODE\\Yarward\\门诊\\template1.5.0": {"node": "14.19.1"},
+        "D:\\CODE\\Yarward\\门诊\\template1.5.2": {"node": "16.20.2", "pm": "pnpm"}
+    }
+}
+```
+
+- `projects` 按**项目绝对路径**为 key，`node` 指定版本、`pm` 指定包管理器（`pnpm`/`npm`）；不配置则用全局默认
+- `package_manager` 包管理器：`auto`（有 `pnpm-lock.yaml` 就用 pnpm，否则 npm）/ `pnpm`（全局强制 pnpm）/ `npm`（全局强制 npm）
+- 优先级：**项目级 `pm`** > 全局 `package_manager` > `auto` 自动判断；即“配置了 pnpm 就优先用 pnpm”
+- pnpm 在当前 node 版本不可用时会**自动回退 npm** 并给出提示
+- 想让某个项目自动打开指定 Chrome：填 `chrome_path`（通过 `BROWSER` 环境变量生效，部分脚手架支持）
+
+### 注意事项
+
+- 需要已安装 [nvm-windows](https://github.com/coreybutler/nvm-windows)，且目标版本已 `nvm install`
+- 运行/打包会在**新的 PowerShell 窗口**中执行，dev 服务常驻、关闭窗口即停止
+
