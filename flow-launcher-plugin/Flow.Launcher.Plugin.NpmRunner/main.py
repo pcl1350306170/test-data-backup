@@ -6,6 +6,9 @@ import sys
 import tempfile
 import time
 
+if sys.platform == "win32":
+    import ctypes
+
 parent_folder_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(parent_folder_path)
 
@@ -239,7 +242,7 @@ class NpmRunner(FlowLauncher):
             # 用 utf-8-sig（带 BOM）写入，确保 PowerShell 正确识别中文路径
             with open(ps1_path, "w", encoding="utf-8-sig") as f:
                 f.write(ps1)
-            subprocess.Popen([
+            self._open_visible_console([
                 "powershell.exe",
                 "-NoExit",
                 "-ExecutionPolicy", "Bypass",
@@ -247,6 +250,68 @@ class NpmRunner(FlowLauncher):
             ])
         except OSError:
             pass
+
+    @staticmethod
+    def _open_visible_console(argv):
+        """启动一个「可见」的控制台窗口。
+
+        Flow Launcher 用 pythonw.exe（无控制台宿主）运行插件，此时
+        subprocess 直接拉起的控制台窗口默认是隐藏的（进程在跑但看不见）。
+        改用 CreateProcessW + CREATE_NEW_CONSOLE 强制分配新的可见控制台。"""
+        if sys.platform != "win32":
+            subprocess.Popen(argv)
+            return
+
+        # 按 Win32 命令行转义规则拼接（subprocess.list2cmdline 即此规则）
+        cmd_line = subprocess.list2cmdline(argv)
+
+        class STARTUPINFOW(ctypes.Structure):
+            _fields_ = [
+                ("cb", ctypes.c_ulong),
+                ("lpReserved", ctypes.c_wchar_p),
+                ("lpDesktop", ctypes.c_wchar_p),
+                ("lpTitle", ctypes.c_wchar_p),
+                ("dwX", ctypes.c_ulong), ("dwY", ctypes.c_ulong),
+                ("dwXSize", ctypes.c_ulong), ("dwYSize", ctypes.c_ulong),
+                ("dwXCountChars", ctypes.c_ulong), ("dwYCountChars", ctypes.c_ulong),
+                ("dwFillAttribute", ctypes.c_ulong),
+                ("dwFlags", ctypes.c_ulong),
+                ("wShowWindow", ctypes.c_ushort),
+                ("cbReserved2", ctypes.c_ushort),
+                ("lpReserved2", ctypes.c_void_p),
+                ("hStdInput", ctypes.c_void_p),
+                ("hStdOutput", ctypes.c_void_p),
+                ("hStdError", ctypes.c_void_p),
+            ]
+
+        class PROCESS_INFORMATION(ctypes.Structure):
+            _fields_ = [
+                ("hProcess", ctypes.c_void_p),
+                ("hThread", ctypes.c_void_p),
+                ("dwProcessId", ctypes.c_ulong),
+                ("dwThreadId", ctypes.c_ulong),
+            ]
+
+        CREATE_NEW_CONSOLE = 0x00000010
+        STARTF_USESHOWWINDOW = 0x00000001
+        SW_SHOW = 5
+        si = STARTUPINFOW()
+        si.cb = ctypes.sizeof(STARTUPINFOW)
+        si.dwFlags = STARTF_USESHOWWINDOW
+        si.wShowWindow = SW_SHOW
+        pi = PROCESS_INFORMATION()
+        ok = ctypes.windll.kernel32.CreateProcessW(
+            None, cmd_line, None, None, False,
+            CREATE_NEW_CONSOLE, None, None,
+            ctypes.byref(si), ctypes.byref(pi),
+        )
+        if ok:
+            # 关闭句柄，子进程继续运行
+            ctypes.windll.kernel32.CloseHandle(pi.hProcess)
+            ctypes.windll.kernel32.CloseHandle(pi.hThread)
+        else:
+            # 兜底：普通方式启动
+            subprocess.Popen(argv)
 
     def _resolve_node_dir(self, version: str):
         """解析指定 node 版本在 nvm 中的安装目录；找不到返回 None"""
@@ -278,8 +343,9 @@ class NpmRunner(FlowLauncher):
 
         name = os.path.basename(project_path)
         # 窗口标题：目录名置顶，方便在任务栏区分多个窗口
+        title = f"{name} - {pm} run {script}"
         lines = [
-            f"$Host.UI.RawUI.WindowTitle = {q(f'{name} - {pm} run {script}')}",
+            f"$Host.UI.RawUI.WindowTitle = {q(title)}",
         ]
 
         # 切换 node：把目标版本目录前置到 PATH（免提权、不影响全局）
@@ -298,8 +364,25 @@ class NpmRunner(FlowLauncher):
 
         lines.append(f"Set-Location -LiteralPath {q(project_path)}")
 
-        if pm == "pnpm":
-            # pnpm 未安装到当前 node 版本时回退到 npm
+        # 优先直接用目标版本的 node.exe 调 CLI 脚本，绕开 npm.cmd/pnpm.cmd：
+        # 批处理壳会改写窗口标题（pnpm.cmd 甚至有 title %COMSPEC%），导致多窗口无法区分
+        node_exe = os.path.join(node_dir, "node.exe") if node_dir else None
+        cli_js = None
+        if node_dir:
+            if pm == "pnpm":
+                p = os.path.join(node_dir, "node_modules", "pnpm", "bin", "pnpm.cjs")
+                cli_js = p if os.path.isfile(p) else None
+            else:
+                p = os.path.join(node_dir, "node_modules", "npm", "bin", "npm-cli.js")
+                cli_js = p if os.path.isfile(p) else None
+
+        if node_exe and cli_js:
+            lines.append(
+                'Write-Host "==> Node: $(node -v)  |  ' + pm + ' run ' + script + '" -ForegroundColor Cyan'
+            )
+            lines.append(f"& {q(node_exe)} {q(cli_js)} run {script}")
+        elif pm == "pnpm":
+            # 兜底：找不到 pnpm CLI 脚本时回退命令方式（含未安装检测）
             lines.append("$pm = 'pnpm'")
             lines.append(
                 "if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) { "
@@ -315,6 +398,9 @@ class NpmRunner(FlowLauncher):
                 'Write-Host "==> Node: $(node -v)  |  npm run ' + script + '" -ForegroundColor Cyan'
             )
             lines.append(f"npm run {script}")
+
+        # dev/build 结束后重新设置标题（保险：防止任何子进程改写过标题）
+        lines.append(f"$Host.UI.RawUI.WindowTitle = {q(title)}")
         return "\n".join(lines) + "\n"
 
 
