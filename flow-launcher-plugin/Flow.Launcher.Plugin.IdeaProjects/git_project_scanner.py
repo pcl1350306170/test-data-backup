@@ -33,8 +33,8 @@ class GitProjectScanner:
                     continue
 
                 path = entry.path
-                # 检查是否为 Git 项目（含 .git 目录）
-                if os.path.isdir(os.path.join(path, ".git")):
+                # 检查是否为项目（含 .git 目录的 Git 仓库，或含 .idea 目录的 IDEA 工作区）
+                if os.path.isdir(os.path.join(path, ".git")) or os.path.isdir(os.path.join(path, ".idea")):
                     items.append(ProjectItem(
                         name=name,
                         path=path,
