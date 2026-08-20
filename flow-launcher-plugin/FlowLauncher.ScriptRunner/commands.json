@@ -97,9 +97,13 @@
             "description": "创建svn目录并检出"
         },
         {
-            "name": "部署Baseio-Web工具",
+            "name": "部署Base-io-Web工具",
             "keywords": [
-                "web"
+                "web",
+                "我的",
+                "升级",
+                "io",
+                "java"
             ],
             "script": "yarward\\base_web_uploader.pyw",
             "description": "部署我的web工具"

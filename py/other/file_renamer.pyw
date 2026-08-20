@@ -187,6 +187,9 @@ class FileRenamerGUI:
         self.preview_btn = Button(btn_frame, text="刷新预览", command=self.update_preview,
                                   bg="#2196F3", fg="white", height=2)
         self.preview_btn.pack(side=LEFT, fill=X, expand=True, padx=(0,5))
+        self.copy_names_btn = Button(btn_frame, text="复制文件名", command=self.copy_file_names,
+                                     bg="#FF9800", fg="white", height=2)
+        self.copy_names_btn.pack(side=LEFT, fill=X, expand=True)
 
         # === 6. 日志区域 ===
         log_frame = LabelFrame(main_frame, text="操作日志", padx=5, pady=5)
@@ -338,6 +341,16 @@ class FileRenamerGUI:
             self.file_listbox.insert(END, disp)
         if len(files) > 20:
             self.file_listbox.insert(END, f"... 共 {len(files)} 个文件")
+
+    def copy_file_names(self):
+        files = self.get_all_files()
+        if not files:
+            messagebox.showwarning("警告", "没有可复制的文件名！")
+            return
+        text = "\n".join(os.path.basename(f) for f in files)
+        self.root.clipboard_clear()
+        self.root.clipboard_append(text)
+        self.log(f"📋 已复制 {len(files)} 个文件名到剪贴板")
 
     def log(self, msg):
         self.log_text.config(state=NORMAL)

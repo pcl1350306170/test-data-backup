@@ -1,10 +1,21 @@
 {
   "svn_base_dir": "D:\\CODE\\Yarward\\SVN\\0门诊",
   "git_base_dir": "D:\\CODE\\Yarward\\门诊",
-  "keyword": "睢宁",
-  "auto_commit_svn": true,
+  "keyword": "宁波",
+  "auto_commit_svn": false,
   "is_version_155_plus": true,
   "history_records": [
+    {
+      "timestamp": "2026-08-20 15:22:50",
+      "project_dir": "D:\\CODE\\Yarward\\门诊\\template1.5.6",
+      "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-1534宁波市奉化区人民医院\\前端",
+      "order_info": "2026-1534宁波市奉化区人民医院",
+      "project_version": "1.5.6",
+      "base_zip_path": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-1534宁波市奉化区人民医院\\前端\\YM-801S-TLSS-V1.5.6.261534.01001-NBSFHQRMYY-FE.zip",
+      "custom_zip_name": "",
+      "auto_commit_svn": false,
+      "is_version_155_plus": true
+    },
     {
       "timestamp": "2026-08-17 12:53:01",
       "project_dir": "D:\\CODE\\Yarward\\门诊\\template1.5.6",
