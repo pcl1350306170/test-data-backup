@@ -1,0 +1,16 @@
+{
+    "geeker_dir": "D:\\CODE\\Java\\Geeker-Admin-Java",
+    "blog_dir": "D:\\CODE\\Java\\my-blog-api",
+    "build_geeker": true,
+    "build_blog": true,
+    "frontend_projects": {
+        "geeker_admin": {
+            "local_dir": "D:\\CODE\\FontEnd\\Geeker-Admin\\dist",
+            "remote_dir": "/home/projects/frontend/GeekerAdmin"
+        },
+        "blog_site": {
+            "local_dir": "D:\\CODE\\FontEnd\\pcl1350306170.github.io",
+            "remote_dir": "/home/projects/frontend/pcl1350306170.github.io"
+        }
+    }
+}

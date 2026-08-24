@@ -109,6 +109,20 @@
             "description": "部署我的web工具"
         },
         {
+            "name": "WSL部署我的geeker和API前端",
+            "keywords": [
+                "web",
+                "geeker",
+                "wsl",
+                "我的",
+                "升级",
+                "io",
+                "java"
+            ],
+            "script": "yarward\\wsl_update_deployer.py",
+            "description": "WSL部署我的geeker和API"
+        },
+        {
             "name": "图片裁剪（生成新文件）",
             "keywords": [
                 "tp1"

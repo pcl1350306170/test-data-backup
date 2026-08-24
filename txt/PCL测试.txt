@@ -44,18 +44,6 @@ shutdown -s -t 900
 
 1-12
 
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-已处理-k9qaw2.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-3r23fh.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-b1w4ug.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-fvc34j.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-hkw888.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-jiu2bv.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-le8tr2.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-me7g3x.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-nboztq.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-pb5y6s.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-pglvav.png
-https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/AI蒂法/横屏-蒂法高清-yw9z7s.png
 
 头像头像头像头像头像头像头像头像头像头像：
 https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/T/yh-1.png
@@ -394,6 +382,7 @@ adb logcat
 
 床头卡
 isStandbyTimeBedHead
+
 
 
 -javaagent:C:\data\idea\FineAgent.jar
