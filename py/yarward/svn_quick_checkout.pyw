@@ -235,7 +235,7 @@ def _svn_list_dirs(url, username, password):
     if code != 0:
         logger.warning(f"svn list 失败: {stderr or stdout}")
         return []
-    dirs = [line.rstrip('/') for line in stdout.strip().splitlines() if line.strip()]
+    dirs = [line.rstrip('/') for line in (stdout or '').strip().splitlines() if line.strip()]
     return dirs
 
 

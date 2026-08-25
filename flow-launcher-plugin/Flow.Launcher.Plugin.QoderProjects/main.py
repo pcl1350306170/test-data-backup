@@ -169,12 +169,11 @@ class QoderProjects(FlowLauncher):
     # ── 打开项目 ──────────────────────────────────────────
 
     def open_project(self, project_path):
-        """调用 Qoder CLI 打开项目"""
+        """调用 Qoder 打开项目"""
         cli = self.settings.qoder_cli
         try:
-            # Windows 下 .cmd 文件需通过 cmd /c 调用
             subprocess.Popen(
-                ["cmd", "/c", cli, project_path],
+                [cli, project_path],
                 creationflags=subprocess.CREATE_NO_WINDOW,
             )
         except FileNotFoundError:

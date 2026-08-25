@@ -12,8 +12,8 @@ _DEFAULTS = {
     "qoder_projects_rel": r"Qoder\SharedClientCache\qoderProjects.json",
     # state.vscdb 路径（相对于 %APPDATA%）
     "state_db_rel": r"QoderCN\User\globalStorage\state.vscdb",
-    # Qoder CLI 命令
-    "qoder_cli": "qoder-cn",
+    # Qoder CLI 命令（支持 %LOCALAPPDATA% 等环境变量）
+    "qoder_cli": r"%LOCALAPPDATA%\Programs\Qoder CN IDE\Qoder CN IDE.exe",
     # 最大显示数量
     "max_results": 30,
     # 缓存刷新间隔（分钟）
@@ -57,7 +57,8 @@ class Settings:
 
     @property
     def qoder_cli(self) -> str:
-        return self._data.get("qoder_cli", _DEFAULTS["qoder_cli"])
+        raw = self._data.get("qoder_cli", _DEFAULTS["qoder_cli"])
+        return os.path.expandvars(raw)
 
     @property
     def max_results(self) -> int:
