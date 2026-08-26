@@ -693,26 +693,82 @@ class MenzOrderPackagerGUI:
             self.root.after(0, self._update_button_states)
 
     def _check_node_version(self, log):
-        """检查当前Node版本"""
+        """检查当前Node版本，必须为 14.19.1，不匹配则尝试 nvm 强制切换"""
+        REQUIRED_NODE_VERSION = "14.19.1"
         try:
             result = subprocess.check_output(
                 ["node", "-v"], text=True, encoding='utf-8',
                 creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
             )
-            current_version = result.strip()
-            log(f"当前Node版本: {current_version}")
-            version_match = re.search(r'v(\d+)', current_version)
-            if version_match:
-                major_version = int(version_match.group(1))
-                if major_version < 14:
-                    self.root.after(0, lambda: messagebox.showwarning(
-                        "Node版本过低",
-                        f"当前Node版本为 {current_version}，建议使用 v14 或更高版本"
-                    ))
-            return True
+            current_version = result.strip().lstrip('v')
+            log(f"当前Node版本: v{current_version}")
+
+            if current_version == REQUIRED_NODE_VERSION:
+                log(f"✅ Node版本匹配: v{REQUIRED_NODE_VERSION}")
+                return True
+
+            log(f"⚠️ Node版本不匹配，需要 v{REQUIRED_NODE_VERSION}，当前为 v{current_version}")
+            log(f"🔄 尝试通过 nvm 切换到 v{REQUIRED_NODE_VERSION}...")
+
+            # 尝试 nvm use 强制切换（需管理员权限）
+            switched = self._try_nvm_switch(REQUIRED_NODE_VERSION, log)
+            if switched:
+                # 切换后再次验证
+                result2 = subprocess.check_output(
+                    ["node", "-v"], text=True, encoding='utf-8',
+                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+                )
+                new_version = result2.strip().lstrip('v')
+                if new_version == REQUIRED_NODE_VERSION:
+                    log(f"✅ Node版本已切换至 v{REQUIRED_NODE_VERSION}")
+                    return True
+                else:
+                    log(f"⚠️ nvm 切换后版本为 v{new_version}，仍未匹配")
+
+            # 切换失败，弹窗提示
+            self.root.after(0, lambda: messagebox.showerror(
+                "Node版本不匹配",
+                f"打包需要 Node v{REQUIRED_NODE_VERSION}，当前为 v{current_version}。\n\n"
+                f"自动切换失败，请手动执行以下命令：\n\n"
+                f"  nvm install {REQUIRED_NODE_VERSION}\n"
+                f"  nvm use {REQUIRED_NODE_VERSION}\n\n"
+                f"（nvm use 需要以管理员身份运行）"
+            ))
+            return False
+
+        except FileNotFoundError:
+            log("❌ 未找到 node 命令")
+            self.root.after(0, lambda: messagebox.showerror(
+                "Node未安装", "未找到 node 命令，请先安装 Node.js"))
+            return False
         except Exception as e:
             log(f"⚠️ 检查Node版本失败: {e}")
             return True
+
+    def _try_nvm_switch(self, version, log):
+        """尝试通过 nvm use 切换Node版本（Windows需提权）"""
+        import ctypes
+        try:
+            # nvm-windows 的 use 命令需要管理员权限来修改系统符号链接
+            # 使用 ShellExecuteW + runas 触发 UAC 弹窗提权
+            ret = ctypes.windll.shell32.ShellExecuteW(
+                None, "runas",
+                "cmd.exe",
+                f"/c nvm use {version}",
+                None,  # 工作目录
+                0  # SW_HIDE，隐藏窗口
+            )
+            # ShellExecuteW 返回值 > 32 表示成功
+            if ret > 32:
+                log("ℹ️ 已请求管理员权限执行 nvm use，等待切换完成...")
+                time.sleep(3)  # 等待切换完成
+                return True
+            else:
+                log(f"⚠️ 提权请求被拒绝或失败（返回值: {ret}）")
+                return False
+        except Exception as e:
+            log(f"⚠️ nvm 切换失败: {e}")
+            return False
 
     def _clean_dist_dirs(self, project_dir, log):
         """清理 dist 和 lib-render-dist 目录"""
