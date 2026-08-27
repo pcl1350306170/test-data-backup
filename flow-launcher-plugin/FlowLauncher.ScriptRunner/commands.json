@@ -259,6 +259,17 @@
             "script": "image\\image_enhancer.pyw",
             "description": "AI放大增强[Real-ESRGAN+GFPGAN]"
         },
+        {
+            "name": "AI图片放大GPU",
+            "keywords": [
+                "tp23",
+                "tupian",
+                "tupm",
+                "aitupmfhdazgqd"
+            ],
+            "script": "image\\image_enhancer_vulkan.pyw",
+            "description": "AI放大增强[Real-ESRGAN]"
+        },
      
         {
             "name": "PDF转图片",
