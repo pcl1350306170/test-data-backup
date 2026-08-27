@@ -89,7 +89,8 @@ def upscale_with_vulkan(input_path, temp_png, tool_dir, factor):
         # 原生倍数，直接出图
         cmd = [exe, '-i', input_path, '-o', temp_png,
                '-n', 'realesrgan-x4plus', '-s', '4', '-f', 'png']
-        proc = subprocess.run(cmd, cwd=tool_dir, capture_output=True)
+        proc = subprocess.run(cmd, cwd=tool_dir, capture_output=True,
+                               creationflags=subprocess.CREATE_NO_WINDOW)
         if not os.path.isfile(temp_png) or os.path.getsize(temp_png) == 0:
             err = (proc.stderr or b'').decode('utf-8', 'ignore').strip()
             raise RuntimeError(f"Vulkan 放大失败: {err[:300] or '未知错误'}")
@@ -104,7 +105,8 @@ def upscale_with_vulkan(input_path, temp_png, tool_dir, factor):
             pass
     cmd = [exe, '-i', input_path, '-o', tmp4,
            '-n', 'realesrgan-x4plus', '-s', '4', '-f', 'png']
-    proc = subprocess.run(cmd, cwd=tool_dir, capture_output=True)
+    proc = subprocess.run(cmd, cwd=tool_dir, capture_output=True,
+                           creationflags=subprocess.CREATE_NO_WINDOW)
     if not os.path.isfile(tmp4) or os.path.getsize(tmp4) == 0:
         err = (proc.stderr or b'').decode('utf-8', 'ignore').strip()
         raise RuntimeError(f"Vulkan 放大失败: {err[:300] or '未知错误'}")
