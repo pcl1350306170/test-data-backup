@@ -37,10 +37,10 @@
 
         // 操作类型对应的字段配置
         const fieldConfig = {
-            insertUser:     { label: '添加的账号名',     name: 'username_emp',     placeholder: '如 gz',          defaultVal: 'gz' },
-            deleteip:       { label: '需要删除设备的IP', name: 'deleteip',         placeholder: '如 192.168.3.199', defaultVal: '' },
-            addlabelclass:  { label: '添加分类数量',     name: 'addlabelclassnum', placeholder: '如 5',           defaultVal: '5' },
-            addlabel:       { label: '添加护理标签数量', name: 'addlabelnum',      placeholder: '如 15',          defaultVal: '15' }
+            insertUser: { label: '添加的账号名', name: 'username_emp', placeholder: '如 gz', defaultVal: 'gz' },
+            deleteip: { label: '需要删除设备的IP', name: 'deleteip', placeholder: '如 192.168.3.199', defaultVal: '' },
+            addlabelclass: { label: '添加分类数量', name: 'addlabelclassnum', placeholder: '如 5', defaultVal: '5' },
+            addlabel: { label: '添加护理标签数量', name: 'addlabelnum', placeholder: '如 15', defaultVal: '15' }
         };
         const field = fieldConfig[sqlType];
 
@@ -258,6 +258,687 @@
     }
 
     // ==============================
+    // 调用当前页面服务的接口（通用）
+    // ==============================
+    async function callPageApi(path, data) {
+        const apiUrl = url.origin + path;
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const res = await response.json();
+        if (res.status === 200) {
+            return res;
+        } else {
+            throw new Error(res.desc || `请求失败(status:${res.status})`);
+        }
+    }
+
+    // ==============================
+    // 调用当前页面服务的接口 - GET（通用）
+    // ==============================
+    async function callPageApiGet(path, params = {}) {
+        const query = new URLSearchParams(params).toString();
+        const apiUrl = url.origin + path + (query ? '?' + query : '');
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const res = await response.json();
+        if (res.status === 200) {
+            return res;
+        } else {
+            throw new Error(res.desc || `请求失败(status:${res.status})`);
+        }
+    }
+
+    // ==============================
+    // 宣教分类添加弹窗
+    // ==============================
+    function showArticleCategoryDialog() {
+        const existing = document.getElementById('ward-dialog-overlay');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'ward-dialog-overlay';
+        const dialog = document.createElement('div');
+        dialog.className = 'ward-dialog';
+
+        dialog.innerHTML = `
+            <div class="ward-dialog-header">
+                <span>📋 宣教分类添加</span>
+                <span class="ward-dialog-close">&times;</span>
+            </div>
+            <div class="ward-dialog-body">
+                <div class="ward-form-group">
+                    <label>宣教类型</label>
+                    <select name="articleType">
+                        <option value="ward">病区宣教</option>
+                        <option value="hospital">全院宣教</option>
+                    </select>
+                </div>
+                <div class="ward-form-group">
+                    <label>生成数量</label>
+                    <input type="number" name="count" value="10" min="1" max="50">
+                </div>
+                <div class="ward-form-group">
+                    <label>将生成的分类预览</label>
+                    <div class="ward-preview-list" style="max-height:200px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;padding:8px;font-size:13px;min-height:40px"></div>
+                </div>
+                <button class="ward-submit-btn" type="button">💾 保存</button>
+                <div class="ward-result" style="display:none"></div>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        dialog.addEventListener('click', (e) => e.stopPropagation());
+        overlay.addEventListener('click', () => overlay.remove());
+        dialog.querySelector('.ward-dialog-close').addEventListener('click', () => overlay.remove());
+
+        // 随机分类名素材
+        const prefixes = ['高血压', '糖尿病', '冠心病', '肺炎', '胃炎', '支气管炎',
+            '贫血', '甲亢', '痛风', '骨质疏松', '脑梗', '哮喘', '脂肪肝', '肾病'];
+        const suffixes = ['健康宣教', '护理指导', '饮食指导', '用药指导', '康复指导',
+            '注意事项', '日常护理', '预防保健', '宣教内容', '健康教育'];
+
+        function generateCategoryNames(count) {
+            const names = [];
+            for (let i = 0; i < count; i++) {
+                const p = prefixes[Math.floor(Math.random() * prefixes.length)];
+                const s = suffixes[Math.floor(Math.random() * suffixes.length)];
+                names.push(p + s);
+            }
+            return names;
+        }
+
+        function updatePreview() {
+            const count = parseInt(dialog.querySelector('input[name="count"]').value) || 10;
+            const names = generateCategoryNames(count);
+            dialog.dataset.names = JSON.stringify(names);
+            const listEl = dialog.querySelector('.ward-preview-list');
+            listEl.innerHTML = names.map((n, i) =>
+                `<div style="padding:2px 0;border-bottom:1px solid #f0f0f0">${i + 1}. ${n}</div>`
+            ).join('');
+        }
+
+        updatePreview();
+
+        dialog.querySelector('input[name="count"]').addEventListener('change', updatePreview);
+        dialog.querySelector('select[name="articleType"]').addEventListener('change', updatePreview);
+
+        // 保存
+        dialog.querySelector('.ward-submit-btn').addEventListener('click', async () => {
+            const articleType = dialog.querySelector('select[name="articleType"]').value;
+            let nurseUnitId = '0';
+
+            if (articleType === 'ward') {
+                try {
+                    const selectDeptInfo = window.localStorage.getItem('selectDeptInfo');
+                    if (!selectDeptInfo) {
+                        showToast('❌ 未找到 selectDeptInfo，请确认当前页面已选择病区', 'error');
+                        return;
+                    }
+                    const deptInfo = JSON.parse(selectDeptInfo);
+                    nurseUnitId = deptInfo.deptId || '';
+                    if (!nurseUnitId) {
+                        showToast('❌ selectDeptInfo 中未找到 deptId', 'error');
+                        return;
+                    }
+                } catch (e) {
+                    showToast('❌ 解析 selectDeptInfo 失败: ' + e.message, 'error');
+                    return;
+                }
+            }
+
+            const names = JSON.parse(dialog.dataset.names || '[]');
+            if (names.length === 0) {
+                showToast('❌ 没有可保存的分类', 'error');
+                return;
+            }
+
+            const btn = dialog.querySelector('.ward-submit-btn');
+            const resultDiv = dialog.querySelector('.ward-result');
+            btn.disabled = true;
+            btn.textContent = '⏳ 保存中...';
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '';
+            resultDiv.className = 'ward-result ward-result-info';
+
+            let successCount = 0;
+            for (let i = 0; i < names.length; i++) {
+                try {
+                    const res = await callPageApi('/hpms/web-hp/articleCategory', {
+                        id: '',
+                        categoryName: names[i],
+                        nurseUnitId: nurseUnitId,
+                        title: '添加'
+                    });
+                    const item = document.createElement('div');
+                    item.className = 'ward-result-item ward-result-success';
+                    item.textContent = `✅ ${i + 1}. ${names[i]} - ${res.desc || '操作成功'}`;
+                    resultDiv.appendChild(item);
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                    successCount++;
+                } catch (e) {
+                    const item = document.createElement('div');
+                    item.className = 'ward-result-item ward-result-error';
+                    item.textContent = `❌ ${i + 1}. ${names[i]} - ${e.message}`;
+                    resultDiv.appendChild(item);
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                }
+                if (i < names.length - 1) await new Promise(r => setTimeout(r, 200));
+            }
+
+            const summary = document.createElement('div');
+            summary.style.marginTop = '8px';
+            summary.style.fontWeight = 'bold';
+            summary.textContent = `完成！成功: ${successCount}, 失败: ${names.length - successCount}`;
+            resultDiv.appendChild(summary);
+
+            btn.disabled = false;
+            btn.textContent = '💾 保存';
+            showToast(`✅ 宣教分类保存完成: 成功${successCount}, 失败${names.length - successCount}`);
+        });
+    }
+
+    // ==============================
+    // 宣教添加弹窗
+    // ==============================
+    function showArticleDialog() {
+        const existing = document.getElementById('ward-dialog-overlay');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'ward-dialog-overlay';
+        const dialog = document.createElement('div');
+        dialog.className = 'ward-dialog ward-device-dialog';
+
+        dialog.innerHTML = `
+            <div class="ward-dialog-header">
+                <span>📝 宣教添加</span>
+                <span class="ward-dialog-close">&times;</span>
+            </div>
+            <div class="ward-dialog-body">
+                <div class="ward-form-group">
+                    <label>宣教类型</label>
+                    <select name="articleType">
+                        <option value="ward">病区宣教</option>
+                        <option value="hospital">全院宣教</option>
+                    </select>
+                </div>
+                <div class="ward-form-group">
+                    <label>宣教分类（加载后勾选）</label>
+                    <div class="ward-category-list" style="max-height:200px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;padding:8px;font-size:13px;min-height:40px">
+                        <span style="color:#999">请先选择宣教类型</span>
+                    </div>
+                    <div style="margin-top:4px">
+                        <button type="button" class="ward-select-all-btn" style="padding:2px 8px;font-size:12px;cursor:pointer">全选</button>
+                        <button type="button" class="ward-deselect-all-btn" style="padding:2px 8px;font-size:12px;cursor:pointer">取消全选</button>
+                    </div>
+                </div>
+                <div class="ward-form-group">
+                    <label>每个分类添加几条</label>
+                    <input type="number" name="countPerCategory" value="10" min="1" max="50">
+                </div>
+                <button class="ward-submit-btn" type="button">💾 保存</button>
+                <div class="ward-result" style="display:none"></div>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        dialog.addEventListener('click', (e) => e.stopPropagation());
+        overlay.addEventListener('click', () => overlay.remove());
+        dialog.querySelector('.ward-dialog-close').addEventListener('click', () => overlay.remove());
+
+        // 随机宣教标题素材
+        const titlePrefixes = ['高血压', '糖尿病', '冠心病', '肺炎', '胃炎', '支气管炎',
+            '贫血', '甲亢', '痛风', '骨质疏松', '脑梗', '哮喘', '脂肪肝', '肾病',
+            '感冒', '腹泻', '失眠', '便秘', '头痛', '腰痛'];
+        const titleSuffixes = ['日常注意事项', '饮食调理', '用药指南', '康复训练',
+            '预防措施', '护理要点', '健康宣教', '知识科普', '保健常识', '就诊须知'];
+
+        function generateTitle(categoryName) {
+            const p = titlePrefixes[Math.floor(Math.random() * titlePrefixes.length)];
+            const s = titleSuffixes[Math.floor(Math.random() * titleSuffixes.length)];
+            return categoryName + '-' + p + s + '_' + Math.random().toString(36).substring(2, 6);
+        }
+
+        // 固定内容模板
+        const fixedContentText = '<p><p><img src="https://cdn.jsdelivr.net/gh/pcl1350306170/Miscellaneous@refs/heads/main/蒂法高清/横屏-蒂法高清-wl36oq.png"></p></p><p><strong style="font-size: 20px;">混沌初开，乾坤始奠。</strong></p><p><strong style="font-size: 20px;">气之轻清上浮者为天，气之重浊下凝者为地。</strong></p><p><strong style="font-size: 20px;">日月五星，谓之七政；天地与人，谓之三才。</strong></p><p><strong style="font-size: 20px;">日为众阳之宗，月乃太阴之象。</strong></p><p><strong style="font-size: 20px;">虹名螮蝀，乃天地之淫气；月里蟾蜍是月魄之精光。</strong></p><p><strong style="font-size: 20px;">风欲起而石燕飞，天将雨而商羊舞。</strong></p><p><strong style="font-size: 20px;">旋风名为羊角，闪电号曰雷鞭。</strong></p><p><strong style="font-size: 20px;">青女乃霜之神，素娥即月之号。</strong></p><p><strong style="font-size: 20px;">雷部至捷之鬼曰律令，雷部推车之女曰阿香。</strong></p><p><strong style="font-size: 20px;">云师系是丰隆，雪神乃是滕六。</strong></p><p><strong style="font-size: 20px;">歘火、谢仙，俱掌雷火；飞廉、箕伯，悉是风神。</strong></p><p><strong style="font-size: 20px;">列缺乃电之神，望舒是月之御。</strong></p><p><strong style="font-size: 20px;">甘霖、甘澍，仅指时雨；玄穹、彼苍，悉称上天。</strong></p><p><strong style="font-size: 20px;">雪花飞六出，先兆丰年；日上已三竿，乃云时晏。</strong></p><p><strong style="font-size: 20px;">蜀犬吠日，比人所见甚稀；吴牛喘月，笑人畏惧过甚。</strong></p>';
+        const fixedUrl = 'https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/T/头像-头像-4jqazq.jpg';
+
+        // 加载分类
+        async function loadCategories() {
+            const articleType = dialog.querySelector('select[name="articleType"]').value;
+            let nurseUnitId = '0';
+
+            if (articleType === 'ward') {
+                try {
+                    const selectDeptInfo = window.localStorage.getItem('selectDeptInfo');
+                    if (!selectDeptInfo) {
+                        dialog.querySelector('.ward-category-list').innerHTML =
+                            '<span style="color:red">❌ 未找到 selectDeptInfo，请确认当前页面已选择病区</span>';
+                        return;
+                    }
+                    const deptInfo = JSON.parse(selectDeptInfo);
+                    nurseUnitId = deptInfo.deptId || '0';
+                } catch (e) {
+                    dialog.querySelector('.ward-category-list').innerHTML =
+                        '<span style="color:red">❌ 解析 selectDeptInfo 失败: ' + e.message + '</span>';
+                    return;
+                }
+            }
+
+            const listEl = dialog.querySelector('.ward-category-list');
+            listEl.innerHTML = '<span style="color:#999">⏳ 正在加载分类...</span>';
+
+            try {
+                const res = await callPageApiGet('/hpms/web-hp/articleCategory', {
+                    IsPage: '0',
+                    nurseUnitId: nurseUnitId
+                });
+                const categories = res.data || [];
+                if (categories.length === 0) {
+                    listEl.innerHTML = '<span style="color:#999">暂无分类，请先添加宣教分类</span>';
+                    return;
+                }
+                listEl.innerHTML = categories.map(cat =>
+                    `<label style="display:block;padding:3px 0;cursor:pointer">
+                        <input type="checkbox" name="category" value="${cat.id}" data-name="${cat.categoryName}" checked>
+                        ${cat.categoryName}
+                    </label>`
+                ).join('');
+                dialog.dataset.categories = JSON.stringify(categories);
+            } catch (e) {
+                listEl.innerHTML = '<span style="color:red">❌ 加载分类失败: ' + e.message + '</span>';
+            }
+        }
+
+        loadCategories();
+
+        // 切换类型时重新加载分类
+        dialog.querySelector('select[name="articleType"]').addEventListener('change', loadCategories);
+
+        // 全选/取消全选
+        dialog.querySelector('.ward-select-all-btn').addEventListener('click', () => {
+            dialog.querySelectorAll('input[name="category"]').forEach(cb => cb.checked = true);
+        });
+        dialog.querySelector('.ward-deselect-all-btn').addEventListener('click', () => {
+            dialog.querySelectorAll('input[name="category"]').forEach(cb => cb.checked = false);
+        });
+
+        // 保存
+        dialog.querySelector('.ward-submit-btn').addEventListener('click', async () => {
+            const articleType = dialog.querySelector('select[name="articleType"]').value;
+            let nurseUnitId = articleType === 'hospital' ? 0 : '';
+
+            if (articleType === 'ward') {
+                try {
+                    const selectDeptInfo = window.localStorage.getItem('selectDeptInfo');
+                    if (!selectDeptInfo) {
+                        showToast('❌ 未找到 selectDeptInfo，请确认当前页面已选择病区', 'error');
+                        return;
+                    }
+                    const deptInfo = JSON.parse(selectDeptInfo);
+                    nurseUnitId = deptInfo.deptId || '';
+                    if (!nurseUnitId) {
+                        showToast('❌ selectDeptInfo 中未找到 deptId', 'error');
+                        return;
+                    }
+                } catch (e) {
+                    showToast('❌ 解析 selectDeptInfo 失败: ' + e.message, 'error');
+                    return;
+                }
+            }
+
+            const checkedBoxes = Array.from(dialog.querySelectorAll('input[name="category"]:checked'));
+            if (checkedBoxes.length === 0) {
+                showToast('❌ 请至少勾选一个分类', 'error');
+                return;
+            }
+
+            const countPerCategory = parseInt(dialog.querySelector('input[name="countPerCategory"]').value) || 10;
+
+            const btn = dialog.querySelector('.ward-submit-btn');
+            const resultDiv = dialog.querySelector('.ward-result');
+            btn.disabled = true;
+            btn.textContent = '⏳ 保存中...';
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '';
+            resultDiv.className = 'ward-result ward-result-info';
+
+            let totalCount = 0;
+            let successCount = 0;
+
+            for (const cb of checkedBoxes) {
+                const categoryId = cb.value;
+                const categoryName = cb.dataset.name;
+
+                const catHeader = document.createElement('div');
+                catHeader.style.fontWeight = 'bold';
+                catHeader.style.marginTop = '6px';
+                catHeader.textContent = `📂 ${categoryName}`;
+                resultDiv.appendChild(catHeader);
+
+                for (let i = 0; i < countPerCategory; i++) {
+                    totalCount++;
+                    try {
+                        const res = await callPageApi('/hpms/web-hp/edArticle', {
+                            title: generateTitle(categoryName),
+                            nurseUnitId: nurseUnitId,
+                            isShowDoor: 1,
+                            createTime: '',
+                            articleType: 0,
+                            categoryId: categoryId,
+                            tags: [],
+                            contentText: fixedContentText,
+                            id: '',
+                            contentFile: '',
+                            url: fixedUrl,
+                            uploadFile: '',
+                            isWard: 0,
+                            eduVideoType: '',
+                            formStyle: '',
+                            fieldStructure: '',
+                            summary: '',
+                            isEnable: 1,
+                            isAskToRead: 0,
+                            isPushOnceIn: ''
+                        });
+                        const item = document.createElement('div');
+                        item.className = 'ward-result-item ward-result-success';
+                        item.textContent = `✅ ${i + 1}. ${res.desc || '操作成功'}`;
+                        resultDiv.appendChild(item);
+                        resultDiv.scrollTop = resultDiv.scrollHeight;
+                        successCount++;
+                    } catch (e) {
+                        const item = document.createElement('div');
+                        item.className = 'ward-result-item ward-result-error';
+                        item.textContent = `❌ ${i + 1}. ${e.message}`;
+                        resultDiv.appendChild(item);
+                        resultDiv.scrollTop = resultDiv.scrollHeight;
+                    }
+                    if (i < countPerCategory - 1) await new Promise(r => setTimeout(r, 200));
+                }
+                await new Promise(r => setTimeout(r, 200));
+            }
+
+            const summary = document.createElement('div');
+            summary.style.marginTop = '8px';
+            summary.style.fontWeight = 'bold';
+            summary.textContent = `完成！共 ${totalCount} 条，成功: ${successCount}, 失败: ${totalCount - successCount}`;
+            resultDiv.appendChild(summary);
+
+            btn.disabled = false;
+            btn.textContent = '💾 保存';
+            showToast(`✅ 宣教添加完成: 共${totalCount}条, 成功${successCount}, 失败${totalCount - successCount}`);
+        });
+    }
+
+    // ==============================
+    // 床头床旁运行 Mock 数据弹窗
+    // ==============================
+    function showMockDataDialog(apiBaseUrl) {
+        const existing = document.getElementById('ward-dialog-overlay');
+        if (existing) existing.remove();
+
+        // 从 localStorage 获取默认 deptId
+        let defaultDeptId = '';
+        try {
+            const selectDeptInfo = window.localStorage.getItem('selectDeptInfo');
+            if (selectDeptInfo) {
+                const deptInfo = JSON.parse(selectDeptInfo);
+                defaultDeptId = deptInfo.deptId || '';
+            }
+        } catch (e) { console.warn('[Ward] 解析 selectDeptInfo 失败:', e); }
+
+        const overlay = document.createElement('div');
+        overlay.id = 'ward-dialog-overlay';
+        const dialog = document.createElement('div');
+        dialog.className = 'ward-dialog ward-device-dialog';
+
+        dialog.innerHTML = `
+            <div class="ward-dialog-header">
+                <span>🖥️ 床头床旁运行 Mock 数据</span>
+                <span class="ward-dialog-close">&times;</span>
+            </div>
+            <div class="ward-dialog-body">
+                <div class="ward-form-row">
+                    <div class="ward-form-group">
+                        <label>科室ID (deptId)</label>
+                        <input type="text" name="deptId" value="${defaultDeptId}" placeholder="从 localStorage 自动获取">
+                    </div>
+                    <div class="ward-form-group">
+                        <label>设备类型</label>
+                        <select name="deviceType">
+                            <option value="wnBedHeadExtension">床头分机</option>
+                            <option value="wnBedSideExtension">床旁分机</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="ward-query-btn" style="margin-bottom:10px">🔍 查询数据</button>
+                <div class="ward-mock-match" style="max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;padding:8px;font-size:13px;min-height:40px">
+                    <span style="color:#999">请先查询数据</span>
+                </div>
+                <div class="ward-mock-actions" style="margin-top:8px;display:none">
+                    <button type="button" class="ward-generate-all-btn" style="margin-right:8px">🚀 全部生成</button>
+                </div>
+                <div class="ward-result" style="display:none;margin-top:8px"></div>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        dialog.addEventListener('click', (e) => e.stopPropagation());
+        overlay.addEventListener('click', () => overlay.remove());
+        dialog.querySelector('.ward-dialog-close').addEventListener('click', () => overlay.remove());
+
+        // 存储匹配数据
+        let matchedItems = [];
+        let DataPatient = null;
+        let DataDevice = null;
+
+        // 查询
+        dialog.querySelector('.ward-query-btn').addEventListener('click', async () => {
+            const deptId = dialog.querySelector('input[name="deptId"]').value.trim();
+            if (!deptId) { showToast('❌ 请输入科室ID', 'error'); return; }
+            const deviceType = dialog.querySelector('select[name="deviceType"]').value;
+
+            const matchEl = dialog.querySelector('.ward-mock-match');
+            matchEl.innerHTML = '<span style="color:#999">⏳ 正在查询...</span>';
+            dialog.querySelector('.ward-mock-actions').style.display = 'none';
+
+            try {
+                // 并行查询设备列表和患者列表
+                const [deviceRes, patientRes] = await Promise.all([
+                    callPageApiGet('/tdms/web-td/device/list', {
+                        deptId: deptId,
+                        deviceType: deviceType,
+                        contain: '1',
+                        size: '100',
+                        page: '1'
+                    }),
+                    callPageApi('/bnms/web-bn/patient-list/list', { deptId: deptId })
+                ]);
+
+                DataDevice = deviceRes.data.list || [];
+                DataPatient = (patientRes.data && patientRes.data.patientSelectDtos) || [];
+
+                if (DataDevice.length === 0) {
+                    matchEl.innerHTML = '<span style="color:#e6a23c">⚠️ 未找到该科室下的设备</span>';
+                    return;
+                }
+                if (DataPatient.length === 0) {
+                    matchEl.innerHTML = '<span style="color:#e6a23c">⚠️ 未找到该科室下的患者</span>';
+                    return;
+                }
+
+                // 按 bedName 匹配设备和患者
+                matchedItems = [];
+                for (const device of DataDevice) {
+                    const patient = DataPatient.find(p => p.patientIn.bedName === device.bedName);
+                    if (patient) {
+                        matchedItems.push({
+                            bedName: device.bedName,
+                            patientName: patient.patientIn.patientName,
+                            generated: false
+                        });
+                    }
+                }
+
+                if (matchedItems.length === 0) {
+                    matchEl.innerHTML = '<span style="color:#e6a23c">⚠️ 设备和患者无匹配的床位（按 bedName 匹配）</span>';
+                    return;
+                }
+
+                // 渲染匹配列表
+                matchEl.innerHTML = matchedItems.map((item, idx) =>
+                    `<div class="ward-mock-item" data-idx="${idx}" style="display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid #f0f0f0">
+                        <span>🛏️ 床位: ${item.bedName} | 👤 ${item.patientName}</span>
+                        <button type="button" class="ward-gen-item-btn" data-idx="${idx}" style="padding:2px 10px;font-size:12px;cursor:pointer">生成</button>
+                    </div>`
+                ).join('');
+
+                dialog.querySelector('.ward-mock-actions').style.display = 'block';
+                showToast(`✅ 查询到 ${matchedItems.length} 条匹配数据`);
+
+            } catch (e) {
+                matchEl.innerHTML = '<span style="color:red">❌ 查询失败: ' + e.message + '</span>';
+            }
+        });
+
+        // 生成单个 Mock 数据
+        async function generateOneMock(bedName, deviceType, btnEl) {
+            const patient = DataPatient.find(p => p.patientIn.bedName === bedName);
+            const device = DataDevice.find(d => d.bedName === bedName);
+
+            if (!patient || !patient.patientIn) { showToast('❌ 患者数据异常', 'error'); return; }
+            if (!device || device.deviceType !== deviceType) {
+                showToast('❌ 该床位无对应类型设备', 'error'); return;
+            }
+
+            const patientIn = patient.patientIn;
+
+            const LS_A10_deviceInfo = {
+                BED_ID: device.bedId, BED_NAME: device.bedName,
+                DEPT_ID: device.deptId, DEPT_KEY: "", DEPT_NAME: device.deptName,
+                DEVICE_APP_ID: device.deviceAppId, DEVICE_BRIGHTNESS: device.brighter,
+                DEVICE_ID: device.deviceId, DEVICE_NAME: device.deviceName,
+                DEVICE_NUM: device.deviceNum, DEVICE_VOLUME: device.volume,
+                ROOM_ID: device.roomId, ROOM_NAME: device.roomName, ROTATE: device.rotate
+            };
+            const LS_orgId = device.orgId;
+            const LS_A10_patientInfo = {
+                bedName: patientIn.bedName, birthday: patientIn.birthday,
+                doctorName: patientIn.doctorName, inTime: patientIn.inTime,
+                inpNo: patientIn.inpNo, nurseName: patientIn.nurseName,
+                patientAge: patientIn.patientAge, patientId: patientIn.patientId,
+                patientName: patientIn.patientName, personIdNo: patientIn.personIdNo,
+                sex: patientIn.sex, wristband: patientIn.wristband
+            };
+            const LS_A10_accountInfo = {
+                patientId: patientIn.patientId, deptId: patientIn.deptId, orgId: patientIn.orgId
+            };
+            const LS_patientData = {
+                orgId: patientIn.orgId, patientId: patientIn.patientId,
+                deptId: patientIn.deptId, patientName: patientIn.patientName,
+                roomId: device.roomId, roomName: device.roomName,
+                bedId: device.bedId, bedName: device.bedName,
+                deviceId: device.deviceId, deviceType: device.deviceType,
+                deptName: device.deptName, inpNo: patientIn.inpNo
+            };
+            const LS_patientInfo = { ...LS_A10_patientInfo };
+
+            const requestData = {
+                getDeviceInfosdk: JSON.stringify(LS_A10_deviceInfo),
+                getOrgIdsdk: JSON.stringify({ orgId: LS_orgId }),
+                getPatientInfosdk: JSON.stringify(LS_patientInfo)
+            };
+
+            try {
+                const apiUrl = apiBaseUrl + '/yh-mock/create-files';
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+                const blob = await response.blob();
+                const disposition = response.headers.get('content-disposition');
+                let filename = 'mock.zip';
+                if (disposition && disposition.indexOf('filename=') !== -1) {
+                    filename = decodeURIComponent(disposition.split('filename=')[1]);
+                }
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(a.href);
+
+                if (btnEl) {
+                    btnEl.textContent = '✅';
+                    btnEl.disabled = true;
+                    btnEl.style.color = '#67c23a';
+                }
+            } catch (e) {
+                showToast('❌ 生成失败: ' + e.message, 'error');
+            }
+        }
+
+        // 更新全部生成进度
+        function updateGenProgress() {
+            const done = matchedItems.filter(i => i.generated).length;
+            const total = matchedItems.length;
+            const resultDiv = dialog.querySelector('.ward-result');
+            resultDiv.textContent = `进度: ${done} / ${total}`;
+            if (done === total) {
+                showToast(`✅ 全部生成完成: ${done} 条`);
+            }
+        }
+
+        // 单项生成按钮点击
+        dialog.querySelector('.ward-mock-match').addEventListener('click', async (e) => {
+            if (!e.target.classList.contains('ward-gen-item-btn')) return;
+            const idx = parseInt(e.target.dataset.idx);
+            const item = matchedItems[idx];
+            if (item.generated) return;
+            const deviceType = dialog.querySelector('select[name="deviceType"]').value;
+            e.target.disabled = true;
+            e.target.textContent = '⏳';
+            await generateOneMock(item.bedName, deviceType, e.target);
+            item.generated = true;
+            const resultDiv = dialog.querySelector('.ward-result');
+            resultDiv.style.display = 'block';
+            updateGenProgress();
+        });
+
+        // 全部生成
+        dialog.querySelector('.ward-generate-all-btn').addEventListener('click', async () => {
+            const deviceType = dialog.querySelector('select[name="deviceType"]').value;
+            const btns = dialog.querySelectorAll('.ward-gen-item-btn');
+            const resultDiv = dialog.querySelector('.ward-result');
+            resultDiv.style.display = 'block';
+
+            for (let i = 0; i < matchedItems.length; i++) {
+                if (matchedItems[i].generated) continue;
+                btns[i].disabled = true;
+                btns[i].textContent = '⏳';
+                await generateOneMock(matchedItems[i].bedName, deviceType, btns[i]);
+                matchedItems[i].generated = true;
+                updateGenProgress();
+                if (i < matchedItems.length - 1) await new Promise(r => setTimeout(r, 300));
+            }
+        });
+    }
+
+    // ==============================
     // 批量创建设备弹窗
     // ==============================
     function showDeviceDialog(apiBaseUrl) {
@@ -287,6 +968,7 @@
             { value: 'wnMedicalMainframe', label: '🏥 医护主机' },
             { value: 'rvKinVisitExtension', label: '👋 探视分机' },
             { value: 'wnMedicalAudioAssistant', label: '📱 手持设备' },
+
             { value: 'wnDoorLampExtension', label: '💡 门灯' },
             { value: 'wnCorridorScreen', label: '📺 走廊显示屏' },
             { value: 'wnCorridorLatticeScreen', label: '📟 走廊点阵屏' },
@@ -431,7 +1113,7 @@
 
         // ===== 辅助函数 =====
         function generateUUID() {
-            return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = Math.random() * 16 | 0;
                 return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
             });
@@ -657,12 +1339,15 @@
         const apiBaseUrl = config.apiBaseUrl || 'http://192.168.18.228:28019';
 
         const menuItems = [
-            { text: '👤 添加用户', action: () => showOperationDialog('insertUser', '添加用户', apiBaseUrl) },
+           
             { text: '🗑️ 删除某IP占用的设备', action: () => showOperationDialog('deleteip', '删除某IP占用的设备', apiBaseUrl) },
             { text: '📂 添加护理标签分类', action: () => showOperationDialog('addlabelclass', '添加护理标签分类', apiBaseUrl) },
-            { text: '🏷️ 添加护理标签（每分类）', action: () => showOperationDialog('addlabel', '添加护理标签【每个分类下面都添加】', apiBaseUrl) },
-            { text: '📤 上传 localStorage', action: () => showUploadDialog(apiBaseUrl) },
-            { text: '📦 批量创建设备', action: () => showDeviceDialog(apiBaseUrl) }
+            { text: '🏷️ 添加护理标签（每分类）', action: () => showOperationDialog('addlabel', '添加护理标签【每个分类下面都添加】', apiBaseUrl) },                   
+            { text: '🖥️ Mock数据（床头床旁）', action: () => showMockDataDialog(apiBaseUrl) },
+            { text: '📦 批量创建设备', action: () => showDeviceDialog(apiBaseUrl) },
+            { text: '📋 宣教分类添加', action: () => showArticleCategoryDialog() },
+            { text: '📝 宣教添加', action: () => showArticleDialog() },
+            { text: '👤 添加用户', action: () => showOperationDialog('insertUser', '添加用户', apiBaseUrl) },
         ];
 
         const itemEls = [];

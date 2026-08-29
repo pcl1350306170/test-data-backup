@@ -13,6 +13,7 @@
   "max_results": 30,
   "cache_minutes": 5,
   "projects": {
+    "D:\\CODE\\Yarward\\病房\\床头\\床头3.1": {"node": "12.22.12"},
     "D:\\CODE\\Yarward\\门诊\\template1.5.0": {"node": "14.19.1"},
     "D:\\CODE\\Yarward\\门诊\\template1.5.2": {"node": "14.19.1"},
     "D:\\CODE\\FontEnd\\mage": {"node": "24.11.0"},
