@@ -4,6 +4,16 @@
   "auto_commit_svn": true,
   "history_records": [
     {
+      "timestamp": "2026-08-29 12:36:43",
+      "project_type": "床头",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\床头\\床头3.1",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1609北京朝阳医院-前端",
+      "package_name": "bedhead-3.1.3_北京朝阳医院_202608291236.tar.gz",
+      "keyword": "朝阳",
+      "auto_commit_svn": false,
+      "branch": "3.1.3_北京朝阳医院"
+    },
+    {
       "timestamp": "2026-07-29 10:33:02",
       "project_type": "床头",
       "project_dir": "D:\\CODE\\Yarward\\病房\\床头\\床头3.4",

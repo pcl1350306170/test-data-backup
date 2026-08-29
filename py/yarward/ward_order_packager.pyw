@@ -106,21 +106,43 @@ def save_config(data):
 # ==============================
 # Git Bash 查找
 # ==============================
+def _is_wsl_bash(bash_cmd):
+    """
+    判断 bash 是否为 WSL 的 Linux bash
+    WSL bash 会把 Windows 路径中的反斜杠当转义符吃掉，且访问不到 D:\\ 盘符
+    """
+    try:
+        result = subprocess.run(
+            [bash_cmd, "--version"],
+            capture_output=True, text=True, timeout=5,
+            encoding='utf-8', errors='replace'
+        )
+    except (FileNotFoundError, OSError, subprocess.SubprocessError):
+        return True
+
+    if result.returncode != 0:
+        return True
+
+    version_text = (result.stdout or "").lower()
+    # Git Bash 的版本信息带 mingw / msys，WSL 的是 pc-linux-gnu
+    return not ('mingw' in version_text or 'msys' in version_text)
+
+
 def find_bash_executable():
     """
     查找 bash 可执行文件路径
-    优先使用 PATH 中的 bash，否则查找常见 Git Bash 安装路径
+    优先使用 PATH 中的 bash（排除 WSL 转发器），否则查找常见 Git Bash 安装路径
     """
     # 1. 先尝试 PATH 中的 bash
-    try:
-        result = subprocess.run(
-            ["bash", "--version"],
-            capture_output=True, text=True, timeout=5
-        )
-        if result.returncode == 0:
-            return "bash"
-    except (FileNotFoundError, OSError):
-        pass
+    path_bash = shutil.which("bash")
+    if path_bash:
+        # WindowsApps 下的 bash.exe 是 WSL 转发器，不能执行 Windows 路径脚本
+        if 'windowsapps' in Path(path_bash).parent.as_posix().lower():
+            logger.warning(f"跳过 WSL bash 转发器: {path_bash}")
+        elif _is_wsl_bash(path_bash):
+            logger.warning(f"PATH 中的 bash 不是 Git Bash，跳过: {path_bash}")
+        else:
+            return path_bash
 
     # 2. 查找常见 Git Bash 安装路径
     common_paths = [
@@ -619,6 +641,7 @@ class WardOrderPackagerGUI:
 
             # 3. 执行 deploy.sh
             log(f"🔄 执行 deploy.sh ...")
+            build_start = datetime.now()
             success = self._run_deploy_script(project_dir, deploy_script, log)
             if not success:
                 log("❌ deploy.sh 执行失败，停止打包")
@@ -629,6 +652,12 @@ class WardOrderPackagerGUI:
             package_file = find_built_package(project_dir, prefix)
             if not package_file:
                 log(f"❌ 未在 dist 目录下找到打包产物 ({prefix}-*.tar.gz)")
+                return
+
+            # 防误判：构建失败时 deploy.sh 中的 rm 不会执行，dist 下可能残留上次的旧包
+            package_mtime = datetime.fromtimestamp(package_file.stat().st_mtime)
+            if (build_start - package_mtime).total_seconds() > 2:
+                log(f"❌ 打包产物是本次执行之前生成的旧包（{package_mtime:%Y-%m-%d %H:%M:%S}），本次未产出新包，停止打包")
                 return
             log(f"✅ 找到打包产物: {package_file.name}")
 
@@ -668,7 +697,7 @@ class WardOrderPackagerGUI:
             self.root.after(0, self._package_finished)
 
     def _run_deploy_script(self, project_dir, deploy_script, log):
-        """执行 deploy.sh 脚本"""
+        """执行 deploy.sh 脚本（脚本自身的非零返回码不视为失败，以是否产出包为准）"""
         try:
             # 查找 bash 可执行文件
             bash_path = find_bash_executable()
@@ -681,10 +710,10 @@ class WardOrderPackagerGUI:
 
             log(f"使用 bash: {bash_path}")
 
-            # 使用 bash 执行 deploy.sh
+            # 使用 bash 执行 deploy.sh（转正斜杠，避免 bash 把反斜杠当转义符）
             process = subprocess.Popen(
-                [bash_path, str(deploy_script)],
-                cwd=str(project_dir),
+                [bash_path, Path(deploy_script).as_posix()],
+                cwd=Path(project_dir).as_posix(),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
@@ -706,11 +735,11 @@ class WardOrderPackagerGUI:
                         if line.strip():
                             log(line.strip())
 
-            if process.returncode == 0:
-                return True
-            else:
-                log(f"❌ deploy.sh 返回码: {process.returncode}")
-                return False
+            # deploy.sh 内部存在非致命报错（如末尾 tar 多带一个已不存在的历史参数，返回码 2），
+            # 但压缩包照常生成，所以不用返回码中止，后面由“是否找到打包产物”兜底
+            if process.returncode != 0:
+                log(f"⚠️ deploy.sh 返回码: {process.returncode}（脚本自身报错，忽略，继续检查打包产物）")
+            return True
 
         except Exception as e:
             log(f"❌ 执行 deploy.sh 出错: {e}")
