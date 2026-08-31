@@ -1,6 +1,7 @@
-# batch_add_text_to_images.pyw （含粘贴JSON+进度条+亮度调节+边距设置）
+# batch_add_text_to_images.pyw （含绘本脚本JSON匹配+粘贴JSON+进度条+亮度调节+边距设置+测试预览+Toast通知）
 import os
 import json
+import random
 import logging
 from pathlib import Path
 from tkinter import *
@@ -18,6 +19,11 @@ CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 LOGS_DIR = CONFIG_DIR / "logs"
 PROCESS_LOG_FILE = LOGS_DIR / f"log_{SCRIPT_NAME}.log"
 DB_CONFIG_PATH = (SCRIPT_DIR.parent) / "json" / "DB_CONFIG.json"
+
+# 绘本脚本 JSON 所在目录（默认取工作区下的 “AI Work Space/AI绘本脚本”）
+DEFAULT_SCRIPT_JSON_DIR = SCRIPT_DIR.parent.parent / "AI Work Space" / "AI绘本脚本"
+# 分镜脚本中剧情描述的字段名
+PLOT_KEY = "plotContent"
 
 # 创建目录
 CONFIG_DIR.mkdir(exist_ok=True)
@@ -49,11 +55,73 @@ DEFAULT_CONFIG = {
     "texts_per_file": {},
     "adjust_brightness": False,  # ✅ 新增：是否调节亮度
     "brightness_level": "10%",   # ✅ 新增：亮度等级
-    "text_margin_x": 30          # ✅ 新增：文案左右边距
+    "text_margin_x": 30,         # ✅ 新增：文案左右边距
+    "script_json_dir": str(DEFAULT_SCRIPT_JSON_DIR),  # ✅ 新增：绘本脚本 JSON 目录
+    "script_json_file": ""                            # ✅ 新增：上次选中的脚本 JSON 文件名
 }
 
 # 支持的图片格式
 IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.bmp', '.tiff'}
+
+# 测试预览（随机抽样）相关配置
+TEST_PREFIX = "TEST_"
+TEST_SAMPLE_COUNT = 5
+TEST_SAMPLE_TEXTS = [
+    "示例文案：这是一段用于查看排版效果的测试文字",
+    "预览效果：可调节字体大小、颜色和边距后再试一次",
+    "测试文案：底部扩展区域的高度是否合适",
+    "效果预览：右下角空白块与透明度检查",
+    "示例文字：亮度调节后的显示效果",
+]
+
+
+def is_test_image(name: str) -> bool:
+    """判断文件名是否为测试预览生成的图片"""
+    return name.startswith(TEST_PREFIX)
+
+
+def clean_test_images(output_dir: Path) -> int:
+    """清理输出目录下的测试预览图片，返回删除数量"""
+    deleted = 0
+    try:
+        for f in output_dir.iterdir():
+            if f.is_file() and is_test_image(f.name) and f.suffix.lower() in IMAGE_EXTENSIONS:
+                try:
+                    f.unlink()
+                    deleted += 1
+                    logger.info(f"已清理测试图片 {f.name}")
+                except Exception as e:
+                    logger.error(f"清理测试图片 {f.name} 失败: {e}")
+    except Exception as e:
+        logger.error(f"清理测试图片失败: {e}")
+    return deleted
+
+
+def list_script_json_files(script_dir: Path) -> list:
+    """列出绘本脚本目录下的所有 JSON 文件名（按名称排序）"""
+    try:
+        return sorted(
+            [f.name for f in script_dir.iterdir()
+             if f.is_file() and f.suffix.lower() == '.json'],
+            key=lambda x: x
+        )
+    except Exception as e:
+        logger.error(f"读取脚本目录 {script_dir} 失败: {e}")
+        return []
+
+
+def parse_plot_contents(json_path: Path) -> list:
+    """解析分镜脚本 JSON，按顺序返回剧情描述（plotContent）列表"""
+    with open(json_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    if not isinstance(data, list):
+        raise ValueError("JSON 根节点必须是数组")
+    plots = []
+    for idx, item in enumerate(data, 1):
+        if not isinstance(item, dict):
+            raise ValueError(f"第 {idx} 项不是对象")
+        plots.append(str(item.get(PLOT_KEY, "") or "").strip())
+    return plots
 
 # ==============================
 # 工具函数：按字符自动换行
@@ -235,6 +303,15 @@ class BatchAddTextGUI:
         self.text_entries = {}
         self.setup_ui()
 
+        # ✅ 新增：启动后直接最大化显示
+        try:
+            self.root.state("zoomed")
+        except Exception:
+            try:
+                self.root.attributes("-zoomed", True)
+            except Exception as e:
+                logger.warning(f"窗口最大化失败: {e}")
+
     def setup_ui(self):
         # 输入目录
         dir_frame = LabelFrame(self.root, text="📂 图片目录", padx=10, pady=8)
@@ -250,6 +327,28 @@ class BatchAddTextGUI:
         self.output_dir_var = StringVar(value=self.config.get("output_dir", ""))
         Entry(output_dir_frame, textvariable=self.output_dir_var, font=("Consolas", 9)).pack(side=LEFT, fill=X, expand=True)
         Button(output_dir_frame, text="📁 选择目录", command=self.browse_output_dir).pack(side=RIGHT, padx=(5, 0))
+
+        # ✅ 新增：绘本脚本 JSON（自动匹配剧情文案）
+        script_frame = LabelFrame(self.root, text="📜 绘本脚本 JSON（按文件名顺序匹配剧情描述）", padx=10, pady=8)
+        script_frame.pack(fill=X, padx=10, pady=5)
+
+        dir_row = Frame(script_frame)
+        dir_row.pack(fill=X)
+        self.script_dir_var = StringVar(value=self.config.get("script_json_dir", str(DEFAULT_SCRIPT_JSON_DIR)))
+        Entry(dir_row, textvariable=self.script_dir_var, font=("Consolas", 9)).pack(side=LEFT, fill=X, expand=True)
+        Button(dir_row, text="📁 浏览", command=self.browse_script_dir).pack(side=RIGHT, padx=(5, 0))
+        Button(dir_row, text="🔄 刷新", command=self.refresh_script_json_list).pack(side=RIGHT, padx=(5, 0))
+
+        file_row = Frame(script_frame)
+        file_row.pack(fill=X, pady=(6, 0))
+        Label(file_row, text="脚本文件:").pack(side=LEFT)
+        self.json_file_var = StringVar(value=self.config.get("script_json_file", ""))
+        self.json_combo = ttk.Combobox(file_row, textvariable=self.json_file_var, state="readonly", width=50, values=[])
+        self.json_combo.pack(side=LEFT, padx=(5, 0))
+        self.json_combo.bind("<<ComboboxSelected>>", self.on_script_json_selected)
+        Button(file_row, text="📥 匹配文案", command=self.apply_script_json, bg="#2196F3", fg="white", width=12).pack(side=LEFT, padx=(10, 0))
+        self.json_count_label = Label(file_row, text="", fg="gray")
+        self.json_count_label.pack(side=LEFT, padx=(10, 0))
 
         # 模式选择（使用 Radiobutton）
         mode_frame = LabelFrame(self.root, text="🎨 显示模式", padx=10, pady=8)
@@ -356,6 +455,10 @@ class BatchAddTextGUI:
         self.start_btn = Button(btn_frame, text="▶️ 开始处理", command=self.start_processing, bg="#4CAF50", fg="white", width=15)
         self.start_btn.pack(side=LEFT, padx=5)
 
+        # 新增：测试效果按钮（随机抽样生成少量图片查看效果）
+        self.test_btn = Button(btn_frame, text=f"🧪 测试效果({TEST_SAMPLE_COUNT}张)", command=self.start_test, bg="#FF9800", fg="white", width=15)
+        self.test_btn.pack(side=LEFT, padx=5)
+
         # ✅ 新增：粘贴JSON按钮
         Button(btn_frame, text="📋 粘贴JSON", command=self.paste_json_texts, bg="#2196F3", fg="white", width=12).pack(side=LEFT, padx=5)
 
@@ -370,6 +473,46 @@ class BatchAddTextGUI:
         status_label.pack(side=BOTTOM, fill=X)
 
         self.load_images()
+        # ✅ 新增：加载脚本 JSON 下拉列表
+        self.refresh_script_json_list()
+
+    def _show_toast(self, title, message, level="info", duration_ms=3500):
+        """右下角 Toast 通知，duration_ms 毫秒后自动消失"""
+        try:
+            toast = Toplevel(self.root)
+            toast.withdraw()
+            toast.overrideredirect(True)
+            toast.attributes('-topmost', True)
+
+            colors = {
+                "success": ("#2e7d32", "#e8f5e9", "✅"),
+                "error":   ("#c62828", "#ffebee", "❌"),
+                "info":    ("#1565c0", "#e3f2fd", "ℹ️"),
+                "warning": ("#e65100", "#fff3e0", "⚠️"),
+            }
+            fg, bg, icon = colors.get(level, colors["info"])
+            toast.configure(bg=bg)
+
+            header = Frame(toast, bg=bg)
+            header.pack(fill=X, padx=10, pady=8)
+            Label(header, text=f"{icon} {title}", font=("Microsoft YaHei UI", 11, "bold"),
+                  fg=fg, bg=bg).pack(side=LEFT)
+            close_btn = Label(header, text="✕", font=("Consolas", 10), fg="#999", bg=bg, cursor="hand2")
+            close_btn.pack(side=RIGHT)
+            close_btn.bind("<Button-1>", lambda e: toast.destroy())
+
+            Label(toast, text=message, font=("Microsoft YaHei UI", 10),
+                  fg="#333", bg=bg, wraplength=340, justify=LEFT).pack(padx=12, pady=(4, 10), anchor=W)
+
+            toast.update_idletasks()
+            w, h = toast.winfo_width(), toast.winfo_height()
+            sx = toast.winfo_screenwidth()
+            sy = toast.winfo_screenheight()
+            toast.geometry(f"+{sx - w - 20}+{sy - h - 60}")
+            toast.deiconify()
+            toast.after(duration_ms, toast.destroy)
+        except Exception:
+            pass
 
     def toggle_mode(self):
         mode = self.mode_var.get()
@@ -391,6 +534,110 @@ class BatchAddTextGUI:
         folder = filedialog.askdirectory(title="选择输出目录", initialdir=self.output_dir_var.get())
         if folder:
             self.output_dir_var.set(folder)
+
+    def browse_script_dir(self):
+        """选择绘本脚本 JSON 所在目录"""
+        folder = filedialog.askdirectory(title="选择绘本脚本目录", initialdir=self.script_dir_var.get())
+        if folder:
+            self.script_dir_var.set(folder)
+            self.save_script_json_choice()
+            self.refresh_script_json_list()
+
+    def refresh_script_json_list(self):
+        """重新加载脚本目录下的 JSON 列表到下拉框"""
+        dir_text = self.script_dir_var.get().strip()
+        script_dir = Path(dir_text) if dir_text else None
+        json_files = list_script_json_files(script_dir) if script_dir else []
+        self.json_combo.config(values=json_files)
+
+        current = self.json_file_var.get().strip()
+        if current and current not in json_files:
+            self.json_file_var.set("")
+            current = ""
+
+        if not script_dir or not script_dir.exists():
+            self.json_count_label.config(text="⚠️ 脚本目录不存在", fg="#c62828")
+        elif not json_files:
+            self.json_count_label.config(text="⚠️ 目录下无 JSON 文件", fg="#e65100")
+        else:
+            self.json_count_label.config(
+                text=f"共 {len(json_files)} 个 JSON" + (f"，当前：{current}" if current else "，未选择"),
+                fg="gray"
+            )
+
+    def on_script_json_selected(self, event=None):
+        """下拉选择脚本 JSON 后，立即解析并匹配文案"""
+        self.save_script_json_choice()
+        self.apply_script_json()
+
+    def save_script_json_choice(self):
+        """记住脚本目录与当前选中的 JSON 文件"""
+        cfg = dict(self.config)
+        cfg["script_json_dir"] = self.script_dir_var.get().strip()
+        cfg["script_json_file"] = self.json_file_var.get().strip()
+        self.config = cfg
+        self.save_config(cfg)
+
+    def apply_script_json(self):
+        """解析选中的脚本 JSON，按图片文件名顺序自动填充剧情描述文案"""
+        file_name = self.json_file_var.get().strip()
+        if not file_name:
+            self._show_toast("绘本脚本", "请先在下拉框中选择一个脚本 JSON 文件", "warning")
+            return
+
+        dir_text = self.script_dir_var.get().strip()
+        if not dir_text or not Path(dir_text).exists():
+            self.status_var.set("⚠️ 脚本目录不存在，未解析")
+            self._show_toast("绘本脚本", f"脚本目录不存在：\n{dir_text or '（未填写）'}", "error")
+            return
+
+        json_path = Path(dir_text) / file_name
+        if not json_path.exists():
+            self.status_var.set(f"⚠️ 脚本文件不存在：{file_name}，未解析")
+            self._show_toast("绘本脚本", f"文件不存在：\n{json_path}", "error")
+            self.refresh_script_json_list()
+            return
+
+        images = [p for p in self.image_files if not is_test_image(p.name)]
+        if not images:
+            self.status_var.set("⚠️ 图片目录下没有图片，未解析")
+            self._show_toast("绘本脚本", "图片目录下没有图片，请先选择有效的图片目录", "warning")
+            return
+
+        try:
+            plots = parse_plot_contents(json_path)
+        except json.JSONDecodeError:
+            self.status_var.set(f"⚠️ JSON 格式无效：{file_name}，未解析")
+            self._show_toast("绘本脚本", f"JSON 格式无效：{file_name}", "error")
+            return
+        except Exception as e:
+            self.status_var.set(f"⚠️ 解析失败：{e}")
+            self._show_toast("绘本脚本", f"解析失败：{e}", "error")
+            return
+
+        # 数量不一致直接提醒，不再解析文案
+        if len(plots) != len(images):
+            self._show_toast(
+                "数量不一致",
+                f"已取消解析。\nJSON 剧情数：{len(plots)}\n图片文件数：{len(images)}",
+                "warning", duration_ms=6000
+            )
+            self.status_var.set(f"⚠️ 脚本 JSON {len(plots)} 条 / 图片 {len(images)} 张，数量不一致，未解析")
+            logger.info(f"脚本 JSON {file_name} 剧情 {len(plots)} 条，图片 {len(images)} 张，数量不一致")
+            return
+
+        filled = 0
+        for img_path, text in zip(images, plots):
+            text_var = self.text_entries.get(img_path.name)
+            if text_var is None or not text:
+                continue
+            text_var.set(text)
+            filled += 1
+
+        self.refresh_script_json_list()
+        self.status_var.set(f"✅ 已按《{file_name}》自动填充 {filled} 条文案")
+        self._show_toast("绘本脚本", f"已自动填充 {filled}/{len(images)} 条文案\n来源：{file_name}", "success")
+        logger.info(f"脚本 JSON {file_name} 匹配成功，填充 {filled} 条文案")
 
     def choose_font_color(self):
         color_code = colorchooser.askcolor(title="选择字体颜色", color=self.color_var.get())[1]
@@ -442,7 +689,7 @@ class BatchAddTextGUI:
 
         self.image_files = sorted([
             f for f in input_dir.iterdir()
-            if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS
+            if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS and not is_test_image(f.name)
         ], key=lambda x: x.name)
 
         if not self.image_files:
@@ -459,22 +706,28 @@ class BatchAddTextGUI:
             entry.pack(side=LEFT, fill=X, expand=True, padx=(10, 0))
             self.text_entries[img_path.name] = text_var
 
-    def start_processing(self):
+    def collect_config(self):
+        """校验界面参数并收集配置，失败时提示并返回 None"""
         input_dir = Path(self.input_dir_var.get().strip())
         output_dir = Path(self.output_dir_var.get().strip())
-        
+
         if not input_dir.exists():
             messagebox.showwarning("警告", "请选择有效的图片目录！")
-            return
-        
-        # ✅ 新增：验证输出目录
-        if not output_dir or not output_dir.exists():
-            messagebox.showwarning("警告", "请选择有效的输出目录！")
-            return
-        
+            return None
+
+        # ✅ 新增：验证输出目录，不存在则自动创建
+        if not output_dir:
+            messagebox.showwarning("警告", "请选择或输入输出目录！")
+            return None
+        try:
+            output_dir.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            messagebox.showerror("错误", f"创建输出目录失败：\n{output_dir}\n{e}")
+            return None
+
         if not self.image_files:
             messagebox.showwarning("警告", "没有可处理的图片！")
-            return
+            return None
 
         try:
             font_size = int(self.size_var.get())
@@ -497,7 +750,7 @@ class BatchAddTextGUI:
                     raise ValueError("空白块宽高百分比应在1~100之间")
         except ValueError as e:
             messagebox.showerror("输入错误", f"参数错误：{e}")
-            return
+            return None
 
         current_texts = {name: var.get() for name, var in self.text_entries.items()}
         current_config = {
@@ -515,14 +768,39 @@ class BatchAddTextGUI:
             "texts_per_file": current_texts,
             "adjust_brightness": self.adjust_brightness_var.get(),  # ✅ 保存亮度设置
             "brightness_level": self.brightness_level_var.get(),   # ✅ 保存亮度等级
-            "text_margin_x": text_margin_x                         # ✅ 保存边距设置
+            "text_margin_x": text_margin_x,                        # ✅ 保存边距设置
+            "script_json_dir": self.script_dir_var.get().strip(),   # ✅ 保存脚本目录
+            "script_json_file": self.json_file_var.get().strip()    # ✅ 保存选中的脚本文件
         }
+        return input_dir, output_dir, current_config
+
+    def start_processing(self):
+        collected = self.collect_config()
+        if not collected:
+            return
+        input_dir, output_dir, current_config = collected
+        self.config = current_config
         self.save_config(current_config)
 
         self.start_btn.config(state=DISABLED, text="🔄 处理中...")
+        self.test_btn.config(state=DISABLED)
         self.progress_var.set(0)
         self.status_var.set("正在处理...")
         thread = threading.Thread(target=self.run_processing, args=(current_config,), daemon=True)
+        thread.start()
+
+    def start_test(self):
+        """随机抽取图片生成测试预览，用于查看效果"""
+        collected = self.collect_config()
+        if not collected:
+            return
+        input_dir, output_dir, current_config = collected
+
+        self.start_btn.config(state=DISABLED)
+        self.test_btn.config(state=DISABLED, text="🧪 测试中...")
+        self.progress_var.set(0)
+        self.status_var.set("正在生成测试图片...")
+        thread = threading.Thread(target=self.run_test, args=(current_config,), daemon=True)
         thread.start()
 
     def run_processing(self, config):
@@ -530,6 +808,11 @@ class BatchAddTextGUI:
         output_dir = Path(config["output_dir"])  # ✅ 新增：获取输出目录
         success_count = 0
         total = len(self.image_files)
+
+        # 正式生成前，清理之前遗留的测试预览图片
+        cleaned_count = clean_test_images(output_dir)
+        if cleaned_count:
+            logger.info(f"正式处理前共清理 {cleaned_count} 张测试图片")
 
         # 只处理有文案的图片
         images_with_text = [
@@ -555,15 +838,67 @@ class BatchAddTextGUI:
             self.root.after(0, lambda p=progress: self.progress_var.set(p))
             self.root.after(0, lambda s=f"正在处理 ({i}/{len(images_with_text)})...": self.status_var.set(s))
 
-        self.root.after(0, self.on_complete, success_count, len(images_with_text))
+        self.root.after(0, self.on_complete, success_count, len(images_with_text), cleaned_count)
 
-    def on_complete(self, success_count, total):
+    def on_complete(self, success_count, total, cleaned_count=0):
         self.start_btn.config(state=NORMAL, text="▶️ 开始处理")
+        self.test_btn.config(state=NORMAL)
         self.progress_var.set(100)
         output_dir = self.output_dir_var.get().strip()
         msg = f"处理完成！成功 {success_count}/{total} 张图片。\n输出目录：{output_dir}"
-        self.status_var.set("✅ " + msg)
-        messagebox.showinfo("完成", msg)
+        if cleaned_count:
+            msg += f"\n已清理 {cleaned_count} 张测试图片"
+        self.status_var.set("✅ " + msg.replace("\n", " "))
+        self._show_toast("完成", msg, "success")
+
+    def run_test(self, config):
+        """后台线程：随机抽取 TEST_SAMPLE_COUNT 张图片生成测试预览"""
+        output_dir = Path(config["output_dir"])
+        texts = config["texts_per_file"]
+
+        candidates = [img for img in self.image_files if not is_test_image(img.name)]
+        random.shuffle(candidates)
+        test_images = candidates[:TEST_SAMPLE_COUNT]
+        if not test_images:
+            self.root.after(0, self.on_test_complete, 0, 0)
+            return
+
+        success_count = 0
+        for i, img_path in enumerate(test_images, 1):
+            text = texts.get(img_path.name, "").strip()
+            if text:
+                text_source = "已填文案"
+            else:
+                text = random.choice(TEST_SAMPLE_TEXTS)
+                text_source = "示例文案"
+
+            output_path = output_dir / f"{TEST_PREFIX}{img_path.name}"
+            success, msg = process_image_with_text(img_path, output_path, text, config)
+            if success:
+                success_count += 1
+                logger.info(f"🧪 测试 {img_path.name}（{text_source}）→ {output_path.name}")
+            else:
+                logger.info(f"🧪 测试 {img_path.name} 失败：{msg}")
+
+            progress = (i / len(test_images)) * 100
+            self.root.after(0, lambda p=progress: self.progress_var.set(p))
+            self.root.after(0, lambda s=f"正在测试 ({i}/{len(test_images)})...": self.status_var.set(s))
+
+        self.root.after(0, self.on_test_complete, success_count, len(test_images))
+
+    def on_test_complete(self, success_count, total):
+        self.start_btn.config(state=NORMAL)
+        self.test_btn.config(state=NORMAL, text=f"🧪 测试效果({TEST_SAMPLE_COUNT}张)")
+        self.progress_var.set(100)
+        output_dir = self.output_dir_var.get().strip()
+        if total == 0:
+            self.status_var.set("🧪 没有可用于测试的图片")
+            self._show_toast("测试", "没有可用于测试的图片", "warning")
+            return
+        msg = (f"已生成 {success_count}/{total} 张测试图片。\n输出目录：{output_dir}\n"
+               f"测试文件名以 {TEST_PREFIX} 开头，正式生成时会自动清理")
+        self.status_var.set(f"🧪 测试完成：成功 {success_count}/{total} 张")
+        self._show_toast("测试效果", msg, "info")
 
     def load_config(self):
         if CONFIG_PATH.exists():

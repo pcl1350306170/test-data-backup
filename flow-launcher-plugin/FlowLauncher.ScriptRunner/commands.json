@@ -283,6 +283,18 @@
             "description": "pdf转images"
         },
         {
+            "name": "播客绘本图片增加文案",
+            "keywords": [
+                "tp25",
+                "tupian",
+                "tupm",
+                "wfoj",
+                "bokehvbftupm"
+            ],
+            "script": "image\\batch_add_text_to_images.pyw",
+            "description": "批量在图片上增加文案扩展或覆盖"
+        },
+        {
             "name": "按关键词删除文件",
             "keywords": [
                 "tp26",
@@ -399,7 +411,7 @@
         {
             "name": "文件重命名为数字",
             "keywords": [
-                "wj12",
+                "wj12",                
                 "wfjmismymywzuuzi"
             ],
             "script": "other\\rename_by_mtime.pyw",

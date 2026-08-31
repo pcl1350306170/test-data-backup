@@ -1,9 +1,9 @@
 {
-  "input_dir": "D:\\FILES\\IMG\\A临时\\临时保存",
-  "output_dir": "D:\\FILES\\IMG\\A临时\\批量放大",
+  "input_dir": "D:\\FILES\\AI Work Space\\AI绘本图片\\古人-悯农(其一)-李绅",
+  "output_dir": "D:\\FILES\\AI Work Space\\AI绘本图片\\古人-悯农(其一)-李绅-放大",
   "weights_dir": "D:\\dev\\image_enhancer",
   "tool_dir": "D:\\dev\\image_enhancer\\realesrgan-tool",
-  "upscale_factor": 4,
+  "upscale_factor": 2,
   "face_enhance": false,
   "thread_count": 1
 }
