@@ -78,6 +78,15 @@ except Exception:
     AudioSegment = None
     HAS_PYDUB = False
 
+# CosyVoice 就绪判断：worker 脚本存在即视为"可配置"（真正的就绪需填写 conda 与仓库路径）
+COSYVOICE_WORKER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cosyvoice_worker.py")
+# 常用 CosyVoice 音色（SFT 预置）
+COSYVOICE_SPK_OPTIONS = ["中文女", "中文男", "英文男", "英文女", "日语男", "韩语女", "粤语女"]
+
+
+def _cosyvoice_ready():
+    return os.path.isfile(COSYVOICE_WORKER)
+
 
 # ============================================================
 # 方案说明与状态
@@ -114,14 +123,16 @@ SCHEMES = {
         "installed": sherpa_onnx is not None,
     },
     "cosyvoice": {
-        "label": "CosyVoice（预留，未实现）",
+        "label": "CosyVoice（阿里开源·离线顶配）",
         "desc": (
-            "简介：阿里开源的高质量离线 TTS，音质最佳，可复刻音色。\n"
-            "特点：效果顶配，但需完整项目环境 + GPU，配置门槛高。\n"
-            "资源：暂未实现，方案占位，后续补充。"
+            "简介：阿里通义开源的离线大模型 TTS，音质最佳、可零样本复刻音色。\n"
+            "特点：需独立 conda 环境(py3.10)+克隆仓库+下载模型；本机通常需 NVIDIA 显卡。\n"
+            "资源：模型目录(如 D:\\dev\\sherpa-models\\CosyVoice2-0.5B)；\n"
+            "      另需在 GUI 中填写 CosyVoice 仓库路径 与 conda 的 python.exe 路径。\n"
+            "音色：预置 中文女/中文男/英文男/英文女 等，选词在下拉框。"
         ),
         "need_resource_dir": True,
-        "installed": False,
+        "installed": _cosyvoice_ready,
     },
 }
 
@@ -255,9 +266,57 @@ def _gen_sherpa_onnx(text: str, out_path: str, model_dir: str, sid: int, log):
     log("  [sherpa-onnx] 已生成: %s（sid=%s）" % (os.path.basename(out_path), sid))
 
 
-def _gen_cosyvoice(text, out_path, model_dir, log):
-    """CosyVoice 预留占位。"""
-    raise NotImplementedError("CosyVoice 方案尚未实现，请选用其他方案。")
+def _gen_cosyvoice(text: str, out_path: str, model_dir: str, spk: str,
+                   log, repo_dir: str = "", conda_python: str = ""):
+    """CosyVoice：通过 subprocess 调用独立 worker（需在 conda 环境内运行）。
+    repo_dir  : CosyVoice 仓库根目录（用于设置 PYTHONPATH）
+    conda_python: CosyVoice conda 环境中的 python.exe 绝对路径
+    """
+    import subprocess as _sp
+
+    if not os.path.isfile(COSYVOICE_WORKER):
+        raise RuntimeError("找不到 cosyvoice_worker.py，请确认它与本脚本在同一目录。")
+    if not model_dir:
+        raise RuntimeError("CosyVoice 需要指定模型目录（资源目录）。")
+
+    # 默认 conda python：优先用户填写；否则尝试 conda run
+    if conda_python and os.path.isfile(conda_python):
+        py_cmd = conda_python
+    else:
+        py_cmd = "python"
+
+    # 构造 PYTHONPATH：仓库根目录 + third_party/Matcha-TTS
+    extra_env = dict(os.environ)
+    if repo_dir and os.path.isdir(repo_dir):
+        paths = [repo_dir,
+                 os.path.join(repo_dir, "third_party", "Matcha-TTS")]
+        cur = extra_env.get("PYTHONPATH", "")
+        extra_env["PYTHONPATH"] = os.pathsep.join(
+            [p for p in paths if p] + ([cur] if cur else []))
+
+    cmd = [py_cmd, COSYVOICE_WORKER,
+           "--model_dir", model_dir,
+           "--text", text,
+           "--output", out_path,
+           "--spk", spk]
+    log("  [cosyvoice] 调用: %s %s" % (py_cmd, os.path.basename(COSYVOICE_WORKER)))
+
+    try:
+        proc = _sp.run(cmd, capture_output=True, text=True,
+                       encoding="utf-8", errors="replace", timeout=600,
+                       env=extra_env)
+    except _sp.TimeoutExpired:
+        raise RuntimeError("CosyVoice 生成超时（>10分钟），可能模型未就绪或显存不足。")
+    except FileNotFoundError:
+        raise RuntimeError("找不到 Python 解释器：%s，请在参数中填写 CosyVoice conda 的 python.exe 路径。" % py_cmd)
+
+    if proc.returncode != 0:
+        err = (proc.stderr or "").strip() or (proc.stdout or "").strip()
+        raise RuntimeError("CosyVoice 生成失败：%s" % err[-2000:])
+
+    if not os.path.isfile(out_path):
+        raise RuntimeError("CosyVoice 未生成文件，请检查模型路径与音色参数。")
+    log("  [cosyvoice] 已生成: %s（音色 %s）" % (os.path.basename(out_path), spk))
 
 
 GENERATORS = {
@@ -291,8 +350,8 @@ class App:
     def __init__(self, root: tk.Tk):
         self.root = root
         root.title("AI绘本 · 旁白音频生成器")
-        root.geometry("760x800")
-        root.minsize(680, 720)
+        root.geometry("760x860")
+        root.minsize(680, 780)
 
         self.msg_queue = queue.Queue()
         self.worker = None
@@ -313,6 +372,8 @@ class App:
         self.edge_interval_var = tk.StringVar(value="0.8")  # edge-tts 请求间隔(秒)
         self.edge_retries_var = tk.StringVar(value="3")     # edge-tts 最大重试次数
         self.edge_retry_wait_var = tk.StringVar(value="5")  # edge-tts 重试等待基数(秒)
+        self.cosy_repo_var = tk.StringVar()                 # CosyVoice 仓库目录
+        self.cosy_python_var = tk.StringVar()               # CosyVoice conda python.exe
 
         self._build_ui()
         self._load_config()
@@ -379,6 +440,23 @@ class App:
             row, textvariable=self.sid_var, width=28, state="readonly")
         self.sid_combo["values"] = SHERPA_SID_OPTIONS
         self.sid_combo.pack(side="left", padx=4)
+
+        # CosyVoice 专属配置（仓库路径 + conda python）
+        self.cosy_frame = ttk.LabelFrame(
+            self.root, text="4b. CosyVoice 配置（仅选 CosyVoice 时生效）")
+        self.cosy_frame.pack(fill="x", **pad)
+        row = ttk.Frame(self.cosy_frame)
+        row.pack(fill="x", padx=6, pady=2)
+        ttk.Label(row, text="CosyVoice 仓库目录:").pack(side="left")
+        ttk.Entry(row, textvariable=self.cosy_repo_var).pack(
+            side="left", fill="x", expand=True, padx=6)
+        ttk.Button(row, text="浏览…", command=self._pick_cosy_repo).pack(side="right")
+        row = ttk.Frame(self.cosy_frame)
+        row.pack(fill="x", padx=6, pady=2)
+        ttk.Label(row, text="conda 环境 python.exe:").pack(side="left")
+        ttk.Entry(row, textvariable=self.cosy_python_var).pack(
+            side="left", fill="x", expand=True, padx=6)
+        ttk.Button(row, text="浏览…", command=self._pick_cosy_python).pack(side="right")
 
         # 淡出
         frm = ttk.LabelFrame(self.root, text="5. 结尾处理")
@@ -573,6 +651,10 @@ class App:
             gen(text, out_path, voice, self._thread_log)
         elif scheme == "sherpa-onnx":
             gen(text, out_path, resource_dir, sid, self._thread_log)
+        elif scheme == "cosyvoice":
+            gen(text, out_path, resource_dir, voice, self._thread_log,
+                repo_dir=self.cosy_repo_var.get().strip(),
+                conda_python=self.cosy_python_var.get().strip())
         else:
             gen(text, out_path, resource_dir, self._thread_log)
 
@@ -608,6 +690,17 @@ class App:
         if p:
             self.resource_dir_var.set(p)
 
+    def _pick_cosy_repo(self):
+        p = filedialog.askdirectory()
+        if p:
+            self.cosy_repo_var.set(p)
+
+    def _pick_cosy_python(self):
+        p = filedialog.askopenfilename(
+            filetypes=[("python.exe", "python.exe"), ("所有文件", "*.*")])
+        if p:
+            self.cosy_python_var.set(p)
+
     def _on_scheme_change(self):
         key = self.scheme_var.get()
         info = SCHEMES[key]
@@ -626,17 +719,32 @@ class App:
         if key == "sherpa-onnx":
             self.sid_combo.config(state="readonly")
             self.voice_combo.config(state="disabled")
+            self._set_cosy_frame(False)
         elif key == "edge-tts":
             self.sid_combo.config(state="disabled")
             self.voice_combo.config(state="readonly")
             if self.edge_voices:
                 self.voice_combo["values"] = self.edge_voices
+            self._set_cosy_frame(False)
         elif key == "pyttsx3":
             self.sid_combo.config(state="disabled")
             self.voice_combo.config(state="disabled")
+            self._set_cosy_frame(False)
         else:  # cosyvoice
             self.sid_combo.config(state="disabled")
-            self.voice_combo.config(state="disabled")
+            self.voice_combo.config(state="readonly")
+            self.voice_combo["values"] = COSYVOICE_SPK_OPTIONS
+            if self.voice_var.get() not in COSYVOICE_SPK_OPTIONS:
+                self.voice_var.set("中文女")
+            self._set_cosy_frame(True)
+
+    def _set_cosy_frame(self, show):
+        """显示/隐藏 CosyVoice 配置区"""
+        if hasattr(self, "cosy_frame"):
+            if show:
+                self.cosy_frame.pack(fill="x", padx=10, pady=4)
+            else:
+                self.cosy_frame.pack_forget()
 
     def _load_edge_voices(self):
         try:
@@ -806,6 +914,8 @@ class App:
             "edge_interval": self.edge_interval_var.get(),
             "edge_retries": self.edge_retries_var.get(),
             "edge_retry_wait": self.edge_retry_wait_var.get(),
+            "cosy_repo": self.cosy_repo_var.get(),
+            "cosy_python": self.cosy_python_var.get(),
         }
         try:
             with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -843,6 +953,10 @@ class App:
                     self.edge_retries_var.set(cfg["edge_retries"])
                 if cfg.get("edge_retry_wait"):
                     self.edge_retry_wait_var.set(cfg["edge_retry_wait"])
+                if cfg.get("cosy_repo"):
+                    self.cosy_repo_var.set(cfg["cosy_repo"])
+                if cfg.get("cosy_python"):
+                    self.cosy_python_var.set(cfg["cosy_python"])
                 logger.info("已加载配置: %s" % CONFIG_PATH)
         except Exception as e:
             logger.error("加载配置失败: %s" % e)

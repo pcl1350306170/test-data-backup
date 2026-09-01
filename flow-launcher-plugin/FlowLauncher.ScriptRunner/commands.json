@@ -576,6 +576,17 @@
             ],
             "script": "other\\绘本旁白音频生成器.py",
             "description": "AI绘本旁白音频生成（edge-tts/pyttsx3/sherpa-onnx）"
+        },
+        {
+            "name": "合并WAV音频+BGM+图片转视频",
+            "keywords": [
+                "qt6",
+                "yp",
+                "yphb",
+                "yphbzsp"
+            ],
+            "script": "other\\音频合并转视频.pyw",
+            "description": "合并WAV音频+BGM+图片转视频"
         }
     ]
 }
