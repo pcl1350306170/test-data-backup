@@ -1,4 +1,4 @@
-# rename_by_mtime.pyw （含排序选项+间隔10重命名）
+# rename_by_mtime.pyw （含排序选项+可选编号格式）
 import os
 import json
 import logging
@@ -37,7 +37,8 @@ logger = logging.getLogger()
 # 默认配置
 DEFAULT_CONFIG = {
     "target_dir": "",
-    "sort_method": "mtime"  # ✅ 新增：排序方式（mtime 或 filename）
+    "sort_method": "mtime",  # 排序方式（mtime 或 filename）
+    "numbering_format": "0010"  # 编号格式：001（间隔1）或 0010（间隔10）
 }
 
 # 排序选项映射
@@ -47,11 +48,18 @@ SORT_OPTIONS = {
 }
 REVERSE_SORT_MAP = {v: k for k, v in SORT_OPTIONS.items()}  # 反向映射
 
+# 编号格式选项映射
+NUMBERING_OPTIONS = {
+    "001, 002, 003...": "001",
+    "0010, 0020, 0030...": "0010"
+}
+REVERSE_NUMBERING_MAP = {v: k for k, v in NUMBERING_OPTIONS.items()}
+
 # ==============================
 # 核心重命名函数
 # ==============================
-def rename_files_by_mtime(target_dir: Path, sort_method: str):
-    """按指定方式排序，重命名为 0010, 0020..."""
+def rename_files_by_mtime(target_dir: Path, sort_method: str, numbering_format: str = "0010"):
+    """按指定方式排序，重命名为指定编号格式"""
     if not target_dir.is_dir():
         return False, "目标路径不是有效文件夹"
 
@@ -72,10 +80,16 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str):
     renamed = 0
     errors = []
 
+    # 根据编号格式计算步长和补零位数
+    if numbering_format == "001":
+        step, width = 1, 3   # 001, 002, 003...
+    else:
+        step, width = 10, 4  # 0010, 0020, 0030...
+
     # 预生成新文件名，检查冲突
     new_names = []
     for i, file in enumerate(files, start=1):
-        new_name = f"{(i * 10):04d}{file.suffix}"  # ✅ 改为间隔10：0010, 0020...
+        new_name = f"{(i * step):0{width}d}{file.suffix}"
         new_path = target_dir / new_name
         new_names.append(new_path)
 
@@ -101,7 +115,7 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str):
 
         # 再从临时目录按序重命名回原目录
         for i, temp_file in enumerate(temp_files, start=1):
-            new_name = f"{(i * 10):04d}{temp_file.suffix}"  # ✅ 间隔10
+            new_name = f"{(i * step):0{width}d}{temp_file.suffix}"
             final_path = target_dir / new_name
             shutil.move(str(temp_file), str(final_path))
             logger.info(f"重命名: {temp_file.name} → {new_name}")
@@ -120,7 +134,9 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str):
 
     if errors:
         return False, "\n".join(errors)
-    return True, f"成功重命名 {renamed} 个文件（按{'修改时间' if sort_method == 'mtime' else '文件名'}排序）"
+    sort_label = '修改时间' if sort_method == 'mtime' else '文件名'
+    fmt_label = '001,002...' if numbering_format == '001' else '0010,0020...'
+    return True, f"成功重命名 {renamed} 个文件（按{sort_label}排序，编号{fmt_label}）"
 
 # ==============================
 # GUI 主类
@@ -128,8 +144,8 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str):
 class RenameByMtimeGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("🔢 文件重命名（按修改时间/文件名 → 0010, 0020...）")
-        self.root.geometry("600x360")  # 高度+40适配新选项
+        self.root.title("🔢 文件重命名（按修改时间/文件名 → 可选编号格式）")
+        self.root.geometry("600x400")
         self.root.resizable(True, True)
 
         self.config = load_config()
@@ -150,6 +166,15 @@ class RenameByMtimeGUI:
         sort_combo = ttk.Combobox(sort_frame, textvariable=self.sort_var, values=list(SORT_OPTIONS.keys()), state="readonly", width=15)
         sort_combo.pack(side=LEFT)
         Label(sort_frame, text="（默认：修改时间）", font=("Arial", 8), fg="gray").pack(side=LEFT, padx=(5, 0))
+
+        # 编号格式选择
+        num_frame = LabelFrame(self.root, text="🔢 编号格式", padx=10, pady=8)
+        num_frame.pack(fill=X, padx=10, pady=5)
+        default_num_label = REVERSE_NUMBERING_MAP.get(self.config.get("numbering_format", "0010"), "0010, 0020, 0030...")
+        self.num_var = StringVar(value=default_num_label)
+        num_combo = ttk.Combobox(num_frame, textvariable=self.num_var, values=list(NUMBERING_OPTIONS.keys()), state="readonly", width=20)
+        num_combo.pack(side=LEFT)
+        Label(num_frame, text="（默认：0010, 0020...）", font=("Arial", 8), fg="gray").pack(side=LEFT, padx=(5, 0))
 
         # 操作按钮
         btn_frame = Frame(self.root)
@@ -186,6 +211,7 @@ class RenameByMtimeGUI:
     def start_rename(self):
         target_dir = Path(self.dir_var.get().strip())
         sort_method = SORT_OPTIONS.get(self.sort_var.get(), "mtime")  # 映射到英文键
+        numbering_format = NUMBERING_OPTIONS.get(self.num_var.get(), "0010")  # 映射到编号格式
 
         if not target_dir or not target_dir.exists():
             messagebox.showwarning("警告", "请选择一个有效的文件夹！")
@@ -194,20 +220,23 @@ class RenameByMtimeGUI:
         # 保存配置（包含新增字段）
         current_config = {
             "target_dir": str(target_dir),
-            "sort_method": sort_method  # ✅ 保存排序方式
+            "sort_method": sort_method,
+            "numbering_format": numbering_format
         }
         save_config(current_config)
 
         # 禁用按钮，启动后台线程
         self.start_btn.config(state=DISABLED, text="🔄 处理中...")
         self.status_var.set("正在处理...")
-        self.log_message(f"开始处理文件夹: {target_dir}，排序方式: {'修改时间' if sort_method == 'mtime' else '文件名'}")
+        sort_label = '修改时间' if sort_method == 'mtime' else '文件名'
+        num_label = '001,002...' if numbering_format == '001' else '0010,0020...'
+        self.log_message(f"开始处理文件夹: {target_dir}，排序: {sort_label}，编号: {num_label}")
 
-        thread = threading.Thread(target=self.run_rename, args=(target_dir, sort_method), daemon=True)
+        thread = threading.Thread(target=self.run_rename, args=(target_dir, sort_method, numbering_format), daemon=True)
         thread.start()
 
-    def run_rename(self, target_dir, sort_method):
-        success, msg = rename_files_by_mtime(target_dir, sort_method)
+    def run_rename(self, target_dir, sort_method, numbering_format):
+        success, msg = rename_files_by_mtime(target_dir, sort_method, numbering_format)
         self.root.after(0, self.on_rename_complete, success, msg)
 
     def on_rename_complete(self, success, msg):
