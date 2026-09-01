@@ -57,7 +57,10 @@ DEFAULT_CONFIG = {
     "brightness_level": "10%",   # ✅ 新增：亮度等级
     "text_margin_x": 30,         # ✅ 新增：文案左右边距
     "script_json_dir": str(DEFAULT_SCRIPT_JSON_DIR),  # ✅ 新增：绘本脚本 JSON 目录
-    "script_json_file": ""                            # ✅ 新增：上次选中的脚本 JSON 文件名
+    "script_json_file": "",                            # ✅ 新增：上次选中的脚本 JSON 文件名
+    "bottom_height_mode": "auto",   # 'auto' 自动计算16:9 / 'manual' 手动输入
+    "force_169": False,             # 手动模式下是否强制输出16:9画布
+    "canvas_bg_color": "#000000"    # 强制16:9画布背景色，默认黑色
 }
 
 # 支持的图片格式
@@ -176,63 +179,138 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
 
             mode = config.get("mode", "bottom")
 
-            # === 方案1：底部扩展区域（动态计算高度，使输出图片比例为16:9）===
+            # === 方案1：底部扩展区域 ===
             if mode == "bottom":
-                # 根据原图宽度动态计算底部扩展高度，使输出图片达到 16:9
-                target_output_h = int(orig_w * 9 / 16)
-                bottom_area_height = target_output_h - orig_h
-                min_text_area = 60  # 最小文本区域高度（至少容纳一行文字）
-                if bottom_area_height <= 0:
-                    logger.warning(f"{image_path.name}: 原图比例已≥16:9({orig_w}x{orig_h})，无扩展区域，使用最小高度{min_text_area}px")
-                    bottom_area_height = min_text_area
-                elif bottom_area_height < min_text_area:
-                    logger.info(f"{image_path.name}: 计算的扩展区域{bottom_area_height}px过小，使用最小高度{min_text_area}px")
-                    bottom_area_height = min_text_area
-                else:
-                    logger.info(f"{image_path.name}: 动态计算扩展区域高度={bottom_area_height}px (原图{orig_w}x{orig_h}, 目标输出{orig_w}x{target_output_h})")
+                height_mode = config.get("bottom_height_mode", "auto")
+                force_169 = config.get("force_169", False) and height_mode == "manual"
 
-                new_h = orig_h + bottom_area_height
-                new_img = Image.new("RGB", (orig_w, new_h), color=tuple(int(config["bg_color"].lstrip('#')[i:i+2], 16) for i in (0, 2, 4)))
-                new_img.paste(img, (0, 0))
+                if height_mode == "auto" or not force_169:
+                    # --- 自动计算 / 手动输入(非强制16:9) ---
+                    if height_mode == "auto":
+                        # 根据原图宽度动态计算底部扩展高度，使输出图片达到 16:9
+                        target_output_h = int(orig_w * 9 / 16)
+                        bottom_area_height = target_output_h - orig_h
+                        min_text_area = 60  # 最小文本区域高度（至少容纳一行文字）
+                        if bottom_area_height <= 0:
+                            logger.warning(f"{image_path.name}: 原图比例已≥16:9({orig_w}x{orig_h})，无扩展区域，使用最小高度{min_text_area}px")
+                            bottom_area_height = min_text_area
+                        elif bottom_area_height < min_text_area:
+                            logger.info(f"{image_path.name}: 计算的扩展区域{bottom_area_height}px过小，使用最小高度{min_text_area}px")
+                            bottom_area_height = min_text_area
+                        else:
+                            logger.info(f"{image_path.name}: 动态计算扩展区域高度={bottom_area_height}px (原图{orig_w}x{orig_h}, 目标输出{orig_w}x{target_output_h})")
+                    else:
+                        bottom_area_height = int(config.get("bottom_area_height", 150))
 
-                draw = ImageDraw.Draw(new_img)
-                font_size = config.get("font_size", 25)
-                font_path = config.get("font_path", "msyh.ttc")
-                try:
-                    font = ImageFont.truetype(font_path, font_size)
-                except:
+                    new_h = orig_h + bottom_area_height
+                    new_img = Image.new("RGB", (orig_w, new_h), color=tuple(int(config["bg_color"].lstrip('#')[i:i+2], 16) for i in (0, 2, 4)))
+                    new_img.paste(img, (0, 0))
+
+                    draw = ImageDraw.Draw(new_img)
+                    font_size = config.get("font_size", 25)
+                    font_path = config.get("font_path", "msyh.ttc")
                     try:
-                        font = ImageFont.truetype("simhei.ttf", font_size)
+                        font = ImageFont.truetype(font_path, font_size)
                     except:
-                        font = ImageFont.load_default()
+                        try:
+                            font = ImageFont.truetype("simhei.ttf", font_size)
+                        except:
+                            font = ImageFont.load_default()
 
-                color_hex = config.get("font_color", "#000000")
-                r = int(color_hex[1:3], 16)
-                g = int(color_hex[3:5], 16)
-                b = int(color_hex[5:7], 16)
+                    color_hex = config.get("font_color", "#000000")
+                    r = int(color_hex[1:3], 16)
+                    g = int(color_hex[3:5], 16)
+                    b = int(color_hex[5:7], 16)
 
-                # ✅ 修改：使用配置的左右边距
-                margin_x = config.get("text_margin_x", 30)
-                margin_y = 50
-                max_text_width = orig_w - 2 * margin_x
-                lines = wrap_text(draw, text, font, max_text_width)
-                line_height = font_size + 6
-                total_text_h = len(lines) * line_height
-                start_y = orig_h + (bottom_area_height - total_text_h) // 2
-                y = max(start_y, orig_h + margin_y)
+                    margin_x = config.get("text_margin_x", 30)
+                    margin_y = 50
+                    max_text_width = orig_w - 2 * margin_x
+                    lines = wrap_text(draw, text, font, max_text_width)
+                    line_height = font_size + 6
+                    total_text_h = len(lines) * line_height
+                    start_y = orig_h + (bottom_area_height - total_text_h) // 2
+                    y = max(start_y, orig_h + margin_y)
 
-                for line in lines:
-                    bbox = draw.textbbox((0, 0), line, font=font)
-                    text_w = bbox[2] - bbox[0]
-                    # ✅ 修改：居中位置使用新的边距
-                    x = (orig_w - text_w) // 2
-                    if x < margin_x:
-                        x = margin_x
-                    draw.text((x, y), line, fill=(r, g, b), font=font)
-                    y += line_height
+                    for line in lines:
+                        bbox = draw.textbbox((0, 0), line, font=font)
+                        text_w = bbox[2] - bbox[0]
+                        x = (orig_w - text_w) // 2
+                        if x < margin_x:
+                            x = margin_x
+                        draw.text((x, y), line, fill=(r, g, b), font=font)
+                        y += line_height
 
-                new_img.save(output_path, quality=95)
-                return True, "成功添加底部文案"
+                    new_img.save(output_path, quality=95)
+                    return True, "成功添加底部文案"
+
+                else:
+                    # --- 手动输入 + 强制16:9画布模式 ---
+                    canvas_w = orig_w
+                    canvas_h = int(orig_w * 9 / 16)
+
+                    # 画布背景色
+                    canvas_bg_hex = config.get("canvas_bg_color", "#000000")
+                    canvas_bg_r = int(canvas_bg_hex[1:3], 16)
+                    canvas_bg_g = int(canvas_bg_hex[3:5], 16)
+                    canvas_bg_b = int(canvas_bg_hex[5:7], 16)
+
+                    # 字体设置
+                    font_size = config.get("font_size", 25)
+                    font_path = config.get("font_path", "msyh.ttc")
+                    try:
+                        font = ImageFont.truetype(font_path, font_size)
+                    except:
+                        try:
+                            font = ImageFont.truetype("simhei.ttf", font_size)
+                        except:
+                            font = ImageFont.load_default()
+
+                    # 计算文案所需高度
+                    margin_x = config.get("text_margin_x", 30)
+                    temp_draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+                    max_text_width = canvas_w - 2 * margin_x
+                    lines = wrap_text(temp_draw, text, font, max_text_width)
+                    line_height = font_size + 6
+                    text_total_h = len(lines) * line_height
+                    text_padding = 20
+                    text_area_h = text_total_h + text_padding * 2
+
+                    # 在可用区域内等比缩放原图，最大化显示
+                    available_h = max(canvas_h - text_area_h, 10)
+                    scale = min(canvas_w / orig_w, available_h / orig_h)
+                    scaled_w = int(orig_w * scale)
+                    scaled_h = int(orig_h * scale)
+
+                    logger.info(f"{image_path.name}: 强制16:9画布 {canvas_w}x{canvas_h}, 图片缩放{scale:.2f} → {scaled_w}x{scaled_h}, 文案区域{text_area_h}px")
+
+                    # 创建画布
+                    canvas = Image.new("RGB", (canvas_w, canvas_h), color=(canvas_bg_r, canvas_bg_g, canvas_bg_b))
+
+                    # 原图居中放置在画布上方区域
+                    img_resized = img.resize((scaled_w, scaled_h), Image.LANCZOS)
+                    img_x = (canvas_w - scaled_w) // 2
+                    img_y = (available_h - scaled_h) // 2
+                    canvas.paste(img_resized, (img_x, img_y))
+
+                    # 在图片下方绘制文案
+                    draw = ImageDraw.Draw(canvas)
+                    color_hex = config.get("font_color", "#000000")
+                    fr = int(color_hex[1:3], 16)
+                    fg = int(color_hex[3:5], 16)
+                    fb = int(color_hex[5:7], 16)
+
+                    text_y_start = available_h + text_padding
+                    for line in lines:
+                        bbox = draw.textbbox((0, 0), line, font=font)
+                        text_w = bbox[2] - bbox[0]
+                        x = (canvas_w - text_w) // 2
+                        if x < margin_x:
+                            x = margin_x
+                        draw.text((x, text_y_start), line, fill=(fr, fg, fb), font=font)
+                        text_y_start += line_height
+
+                    canvas.save(output_path, quality=95)
+                    return True, "成功添加底部文案(强制16:9画布)"
 
             # === 方案2：右下角空白块 ===
             elif mode == "block":
@@ -326,8 +404,16 @@ class BatchAddTextGUI:
                 logger.warning(f"窗口最大化失败: {e}")
 
     def setup_ui(self):
+        # 创建标签页容器
+        notebook = ttk.Notebook(self.root)
+        notebook.pack(fill=BOTH, expand=True, padx=5, pady=5)
+
+        # ==================== Tab 1: 文件目录 ====================
+        tab_dir = Frame(notebook)
+        notebook.add(tab_dir, text="  📂 文件目录  ")
+
         # 输入目录
-        dir_frame = LabelFrame(self.root, text="📂 图片目录", padx=10, pady=8)
+        dir_frame = LabelFrame(tab_dir, text="📂 图片目录", padx=10, pady=8)
         dir_frame.pack(fill=X, padx=10, pady=5)
         self.input_dir_var = StringVar(value=self.config["input_dir"])
         Entry(dir_frame, textvariable=self.input_dir_var, font=("Consolas", 9)).pack(side=LEFT, fill=X, expand=True)
@@ -335,14 +421,33 @@ class BatchAddTextGUI:
         Button(dir_frame, text="🔄 刷新", command=self.load_images).pack(side=RIGHT, padx=(5, 0))
 
         # ✅ 新增：输出目录
-        output_dir_frame = LabelFrame(self.root, text="💾 输出目录", padx=10, pady=8)
+        output_dir_frame = LabelFrame(tab_dir, text="💾 输出目录", padx=10, pady=8)
         output_dir_frame.pack(fill=X, padx=10, pady=5)
         self.output_dir_var = StringVar(value=self.config.get("output_dir", ""))
         Entry(output_dir_frame, textvariable=self.output_dir_var, font=("Consolas", 9)).pack(side=LEFT, fill=X, expand=True)
         Button(output_dir_frame, text="📁 选择目录", command=self.browse_output_dir).pack(side=RIGHT, padx=(5, 0))
 
+        # ==================== Tab 2: 配置 ====================
+        tab_config = Frame(notebook)
+        notebook.add(tab_config, text="  ⚙️ 配置  ")
+
+        # 配置页可滚动容器
+        config_canvas = Canvas(tab_config, highlightthickness=0)
+        config_scrollbar = Scrollbar(tab_config, orient=VERTICAL, command=config_canvas.yview)
+        self.config_scrollable = Frame(config_canvas)
+        self.config_scrollable.bind("<Configure>", lambda e: config_canvas.configure(scrollregion=config_canvas.bbox("all")))
+        config_canvas.create_window((0, 0), window=self.config_scrollable, anchor="nw")
+        config_canvas.configure(yscrollcommand=config_scrollbar.set)
+        config_canvas.pack(side=LEFT, fill=BOTH, expand=True)
+        config_scrollbar.pack(side=RIGHT, fill=Y)
+
+        def _on_config_mousewheel(event):
+            config_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        config_canvas.bind("<MouseWheel>", _on_config_mousewheel)
+        self.config_scrollable.bind("<MouseWheel>", _on_config_mousewheel)
+
         # ✅ 新增：绘本脚本 JSON（自动匹配剧情文案）
-        script_frame = LabelFrame(self.root, text="📜 绘本脚本 JSON（按文件名顺序匹配剧情描述）", padx=10, pady=8)
+        script_frame = LabelFrame(tab_dir, text="📜 绘本脚本 JSON（按文件名顺序匹配剧情描述）", padx=10, pady=8)
         script_frame.pack(fill=X, padx=10, pady=5)
 
         dir_row = Frame(script_frame)
@@ -364,7 +469,7 @@ class BatchAddTextGUI:
         self.json_count_label.pack(side=LEFT, padx=(10, 0))
 
         # 模式选择（使用 Radiobutton）
-        mode_frame = LabelFrame(self.root, text="🎨 显示模式", padx=10, pady=8)
+        mode_frame = LabelFrame(self.config_scrollable, text="🎨 显示模式", padx=10, pady=8)
         mode_frame.pack(fill=X, padx=10, pady=5)
 
         self.mode_var = StringVar(value=self.config.get("mode", "bottom"))
@@ -372,7 +477,7 @@ class BatchAddTextGUI:
         Radiobutton(mode_frame, text="在右下角叠加空白块显示文案", variable=self.mode_var, value="block", command=self.toggle_mode).pack(side=LEFT, padx=(20, 0))
 
         # ✅ 新增：亮度调节选项
-        brightness_frame = LabelFrame(self.root, text="☀️ 亮度调节", padx=10, pady=8)
+        brightness_frame = LabelFrame(self.config_scrollable, text="☀️ 亮度调节", padx=10, pady=8)
         brightness_frame.pack(fill=X, padx=10, pady=5)
 
         self.adjust_brightness_var = BooleanVar(value=self.config.get("adjust_brightness", False))
@@ -385,7 +490,7 @@ class BatchAddTextGUI:
         brightness_combo.pack(side=LEFT, padx=(5, 0))
 
         # 字体设置（始终显示）
-        font_frame = LabelFrame(self.root, text="🔤 字体设置", padx=10, pady=8)
+        font_frame = LabelFrame(self.config_scrollable, text="🔤 字体设置", padx=10, pady=8)
         font_frame.pack(fill=X, padx=10, pady=5)
 
         row = 0
@@ -419,12 +524,49 @@ class BatchAddTextGUI:
         Entry(font_frame, textvariable=self.font_path_var, width=20).grid(row=row, column=5, columnspan=2, padx=5, pady=(5,0))
 
         # 底部区域设置（初始状态根据 mode 决定）
-        self.bottom_frame = LabelFrame(self.root, text="🔽 底部扩展区域设置", padx=10, pady=8)
+        self.bottom_frame = LabelFrame(self.config_scrollable, text="🔽 底部扩展区域设置", padx=10, pady=8)
+        self.bottom_frame.pack(fill=X, padx=10, pady=5)
 
-        Label(self.bottom_frame, text="高度: 自动计算(输出16:9)").grid(row=0, column=0, sticky=W, columnspan=2)
+        # 高度增加方式：自动计算 / 手动输入
+        self.bottom_height_mode_var = StringVar(value=self.config.get("bottom_height_mode", "auto"))
+        height_mode_row = Frame(self.bottom_frame)
+        height_mode_row.pack(fill=X)
+        Label(height_mode_row, text="高度方式:").pack(side=LEFT)
+        Radiobutton(height_mode_row, text="自动计算(输出16:9)", variable=self.bottom_height_mode_var,
+                    value="auto", command=self.toggle_bottom_height_mode).pack(side=LEFT, padx=(5, 0))
+        Radiobutton(height_mode_row, text="手动输入", variable=self.bottom_height_mode_var,
+                    value="manual", command=self.toggle_bottom_height_mode).pack(side=LEFT, padx=(10, 0))
+
+        # 自动计算提示（auto 模式时显示）
+        self.bottom_auto_frame = Frame(self.bottom_frame)
+        Label(self.bottom_auto_frame, text="高度根据原图宽度自动计算，输出比例为16:9", fg="gray").pack(anchor=W)
+
+        # 手动输入区域（manual 模式时显示）
+        self.bottom_manual_frame = Frame(self.bottom_frame)
+        manual_row = Frame(self.bottom_manual_frame)
+        manual_row.pack(fill=X)
+        Label(manual_row, text="高度(px):").pack(side=LEFT)
+        self.bottom_h_var = StringVar(value=str(self.config.get("bottom_area_height", 150)))
+        Entry(manual_row, textvariable=self.bottom_h_var, width=8).pack(side=LEFT, padx=5)
+
+        self.force_169_var = BooleanVar(value=self.config.get("force_169", False))
+        Checkbutton(self.bottom_manual_frame, text="强制输出16:9(画布模式)",
+                    variable=self.force_169_var, command=self.toggle_force_169
+                    ).pack(anchor=W, pady=(5, 0))
+
+        # 画布背景色（强制16:9时显示）
+        self.canvas_bg_frame = Frame(self.bottom_manual_frame)
+        Label(self.canvas_bg_frame, text="画布背景色:").pack(side=LEFT)
+        self.canvas_bg_color_var = StringVar(value=self.config.get("canvas_bg_color", "#000000"))
+        Button(self.canvas_bg_frame, text="🎨 选择", command=self.choose_canvas_bg_color, width=6
+               ).pack(side=LEFT, padx=5)
+        self.canvas_bg_preview = Label(self.canvas_bg_frame, bg=self.canvas_bg_color_var.get(),
+                                       width=2, relief=SUNKEN)
+        self.canvas_bg_preview.pack(side=LEFT, padx=(0, 5))
 
         # 右下角空白块设置（放在字体设置之后）
-        self.block_frame = LabelFrame(self.root, text="🔷 右下角空白块设置", padx=10, pady=8)
+        self.block_frame = LabelFrame(self.config_scrollable, text="🔷 右下角空白块设置", padx=10, pady=8)
+        self.block_frame.pack(fill=X, padx=10, pady=5)
 
         Label(self.block_frame, text="宽度(%):").grid(row=0, column=0, sticky=W)
         self.blank_w_var = StringVar(value=str(self.config.get("blank_block_width_pct", 10)))
@@ -437,8 +579,12 @@ class BatchAddTextGUI:
         # 初始显示正确面板
         self.toggle_mode()
 
+        # ==================== Tab 3: 图片文案 ====================
+        tab_images = Frame(notebook)
+        notebook.add(tab_images, text="  📝 图片文案  ")
+
         # 图片与文案列表
-        list_frame = LabelFrame(self.root, text="📝 为每张图片输入文案", padx=10, pady=8)
+        list_frame = LabelFrame(tab_images, text="📝 为每张图片输入文案", padx=10, pady=8)
         list_frame.pack(fill=BOTH, expand=True, padx=10, pady=5)
 
         self.canvas = Canvas(list_frame)
@@ -452,39 +598,37 @@ class BatchAddTextGUI:
         self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
         self.canvas.configure(yscrollcommand=scrollbar.set)
 
-        # 绑定鼠标滚轮（Windows）
+        # 绑定鼠标滚轮（仅图片列表标签页内）
         def _on_mousewheel(event):
             self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
-        self.canvas.bind_all("<MouseWheel>", _on_mousewheel)
+        self.canvas.bind("<MouseWheel>", _on_mousewheel)
+        self.scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
 
         self.canvas.pack(side=LEFT, fill=BOTH, expand=True)
         scrollbar.pack(side=RIGHT, fill=Y)
 
         # 控制按钮
-        btn_frame = Frame(self.root)
-        btn_frame.pack(pady=10)
+        btn_frame = Frame(tab_images)
+        btn_frame.pack(pady=5)
         self.start_btn = Button(btn_frame, text="▶️ 开始处理", command=self.start_processing, bg="#4CAF50", fg="white", width=15)
         self.start_btn.pack(side=LEFT, padx=5)
 
-        # 新增：测试效果按钮（随机抽样生成少量图片查看效果）
         self.test_btn = Button(btn_frame, text=f"🧪 测试效果({TEST_SAMPLE_COUNT}张)", command=self.start_test, bg="#FF9800", fg="white", width=15)
         self.test_btn.pack(side=LEFT, padx=5)
 
-        # ✅ 新增：粘贴JSON按钮
         Button(btn_frame, text="📋 粘贴JSON", command=self.paste_json_texts, bg="#2196F3", fg="white", width=12).pack(side=LEFT, padx=5)
 
-        # ✅ 新增：进度条
+        # 进度条
         self.progress_var = DoubleVar()
-        self.progress_bar = ttk.Progressbar(self.root, variable=self.progress_var, maximum=100, length=400)
+        self.progress_bar = ttk.Progressbar(tab_images, variable=self.progress_var, maximum=100, length=400)
         self.progress_bar.pack(pady=5)
 
-        # 状态栏
+        # 状态栏（全局，不在标签页内）
         self.status_var = StringVar(value="就绪")
         status_label = Label(self.root, textvariable=self.status_var, bd=1, relief=SUNKEN, anchor=W, fg="blue")
         status_label.pack(side=BOTTOM, fill=X)
 
         self.load_images()
-        # ✅ 新增：加载脚本 JSON 下拉列表
         self.refresh_script_json_list()
 
     def _show_toast(self, title, message, level="info", duration_ms=3500):
@@ -530,9 +674,34 @@ class BatchAddTextGUI:
         if mode == "bottom":
             self.bottom_frame.pack(fill=X, padx=10, pady=5)
             self.block_frame.pack_forget()
+            self.toggle_bottom_height_mode()
         else:
             self.bottom_frame.pack_forget()
             self.block_frame.pack(fill=X, padx=10, pady=5)
+
+    def toggle_bottom_height_mode(self):
+        """切换底部扩展区域的高度方式：自动计算 / 手动输入"""
+        if self.bottom_height_mode_var.get() == "auto":
+            self.bottom_auto_frame.pack(fill=X, pady=(5, 0))
+            self.bottom_manual_frame.pack_forget()
+        else:
+            self.bottom_auto_frame.pack_forget()
+            self.bottom_manual_frame.pack(fill=X, pady=(5, 0))
+            self.toggle_force_169()
+
+    def toggle_force_169(self):
+        """切换强制16:9画布背景色选择器的显示"""
+        if self.force_169_var.get():
+            self.canvas_bg_frame.pack(fill=X, pady=(5, 0))
+        else:
+            self.canvas_bg_frame.pack_forget()
+
+    def choose_canvas_bg_color(self):
+        """选择强制16:9画布背景色"""
+        color_code = colorchooser.askcolor(title="选择画布背景色", color=self.canvas_bg_color_var.get())[1]
+        if color_code:
+            self.canvas_bg_color_var.set(color_code)
+            self.canvas_bg_preview.config(bg=color_code)
 
     def browse_input_dir(self):
         folder = filedialog.askdirectory(title="选择图片目录", initialdir=self.input_dir_var.get())
@@ -768,7 +937,10 @@ class BatchAddTextGUI:
             "bg_color": self.bg_color_var.get(),
             "font_path": self.font_path_var.get(),
             "opacity": opacity,
-            "bottom_area_height": self.config.get("bottom_area_height", 150),  # 动态计算，保留配置兼容
+            "bottom_area_height": int(self.bottom_h_var.get()) if self.bottom_height_mode_var.get() == "manual" else self.config.get("bottom_area_height", 150),
+            "bottom_height_mode": self.bottom_height_mode_var.get(),
+            "force_169": self.force_169_var.get(),
+            "canvas_bg_color": self.canvas_bg_color_var.get(),
             "mode": mode,
             "blank_block_width_pct": float(self.blank_w_var.get()),
             "blank_block_height_pct": float(self.blank_h_var.get()),

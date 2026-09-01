@@ -566,6 +566,16 @@
             ],
             "script": "craw\\youtube_downloader_gpt.pyw",
             "description": "youtube视频下载"
+        },
+        {
+            "name": "绘本旁白音频生成器",
+            "keywords": [
+                "qt5",
+                "hbpb",
+                "hbbypyscqr"
+            ],
+            "script": "other\\绘本旁白音频生成器.py",
+            "description": "AI绘本旁白音频生成（edge-tts/pyttsx3/sherpa-onnx）"
         }
     ]
 }

@@ -1,0 +1,14 @@
+{
+  "last_json": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\AI绘本脚本\\古人-绝句(迟日)-杜甫.json",
+  "out_dir": "D:\\FILES\\糖蛋蛋(＾Ｕ＾)ノ~ＹＯ\\AI绘本\\古人-绝句(迟日)-杜甫\\音频",
+  "scheme": "edge-tts",
+  "resource_dir": "D:/dev/sherpa-models/sherpa-onnx-vits-zh-ll",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "sid": "2",
+  "fade": true,
+  "fade_ms": "1200",
+  "tail_ms": "900",
+  "edge_interval": "0.8",
+  "edge_retries": "3",
+  "edge_retry_wait": "5"
+}
