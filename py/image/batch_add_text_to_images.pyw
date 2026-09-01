@@ -176,9 +176,22 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
 
             mode = config.get("mode", "bottom")
 
-            # === 方案1：底部扩展区域 ===
+            # === 方案1：底部扩展区域（动态计算高度，使输出图片比例为16:9）===
             if mode == "bottom":
-                new_h = orig_h + int(config.get("bottom_area_height", 150))
+                # 根据原图宽度动态计算底部扩展高度，使输出图片达到 16:9
+                target_output_h = int(orig_w * 9 / 16)
+                bottom_area_height = target_output_h - orig_h
+                min_text_area = 60  # 最小文本区域高度（至少容纳一行文字）
+                if bottom_area_height <= 0:
+                    logger.warning(f"{image_path.name}: 原图比例已≥16:9({orig_w}x{orig_h})，无扩展区域，使用最小高度{min_text_area}px")
+                    bottom_area_height = min_text_area
+                elif bottom_area_height < min_text_area:
+                    logger.info(f"{image_path.name}: 计算的扩展区域{bottom_area_height}px过小，使用最小高度{min_text_area}px")
+                    bottom_area_height = min_text_area
+                else:
+                    logger.info(f"{image_path.name}: 动态计算扩展区域高度={bottom_area_height}px (原图{orig_w}x{orig_h}, 目标输出{orig_w}x{target_output_h})")
+
+                new_h = orig_h + bottom_area_height
                 new_img = Image.new("RGB", (orig_w, new_h), color=tuple(int(config["bg_color"].lstrip('#')[i:i+2], 16) for i in (0, 2, 4)))
                 new_img.paste(img, (0, 0))
 
@@ -205,7 +218,7 @@ def process_image_with_text(image_path: Path, output_path: Path, text: str, conf
                 lines = wrap_text(draw, text, font, max_text_width)
                 line_height = font_size + 6
                 total_text_h = len(lines) * line_height
-                start_y = orig_h + (int(config["bottom_area_height"]) - total_text_h) // 2
+                start_y = orig_h + (bottom_area_height - total_text_h) // 2
                 y = max(start_y, orig_h + margin_y)
 
                 for line in lines:
@@ -408,9 +421,7 @@ class BatchAddTextGUI:
         # 底部区域设置（初始状态根据 mode 决定）
         self.bottom_frame = LabelFrame(self.root, text="🔽 底部扩展区域设置", padx=10, pady=8)
 
-        Label(self.bottom_frame, text="高度(px):").grid(row=0, column=0, sticky=W)
-        self.bottom_h_var = StringVar(value=str(self.config.get("bottom_area_height", 150)))
-        Entry(self.bottom_frame, textvariable=self.bottom_h_var, width=8).grid(row=0, column=1, padx=5)
+        Label(self.bottom_frame, text="高度: 自动计算(输出16:9)").grid(row=0, column=0, sticky=W, columnspan=2)
 
         # 右下角空白块设置（放在字体设置之后）
         self.block_frame = LabelFrame(self.root, text="🔷 右下角空白块设置", padx=10, pady=8)
@@ -739,11 +750,7 @@ class BatchAddTextGUI:
                 raise ValueError("左右边距不能为负数")
 
             mode = self.mode_var.get()
-            if mode == "bottom":
-                bottom_h = int(self.bottom_h_var.get())
-                if bottom_h < 10:
-                    raise ValueError("底部高度至少10px")
-            else:
+            if mode != "bottom":
                 w_pct = float(self.blank_w_var.get())
                 h_pct = float(self.blank_h_var.get())
                 if not (1 <= w_pct <= 100) or not (1 <= h_pct <= 100):
@@ -761,7 +768,7 @@ class BatchAddTextGUI:
             "bg_color": self.bg_color_var.get(),
             "font_path": self.font_path_var.get(),
             "opacity": opacity,
-            "bottom_area_height": int(self.bottom_h_var.get()),
+            "bottom_area_height": self.config.get("bottom_area_height", 150),  # 动态计算，保留配置兼容
             "mode": mode,
             "blank_block_width_pct": float(self.blank_w_var.get()),
             "blank_block_height_pct": float(self.blank_h_var.get()),
