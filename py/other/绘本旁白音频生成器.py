@@ -177,10 +177,13 @@ def _gen_edge_tts(text: str, out_path: str, voice: str, log,
     """
     import asyncio
 
-    # Windows 下旧版 Python 的 ProactorEventLoop 会闪黑框
-    # Python 3.13+ 已修复，仅旧版需要切换
-    if sys.platform == "win32" and sys.version_info < (3, 13):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    # Windows 下 ProactorEventLoop 会闪黑框，切换到 SelectorEventLoop
+    # 3.13+ 虽标记弃用但仍需设置，抑制 DeprecationWarning 即可
+    if sys.platform == "win32":
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
     last_err = None
     for attempt in range(1, retries + 1):
@@ -750,8 +753,11 @@ class App:
     def _load_edge_voices(self):
         try:
             import asyncio
-            if sys.platform == "win32" and sys.version_info < (3, 13):
-                asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+            if sys.platform == "win32":
+                import warnings
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore", DeprecationWarning)
+                    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
             voices = asyncio.run(edge_tts.list_voices())
             zh = [v["ShortName"]
                   for v in voices if v.get("Locale", "").startswith("zh")]
