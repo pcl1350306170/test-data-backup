@@ -177,8 +177,9 @@ def _gen_edge_tts(text: str, out_path: str, voice: str, log,
     """
     import asyncio
 
-    # Windows 下 ProactorEventLoop 会闪黑框，切换到 SelectorEventLoop
-    if sys.platform == "win32":
+    # Windows 下旧版 Python 的 ProactorEventLoop 会闪黑框
+    # Python 3.13+ 已修复，仅旧版需要切换
+    if sys.platform == "win32" and sys.version_info < (3, 13):
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
     last_err = None
@@ -749,7 +750,7 @@ class App:
     def _load_edge_voices(self):
         try:
             import asyncio
-            if sys.platform == "win32":
+            if sys.platform == "win32" and sys.version_info < (3, 13):
                 asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
             voices = asyncio.run(edge_tts.list_voices())
             zh = [v["ShortName"]
@@ -962,7 +963,87 @@ class App:
             logger.error("加载配置失败: %s" % e)
 
 
+def main_cli():
+    """命令行模式：无 GUI，直接生成音频"""
+    import argparse
+    parser = argparse.ArgumentParser(description="绘本旁白音频生成器（CLI模式）")
+    parser.add_argument("--json", required=True, help="JSON 脚本文件路径")
+    parser.add_argument("--output", required=True, help="输出目录")
+    parser.add_argument("--scheme", help="生成方案（默认读取配置）")
+    parser.add_argument("--voice", help="音色（edge-tts）")
+    parser.add_argument("--sid", help="音色ID（sherpa-onnx）")
+    args = parser.parse_args()
+
+    # 读取配置作为默认值
+    cfg = {}
+    if CONFIG_PATH.exists():
+        try:
+            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            pass
+
+    scheme = args.scheme or cfg.get("scheme", "edge-tts")
+    voice = args.voice or cfg.get("voice", EDGE_DEFAULT_VOICE)
+    sid_raw = args.sid or cfg.get("sid", "0")
+    sid = sid_raw.split(" - ")[0] if " - " in sid_raw else sid_raw
+    resource_dir = cfg.get("resource_dir", "") or None
+    fade = cfg.get("fade", True)
+    fade_ms = int(cfg.get("fade_ms", 1200) or 1200)
+    tail_ms = int(cfg.get("tail_ms", 900) or 900)
+    edge_interval = float(cfg.get("edge_interval", 0.8) or 0.8)
+    edge_retries = int(cfg.get("edge_retries", 3) or 3)
+    edge_retry_wait = float(cfg.get("edge_retry_wait", 5) or 5)
+
+    # 读取 JSON
+    print(f"[INFO] 读取 JSON: {args.json}")
+    with open(args.json, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    items = data if isinstance(data, list) else [data]
+    texts = [it["plotContent"] for it in items if isinstance(it, dict) and it.get("plotContent")]
+    if not texts:
+        print("[ERROR] JSON 中未找到 plotContent 字段")
+        sys.exit(1)
+
+    os.makedirs(args.output, exist_ok=True)
+    gen = GENERATORS.get(scheme)
+    if not gen:
+        print(f"[ERROR] 未知方案: {scheme}")
+        sys.exit(1)
+
+    print(f"[INFO] 方案: {scheme}, 共 {len(texts)} 段文本")
+    for idx, text in enumerate(texts, start=1):
+        name = "%03d.wav" % idx
+        out_path = os.path.join(args.output, name)
+        print(f"[INFO] 生成 {name} ...")
+        try:
+            if scheme == "edge-tts":
+                time.sleep(edge_interval)
+                gen(text, out_path, voice, lambda s: print(f"  {s}"),
+                    retries=edge_retries, retry_wait=edge_retry_wait)
+            elif scheme == "pyttsx3":
+                gen(text, out_path, voice, lambda s: print(f"  {s}"))
+            elif scheme == "sherpa-onnx":
+                gen(text, out_path, resource_dir, sid, lambda s: print(f"  {s}"))
+            else:
+                gen(text, out_path, resource_dir, lambda s: print(f"  {s}"))
+
+            if fade and os.path.exists(out_path):
+                apply_fade_out(out_path, fade_ms, tail_ms)
+                print(f"  [淡出] 已处理")
+        except Exception as e:
+            print(f"[ERROR] {name} 生成失败: {e}")
+            continue
+
+    print(f"[DONE] 共生成 {len(texts)} 段音频到: {args.output}")
+
+
 def main():
+    # 检查是否有命令行参数（排除脚本名本身）
+    if len(sys.argv) > 1 and sys.argv[1] in ("--json", "--output", "-h", "--help"):
+        main_cli()
+        return
+
     root = tk.Tk()
     # 主题
     try:

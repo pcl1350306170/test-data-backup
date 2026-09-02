@@ -667,7 +667,167 @@ class AudioMergerApp:
             logger.error("加载配置失败: %s", e)
 
 
-if __name__ == "__main__":
+def main_cli():
+    """命令行模式：无 GUI，直接合并音频/生成视频"""
+    import argparse
+    from datetime import date
+
+    parser = argparse.ArgumentParser(description="音频合并转视频（CLI模式）")
+    parser.add_argument("--input", required=True, help="音频目录（WAV文件）")
+    parser.add_argument("--output", required=True, help="输出目录")
+    parser.add_argument("--bgm", help="背景音乐文件路径")
+    parser.add_argument("--bgm-volume", type=int, default=30, help="BGM音量 0-100（默认30）")
+    parser.add_argument("--images", help="图片目录（生成视频时需要）")
+    parser.add_argument("--video", action="store_true", help="生成视频")
+    args = parser.parse_args()
+
+    if AudioSegment is None:
+        print("[ERROR] 缺少 pydub 库，请执行: pip install pydub")
+        sys.exit(1)
+
+    # 读取配置作为默认值
+    cfg = {}
+    if CONFIG_PATH.exists():
+        try:
+            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                cfg = json.load(f)
+        except Exception:
+            pass
+
+    bgm_volume = args.bgm_volume if args.bgm_volume != 30 else cfg.get("bgm_volume", 30)
+
+    # 扫描音频目录
+    wav_files = sorted(
+        [f for f in os.listdir(args.input) if f.lower().endswith(".wav")],
+        key=lambda x: x.lower())
+    if not wav_files:
+        print(f"[ERROR] 音频目录为空: {args.input}")
+        sys.exit(1)
+    print(f"[INFO] 找到 {len(wav_files)} 个 WAV 文件")
+
+    # 扫描图片目录
+    png_files = []
+    if args.video and args.images:
+        png_files = sorted(
+            [f for f in os.listdir(args.images) if f.lower().endswith(".png")],
+            key=lambda x: x.lower())
+        print(f"[INFO] 找到 {len(png_files)} 张 PNG 图片")
+
+    # 加载 BGM
+    bgm_audio = None
+    bgm_path = args.bgm or cfg.get("bgm_path", "")
+    if bgm_path and os.path.isfile(bgm_path):
+        try:
+            bgm_audio = AudioSegment.from_file(bgm_path)
+            print(f"[INFO] BGM 已加载: {bgm_path}")
+        except Exception as e:
+            print(f"[WARN] BGM 加载失败: {e}")
+
+    # 合并音频
+    print("[INFO] 开始合并音频...")
+    combined = AudioSegment.empty()
+    segment_durations = []
+    for i, fname in enumerate(wav_files):
+        fpath = os.path.join(args.input, fname)
+        print(f"  [{i+1}/{len(wav_files)}] {fname}")
+        try:
+            seg = AudioSegment.from_wav(fpath)
+            segment_durations.append(len(seg) / 1000.0)
+            combined += seg
+        except Exception as e:
+            print(f"  [ERROR] {fname}: {e}")
+
+    if len(combined) == 0:
+        print("[ERROR] 合并结果为空")
+        sys.exit(1)
+
+    # 叠加 BGM
+    if bgm_audio and bgm_volume > 0:
+        print(f"[INFO] 叠加 BGM (音量={bgm_volume}%)")
+        gain = -30.0 + (bgm_volume / 100.0) * 30.0
+        bgm = bgm_audio.apply_gain(gain)
+        if bgm.channels != combined.channels:
+            bgm = bgm.set_channels(combined.channels)
+        if len(bgm) < len(combined):
+            loops = (len(combined) // len(bgm)) + 1
+            for _ in range(loops - 1):
+                bgm = bgm + bgm_audio.apply_gain(gain)
+        bgm = bgm[:len(combined)].fade_out(2000)
+        combined = combined.overlay(bgm)
+
+    # 导出音频
+    os.makedirs(args.output, exist_ok=True)
+    dir_name = os.path.basename(os.path.normpath(args.output))
+    date_str = date.today().strftime("%Y%m%d")
+    output_path = os.path.join(args.output, f"{dir_name}_{date_str}.wav")
+    print(f"[INFO] 导出音频: {output_path}")
+    combined.export(output_path, format="wav")
+    duration_sec = len(combined) / 1000
+    print(f"[DONE] 音频导出完成，时长 {duration_sec:.1f} 秒")
+
+    # 生成视频
+    if args.video and png_files and shutil.which("ffmpeg"):
+        if len(png_files) != len(wav_files):
+            print(f"[WARN] 图片数量({len(png_files)})与音频数量({len(wav_files)})不一致，跳过视频生成")
+            return
+
+        video_path = os.path.join(args.output, f"{dir_name}_{date_str}.mp4")
+        print(f"[INFO] 开始生成视频: {video_path}")
+
+        # 生成 concat 清单
+        concat_file = os.path.join(tempfile.gettempdir(), "audio_merger_concat.txt")
+        with open(concat_file, "w", encoding="utf-8") as f:
+            for i, fname in enumerate(wav_files):
+                base = os.path.splitext(fname)[0]
+                png_name = base + ".png"
+                png_match = [p for p in png_files if p.lower() == png_name.lower()]
+                if not png_match:
+                    continue
+                img_path = os.path.join(args.images, png_match[0]).replace("\\", "/")
+                dur = segment_durations[i] if i < len(segment_durations) else 1.0
+                f.write(f"file '{img_path}'\n")
+                f.write(f"duration {dur}\n")
+            if wav_files:
+                base = os.path.splitext(wav_files[-1])[0]
+                png_match = [p for p in png_files if p.lower() == (base + ".png").lower()]
+                if png_match:
+                    last_img = os.path.join(args.images, png_match[0]).replace("\\", "/")
+                    f.write(f"file '{last_img}'\n")
+
+        cmd = [
+            "ffmpeg", "-y",
+            "-f", "concat", "-safe", "0", "-i", concat_file,
+            "-i", output_path,
+            "-c:v", "libx264", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:a", "192k", "-shortest",
+            video_path
+        ]
+        result = subprocess.run(
+            cmd, capture_output=True, text=True,
+            encoding="utf-8", errors="replace",
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0)
+
+        if result.returncode == 0:
+            print(f"[DONE] 视频生成完成: {video_path}")
+        else:
+            print(f"[ERROR] 视频生成失败: {result.stderr[-500:]}")
+    elif args.video:
+        if not shutil.which("ffmpeg"):
+            print("[WARN] ffmpeg 不可用，跳过视频生成")
+        elif not png_files:
+            print("[WARN] 无图片，跳过视频生成")
+
+
+def main():
+    # 检查是否有命令行参数
+    if len(sys.argv) > 1 and sys.argv[1] in ("--input", "--output", "-h", "--help"):
+        main_cli()
+        return
+
     root = tk.Tk()
     app = AudioMergerApp(root)
     root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
