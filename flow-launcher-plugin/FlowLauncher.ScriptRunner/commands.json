@@ -587,6 +587,16 @@
             ],
             "script": "other\\音频合并转视频.pyw",
             "description": "合并WAV音频+BGM+图片转视频"
+        },
+        {
+            "name": "绘本一键生成（音频+视频）",
+            "keywords": [
+                "hbyjsc",
+                "hb",
+                "huijb"
+            ],
+            "script": "other\\绘本一键生成.py",
+            "description": "绘本一键生成：输入关键字自动匹配JSON、生成音频、合成视频"
         }
     ]
 }
