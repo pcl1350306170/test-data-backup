@@ -1,0 +1,15 @@
+{
+  "api_provider": "baidu",
+  "baidu_appid": "20251112002496143",
+  "baidu_secret": "DbG9989cWoQmr3syzT35",
+  "google_api_key": "",
+  "timeout": 30,
+  "rate_limit": 1.0,
+  "ignore_patterns": [
+    ".git",
+    "node_modules",
+    "venv",
+    "__pycache__",
+    ".translation_logs"
+  ]
+}

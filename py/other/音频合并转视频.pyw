@@ -41,6 +41,50 @@ try:
 except Exception:
     AudioSegment = None
 
+_NO_WINDOW = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+
+
+def _ffmpeg_load_audio(filepath):
+    """通过 ffmpeg 加载音频为 AudioSegment（避免 pydub 弹黑窗）"""
+    probe = subprocess.run(
+        ["ffprobe", "-v", "quiet", "-show_entries",
+         "stream=sample_rate,channels,channel_layout",
+         "-of", "csv=p=0:nk=1", filepath],
+        capture_output=True, encoding="utf-8", errors="replace",
+        creationflags=_NO_WINDOW)
+    sample_rate, channels = 44100, 2
+    for line in (probe.stdout or "").strip().split("\n"):
+        parts = line.strip().split(",")
+        if len(parts) >= 2:
+            try:
+                sample_rate = int(parts[0])
+                channels = int(parts[1])
+                break
+            except (ValueError, IndexError):
+                pass
+    sample_fmt = "s16le" if sample_rate <= 48000 else "fltp"
+    acodec = "pcm_s16le" if sample_fmt == "s16le" else "pcm_f32le"
+    raw_result = subprocess.run(
+        ["ffmpeg", "-y", "-i", filepath,
+         "-f", sample_fmt, "-acodec", acodec,
+         "-ar", str(sample_rate), "-ac", str(channels), "pipe:1"],
+        capture_output=True, creationflags=_NO_WINDOW)
+    sw = 2 if sample_fmt == "s16le" else 4
+    return AudioSegment(
+        data=raw_result.stdout,
+        sample_width=sw, frame_rate=sample_rate, channels=channels)
+
+
+def _ffmpeg_export_wav(audio_segment, output_path):
+    """通过 ffmpeg 管道导出 AudioSegment 为 WAV（避免 pydub 弹黑窗）"""
+    subprocess.run(
+        ["ffmpeg", "-y",
+         "-f", "s16le", "-ar", str(audio_segment.frame_rate),
+         "-ac", str(audio_segment.channels), "-i", "pipe:0",
+         "-acodec", "pcm_s16le", output_path],
+        input=audio_segment.raw_data,
+        capture_output=True, creationflags=_NO_WINDOW)
+
 
 class AudioMergerApp:
     def __init__(self, root: tk.Tk):
@@ -265,8 +309,8 @@ class AudioMergerApp:
                 return
             self.bgm_path.set(path)
             try:
-                self.bgm_audio = AudioSegment.from_file(path)
-                logger.info("背景音乐已加载: %s", path)
+                self.bgm_audio = _ffmpeg_load_audio(path)
+                logger.info("背景音乐已加载(ffmpeg): %s", path)
             except Exception as e:
                 self._show_toast("错误", f"无法加载背景音乐: {e}", level="error")
                 self.bgm_audio = None
@@ -367,9 +411,9 @@ class AudioMergerApp:
         self.root.after(0, self.status_text.set, f"{tag}正在导出音频...")
         self.root.after(0, self.progress_var.set, 90)
         try:
-            combined.export(output_path, format="wav")
+            _ffmpeg_export_wav(combined, output_path)
             duration_sec = len(combined) / 1000
-            logger.info("%s音频导出成功: %s (%.1f秒)", tag, output_path, duration_sec)
+            logger.info("%s音频导出成功(ffmpeg): %s (%.1f秒)", tag, output_path, duration_sec)
         except Exception as e:
             logger.error("导出失败: %s", e)
             self.root.after(0, lambda: self._show_toast("错误", f"导出失败: {e}", level="error"))
@@ -484,6 +528,7 @@ class AudioMergerApp:
                 "-f", "concat", "-safe", "0", "-i", concat_file,
                 "-i", audio_path,
                 "-c:v", "libx264",
+                "-preset", "ultrafast",
                 "-pix_fmt", "yuv420p",
                 "-c:a", "aac",
                 "-b:a", "192k",
@@ -650,7 +695,7 @@ class AudioMergerApp:
                 if cfg.get("bgm_path"):
                     self.bgm_path.set(cfg["bgm_path"])
                     try:
-                        self.bgm_audio = AudioSegment.from_file(cfg["bgm_path"])
+                        self.bgm_audio = _ffmpeg_load_audio(cfg["bgm_path"])
                     except Exception:
                         self.bgm_audio = None
                         self.bgm_path.set("")
@@ -718,8 +763,8 @@ def main_cli():
     bgm_path = args.bgm or cfg.get("bgm_path", "")
     if bgm_path and os.path.isfile(bgm_path):
         try:
-            bgm_audio = AudioSegment.from_file(bgm_path)
-            print(f"[INFO] BGM 已加载: {bgm_path}")
+            bgm_audio = _ffmpeg_load_audio(bgm_path)
+            print(f"[INFO] BGM 已加载(ffmpeg): {bgm_path}")
         except Exception as e:
             print(f"[WARN] BGM 加载失败: {e}")
 
@@ -761,7 +806,7 @@ def main_cli():
     date_str = date.today().strftime("%Y%m%d")
     output_path = os.path.join(args.output, f"{dir_name}_{date_str}.wav")
     print(f"[INFO] 导出音频: {output_path}")
-    combined.export(output_path, format="wav")
+    _ffmpeg_export_wav(combined, output_path)
     duration_sec = len(combined) / 1000
     print(f"[DONE] 音频导出完成，时长 {duration_sec:.1f} 秒")
 
@@ -798,7 +843,7 @@ def main_cli():
             "ffmpeg", "-y",
             "-f", "concat", "-safe", "0", "-i", concat_file,
             "-i", output_path,
-            "-c:v", "libx264", "-pix_fmt", "yuv420p",
+            "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
             "-c:a", "aac", "-b:a", "192k", "-shortest",
             video_path
         ]

@@ -23,6 +23,7 @@ import os
 import sys
 import queue
 import random
+import shutil
 import subprocess
 import tempfile
 import threading
@@ -77,6 +78,28 @@ try:
 except Exception:
     AudioSegment = None
     HAS_PYDUB = False
+
+_NO_WINDOW = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+
+
+def _ffmpeg_convert(input_path, output_path):
+    """用 ffmpeg 将任意格式音频转为 WAV（不弹黑窗）"""
+    subprocess.run(
+        ["ffmpeg", "-y", "-i", input_path,
+         "-acodec", "pcm_s16le", output_path],
+        capture_output=True, creationflags=_NO_WINDOW)
+
+
+def _ffmpeg_export_wav(audio_segment, output_path):
+    """通过 ffmpeg 管道导出 AudioSegment 为 WAV（不弹黑窗）"""
+    subprocess.run(
+        ["ffmpeg", "-y",
+         "-f", "s16le", "-ar", str(audio_segment.frame_rate),
+         "-ac", str(audio_segment.channels), "-i", "pipe:0",
+         "-acodec", "pcm_s16le", output_path],
+        input=audio_segment.raw_data,
+        capture_output=True, creationflags=_NO_WINDOW)
+
 
 # CosyVoice 就绪判断：worker 脚本存在即视为"可配置"（真正的就绪需填写 conda 与仓库路径）
 COSYVOICE_WORKER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cosyvoice_worker.py")
@@ -199,8 +222,10 @@ def _gen_edge_tts(text: str, out_path: str, voice: str, log,
                 await communicate.save(out_path)
 
             asyncio.run(_run())
-            # edge-tts 默认输出 mp3，若扩展名是 wav 仍需确认格式；统一转 wav
-            if HAS_PYDUB:
+            # edge-tts 默认输出 mp3，统一转为 wav
+            if shutil.which("ffmpeg"):
+                _ffmpeg_convert(out_path, out_path)
+            elif HAS_PYDUB:
                 raw = AudioSegment.from_file(out_path, format="mp3")
                 raw.export(out_path, format="wav")
             log("  [edge-tts] 已生成: %s（音色 %s）" % (os.path.basename(out_path), voice))
@@ -344,7 +369,10 @@ def apply_fade_out(wav_path, fade_ms=1200, tail_ms=900):
     audio = audio.fade_out(fade)
     if tail_ms > 0:
         audio = audio + AudioSegment.silent(duration=tail_ms)
-    audio.export(wav_path, format="wav")
+    if shutil.which("ffmpeg"):
+        _ffmpeg_export_wav(audio, wav_path)
+    else:
+        audio.export(wav_path, format="wav")
 
 
 # ============================================================
@@ -673,7 +701,8 @@ class App:
                     cmd = ["afplay", wav_path]
                 else:
                     cmd = ["aplay", wav_path]
-                subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                 creationflags=_NO_WINDOW)
             self._thread_log("  [播放] %s" % os.path.basename(wav_path))
         except Exception as e:
             self._thread_log("  [提示] 自动播放失败: %s" % e)
