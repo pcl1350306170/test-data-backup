@@ -380,7 +380,7 @@ class AudioMergerApp:
             logger.info("%s正在合并 [%d/%d]: %s", tag, i + 1, total, fname)
 
             try:
-                seg = AudioSegment.from_wav(fpath)
+                seg = _ffmpeg_load_audio(fpath)
                 segment_durations.append(len(seg) / 1000.0)  # 秒
                 combined += seg
             except Exception as e:
@@ -776,7 +776,7 @@ def main_cli():
         fpath = os.path.join(args.input, fname)
         print(f"  [{i+1}/{len(wav_files)}] {fname}")
         try:
-            seg = AudioSegment.from_wav(fpath)
+            seg = _ffmpeg_load_audio(fpath)
             segment_durations.append(len(seg) / 1000.0)
             combined += seg
         except Exception as e:

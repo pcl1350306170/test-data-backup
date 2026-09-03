@@ -101,6 +101,34 @@ def _ffmpeg_export_wav(audio_segment, output_path):
         capture_output=True, creationflags=_NO_WINDOW)
 
 
+def _ffmpeg_load_audio(filepath):
+    """通过 ffmpeg 管道加载音频为 AudioSegment（不弹黑窗）"""
+    probe = subprocess.run(
+        ["ffprobe", "-v", "quiet", "-show_entries",
+         "stream=sample_rate,channels",
+         "-of", "csv=p=0:nk=1", filepath],
+        capture_output=True, encoding="utf-8", errors="replace",
+        creationflags=_NO_WINDOW)
+    sample_rate, channels = 44100, 1
+    for line in (probe.stdout or "").strip().split("\n"):
+        parts = line.strip().split(",")
+        if len(parts) >= 2:
+            try:
+                sample_rate = int(parts[0])
+                channels = int(parts[1])
+                break
+            except (ValueError, IndexError):
+                pass
+    raw_result = subprocess.run(
+        ["ffmpeg", "-y", "-i", filepath,
+         "-f", "s16le", "-acodec", "pcm_s16le",
+         "-ar", str(sample_rate), "-ac", str(channels), "pipe:1"],
+        capture_output=True, creationflags=_NO_WINDOW)
+    return AudioSegment(
+        data=raw_result.stdout,
+        sample_width=2, frame_rate=sample_rate, channels=channels)
+
+
 # CosyVoice 就绪判断：worker 脚本存在即视为"可配置"（真正的就绪需填写 conda 与仓库路径）
 COSYVOICE_WORKER = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cosyvoice_worker.py")
 # 常用 CosyVoice 音色（SFT 预置）
@@ -333,7 +361,7 @@ def _gen_cosyvoice(text: str, out_path: str, model_dir: str, spk: str,
     try:
         proc = _sp.run(cmd, capture_output=True, text=True,
                        encoding="utf-8", errors="replace", timeout=600,
-                       env=extra_env)
+                       env=extra_env, creationflags=_NO_WINDOW)
     except _sp.TimeoutExpired:
         raise RuntimeError("CosyVoice 生成超时（>10分钟），可能模型未就绪或显存不足。")
     except FileNotFoundError:
@@ -360,10 +388,13 @@ GENERATORS = {
 # 结尾淡出处理
 # ============================================================
 def apply_fade_out(wav_path, fade_ms=1200, tail_ms=900):
-    """末尾淡出 + 补一段静音余韵。用 pydub。"""
+    """末尾淡出 + 补一段静音余韵。优先 ffmpeg 加载避免黑窗。"""
     if not HAS_PYDUB:
         return
-    audio = AudioSegment.from_wav(wav_path)
+    if shutil.which("ffmpeg"):
+        audio = _ffmpeg_load_audio(wav_path)
+    else:
+        audio = AudioSegment.from_wav(wav_path)
     duration = len(audio)
     fade = min(fade_ms, int(duration * 0.3))
     audio = audio.fade_out(fade)
@@ -404,6 +435,7 @@ class App:
         self.edge_interval_var = tk.StringVar(value="0.8")  # edge-tts 请求间隔(秒)
         self.edge_retries_var = tk.StringVar(value="3")     # edge-tts 最大重试次数
         self.edge_retry_wait_var = tk.StringVar(value="5")  # edge-tts 重试等待基数(秒)
+        self.cosy_model_var = tk.StringVar()                # CosyVoice 模型目录
         self.cosy_repo_var = tk.StringVar()                 # CosyVoice 仓库目录
         self.cosy_python_var = tk.StringVar()               # CosyVoice conda python.exe
 
@@ -419,8 +451,16 @@ class App:
         ttk.Label(self.root, text="AI绘本 旁白音频生成器", font=(
             "Microsoft YaHei UI", 14, "bold")).pack(anchor="w", **pad)
 
+        # 创建标签页容器
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill="both", expand=True, **pad)
+
+        # ========== 配置标签页 ==========
+        config_tab = ttk.Frame(self.notebook)
+        self.notebook.add(config_tab, text=" 配置 ")
+
         # JSON 文件
-        frm = ttk.LabelFrame(self.root, text="1. 脚本文件（JSON）")
+        frm = ttk.LabelFrame(config_tab, text="1. 脚本文件（JSON）")
         frm.pack(fill="x", **pad)
         ttk.Entry(frm, textvariable=self.json_var).pack(
             side="left", fill="x", expand=True, padx=6, pady=6)
@@ -428,7 +468,7 @@ class App:
             side="right", padx=6)
 
         # 输出目录
-        frm = ttk.LabelFrame(self.root, text="2. 输出目录（WAV 将按 001.wav 命名保存）")
+        frm = ttk.LabelFrame(config_tab, text="2. 输出目录（WAV 将按 001.wav 命名保存）")
         frm.pack(fill="x", **pad)
         ttk.Entry(frm, textvariable=self.out_dir_var).pack(
             side="left", fill="x", expand=True, padx=6, pady=6)
@@ -436,7 +476,7 @@ class App:
             side="right", padx=6)
 
         # 方案选择
-        frm = ttk.LabelFrame(self.root, text="3. 生成方案")
+        frm = ttk.LabelFrame(config_tab, text="3. 生成方案")
         frm.pack(fill="x", **pad)
         for key, info in SCHEMES.items():
             status = "（可选用）" if info["installed"] else "（未安装/未实现）"
@@ -447,7 +487,7 @@ class App:
         self.scheme_desc.pack(anchor="w", padx=8, pady=4)
 
         # 资源目录 / 音色
-        frm = ttk.LabelFrame(self.root, text="4. 方案参数（资源目录 / 音色）")
+        frm = ttk.LabelFrame(config_tab, text="4. 方案参数（资源目录 / 音色）")
         frm.pack(fill="x", **pad)
 
         row = ttk.Frame(frm)
@@ -473,25 +513,31 @@ class App:
         self.sid_combo["values"] = SHERPA_SID_OPTIONS
         self.sid_combo.pack(side="left", padx=4)
 
-        # CosyVoice 专属配置（仓库路径 + conda python）
+        # CosyVoice 专属配置（模型目录 + 仓库路径 + conda python）
         self.cosy_frame = ttk.LabelFrame(
-            self.root, text="4b. CosyVoice 配置（仅选 CosyVoice 时生效）")
+            config_tab, text="4b. CosyVoice 配置（仅选 CosyVoice 时生效）")
         self.cosy_frame.pack(fill="x", **pad)
         row = ttk.Frame(self.cosy_frame)
         row.pack(fill="x", padx=6, pady=2)
-        ttk.Label(row, text="CosyVoice 仓库目录:").pack(side="left")
+        ttk.Label(row, text="模型目录:").pack(side="left")
+        ttk.Entry(row, textvariable=self.cosy_model_var).pack(
+            side="left", fill="x", expand=True, padx=6)
+        ttk.Button(row, text="浏览…", command=self._pick_cosy_model).pack(side="right")
+        row = ttk.Frame(self.cosy_frame)
+        row.pack(fill="x", padx=6, pady=2)
+        ttk.Label(row, text="仓库目录:").pack(side="left")
         ttk.Entry(row, textvariable=self.cosy_repo_var).pack(
             side="left", fill="x", expand=True, padx=6)
         ttk.Button(row, text="浏览…", command=self._pick_cosy_repo).pack(side="right")
         row = ttk.Frame(self.cosy_frame)
         row.pack(fill="x", padx=6, pady=2)
-        ttk.Label(row, text="conda 环境 python.exe:").pack(side="left")
+        ttk.Label(row, text="conda python.exe:").pack(side="left")
         ttk.Entry(row, textvariable=self.cosy_python_var).pack(
             side="left", fill="x", expand=True, padx=6)
         ttk.Button(row, text="浏览…", command=self._pick_cosy_python).pack(side="right")
 
         # 淡出
-        frm = ttk.LabelFrame(self.root, text="5. 结尾处理")
+        frm = ttk.LabelFrame(config_tab, text="5. 结尾处理")
         frm.pack(fill="x", **pad)
         ttk.Checkbutton(frm, text="结尾淡出 + 补静音余韵（避免戛然而止）",
                         variable=self.fade_var).pack(anchor="w", padx=8, pady=2)
@@ -506,7 +552,7 @@ class App:
 
         # edge-tts 保险（请求间隔 + 自动重试）
         frm = ttk.LabelFrame(
-            self.root, text="5b. edge-tts 保险（仅在线方案生效：请求间隔 + 自动重试）")
+            config_tab, text="5b. edge-tts 保险（仅在线方案生效：请求间隔 + 自动重试）")
         frm.pack(fill="x", **pad)
         row = ttk.Frame(frm)
         row.pack(anchor="w", padx=8, pady=2)
@@ -522,7 +568,20 @@ class App:
         ttk.Label(
             row, text="重试等待按 1x/2x/3x 递增，避免触发限流", foreground="#888").pack(side="left", padx=6)
 
-        # 操作按钮
+        # ========== 日志标签页 ==========
+        log_tab = ttk.Frame(self.notebook)
+        self.notebook.add(log_tab, text=" 日志 ")
+
+        frm = ttk.LabelFrame(log_tab, text="运行日志")
+        frm.pack(fill="both", expand=True, **pad)
+        self.log_text = tk.Text(frm, height=20, wrap="word", state="disabled")
+        self.log_text.pack(side="left", fill="both",
+                           expand=True, padx=4, pady=4)
+        sb = ttk.Scrollbar(frm, command=self.log_text.yview)
+        sb.pack(side="right", fill="y")
+        self.log_text.config(yscrollcommand=sb.set)
+
+        # ========== 操作按钮（始终显示在底部） ==========
         btn_bar = ttk.Frame(self.root)
         btn_bar.pack(anchor="w", **pad)
         self.start_btn = ttk.Button(
@@ -538,15 +597,8 @@ class App:
             btn_bar, text="试听测试（随机5条）", command=self._test_run)
         self.test_btn.pack(side="left", padx=(0, 6))
 
-        # 日志
-        frm = ttk.LabelFrame(self.root, text="日志")
-        frm.pack(fill="both", expand=True, **pad)
-        self.log_text = tk.Text(frm, height=12, wrap="word", state="disabled")
-        self.log_text.pack(side="left", fill="both",
-                           expand=True, padx=4, pady=4)
-        sb = ttk.Scrollbar(frm, command=self.log_text.yview)
-        sb.pack(side="right", fill="y")
-        self.log_text.config(yscrollcommand=sb.set)
+        # 保存日志标签页索引，用于切换
+        self.log_tab_index = 1
 
         # 所有控件创建完毕后再初始化方案状态
         self._on_scheme_change()
@@ -582,6 +634,11 @@ class App:
         self.test_btn.config(state="normal")
         self._gen_mode = "idle"
 
+    def _switch_to_log_tab(self):
+        """切换到日志标签页"""
+        if hasattr(self, 'notebook'):
+            self.notebook.select(self.log_tab_index)
+
     def _test_run(self):
         """试听测试：随机选5条生成音频"""
         json_path = self.json_var.get().strip()
@@ -593,10 +650,18 @@ class App:
         if not info["installed"]:
             messagebox.showwarning("提示", "该方案未安装或未实现。")
             return
-        if info["need_resource_dir"] and not self.resource_dir_var.get().strip():
-            messagebox.showwarning("提示", "该方案需要指定资源目录。")
-            return
+        if info["need_resource_dir"]:
+            # CosyVoice 使用 cosy_model_var，其他方案使用 resource_dir_var
+            if scheme == "cosyvoice":
+                if not self.cosy_model_var.get().strip():
+                    messagebox.showwarning("提示", "CosyVoice 需要指定模型目录。")
+                    return
+            elif not self.resource_dir_var.get().strip():
+                messagebox.showwarning("提示", "该方案需要指定资源目录。")
+                return
 
+        self._save_config()  # 点击测试前保存配置
+        self._switch_to_log_tab()  # 自动切换到日志标签页
         self._stop_event.clear()
         self._pause_event.set()
         self._gen_mode = "test"
@@ -684,7 +749,9 @@ class App:
         elif scheme == "sherpa-onnx":
             gen(text, out_path, resource_dir, sid, self._thread_log)
         elif scheme == "cosyvoice":
-            gen(text, out_path, resource_dir, voice, self._thread_log,
+            # CosyVoice 使用专属的 cosy_model_var 作为模型目录
+            cosy_model_dir = self.cosy_model_var.get().strip()
+            gen(text, out_path, cosy_model_dir, voice, self._thread_log,
                 repo_dir=self.cosy_repo_var.get().strip(),
                 conda_python=self.cosy_python_var.get().strip())
         else:
@@ -723,6 +790,11 @@ class App:
         if p:
             self.resource_dir_var.set(p)
 
+    def _pick_cosy_model(self):
+        p = filedialog.askdirectory()
+        if p:
+            self.cosy_model_var.set(p)
+
     def _pick_cosy_repo(self):
         p = filedialog.askdirectory()
         if p:
@@ -738,8 +810,8 @@ class App:
         key = self.scheme_var.get()
         info = SCHEMES[key]
         self.scheme_desc.config(text=info["desc"])
-        # 资源目录开关
-        if info["need_resource_dir"]:
+        # 资源目录开关（CosyVoice 使用专属的 4b 配置区，此处禁用）
+        if info["need_resource_dir"] and key != "cosyvoice":
             self.resource_label.config(state="normal")
             self.resource_entry.config(state="normal")
             self.resource_btn.config(state="normal")
@@ -854,9 +926,15 @@ class App:
         if not info["installed"]:
             messagebox.showwarning("提示", "该方案未安装或未实现：\n" + info["desc"])
             return
-        if info["need_resource_dir"] and not self.resource_dir_var.get().strip():
-            messagebox.showwarning("提示", "该方案需要指定资源目录（模型目录）。")
-            return
+        if info["need_resource_dir"]:
+            # CosyVoice 使用 cosy_model_var，其他方案使用 resource_dir_var
+            if scheme == "cosyvoice":
+                if not self.cosy_model_var.get().strip():
+                    messagebox.showwarning("提示", "CosyVoice 需要指定模型目录。")
+                    return
+            elif not self.resource_dir_var.get().strip():
+                messagebox.showwarning("提示", "该方案需要指定资源目录（模型目录）。")
+                return
         if scheme == "sherpa-onnx" and not HAS_PYDUB:
             # sherpa 直接写 wav，不需要 pydub；但淡出需要
             pass
@@ -866,6 +944,7 @@ class App:
         self._gen_mode = "gen"
 
         self._save_config()
+        self._switch_to_log_tab()  # 自动切换到日志标签页
 
         self.start_btn.config(state="disabled")
         self.test_btn.config(state="disabled")
@@ -950,6 +1029,7 @@ class App:
             "edge_interval": self.edge_interval_var.get(),
             "edge_retries": self.edge_retries_var.get(),
             "edge_retry_wait": self.edge_retry_wait_var.get(),
+            "cosy_model": self.cosy_model_var.get(),
             "cosy_repo": self.cosy_repo_var.get(),
             "cosy_python": self.cosy_python_var.get(),
         }
@@ -989,10 +1069,14 @@ class App:
                     self.edge_retries_var.set(cfg["edge_retries"])
                 if cfg.get("edge_retry_wait"):
                     self.edge_retry_wait_var.set(cfg["edge_retry_wait"])
+                if cfg.get("cosy_model"):
+                    self.cosy_model_var.set(cfg["cosy_model"])
                 if cfg.get("cosy_repo"):
                     self.cosy_repo_var.set(cfg["cosy_repo"])
                 if cfg.get("cosy_python"):
                     self.cosy_python_var.set(cfg["cosy_python"])
+                # 配置加载后刷新方案状态（显示/隐藏 CosyVoice 配置区等）
+                self._on_scheme_change()
                 logger.info("已加载配置: %s" % CONFIG_PATH)
         except Exception as e:
             logger.error("加载配置失败: %s" % e)

@@ -431,8 +431,11 @@ class ImageEnhancerVulkanApp:
         except ImportError:
             HAS_GFPGAN = False
             logger.warning("GFPGAN 库未安装")
-
-        self.root.after(0, self._update_lib_status)
+        except Exception as e:
+            HAS_GFPGAN = False
+            logger.error(f"GFPGAN 加载失败: {type(e).__name__}: {e}")
+        finally:
+            self.root.after(0, self._update_lib_status)
 
     def _update_lib_status(self):
         parts = []
