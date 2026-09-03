@@ -1,7 +1,0 @@
-{
-  "input_dir": "D:/FILES/IMG/A临时",
-  "output_dir": "D:/FILES/IMG/A临时/批量才接",
-  "crop_ratio": "自动",
-  "thread_count": 5,
-  "subject_aware": true
-}

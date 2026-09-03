@@ -1,6 +1,0 @@
-{
-  "export_dir": "D:/附件/音频",
-  "silence_threshold": 500,
-  "silence_duration": 1.5,
-  "min_recording_duration": 3.0
-}
