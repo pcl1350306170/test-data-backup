@@ -58,6 +58,13 @@ SPK_OPTIONS = ["中文女", "中文男", "英文女", "英文男", "日语男", 
 # 预置情感风格（可手动输入自定义值）
 STYLE_OPTIONS = ["", "开心", "温柔", "严肃", "活泼", "深情"]
 
+# 参考音频目录（Zero-Shot 音色复刻用）
+PROMPT_AUDIO_DIR = r"D:\CODE\Python\test-data-backup\AI Work Space\TTS"
+# 参考音频统一对应文本
+DEFAULT_PROMPT_TEXT = "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。"
+# 支持的音频后缀
+_AUDIO_EXTS = {".wav", ".mp3", ".flac", ".ogg", ".m4a"}
+
 # 语速快捷选项
 SPEED_OPTIONS = ["0.8", "1.0", "1.2", "1.5"]
 
@@ -371,6 +378,7 @@ class App:
         self.repo_dir_var = tk.StringVar(value=DEFAULT_REPO_DIR)
         self.conda_py_var = tk.StringVar(value=DEFAULT_CONDA_PY)
         self.prompt_audio_var = tk.StringVar(value="")
+        self.prompt_audio_display_var = tk.StringVar(value="")  # 下拉框显示用
         self.prompt_text_var = tk.StringVar(value="")
         self.status_var = tk.StringVar(value="就绪")
         self.progress_var = tk.DoubleVar(value=0)
@@ -444,23 +452,31 @@ class App:
 
         row_audio = ttk.Frame(frm_clone)
         row_audio.pack(fill="x", padx=6, pady=2)
-        ttk.Label(row_audio, text="参考音频:", width=12).pack(side="left")
-        self.prompt_audio_entry = ttk.Entry(row_audio, textvariable=self.prompt_audio_var)
-        self.prompt_audio_entry.pack(side="left", fill="x", expand=True, padx=4)
-        ttk.Button(row_audio, text="选择音频…", command=self._pick_prompt_audio).pack(side="right")
+        ttk.Label(row_audio, text="参考音色:", width=12).pack(side="left")
+        # 下拉框选择音频文件（显示文件名，实际存储完整路径）
+        self.prompt_audio_combo = ttk.Combobox(
+            row_audio, textvariable=self.prompt_audio_display_var, width=45, state="readonly")
+        self.prompt_audio_combo.pack(side="left", fill="x", expand=True, padx=4)
+        self.prompt_audio_combo.bind("<<ComboboxSelected>>", self._on_prompt_audio_selected)
+        ttk.Button(row_audio, text="刷新列表", command=self._refresh_prompt_audios, width=8).pack(side="right", padx=2)
         ttk.Button(row_audio, text="清除", command=self._clear_prompt_audio, width=5).pack(side="right", padx=2)
 
         row_ptext = ttk.Frame(frm_clone)
         row_ptext.pack(fill="x", padx=6, pady=2)
         ttk.Label(row_ptext, text="音频对应文本:", width=12).pack(side="left")
-        ttk.Entry(row_ptext, textvariable=self.prompt_text_var).pack(side="left", fill="x", expand=True, padx=4)
+        self.prompt_text_entry = ttk.Entry(row_ptext, textvariable=self.prompt_text_var)
+        self.prompt_text_entry.pack(side="left", fill="x", expand=True, padx=4)
 
         self.lbl_clone_hint = ttk.Label(
             frm_clone,
-            text="提示：选择参考音频后，将使用 Zero-Shot 复刻该音频的音色，上方\"音色\"下拉框将被忽略。\n"
-                 "      参考音频建议 3~10 秒清晰人声；\"音频对应文本\"填写该录音中说的话。",
+            text="提示：选择参考音色后，将使用 Zero-Shot 复刻该音频的音色，上方\"音色\"下拉框将被忽略。\n"
+                 f"      音频目录：{PROMPT_AUDIO_DIR}",
             foreground="#666", wraplength=700, justify="left")
         self.lbl_clone_hint.pack(anchor="w", padx=6, pady=2)
+
+        # 初始化音频列表
+        self._prompt_audio_files = []  # [(display_name, full_path), ...]
+        self._refresh_prompt_audios()
 
         # --- 输出目录 ---
         frm_out = ttk.LabelFrame(cfg_tab, text="3. 输出目录")
@@ -567,18 +583,52 @@ class App:
         if p:
             self.conda_py_var.set(p)
 
-    def _pick_prompt_audio(self):
-        p = filedialog.askopenfilename(
-            title="选择参考音频文件（建议 3~10 秒清晰人声）",
-            filetypes=[("音频文件", "*.wav *.mp3 *.flac *.ogg *.m4a"), ("所有文件", "*.*")])
-        if p:
-            self.prompt_audio_var.set(p)
-            self._update_spk_state()
-            self._log(f"[参考音频] 已选择: {p}")
+    def _refresh_prompt_audios(self):
+        """扫描参考音频目录，更新下拉列表"""
+        self._prompt_audio_files = []
+        audio_dir = Path(PROMPT_AUDIO_DIR)
+        if audio_dir.is_dir():
+            for f in sorted(audio_dir.iterdir()):
+                if f.is_file() and f.suffix.lower() in _AUDIO_EXTS:
+                    self._prompt_audio_files.append((f.stem, str(f)))
+        # 下拉框显示："(不使用)" + 各文件名
+        display_values = ["(不使用 Zero-Shot)"] + [name for name, _ in self._prompt_audio_files]
+        self.prompt_audio_combo["values"] = display_values
+        # 如果当前配置有已保存的音频路径，尝试恢复选中
+        saved = self.prompt_audio_var.get().strip()
+        if saved:
+            matched = False
+            for i, (_, path) in enumerate(self._prompt_audio_files, start=1):
+                if os.path.normcase(path) == os.path.normcase(saved):
+                    self.prompt_audio_combo.current(i)
+                    matched = True
+                    break
+            if not matched:
+                # 文件已不存在，清除
+                self.prompt_audio_var.set("")
+                self.prompt_audio_combo.current(0)
+        else:
+            self.prompt_audio_combo.current(0)
+        self._update_spk_state()
+
+    def _on_prompt_audio_selected(self, event=None):
+        """下拉框选中时更新实际路径"""
+        idx = self.prompt_audio_combo.current()
+        if idx <= 0:
+            # 选择了"(不使用)"
+            self.prompt_audio_var.set("")
+        else:
+            _, full_path = self._prompt_audio_files[idx - 1]
+            self.prompt_audio_var.set(full_path)
+            # 自动填充默认参考文本（若当前为空）
+            if not self.prompt_text_var.get().strip():
+                self.prompt_text_var.set(DEFAULT_PROMPT_TEXT)
+        self._update_spk_state()
 
     def _clear_prompt_audio(self):
         self.prompt_audio_var.set("")
         self.prompt_text_var.set("")
+        self.prompt_audio_combo.current(0)
         self._update_spk_state()
         self._log("[参考音频] 已清除，将使用预置音色")
 

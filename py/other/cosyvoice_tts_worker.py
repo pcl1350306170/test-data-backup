@@ -22,12 +22,23 @@ import sys
 
 
 def _save_first_chunk(generator, output_path, sample_rate):
-    """从生成器取第一个音频片段保存为 wav（非流式场景足够）"""
+    """从生成器收集所有音频片段，拼接后保存为 wav。
+    CosyVoice2 即使 stream=False，对较长文本仍可能分多个 chunk 生成。
+    """
+    import torch
     import torchaudio
+    chunks = []
     for chunk in generator:
-        torchaudio.save(output_path, chunk["tts_speech"], sample_rate)
-        return True
-    return False
+        chunks.append(chunk["tts_speech"])
+    if not chunks:
+        return False
+    # 拼接所有片段（沿时间轴）
+    if len(chunks) == 1:
+        audio = chunks[0]
+    else:
+        audio = torch.cat(chunks, dim=-1)
+    torchaudio.save(output_path, audio, sample_rate)
+    return True
 
 
 def main():
@@ -83,24 +94,71 @@ def main():
             print("提示: 当前模型不支持 zero-shot，请使用 CosyVoice2 或 CosyVoice3", file=sys.stderr)
             sys.exit(5)
         try:
-            import torchaudio
-            # 加载参考音频并重采样到 16kHz
-            speech, sr = torchaudio.load(prompt_audio)
-            if sr != 16000:
-                speech = torchaudio.transforms.Resample(orig_freq=sr, new_freq=16000)(speech)
-            # 取单声道
-            if speech.shape[0] > 1:
-                speech = speech.mean(dim=0, keepdim=True)
-            prompt_speech_16k = speech.squeeze(0)  # shape: [samples]
+            import tempfile
+            import subprocess
 
-            ok = _save_first_chunk(
-                cv.inference_zero_shot(args.text, prompt_text, prompt_speech_16k, stream=False),
-                args.output, cv.sample_rate)
+            # MP3 等格式先用 ffmpeg 转为临时 WAV（CosyVoice 内部用 torchaudio 加载，对 WAV 最可靠）
+            audio_path = prompt_audio
+            tmp_wav = None
+            ext = os.path.splitext(prompt_audio)[1].lower()
+            if ext != ".wav":
+                tmp_fd, tmp_wav = tempfile.mkstemp(suffix=".wav")
+                os.close(tmp_fd)
+                conv_proc = subprocess.run(
+                    ["ffmpeg", "-y", "-i", prompt_audio,
+                     "-ar", "16000", "-ac", "1", "-acodec", "pcm_s16le", tmp_wav],
+                    capture_output=True, text=True, encoding="utf-8", errors="replace")
+                if conv_proc.returncode != 0:
+                    err_msg = (conv_proc.stderr or "").strip()[-300:]
+                    print("COSYVOICE_ERR ffmpeg_convert_failed: %s" % err_msg, file=sys.stderr)
+                    sys.exit(5)
+                audio_path = tmp_wav
+
+            # 尝试两种方式调用 inference_zero_shot：
+            # 方式 A：传入文件路径（某些版本期望 path）
+            # 方式 B：传入 tensor（官方示例用法）
+            ok = False
+            try:
+                # 先尝试传入文件路径
+                ok = _save_first_chunk(
+                    cv.inference_zero_shot(args.text, prompt_text, audio_path, stream=False),
+                    args.output, cv.sample_rate)
+            except Exception as path_err:
+                # 路径方式失败，尝试 tensor 方式
+                print("COSYVOICE_INFO path_mode_failed_trying_tensor: %s" % path_err, file=sys.stderr)
+                try:
+                    from cosyvoice.utils.file_utils import load_wav
+                    prompt_speech_16k = load_wav(audio_path, 16000)
+                except (ImportError, AttributeError):
+                    import torchaudio
+                    speech, sr = torchaudio.load(audio_path)
+                    if sr != 16000:
+                        speech = torchaudio.transforms.Resample(orig_freq=sr, new_freq=16000)(speech)
+                    prompt_speech_16k = speech.squeeze(0)  # 确保 1D
+                ok = _save_first_chunk(
+                    cv.inference_zero_shot(args.text, prompt_text, prompt_speech_16k, stream=False),
+                    args.output, cv.sample_rate)
+
+            # 清理临时文件
+            if tmp_wav and os.path.isfile(tmp_wav):
+                try:
+                    os.remove(tmp_wav)
+                except Exception:
+                    pass
+
             used_mode = "zero_shot"
             if not ok:
                 print("COSYVOICE_ERR empty_output_zero_shot", file=sys.stderr)
                 sys.exit(4)
+        except SystemExit:
+            raise
         except Exception as e:
+            # 清理临时文件
+            if 'tmp_wav' in locals() and tmp_wav and os.path.isfile(tmp_wav):
+                try:
+                    os.remove(tmp_wav)
+                except Exception:
+                    pass
             print("COSYVOICE_ERR zero_shot_failed: %s" % e, file=sys.stderr)
             sys.exit(4)
 

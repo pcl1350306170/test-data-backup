@@ -575,13 +575,23 @@
                 "hbbypyscqr"
             ],
             "script": "other\\绘本旁白音频生成器.py",
-            "description": "AI绘本旁白音频生成（edge-tts/pyttsx3/sherpa-onnx）"
+            "description": "AI绘本旁白音频生成（edge-tts/pyttsx3/sherpa-onnx/cosyvoice）"
+        },
+        {
+            "name": "cosyvoice文字转音频",
+            "keywords": [
+                "cosyvoice",
+                "wfziynpn"
+            ],
+            "script": "other\\cosyvoice_tts.py",
+            "description": "AI文字转音频（cosyvoice）"
         },
         {
             "name": "合并WAV音频+BGM+图片转视频",
             "keywords": [
                 "qt6",
                 "yp",
+                "uipn",
                 "yphb",
                 "yphbzsp"
             ],

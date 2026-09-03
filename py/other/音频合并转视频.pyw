@@ -51,7 +51,7 @@ def _ffmpeg_load_audio(filepath):
          "stream=sample_rate,channels,channel_layout",
          "-of", "csv=p=0:nk=1", filepath],
         capture_output=True, encoding="utf-8", errors="replace",
-        creationflags=_NO_WINDOW)
+        creationflags=_NO_WINDOW, timeout=30)
     sample_rate, channels = 44100, 2
     for line in (probe.stdout or "").strip().split("\n"):
         parts = line.strip().split(",")
@@ -65,10 +65,15 @@ def _ffmpeg_load_audio(filepath):
     sample_fmt = "s16le" if sample_rate <= 48000 else "fltp"
     acodec = "pcm_s16le" if sample_fmt == "s16le" else "pcm_f32le"
     raw_result = subprocess.run(
-        ["ffmpeg", "-y", "-i", filepath,
+        ["ffmpeg", "-y", "-loglevel", "error",
+         "-i", filepath,
          "-f", sample_fmt, "-acodec", acodec,
          "-ar", str(sample_rate), "-ac", str(channels), "pipe:1"],
-        capture_output=True, creationflags=_NO_WINDOW)
+        capture_output=True, creationflags=_NO_WINDOW, timeout=120)
+    if raw_result.returncode != 0:
+        raise RuntimeError("ffmpeg 解码失败: %s" % (raw_result.stderr or b"").decode("utf-8", errors="replace")[-500:])
+    if not raw_result.stdout:
+        raise RuntimeError("ffmpeg 输出为空，文件可能损坏: %s" % filepath)
     sw = 2 if sample_fmt == "s16le" else 4
     return AudioSegment(
         data=raw_result.stdout,
@@ -77,13 +82,15 @@ def _ffmpeg_load_audio(filepath):
 
 def _ffmpeg_export_wav(audio_segment, output_path):
     """通过 ffmpeg 管道导出 AudioSegment 为 WAV（避免 pydub 弹黑窗）"""
-    subprocess.run(
-        ["ffmpeg", "-y",
+    result = subprocess.run(
+        ["ffmpeg", "-y", "-loglevel", "error",
          "-f", "s16le", "-ar", str(audio_segment.frame_rate),
          "-ac", str(audio_segment.channels), "-i", "pipe:0",
          "-acodec", "pcm_s16le", output_path],
         input=audio_segment.raw_data,
-        capture_output=True, creationflags=_NO_WINDOW)
+        capture_output=True, creationflags=_NO_WINDOW, timeout=120)
+    if result.returncode != 0:
+        raise RuntimeError("ffmpeg 导出失败: %s" % (result.stderr or b"").decode("utf-8", errors="replace")[-500:])
 
 
 class AudioMergerApp:
@@ -258,17 +265,17 @@ class AudioMergerApp:
         self._auto_save()
 
     def _scan_images(self):
-        """扫描图片目录下的所有 png 文件"""
+        """扫描图片目录下的所有 png/jpg 文件"""
         dir_path = self.image_dir.get()
         if not dir_path or not os.path.isdir(dir_path):
             self.png_files = []
             self.png_count.set("共 0 张图片")
             return
         self.png_files = sorted(
-            [f for f in os.listdir(dir_path) if f.lower().endswith(".png")],
+            [f for f in os.listdir(dir_path) if f.lower().endswith((".png", ".jpg", ".jpeg"))],
             key=lambda x: x.lower())
         self.png_count.set(f"共 {len(self.png_files)} 张图片")
-        logger.info("扫描到 %d 张 PNG 图片: %s", len(self.png_files), dir_path)
+        logger.info("扫描到 %d 张图片: %s", len(self.png_files), dir_path)
 
     def _auto_save(self):
         """防抖自动保存配置（500ms 内多次调用只执行最后一次）"""
@@ -421,24 +428,31 @@ class AudioMergerApp:
             return
 
         # 视频生成（非试听模式 + 勾选了生成视频）
-        if (not is_test and self.generate_video.get()
-                and self.png_files and not self._stop_flag):
-            video_path = self._get_video_output_path()
-            self.root.after(0, self.status_text.set, f"正在生成视频...")
-            self.root.after(0, self.progress_var.set, 95)
-            success = self._generate_video(output_path, video_path,
-                                           file_list, segment_durations)
-            if success:
-                self.root.after(0, self.progress_var.set, 100)
+        if not is_test and self.generate_video.get():
+            if not self.png_files:
+                logger.warning("已勾选生成视频，但图片目录为空，跳过视频生成")
                 self.root.after(0, lambda: self._show_toast(
-                    "完成",
-                    f"合并完成! 视频: {video_path}  时长: {duration_sec:.1f}秒",
-                    level="success", duration_ms=5000))
+                    "提示", "音频已导出，但图片目录为空，未生成视频",
+                    level="warning", duration_ms=5000))
+            elif self._stop_flag:
+                logger.info("用户已停止，跳过视频生成")
             else:
-                self.root.after(0, self.progress_var.set, 100)
-                self.root.after(0, lambda: self._show_toast(
-                    "部分完成", "音频已导出，但视频生成失败，请查看日志。",
-                    level="warning", duration_ms=6000))
+                video_path = self._get_video_output_path()
+                self.root.after(0, self.status_text.set, f"正在生成视频...")
+                self.root.after(0, self.progress_var.set, 95)
+                success = self._generate_video(output_path, video_path,
+                                               file_list, segment_durations)
+                if success:
+                    self.root.after(0, self.progress_var.set, 100)
+                    self.root.after(0, lambda: self._show_toast(
+                        "完成",
+                        f"合并完成! 视频: {video_path}  时长: {duration_sec:.1f}秒",
+                        level="success", duration_ms=5000))
+                else:
+                    self.root.after(0, self.progress_var.set, 100)
+                    self.root.after(0, lambda: self._show_toast(
+                        "部分完成", "音频已导出，但视频生成失败，请查看日志。",
+                        level="warning", duration_ms=6000))
         else:
             self.root.after(0, self.progress_var.set, 100)
             self.root.after(0, self.status_text.set,
@@ -501,30 +515,30 @@ class AudioMergerApp:
                 for i, fname in enumerate(file_list):
                     # 音频文件名与图片文件名一一对应（去掉扩展名匹配）
                     base = os.path.splitext(fname)[0]
-                    # 查找对应的 png 文件
-                    png_name = base + ".png"
-                    png_match = [p for p in self.png_files if p.lower() == png_name.lower()]
-                    if not png_match:
-                        logger.warning("未找到匹配图片: %s -> %s", fname, png_name)
+                    # 查找对应的图片文件（支持 png/jpg/jpeg）
+                    img_match = [p for p in self.png_files 
+                                 if os.path.splitext(p)[0].lower() == base.lower()]
+                    if not img_match:
+                        logger.warning("未找到匹配图片: %s", fname)
                         continue
-                    img_path = os.path.join(img_dir, png_match[0]).replace("\\", "/")
+                    img_path = os.path.join(img_dir, img_match[0]).replace("\\", "/")
                     dur = segment_durations[i] if i < len(segment_durations) else 1.0
                     f.write(f"file '{img_path}'\n")
                     f.write(f"duration {dur}\n")
                 # 最后一张图片需要再写一次（ffmpeg concat 的已知行为）
                 if file_list:
                     base = os.path.splitext(file_list[-1])[0]
-                    png_match = [p for p in self.png_files
-                                 if p.lower() == (base + ".png").lower()]
-                    if png_match:
-                        last_img = os.path.join(img_dir, png_match[0]).replace("\\", "/")
+                    img_match = [p for p in self.png_files
+                                 if os.path.splitext(p)[0].lower() == base.lower()]
+                    if img_match:
+                        last_img = os.path.join(img_dir, img_match[0]).replace("\\", "/")
                         f.write(f"file '{last_img}'\n")
 
             logger.info("concat 清单已生成: %s (%d 段)", concat_file, total)
 
             # 构建 ffmpeg 命令
             cmd = [
-                "ffmpeg", "-y",
+                "ffmpeg", "-y", "-loglevel", "error",
                 "-f", "concat", "-safe", "0", "-i", concat_file,
                 "-i", audio_path,
                 "-c:v", "libx264",
@@ -824,23 +838,25 @@ def main_cli():
         with open(concat_file, "w", encoding="utf-8") as f:
             for i, fname in enumerate(wav_files):
                 base = os.path.splitext(fname)[0]
-                png_name = base + ".png"
-                png_match = [p for p in png_files if p.lower() == png_name.lower()]
-                if not png_match:
+                # 查找对应的图片文件（支持 png/jpg/jpeg）
+                img_match = [p for p in png_files 
+                             if os.path.splitext(p)[0].lower() == base.lower()]
+                if not img_match:
                     continue
-                img_path = os.path.join(args.images, png_match[0]).replace("\\", "/")
+                img_path = os.path.join(args.images, img_match[0]).replace("\\", "/")
                 dur = segment_durations[i] if i < len(segment_durations) else 1.0
                 f.write(f"file '{img_path}'\n")
                 f.write(f"duration {dur}\n")
             if wav_files:
                 base = os.path.splitext(wav_files[-1])[0]
-                png_match = [p for p in png_files if p.lower() == (base + ".png").lower()]
-                if png_match:
-                    last_img = os.path.join(args.images, png_match[0]).replace("\\", "/")
+                img_match = [p for p in png_files
+                             if os.path.splitext(p)[0].lower() == base.lower()]
+                if img_match:
+                    last_img = os.path.join(args.images, img_match[0]).replace("\\", "/")
                     f.write(f"file '{last_img}'\n")
 
         cmd = [
-            "ffmpeg", "-y",
+            "ffmpeg", "-y", "-loglevel", "error",
             "-f", "concat", "-safe", "0", "-i", concat_file,
             "-i", output_path,
             "-c:v", "libx264", "-preset", "ultrafast", "-pix_fmt", "yuv420p",
