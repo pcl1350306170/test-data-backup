@@ -29,7 +29,7 @@ import time
 import traceback
 import tkinter as tk
 from pathlib import Path
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog
 
 # ---------- 路径与常量 ----------
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
@@ -689,36 +689,76 @@ class App:
     def _switch_to_log_tab(self):
         self.notebook.select(1)
 
+    # ---------- Toast 通知 ----------
+    def _show_toast(self, title, message, level="info", duration_ms=3500):
+        """右下角 Toast 通知，自动消失，点击关闭"""
+        try:
+            toast = tk.Toplevel(self.root)
+            toast.withdraw()
+            toast.overrideredirect(True)
+            toast.attributes('-topmost', True)
+
+            colors = {
+                "success": ("#2e7d32", "#e8f5e9", "✅"),
+                "error":   ("#c62828", "#ffebee", "❌"),
+                "info":    ("#1565c0", "#e3f2fd", "ℹ️"),
+                "warning": ("#e65100", "#fff3e0", "⚠️"),
+            }
+            fg, bg, icon = colors.get(level, colors["info"])
+            toast.configure(bg=bg)
+
+            header = tk.Frame(toast, bg=bg)
+            header.pack(fill=tk.X, padx=10, pady=8)
+            tk.Label(header, text=f"{icon} {title}", font=("Microsoft YaHei UI", 11, "bold"),
+                     fg=fg, bg=bg).pack(side=tk.LEFT)
+            close_btn = tk.Label(header, text="✕", font=("Consolas", 10), fg="#999", bg=bg, cursor="hand2")
+            close_btn.pack(side=tk.RIGHT)
+            close_btn.bind("<Button-1>", lambda e: toast.destroy())
+
+            tk.Label(toast, text=message, font=("Microsoft YaHei UI", 10),
+                     fg="#333", bg=bg, wraplength=320, justify=tk.LEFT).pack(padx=12, pady=(4, 10), anchor=tk.W)
+
+            toast.update_idletasks()
+            w, h = toast.winfo_width(), toast.winfo_height()
+            sx = toast.winfo_screenwidth()
+            sy = toast.winfo_screenheight()
+            x = sx - w - 20
+            y = sy - h - 60
+            toast.geometry(f"+{x}+{y}")
+            toast.deiconify()
+            toast.after(duration_ms, toast.destroy)
+        except Exception:
+            pass
+
     # ---------- 控制 ----------
     def _start(self):
         # 获取文本
         content = self.txt_widget.get("1.0", "end").strip()
         if not content:
-            messagebox.showwarning("提示", "请先输入或导入文本内容。")
+            self._show_toast("提示", "请先输入或导入文本内容。", "warning")
             return
 
         # 校验路径
         model_dir = self.model_dir_var.get().strip()
         conda_py = self.conda_py_var.get().strip()
         if not os.path.isdir(model_dir):
-            messagebox.showerror("错误", f"模型目录不存在：\n{model_dir}")
+            self._show_toast("错误", f"模型目录不存在：{model_dir}", "error")
             return
         if not os.path.isfile(conda_py):
-            messagebox.showerror("错误", f"conda python 不存在：\n{conda_py}")
+            self._show_toast("错误", f"conda python 不存在：{conda_py}", "error")
             return
         if not WORKER_PATH.is_file():
-            messagebox.showerror("错误", f"Worker 脚本不存在：\n{WORKER_PATH}")
+            self._show_toast("错误", f"Worker 脚本不存在：{WORKER_PATH}", "error")
             return
 
         # 校验参考音频（若选了音频但未填文本，提示用户）
         prompt_audio = self.prompt_audio_var.get().strip()
         prompt_text = self.prompt_text_var.get().strip()
         if prompt_audio and not prompt_text:
-            messagebox.showwarning("提示", "已选择参考音频，但未填写\"音频对应文本\"。\n"
-                                   "请填写参考音频中说的内容，或清除参考音频。")
+            self._show_toast("提示", "已选择参考音频，但未填写音频对应文本", "warning")
             return
         if prompt_audio and not os.path.isfile(prompt_audio):
-            messagebox.showerror("错误", f"参考音频文件不存在：\n{prompt_audio}")
+            self._show_toast("错误", f"参考音频文件不存在：{prompt_audio}", "error")
             return
 
         # 保存配置并收集参数
@@ -728,7 +768,7 @@ class App:
         seg_len = int(self.seg_len_var.get().strip() or DEFAULT_SEG_LEN)
         segments = split_text(content, seg_len)
         if not segments:
-            messagebox.showwarning("提示", "文本切段后为空，请检查内容。")
+            self._show_toast("提示", "文本切段后为空，请检查内容", "warning")
             return
 
         # 切换到日志页，准备开始
@@ -843,7 +883,7 @@ class App:
                         self._log(f"  {p}")
                     self._log("=" * 60)
                     logger.info("GUI 生成完成，共 %d 个文件", len(paths))
-                    messagebox.showinfo("完成", f"共生成 {len(paths)} 个音频文件：\n{out_dir}")
+                    self._show_toast("生成完成", f"共生成 {len(paths)} 个音频文件\n{out_dir}", "success", 5000)
                     # 自动打开输出目录
                     if self.open_dir_var.get() and os.path.isdir(out_dir):
                         try:
@@ -860,7 +900,7 @@ class App:
                     self.start_btn.config(state="normal")
                     self.stop_btn.config(state="disabled")
                     self._log(f"\n[错误] {msg[1]}")
-                    messagebox.showerror("出错", msg[1])
+                    self._show_toast("出错", msg[1], "error", 6000)
         except queue.Empty:
             pass
         self.root.after(100, self._after_poll)

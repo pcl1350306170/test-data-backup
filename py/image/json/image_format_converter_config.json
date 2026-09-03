@@ -1,5 +1,5 @@
 {
-  "output_format": "JPEG",
-  "output_dir": "D:\\FILES\\IMG\\A临时\\高清压缩",
+  "output_format": "PNG",
+  "output_dir": "D:\\CODE\\Python\\test-data-backup\\img\\T",
   "keep_structure": true
 }

@@ -1,6 +1,7 @@
 # ward_order_packager.pyw - 病房订单打包工具
 
 import os
+import re
 import json
 import logging
 import threading
@@ -8,6 +9,8 @@ import subprocess
 import ctypes
 import shutil
 import glob
+import tempfile
+import time
 from pathlib import Path
 from datetime import datetime
 from tkinter import *
@@ -73,6 +76,9 @@ PACKAGE_PREFIX_MAP = {
     "护理看板": "ntv",
 }
 
+# Node 默认版本
+DEFAULT_NODE_VERSION = "14.19.1"
+
 # ==============================
 # 配置函数
 # ==============================
@@ -80,6 +86,7 @@ DEFAULT_CONFIG = {
     "project_type": "床旁",
     "keyword": "",
     "auto_commit_svn": True,
+    "node_version": DEFAULT_NODE_VERSION,
     "history_records": [],
 }
 
@@ -294,6 +301,146 @@ def find_svn_working_copy(start_dir):
 
 
 # ==============================
+# Node 版本工具函数
+# ==============================
+def get_nvm_versions():
+    """
+    调用 nvm list 获取已安装的所有 Node.js 版本
+    返回 (versions_list, current_version)
+    current_version 为带 * 标记的当前版本，不含 v 前缀
+    """
+    try:
+        result = subprocess.run(
+            ["nvm", "list"],
+            capture_output=True, text=True, timeout=10,
+            encoding='utf-8', errors='replace',
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
+        )
+        output = result.stdout or ""
+    except Exception:
+        return [], ""
+
+    versions = []
+    current = ""
+    for line in output.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        # 当前版本行：* 14.19.1 (Currently using 64-bit executable)
+        if stripped.startswith("*"):
+            m = re.search(r'\*\s+(\d+\.\d+\.\d+)', stripped)
+            if m:
+                current = m.group(1)
+                if current not in versions:
+                    versions.append(current)
+        else:
+            m = re.search(r'(\d+\.\d+\.\d+)', stripped)
+            if m:
+                ver = m.group(1)
+                if ver not in versions:
+                    versions.append(ver)
+    return versions, current
+
+
+def get_current_node_version():
+    """获取当前使用的 Node.js 版本（不含 v 前缀）"""
+    try:
+        result = subprocess.run(
+            ["node", "-v"],
+            capture_output=True, text=True, timeout=5,
+            encoding='utf-8', errors='replace',
+            creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == 'win32' else 0
+        )
+        if result.returncode == 0:
+            return (result.stdout or "").strip().lstrip('v')
+    except Exception:
+        pass
+    return ""
+
+
+def switch_node_version(version, log_func=None):
+    """
+    以 UAC 管理员提权方式执行 nvm use <version>
+    返回 True 表示切换成功，False 表示失败或用户取消
+    """
+    def _log(msg):
+        if log_func:
+            log_func(msg)
+
+    temp_dir = tempfile.gettempdir()
+    pid = os.getpid()
+    result_file = os.path.join(temp_dir, f"nvm_switch_{pid}.txt")
+    bat_file = os.path.join(temp_dir, f"nvm_switch_{pid}.bat")
+
+    # 清理可能存在的旧文件
+    for f in [result_file, bat_file]:
+        try:
+            os.remove(f)
+        except OSError:
+            pass
+
+    bat_content = (
+        f'@echo off\n'
+        f'nvm use {version}\n'
+        f'if %errorlevel% equ 0 (\n'
+        f'    echo OK>"{result_file}"\n'
+        f') else (\n'
+        f'    echo FAIL>"{result_file}"\n'
+        f')\n'
+    )
+
+    try:
+        with open(bat_file, "w", encoding="gbk") as f:
+            f.write(bat_content)
+
+        _log(f"🔐 正在请求管理员权限切换 Node 版本到 {version}...")
+        ret = ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", "cmd.exe",
+            f'/c "{bat_file}"', None, 0  # SW_HIDE 隐藏 cmd 窗口
+        )
+        if ret <= 32:
+            _log(f"❌ UAC 提权失败（返回码: {ret}），可能用户取消了授权")
+            return False
+    except Exception as e:
+        _log(f"❌ 启动提权进程出错: {e}")
+        return False
+
+    # 轮询等待结果（最长 30 秒，给用户留时间点击 UAC 确认）
+    success = False
+    for _ in range(60):
+        time.sleep(0.5)
+        if os.path.exists(result_file):
+            try:
+                with open(result_file, "r") as f:
+                    success = f.read().strip() == "OK"
+            except Exception:
+                pass
+            break
+    else:
+        _log("⚠️ 等待 nvm use 超时（30秒），请确认已点击 UAC 授权")
+
+    # 清理临时文件
+    for f in [result_file, bat_file]:
+        try:
+            os.remove(f)
+        except OSError:
+            pass
+
+    if not success:
+        _log("❌ nvm use 执行失败")
+        return False
+
+    # 验证切换结果
+    actual = get_current_node_version()
+    if actual == version:
+        _log(f"✅ Node 版本已成功切换到 {version}")
+        return True
+    else:
+        _log(f"⚠️ nvm use 返回成功，但当前版本仍为 {actual}，请重新尝试")
+        return False
+
+
+# ==============================
 # GUI
 # ==============================
 class WardOrderPackagerGUI:
@@ -310,6 +457,7 @@ class WardOrderPackagerGUI:
         self.project_type = StringVar(value=self.config.get("project_type", "床旁"))
         self.keyword = StringVar(value=self.config.get("keyword", ""))
         self.auto_commit_svn = BooleanVar(value=self.config.get("auto_commit_svn", True))
+        self.node_version = StringVar(value=self.config.get("node_version", DEFAULT_NODE_VERSION))
 
         # 匹配结果
         self.matched_project_dirs = []  # [(path, branch_name), ...]
@@ -319,6 +467,7 @@ class WardOrderPackagerGUI:
 
         self.create_widgets()
         self._log("配置已加载")
+        self._refresh_node_versions()  # 启动时后台加载 nvm 版本列表
 
     def create_widgets(self):
         # Notebook 双标签页
@@ -395,6 +544,22 @@ class WardOrderPackagerGUI:
         )
         svn_check.pack(anchor=W, pady=3)
         ttk.Label(svn_opt_frame, text="提示：会自动查找SVN工作副本根目录进行提交", foreground="gray").pack(anchor=W)
+
+        # --- Node 版本 ---
+        node_frame = ttk.LabelFrame(config_tab, text="🔢 Node 版本", padding=8)
+        node_frame.pack(fill=X, pady=(0, 8))
+        node_inner = ttk.Frame(node_frame)
+        node_inner.pack(fill=X)
+        self.node_combo = ttk.Combobox(
+            node_inner, textvariable=self.node_version,
+            state="readonly", width=20
+        )
+        self.node_combo.pack(side=LEFT, padx=(0, 8))
+        self.btn_refresh_node = ttk.Button(node_inner, text="🔄 刷新版本列表", command=self._refresh_node_versions)
+        self.btn_refresh_node.pack(side=LEFT, padx=(0, 8))
+        self.node_current_label = ttk.Label(node_inner, text="当前: 检测中...", foreground="gray")
+        self.node_current_label.pack(side=LEFT)
+        ttk.Label(node_frame, text="打包前自动检测，版本不一致时弹出 UAC 管理员授权窗口进行切换", foreground="gray").pack(anchor=W, pady=(5, 0))
 
         # --- 操作按钮 ---
         btn_frame = ttk.Frame(config_tab)
@@ -584,6 +749,36 @@ class WardOrderPackagerGUI:
 
         self._log(f"📂 手动选择SVN目录: {dir_path}")
 
+    # ---------- Node 版本 ----------
+    def _refresh_node_versions(self):
+        """后台刷新 nvm 版本列表"""
+        self.btn_refresh_node.config(state=DISABLED)
+        self.node_current_label.config(text="当前: 检测中...")
+
+        def _do():
+            versions, current = get_nvm_versions()
+            self.root.after(0, lambda: self._on_node_versions_loaded(versions, current))
+
+        threading.Thread(target=_do, daemon=True).start()
+
+    def _on_node_versions_loaded(self, versions, current):
+        self.btn_refresh_node.config(state=NORMAL)
+        if versions:
+            self.node_combo['values'] = versions
+            saved_ver = self.node_version.get()
+            if saved_ver not in versions:
+                # 优先选择默认版本，否则选列表第一个
+                if DEFAULT_NODE_VERSION in versions:
+                    self.node_version.set(DEFAULT_NODE_VERSION)
+                else:
+                    self.node_version.set(versions[0])
+            self._log(f"✅ 获取到 {len(versions)} 个 Node 版本: {', '.join(versions)}")
+        else:
+            self._log("⚠️ 未能获取 nvm 版本列表（nvm 未安装或命令不可用）")
+        self.node_current_label.config(
+            text=f"当前: v{current}" if current else "当前: 未检测到"
+        )
+
     # ---------- 开始打包 ----------
     def _start_package(self):
         if not self.selected_project_dir:
@@ -638,6 +833,18 @@ class WardOrderPackagerGUI:
                 log(f"ℹ️ 检测到'前端'子目录，后续操作在: {svn_work_dir}")
             else:
                 log(f"ℹ️ 未检测到'前端'子目录，直接在: {svn_work_dir}")
+
+            # 2.5 检查并切换 Node 版本
+            target_node_ver = self.node_version.get()
+            current_node_ver = get_current_node_version()
+            log(f"ℹ️ 当前 Node 版本: {'v' + current_node_ver if current_node_ver else '未检测到'}，目标版本: v{target_node_ver}")
+            if current_node_ver != target_node_ver:
+                log("⚠️ Node 版本不一致，开始切换...")
+                if not switch_node_version(target_node_ver, log):
+                    log("❌ Node 版本切换失败，停止打包")
+                    return
+            else:
+                log(f"✅ Node 版本已为 v{target_node_ver}，无需切换")
 
             # 3. 执行 deploy.sh
             log(f"🔄 执行 deploy.sh ...")
@@ -843,6 +1050,7 @@ class WardOrderPackagerGUI:
             "package_name": package_name,
             "keyword": self.keyword.get().strip(),
             "auto_commit_svn": self.auto_commit_svn.get(),
+            "node_version": self.node_version.get(),
             "branch": branch,
         }
 
@@ -879,6 +1087,7 @@ class WardOrderPackagerGUI:
         self.project_type.set(record.get("project_type", "床旁"))
         self.keyword.set(record.get("keyword", ""))
         self.auto_commit_svn.set(record.get("auto_commit_svn", True))
+        self.node_version.set(record.get("node_version", DEFAULT_NODE_VERSION))
 
         saved_proj = record.get("project_dir", "")
         saved_svn = record.get("svn_dir", "")
@@ -949,6 +1158,7 @@ class WardOrderPackagerGUI:
         self.config["project_type"] = self.project_type.get()
         self.config["keyword"] = self.keyword.get().strip()
         self.config["auto_commit_svn"] = self.auto_commit_svn.get()
+        self.config["node_version"] = self.node_version.get()
         save_config(self.config)
         messagebox.showinfo("成功", "配置已保存！")
 

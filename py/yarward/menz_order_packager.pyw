@@ -9,6 +9,8 @@ import shutil
 import zipfile
 import re
 import time
+import ctypes
+import tempfile
 from pathlib import Path
 from datetime import datetime
 from tkinter import *
@@ -52,12 +54,16 @@ except ImportError:
 SVN_BASE_DIR = Path(r"D:\CODE\Yarward\SVN\0门诊")
 GIT_BASE_DIR = Path(r"D:\CODE\Yarward\门诊")
 
+# Node 默认版本
+DEFAULT_NODE_VERSION = "14.19.1"
+
 DEFAULT_CONFIG = {
     "svn_base_dir": str(SVN_BASE_DIR),
     "git_base_dir": str(GIT_BASE_DIR),
     "keyword": "",
     "auto_commit_svn": True,
     "is_version_155_plus": False,
+    "node_version": DEFAULT_NODE_VERSION,
     "history_records": [],
 }
 
@@ -153,6 +159,47 @@ def extract_version_from_branch(branch_name):
 
 
 # ==============================
+# Node 版本工具函数
+# ==============================
+def get_nvm_versions():
+    """
+    调用 nvm list 获取已安装的所有 Node.js 版本
+    返回 (versions_list, current_version)
+    """
+    _no_window = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+    try:
+        result = subprocess.run(
+            ["nvm", "list"],
+            capture_output=True, text=True, timeout=10,
+            encoding='utf-8', errors='replace',
+            creationflags=_no_window
+        )
+        output = result.stdout or ""
+    except Exception:
+        return [], ""
+
+    versions = []
+    current = ""
+    for line in output.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if stripped.startswith("*"):
+            m = re.search(r'\*\s+(\d+\.\d+\.\d+)', stripped)
+            if m:
+                current = m.group(1)
+                if current not in versions:
+                    versions.append(current)
+        else:
+            m = re.search(r'(\d+\.\d+\.\d+)', stripped)
+            if m:
+                ver = m.group(1)
+                if ver not in versions:
+                    versions.append(ver)
+    return versions, current
+
+
+# ==============================
 # GUI
 # ==============================
 class MenzOrderPackagerGUI:
@@ -189,6 +236,7 @@ class MenzOrderPackagerGUI:
         self.custom_zip_name = StringVar()
         self.auto_commit_svn = BooleanVar(value=self.config.get("auto_commit_svn", True))
         self.is_version_155_plus = BooleanVar(value=self.config.get("is_version_155_plus", False))
+        self.node_version = StringVar(value=self.config.get("node_version", DEFAULT_NODE_VERSION))
         self.history_records = self.config.get("history_records", [])
 
         # 快捷键：连续3次Enter触发打包
@@ -197,7 +245,8 @@ class MenzOrderPackagerGUI:
         self.create_widgets()
         self._refresh_history_listbox()
         self._log("配置已加载")
-        self._log("💡 快捷键：连续按3次 Enter 可直接开始打包")
+        self._log("💡 快捷键：连续按 3 次 Enter 可直接开始打包")
+        self._refresh_node_versions()  # 启动时后台加载 nvm 版本列表
 
     def create_widgets(self):
         # Notebook 双标签页
@@ -330,6 +379,22 @@ class MenzOrderPackagerGUI:
         ttk.Checkbutton(vt_frame, text="是 1.5.5 及以上版本（仅执行 npm run build）",
                         variable=self.is_version_155_plus).pack(anchor=W, pady=5)
         ttk.Label(vt_frame, text="提示：勾选后仅执行 build，不执行 lib-render2", foreground="gray").pack(anchor=W)
+
+        # --- Node 版本 ---
+        node_frame = ttk.LabelFrame(config_tab, text="🔢 Node 版本", padding=5)
+        node_frame.pack(fill=X, pady=5)
+        node_inner = ttk.Frame(node_frame)
+        node_inner.pack(fill=X)
+        self.node_combo = ttk.Combobox(
+            node_inner, textvariable=self.node_version,
+            state="readonly", width=20
+        )
+        self.node_combo.pack(side=LEFT, padx=(0, 8))
+        self.btn_refresh_node = ttk.Button(node_inner, text="🔄 刷新版本列表", command=self._refresh_node_versions)
+        self.btn_refresh_node.pack(side=LEFT, padx=(0, 8))
+        self.node_current_label = ttk.Label(node_inner, text="当前: 检测中...", foreground="gray")
+        self.node_current_label.pack(side=LEFT)
+        ttk.Label(node_frame, text="打包前自动检测，版本不一致时弹出 UAC 管理员授权窗口进行切换", foreground="gray").pack(anchor=W, pady=(5, 0))
 
         # --- SVN自动提交 ---
         svn_opt_frame = ttk.LabelFrame(config_tab, text="🔗 SVN自动提交", padding=5)
@@ -602,6 +667,35 @@ class MenzOrderPackagerGUI:
         if val:
             self.project_version.set(val)
 
+    # ==================== Node 版本 ====================
+    def _refresh_node_versions(self):
+        """后台刷新 nvm 版本列表"""
+        self.btn_refresh_node.config(state=DISABLED)
+        self.node_current_label.config(text="当前: 检测中...")
+
+        def _do():
+            versions, current = get_nvm_versions()
+            self.root.after(0, lambda: self._on_node_versions_loaded(versions, current))
+
+        threading.Thread(target=_do, daemon=True).start()
+
+    def _on_node_versions_loaded(self, versions, current):
+        self.btn_refresh_node.config(state=NORMAL)
+        if versions:
+            self.node_combo['values'] = versions
+            saved_ver = self.node_version.get()
+            if saved_ver not in versions:
+                if DEFAULT_NODE_VERSION in versions:
+                    self.node_version.set(DEFAULT_NODE_VERSION)
+                else:
+                    self.node_version.set(versions[0])
+            self._log(f"✅ 获取到 {len(versions)} 个 Node 版本: {', '.join(versions)}")
+        else:
+            self._log("⚠️ 未能获取 nvm 版本列表（nvm 未安装或命令不可用）")
+        self.node_current_label.config(
+            text=f"当前: v{current}" if current else "当前: 未检测到"
+        )
+
     # ==================== 打包逻辑 ====================
     def _start_packaging(self):
         if not self.project_dir.get():
@@ -693,45 +787,32 @@ class MenzOrderPackagerGUI:
             self.root.after(0, self._update_button_states)
 
     def _check_node_version(self, log):
-        """检查当前Node版本，必须为 14.19.1，不匹配则尝试 nvm 强制切换"""
-        REQUIRED_NODE_VERSION = "14.19.1"
+        """检查当前Node版本是否与下拉框选中版本一致，不匹配则尝试 nvm 强制切换"""
+        required_version = self.node_version.get()
+        _no_window = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
         try:
             result = subprocess.check_output(
                 ["node", "-v"], text=True, encoding='utf-8',
-                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+                creationflags=_no_window
             )
             current_version = result.strip().lstrip('v')
-            log(f"当前Node版本: v{current_version}")
+            log(f"ℹ️ 当前 Node 版本: v{current_version}，目标版本: v{required_version}")
 
-            if current_version == REQUIRED_NODE_VERSION:
-                log(f"✅ Node版本匹配: v{REQUIRED_NODE_VERSION}")
+            if current_version == required_version:
+                log(f"✅ Node 版本匹配: v{required_version}")
                 return True
 
-            log(f"⚠️ Node版本不匹配，需要 v{REQUIRED_NODE_VERSION}，当前为 v{current_version}")
-            log(f"🔄 尝试通过 nvm 切换到 v{REQUIRED_NODE_VERSION}...")
-
-            # 尝试 nvm use 强制切换（需管理员权限）
-            switched = self._try_nvm_switch(REQUIRED_NODE_VERSION, log)
+            log(f"⚠️ Node 版本不匹配，开始切换...")
+            switched = self._try_nvm_switch(required_version, log)
             if switched:
-                # 切换后再次验证
-                result2 = subprocess.check_output(
-                    ["node", "-v"], text=True, encoding='utf-8',
-                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
-                )
-                new_version = result2.strip().lstrip('v')
-                if new_version == REQUIRED_NODE_VERSION:
-                    log(f"✅ Node版本已切换至 v{REQUIRED_NODE_VERSION}")
-                    return True
-                else:
-                    log(f"⚠️ nvm 切换后版本为 v{new_version}，仍未匹配")
+                return True
 
             # 切换失败，弹窗提示
             self.root.after(0, lambda: messagebox.showerror(
                 "Node版本不匹配",
-                f"打包需要 Node v{REQUIRED_NODE_VERSION}，当前为 v{current_version}。\n\n"
-                f"自动切换失败，请手动执行以下命令：\n\n"
-                f"  nvm install {REQUIRED_NODE_VERSION}\n"
-                f"  nvm use {REQUIRED_NODE_VERSION}\n\n"
+                f"打包需要 Node v{required_version}，当前为 v{current_version}。\n\n"
+                f"自动切换失败，请手动执行：\n\n"
+                f"  nvm use {required_version}\n\n"
                 f"（nvm use 需要以管理员身份运行）"
             ))
             return False
@@ -746,29 +827,87 @@ class MenzOrderPackagerGUI:
             return True
 
     def _try_nvm_switch(self, version, log):
-        """尝试通过 nvm use 切换Node版本（Windows需提权）"""
-        import ctypes
+        """通过 UAC 提权执行 nvm use 切换 Node 版本，轮询等待结果"""
+        temp_dir = tempfile.gettempdir()
+        pid = os.getpid()
+        result_file = os.path.join(temp_dir, f"nvm_switch_{pid}.txt")
+        bat_file = os.path.join(temp_dir, f"nvm_switch_{pid}.bat")
+
+        # 清理可能存在的旧文件
+        for f in [result_file, bat_file]:
+            try:
+                os.remove(f)
+            except OSError:
+                pass
+
+        bat_content = (
+            f'@echo off\n'
+            f'nvm use {version}\n'
+            f'if %errorlevel% equ 0 (\n'
+            f'    echo OK>"{result_file}"\n'
+            f') else (\n'
+            f'    echo FAIL>"{result_file}"\n'
+            f')\n'
+        )
+
         try:
-            # nvm-windows 的 use 命令需要管理员权限来修改系统符号链接
-            # 使用 ShellExecuteW + runas 触发 UAC 弹窗提权
+            with open(bat_file, "w", encoding="gbk") as f:
+                f.write(bat_content)
+
+            log(f"🔐 正在请求管理员权限切换 Node 版本到 {version}...")
             ret = ctypes.windll.shell32.ShellExecuteW(
-                None, "runas",
-                "cmd.exe",
-                f"/c nvm use {version}",
-                None,  # 工作目录
-                0  # SW_HIDE，隐藏窗口
+                None, "runas", "cmd.exe",
+                f'/c "{bat_file}"', None, 0  # SW_HIDE
             )
-            # ShellExecuteW 返回值 > 32 表示成功
-            if ret > 32:
-                log("ℹ️ 已请求管理员权限执行 nvm use，等待切换完成...")
-                time.sleep(3)  # 等待切换完成
-                return True
-            else:
-                log(f"⚠️ 提权请求被拒绝或失败（返回值: {ret}）")
+            if ret <= 32:
+                log(f"❌ UAC 提权失败（返回码: {ret}），可能用户取消了授权")
                 return False
         except Exception as e:
-            log(f"⚠️ nvm 切换失败: {e}")
+            log(f"❌ 启动提权进程出错: {e}")
             return False
+
+        # 轮询等待结果（最长 30 秒）
+        success = False
+        for _ in range(60):
+            time.sleep(0.5)
+            if os.path.exists(result_file):
+                try:
+                    with open(result_file, "r") as f:
+                        success = f.read().strip() == "OK"
+                except Exception:
+                    pass
+                break
+        else:
+            log("⚠️ 等待 nvm use 超时（30秒），请确认已点击 UAC 授权")
+
+        # 清理临时文件
+        for f in [result_file, bat_file]:
+            try:
+                os.remove(f)
+            except OSError:
+                pass
+
+        if not success:
+            log("❌ nvm use 执行失败")
+            return False
+
+        # 验证切换结果
+        _no_window = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+        try:
+            result2 = subprocess.check_output(
+                ["node", "-v"], text=True, encoding='utf-8',
+                creationflags=_no_window
+            )
+            new_version = result2.strip().lstrip('v')
+            if new_version == version:
+                log(f"✅ Node 版本已成功切换到 v{version}")
+                return True
+            else:
+                log(f"⚠️ nvm use 返回成功，但当前版本仍为 v{new_version}，请重新尝试")
+                return False
+        except Exception:
+            log(f"✅ nvm use 执行完成（无法验证版本）")
+            return True
 
     def _clean_dist_dirs(self, project_dir, log):
         """清理 dist 和 lib-render-dist 目录"""
@@ -1071,6 +1210,7 @@ class MenzOrderPackagerGUI:
             "custom_zip_name": self.custom_zip_name.get(),
             "auto_commit_svn": self.auto_commit_svn.get(),
             "is_version_155_plus": self.is_version_155_plus.get(),
+            "node_version": self.node_version.get(),
         }
 
         order_info = self.order_info.get()
@@ -1105,6 +1245,7 @@ class MenzOrderPackagerGUI:
             self.custom_zip_name.set(record.get('custom_zip_name', ''))
             self.auto_commit_svn.set(record.get('auto_commit_svn', True))
             self.is_version_155_plus.set(record.get('is_version_155_plus', False))
+            self.node_version.set(record.get('node_version', DEFAULT_NODE_VERSION))
             self._log(f"✅ 已加载历史记录: {record.get('timestamp', '')} - {record.get('order_info', '')}")
             self._log("ℹ️ 配置已恢复，请点击「🚀 开始打包」执行打包")
             self.notebook.select(0)
@@ -1134,6 +1275,7 @@ class MenzOrderPackagerGUI:
             "keyword": self.keyword.get().strip(),
             "auto_commit_svn": self.auto_commit_svn.get(),
             "is_version_155_plus": self.is_version_155_plus.get(),
+            "node_version": self.node_version.get(),
             "history_records": self.history_records,
         }
         save_config(config)
