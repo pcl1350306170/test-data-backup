@@ -957,6 +957,18 @@
             }
         } catch (e) { console.warn('[Ward] 解析 orgInfo 失败:', e); }
 
+        // 从 localStorage dataDeptInfoList 获取第一条科室的 deptId
+        let defaultDeptId = '';
+        try {
+            const deptListStr = window.localStorage.getItem('dataDeptInfoList');
+            if (deptListStr) {
+                const deptList = JSON.parse(deptListStr);
+                if (Array.isArray(deptList) && deptList.length > 0) {
+                    defaultDeptId = deptList[0].deptId || '';
+                }
+            }
+        } catch (e) { console.warn('[Ward] 解析 dataDeptInfoList 失败:', e); }
+
         // 设备类型映射
         const deviceTypes = [
             { value: 'wnBedHeadExtension', label: '🛏️ 床头分机' },
@@ -983,6 +995,36 @@
             wnCorridorScreen: '走廊显示屏', wnCorridorLatticeScreen: '走廊点阵屏',
             bnNursingTV: '智能护理看板'
         };
+        // 设备号前缀映射（按设备类型英文/拼音缩写），起始设备号 = 前缀 + 001
+        const deviceNumPrefixMap = {
+            wnBedHeadExtension: 'CCT',        // 床头分机
+            wnBedSideExtension: 'CCP',        // 床旁分机
+            wnToiletExtension: 'WSJ',        // 卫生间分机
+            wnDutyMainframe: 'ZBS',          // 值班室主机
+            wnDoorWayExtension: 'MK',        // 门口分机
+            wnEntranceGuard: 'MJ',           // 门禁分机
+            wnMedicalMainframe: 'YH',        // 医护主机
+            rvKinVisitExtension: 'TS',       // 探视分机
+            wnMedicalAudioAssistant: 'SC',   // 手持设备
+            wnDoorLampExtension: 'MD',       // 门灯
+            wnCorridorScreen: 'ZLX',         // 走廊显示屏
+            wnCorridorLatticeScreen: 'ZLD',  // 走廊点阵屏
+            bnNursingTV: 'KKB'                // 智能护理看板
+        };
+        // 完全随机生成起始IP，末段留出累加空间（后续设备IP在此基础上递增）
+        function generateRandomIp() {
+            const o1 = Math.floor(Math.random() * 223) + 1;  // 1-223，避开 0 与组播/保留段
+            const o2 = Math.floor(Math.random() * 256);      // 0-255
+            const o3 = Math.floor(Math.random() * 256);      // 0-255
+            const o4 = Math.floor(Math.random() * 100) + 1;  // 1-100，为设备数量递增留出空间
+            return `${o1}.${o2}.${o3}.${o4}`;
+        }
+        // 根据设备类型生成起始设备号
+        function buildStartDeviceNum(deviceType) {
+            return (deviceNumPrefixMap[deviceType] || 'DEV') + '001';
+        }
+        const defaultDeviceNum = buildStartDeviceNum(deviceTypes[0].value);
+        const randomStartIp = generateRandomIp();
 
         const defaultVersions = JSON.stringify({
             "appVersion": "3.4.2.004-20260327",
@@ -1020,7 +1062,7 @@
                 <div class="ward-section-title">设备配置</div>
                 <div class="ward-form-row">
                     <div class="ward-form-group"><label>机构ID</label><div style="display:flex;gap:6px;align-items:center"><input type="text" name="orgId" value="${orgId}" placeholder="从 localStorage 自动获取" style="flex:1"><button type="button" class="ward-fetch-org-btn" style="white-space:nowrap;padding:4px 10px;font-size:12px">获取</button></div><span class="ward-hint" id="ward-org-status">${orgId ? '✅ 已从 localStorage 获取' : '⚠️ 未获取到，可点击获取或手动填写'}</span></div>
-                    <div class="ward-form-group"><label>科室ID（可选）</label><input type="text" name="deptId" placeholder="可选"></div>
+                    <div class="ward-form-group"><label>科室ID（可选）</label><input type="text" name="deptId" value="${defaultDeptId}" placeholder="从 localStorage dataDeptInfoList 自动获取"></div>
                 </div>
                 <div class="ward-form-row">
                     <div class="ward-form-group"><label>设备类型</label><select name="deviceType">${deviceTypeOptions}</select></div>
@@ -1028,11 +1070,12 @@
                 </div>
                 <div class="ward-form-row">
                     <div class="ward-form-group"><label>设备数量</label><input type="number" name="deviceCount" value="10" min="1" max="100"></div>
-                    <div class="ward-form-group"><label>起始设备号</label><input type="text" name="startDeviceNum" value="BED001"></div>
-                    <div class="ward-form-group"><label>起始IP地址</label><input type="text" name="startIp" value="192.168.31.201"></div>
+                    <div class="ward-form-group"><label>起始设备号</label><input type="text" name="startDeviceNum" value="${defaultDeviceNum}"></div>
+                    <div class="ward-form-group"><label>起始IP地址</label><input type="text" name="startIp" value="${randomStartIp}"></div>
                 </div>
                 <div class="ward-section-title">设备型号</div>
                 <div class="ward-form-group"><label>设备型号</label><select name="deviceModel"><option value="A10">A10</option><option value="A27L">A27L</option><option value="A36">A36</option><option value="A25">A25</option></select></div>
+                <div class="ward-form-group" id="ward-touch-mode-group" style="display:none"><label>触屏模式（护理看板）</label><div class="ward-radio-group"><label><input type="radio" name="touchMode" value="0" checked> 非触屏</label><label><input type="radio" name="touchMode" value="1"> 触屏</label></div></div>
                 <div class="ward-section-title ward-advanced-toggle">▶ 高级配置（点击展开）</div>
                 <div class="ward-advanced-content" style="display:none">
                     <div class="ward-form-row">
@@ -1067,10 +1110,20 @@
         // 设备类型切换时更新名称前缀
         const deviceTypeSelect = dialog.querySelector('select[name="deviceType"]');
         const namePrefixInput = dialog.querySelector('input[name="deviceNamePrefix"]');
+        const startDeviceNumInput = dialog.querySelector('input[name="startDeviceNum"]');
+        const touchModeGroup = dialog.querySelector('#ward-touch-mode-group');
+        // 仅"智能护理看板"显示触屏模式选项
+        function toggleTouchModeGroup() {
+            touchModeGroup.style.display = deviceTypeSelect.value === 'bnNursingTV' ? '' : 'none';
+        }
         deviceTypeSelect.addEventListener('change', () => {
             const name = deviceTypeNameMap[deviceTypeSelect.value];
             if (name) namePrefixInput.value = name;
+            // 起始设备号根据选择的设备类型自动生成
+            startDeviceNumInput.value = buildStartDeviceNum(deviceTypeSelect.value);
+            toggleTouchModeGroup();
         });
+        toggleTouchModeGroup();
 
         // 高级配置展开/收起
         const advToggle = dialog.querySelector('.ward-advanced-toggle');
@@ -1181,6 +1234,23 @@
             return data;
         }
 
+        // 护理看板：拿到设备ID后调用 bnms 接口保存触屏/非触屏模式
+        async function saveSwitchMode(deviceId, formData) {
+            const switchUrl = url.origin + '/bnms/app-bn/switch';
+            const resp = await fetch(switchUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    deptId: formData.deptId,
+                    devId: deviceId,
+                    orgId: formData.orgId,
+                    touchMode: parseInt(formData.touchMode, 10)
+                })
+            });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            return parseInt(formData.touchMode, 10) === 1 ? '触屏' : '非触屏';
+        }
+
         // ===== 提交 =====
         dialog.querySelector('.ward-submit-btn').addEventListener('click', async () => {
             const getVal = (n) => dialog.querySelector(`[name="${n}"]`).value.trim();
@@ -1202,12 +1272,14 @@
                 deviceNamePrefix: getVal('deviceNamePrefix'),
                 versionsJson: dialog.querySelector('textarea[name="versionsJson"]').value,
                 paramsJson: dialog.querySelector('textarea[name="paramsJson"]').value,
-                positionsJson: dialog.querySelector('textarea[name="positionsJson"]').value
+                positionsJson: dialog.querySelector('textarea[name="positionsJson"]').value,
+                touchMode: dialog.querySelector('input[name="touchMode"]:checked')?.value || '0'
             };
 
             if (!formData.serverIp) { showToast('❌ 请输入服务器IP', 'error'); return; }
             if (!formData.orgId) { showToast('❌ 请输入机构ID', 'error'); return; }
             if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(formData.startIp)) { showToast('❌ 起始IP格式不正确', 'error'); return; }
+            if (formData.deviceType === 'bnNursingTV' && !formData.deptId) { showToast('❌ 护理看板需要科室ID，请确认 localStorage 存在 dataDeptInfoList 或手动填写', 'error'); return; }
 
             const btn = dialog.querySelector('.ward-submit-btn');
             const progressDiv = dialog.querySelector('.ward-device-progress');
@@ -1243,6 +1315,15 @@
                     if (res.status === 200) {
                         result = { success: true, index: i + 1, message: res.desc || '添加成功', deviceId: res.data?.deviceId };
                         successCount++;
+                        // 护理看板：拿到设备ID后保存触屏模式到 bnms
+                        if (formData.deviceType === 'bnNursingTV' && result.deviceId) {
+                            try {
+                                const modeText = await saveSwitchMode(result.deviceId, formData);
+                                result.message += ` | 触屏设置成功(${modeText})`;
+                            } catch (se) {
+                                result.message += ` | ❌ 触屏设置失败: ${se.message}`;
+                            }
+                        }
                     } else {
                         result = { success: false, index: i + 1, message: res.desc || `失败(status:${res.status})` };
                     }

@@ -21,6 +21,7 @@ CosyVoice 本地 TTS 生成器（GUI 版）
 import json
 import os
 import queue
+import random
 import shutil
 import subprocess
 import sys
@@ -363,6 +364,8 @@ class App:
         self.msg_queue = queue.Queue()
         self.worker_thread = None
         self._stop_event = threading.Event()
+        self._pause_event = threading.Event()  # set=暂停中，clear=正常运行
+        self._is_paused = False
 
         # 变量
         self.text_content = ""           # 当前文本内容
@@ -529,6 +532,12 @@ class App:
         self.start_btn.pack(side="left", padx=(0, 6))
         self.stop_btn = ttk.Button(btn_bar, text="停止", command=self._stop, state="disabled")
         self.stop_btn.pack(side="left", padx=(0, 6))
+        self.pause_btn = ttk.Button(btn_bar, text="暂停", command=self._pause, state="disabled")
+        self.pause_btn.pack(side="left", padx=(0, 6))
+        self.resume_btn = ttk.Button(btn_bar, text="继续", command=self._resume, state="disabled")
+        self.resume_btn.pack(side="left", padx=(0, 6))
+        self.test_btn = ttk.Button(btn_bar, text="测试", command=self._test_generate)
+        self.test_btn.pack(side="left", padx=(0, 6))
 
         # 进度条
         self.progress_bar = ttk.Progressbar(btn_bar, variable=self.progress_var,
@@ -773,9 +782,14 @@ class App:
 
         # 切换到日志页，准备开始
         self._stop_event.clear()
+        self._pause_event.clear()
+        self._is_paused = False
         self._switch_to_log_tab()
         self.start_btn.config(state="disabled")
         self.stop_btn.config(state="normal")
+        self.pause_btn.config(state="normal")
+        self.resume_btn.config(state="disabled")
+        self.test_btn.config(state="disabled")
         self.progress_var.set(0)
         self.status_var.set(f"正在生成 0/{len(segments)}")
         # 显示当前模式
@@ -798,9 +812,116 @@ class App:
 
     def _stop(self):
         self._stop_event.set()
+        self._pause_event.clear()  # 如果正在暂停中，解除暂停以便线程退出
         self._log("[停止] 用户请求停止...")
         self.status_var.set("正在停止...")
         logger.info("用户请求停止")
+
+    def _pause(self):
+        """暂停生成（当前段完成后暂停，不中断正在执行的段）"""
+        self._pause_event.set()
+        self._is_paused = True
+        self.pause_btn.config(state="disabled")
+        self.resume_btn.config(state="normal")
+        self.status_var.set("已暂停（等待当前段完成）")
+        self._log("[暂停] 当前段完成后将暂停...")
+        logger.info("用户请求暂停")
+
+    def _resume(self):
+        """继续生成"""
+        self._pause_event.clear()
+        self._is_paused = False
+        self.pause_btn.config(state="normal")
+        self.resume_btn.config(state="disabled")
+        self.status_var.set("继续生成中...")
+        self._log("[继续] 恢复生成")
+        logger.info("用户请求继续")
+
+    # ---------- 测试生成 ----------
+    _TEST_SENTENCES = [
+        "清晨的阳光洒在窗台上，鸟儿在枝头欢快地歌唱，新的一天开始了。",
+        "春天的田野里，油菜花金灿灿的一片，微风吹过，带来阵阵清香。",
+        "夜幕降临，繁星点点，月亮悄悄爬上了树梢，一切都安静了下来。",
+        "小溪潺潺流过石桥，鱼儿在水中自由自在地游来游去。",
+        "秋天的果园里，红彤彤的苹果挂满枝头，空气中弥漫着丰收的喜悦。",
+        "雨后的街道格外清新，路面上的水洼倒映着天空和行人。",
+        "远处的山峦层叠起伏，云雾缭绕其间，宛如一幅水墨画卷。",
+        "咖啡的香气弥漫在房间里，书页在指尖轻轻翻动，时光静好。",
+    ]
+
+    def _test_generate(self):
+        """测试功能：随机生成1条音频供试听"""
+        # 校验环境
+        model_dir = self.model_dir_var.get().strip()
+        conda_py = self.conda_py_var.get().strip()
+        if not os.path.isdir(model_dir):
+            self._show_toast("错误", f"模型目录不存在：{model_dir}", "error")
+            return
+        if not os.path.isfile(conda_py):
+            self._show_toast("错误", f"conda python 不存在：{conda_py}", "error")
+            return
+        if not WORKER_PATH.is_file():
+            self._show_toast("错误", f"Worker 脚本不存在：{WORKER_PATH}", "error")
+            return
+
+        # 校验参考音频
+        prompt_audio = self.prompt_audio_var.get().strip()
+        prompt_text = self.prompt_text_var.get().strip()
+        if prompt_audio and not prompt_text:
+            self._show_toast("提示", "已选择参考音频，但未填写音频对应文本", "warning")
+            return
+
+        # 收集配置
+        cfg = self._save_config_from_ui()
+        test_text = random.choice(self._TEST_SENTENCES)
+        out_dir = cfg.get("out_dir") or DEFAULT_OUT_DIR
+        os.makedirs(out_dir, exist_ok=True)
+
+        # 输出文件名
+        ts = time.strftime("%Y%m%d_%H%M%S")
+        spk_name = os.path.basename(prompt_audio) if prompt_audio else cfg.get("spk", "测试")
+        spk_name = os.path.splitext(spk_name)[0] if prompt_audio else spk_name
+        fmt = (cfg.get("format") or "wav").lower()
+        out_name = f"测试_{_safe_name(spk_name)}_{ts}.{fmt}"
+        out_path = os.path.join(out_dir, out_name)
+        wav_path = os.path.splitext(out_path)[0] + ".wav"
+
+        # 切换到日志页
+        self._switch_to_log_tab()
+        self.test_btn.config(state="disabled")
+        self.start_btn.config(state="disabled")
+        self.status_var.set("测试生成中...")
+        self._log(f"\n{'='*40}")
+        self._log(f"[测试] 随机文本: {test_text}")
+        self._log(f"[测试] 输出: {out_path}")
+        self._log(f"{'='*40}")
+
+        # 后台线程执行
+        def _do_test():
+            try:
+                call_worker(test_text, wav_path, cfg, log=self._thread_log)
+                # 语速调整
+                speed = float(cfg.get("speed") or 1.0)
+                if abs(speed - 1.0) >= 0.01:
+                    apply_speed(wav_path, speed, log=self._thread_log)
+                # 格式转换
+                if fmt == "mp3":
+                    mp3_path = os.path.splitext(wav_path)[0] + ".mp3"
+                    if wav_to_mp3(wav_path, mp3_path, log=self._thread_log):
+                        try:
+                            os.remove(wav_path)
+                        except Exception:
+                            pass
+                        final_path = mp3_path
+                    else:
+                        final_path = wav_path
+                else:
+                    final_path = wav_path
+                self.msg_queue.put(("test_done", final_path, out_dir))
+            except Exception as e:
+                self.msg_queue.put(("test_error", str(e)))
+
+        threading.Thread(target=_do_test, daemon=True).start()
 
     def _work(self, segments, cfg):
         """后台线程：逐段调用 worker 生成音频"""
@@ -819,6 +940,16 @@ class App:
                 if self._stop_event.is_set():
                     self.msg_queue.put(("stopped", f"已在第 {idx-1}/{total} 段后停止"))
                     return
+
+                # 暂停检查：等待恢复或停止
+                if self._pause_event.is_set():
+                    self.msg_queue.put(("log", f"  [暂停] 等待继续..."))
+                    while self._pause_event.is_set() and not self._stop_event.is_set():
+                        time.sleep(0.3)
+                    if self._stop_event.is_set():
+                        self.msg_queue.put(("stopped", f"已在第 {idx-1}/{total} 段后停止"))
+                        return
+                    self.msg_queue.put(("log", f"  [继续] 恢复生成"))
 
                 wav_path = wav_paths[idx - 1]
                 self.msg_queue.put(("progress", idx, total))
@@ -877,6 +1008,9 @@ class App:
                     self.status_var.set(f"完成，共 {len(paths)} 个文件")
                     self.start_btn.config(state="normal")
                     self.stop_btn.config(state="disabled")
+                    self.pause_btn.config(state="disabled")
+                    self.resume_btn.config(state="disabled")
+                    self.test_btn.config(state="normal")
                     self._log("\n" + "=" * 60)
                     self._log(f"[完成] 共生成 {len(paths)} 个文件：")
                     for p in paths:
@@ -894,13 +1028,34 @@ class App:
                     self.status_var.set("已停止")
                     self.start_btn.config(state="normal")
                     self.stop_btn.config(state="disabled")
+                    self.pause_btn.config(state="disabled")
+                    self.resume_btn.config(state="disabled")
+                    self.test_btn.config(state="normal")
                     self._log(f"\n[停止] {msg[1]}")
                 elif kind == "error":
                     self.status_var.set("出错")
                     self.start_btn.config(state="normal")
                     self.stop_btn.config(state="disabled")
+                    self.pause_btn.config(state="disabled")
+                    self.resume_btn.config(state="disabled")
+                    self.test_btn.config(state="normal")
                     self._log(f"\n[错误] {msg[1]}")
                     self._show_toast("出错", msg[1], "error", 6000)
+                elif kind == "test_done":
+                    final_path, out_dir = msg[1], msg[2]
+                    self.test_btn.config(state="normal")
+                    self.start_btn.config(state="normal")
+                    self.status_var.set("测试完成")
+                    self._log(f"\n[测试完成] {final_path}")
+                    self._show_toast("测试完成", f"音频已生成：\n{os.path.basename(final_path)}", "success", 4000)
+                    logger.info("测试生成完成: %s", final_path)
+                elif kind == "test_error":
+                    self.test_btn.config(state="normal")
+                    self.start_btn.config(state="normal")
+                    self.status_var.set("测试失败")
+                    self._log(f"\n[测试失败] {msg[1]}")
+                    self._show_toast("测试失败", msg[1], "error", 6000)
+                    logger.error("测试生成失败: %s", msg[1])
         except queue.Empty:
             pass
         self.root.after(100, self._after_poll)
