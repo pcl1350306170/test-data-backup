@@ -607,6 +607,28 @@
             ],
             "script": "other\\绘本一键生成.py",
             "description": "绘本一键生成：输入关键字自动匹配JSON、生成音频、合成视频"
+        },
+        {
+            "name": "音频合并+BGM",
+            "keywords": [
+                "qt7",
+                "yp",
+                "ynpnheb;",
+                "yphb",
+                "yphbzsp"
+            ],
+            "script": "other\\音频合并工具.pyw",
+            "description": "音频合并+BGM"
+        }
+        ,
+        {
+            "name": "音频格式转换WAVtoMP3",
+            "keywords": [               
+                "yp",                
+                "ynpngeuivrhr"
+            ],
+            "script": "other\\WAV转MP3.pyw",
+            "description": "音频格式转换WAVtoMP3"
         }
     ]
 }
