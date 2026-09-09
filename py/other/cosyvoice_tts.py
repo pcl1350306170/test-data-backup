@@ -18,6 +18,7 @@ CosyVoice 本地 TTS 生成器（GUI 版）
   python cosyvoice_tts.py
 """
 
+import hashlib
 import json
 import os
 import queue
@@ -30,7 +31,7 @@ import time
 import traceback
 import tkinter as tk
 from pathlib import Path
-from tkinter import ttk, filedialog
+from tkinter import messagebox, ttk, filedialog
 
 # ---------- 路径与常量 ----------
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
@@ -38,6 +39,8 @@ SCRIPT_NAME = "cosyvoice_tts"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
 CONFIG_DIR.mkdir(exist_ok=True)
+PROGRESS_DIR = CONFIG_DIR / "progress"
+PROGRESS_DIR.mkdir(exist_ok=True)
 
 # Worker 脚本（与本脚本同目录）
 WORKER_PATH = SCRIPT_DIR / "cosyvoice_tts_worker.py"
@@ -128,6 +131,84 @@ def save_config(cfg):
         logger.info("配置已保存: %s", CONFIG_PATH)
     except Exception as e:
         logger.error("保存配置失败: %s", e)
+
+
+# ============================================================
+# 断点续转：进度管理
+# ============================================================
+def _compute_task_id(text, cfg):
+    """根据文本内容和关键配置计算任务唯一标识"""
+    key_parts = [
+        text,
+        cfg.get("spk", ""),
+        cfg.get("style", ""),
+        str(cfg.get("speed", "")),
+        str(cfg.get("seg_len", "")),
+        cfg.get("prompt_audio", ""),
+        cfg.get("prompt_text", ""),
+    ]
+    raw = "|".join(key_parts)
+    return hashlib.md5(raw.encode("utf-8")).hexdigest()[:12]
+
+
+def _save_progress(task_id, progress_data):
+    """保存任务进度到 JSON 文件"""
+    path = PROGRESS_DIR / f"task_{task_id}.json"
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(progress_data, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error("保存进度失败: %s", e)
+
+
+def _load_progress(task_id):
+    """加载任务进度，不存在或解析失败返回 None"""
+    path = PROGRESS_DIR / f"task_{task_id}.json"
+    try:
+        if path.exists():
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception as e:
+        logger.warning("加载进度文件失败: %s", e)
+    return None
+
+
+def _delete_progress(task_id):
+    """删除任务进度文件"""
+    path = PROGRESS_DIR / f"task_{task_id}.json"
+    try:
+        if path.exists():
+            path.unlink()
+    except Exception as e:
+        logger.debug("删除进度文件失败: %s", e)
+
+
+def _find_latest_progress():
+    """查找最近一个未完成的进度文件，返回 (task_id, progress_data) 或 (None, None)"""
+    latest_path = None
+    latest_mtime = 0
+    try:
+        for f in PROGRESS_DIR.glob("task_*.json"):
+            if f.is_file():
+                mtime = f.stat().st_mtime
+                if mtime > latest_mtime:
+                    latest_mtime = mtime
+                    latest_path = f
+    except Exception:
+        return None, None
+    if latest_path is None:
+        return None, None
+    try:
+        with open(latest_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        completed = data.get("completed_indices", [])
+        total = len(data.get("segments", []))
+        if total > 0 and len(completed) < total:
+            task_id = latest_path.stem.replace("task_", "")
+            return task_id, data
+    except Exception:
+        pass
+    return None, None
 
 
 # ============================================================
@@ -390,6 +471,81 @@ class App:
         self._build_ui()
         self._load_config_to_ui()
         self._after_poll()
+
+        # 启动时检查是否有中断的任务
+        self.root.after(500, self._check_resume_on_startup)
+
+    # ---------- 断点续转 ----------
+    def _check_resume_on_startup(self):
+        """启动时检测中断任务，弹窗询问是否继续"""
+        task_id, progress = _find_latest_progress()
+        if not task_id or not progress:
+            return
+        completed = progress.get("completed_indices", [])
+        total = len(progress.get("segments", []))
+        if total == 0 or len(completed) >= total:
+            return
+        msg = (f"检测到上次未完成的任务\n"
+               f"已完成 {len(completed)}/{total} 段\n\n"
+               f"是否继续？")
+        if messagebox.askyesno("断点续转", msg, parent=self.root):
+            self._resume_task(task_id, progress)
+
+    def _resume_task(self, task_id, progress):
+        """恢复中断的任务"""
+        saved_text = progress.get("text", "")
+        cfg = progress.get("cfg", {})
+        segments = progress.get("segments", [])
+        if not segments:
+            return
+
+        # 恢复配置到 UI
+        for key, var in [
+            ("spk", self.spk_var), ("style", self.style_var),
+            ("speed", self.speed_var), ("format", self.format_var),
+            ("out_dir", self.out_dir_var), ("prefix", self.prefix_var),
+            ("seg_len", self.seg_len_var), ("model_dir", self.model_dir_var),
+            ("repo_dir", self.repo_dir_var), ("conda_python", self.conda_py_var),
+            ("prompt_audio", self.prompt_audio_var),
+            ("prompt_text", self.prompt_text_var),
+        ]:
+            val = cfg.get(key, "")
+            if key in ("speed", "seg_len"):
+                val = str(val)
+            var.set(str(val) if val else "")
+
+        # 恢复文本到编辑区
+        self.txt_widget.delete("1.0", "end")
+        self.txt_widget.insert("1.0", saved_text)
+        self.lbl_text_info.config(
+            text=f"[断点续转] 共 {len(segments)} 段，{len(saved_text)} 字符")
+
+        # UI 状态
+        completed = progress.get("completed_indices", [])
+        remaining = len(segments) - len(completed)
+        self._stop_event.clear()
+        self._pause_event.clear()
+        self._is_paused = False
+        self._switch_to_log_tab()
+        self.start_btn.config(state="disabled")
+        self.stop_btn.config(state="normal")
+        self.pause_btn.config(state="normal")
+        self.resume_btn.config(state="disabled")
+        self.test_btn.config(state="disabled")
+        self.progress_var.set(len(completed) / len(segments) * 100)
+        self.status_var.set(f"断点续转 {len(completed)}/{len(segments)}")
+
+        self._log("=" * 60)
+        self._log(f"[断点续转] 恢复任务，已完成 {len(completed)}/{len(segments)} 段，"
+                  f"剩余 {remaining} 段")
+        self._log(f"输出目录：{cfg.get('out_dir', '')}")
+        self._log("=" * 60)
+
+        # 启动后台线程继续处理
+        self.worker_thread = threading.Thread(
+            target=self._work, args=(segments, cfg, task_id, progress),
+            daemon=True)
+        self.worker_thread.start()
 
     # ---------- UI 构建 ----------
     def _build_ui(self):
@@ -773,6 +929,9 @@ class App:
         # 保存配置并收集参数
         cfg = self._save_config_from_ui()
 
+        # 新任务开始，清理旧的进度文件
+        self._cleanup_progress()
+
         # 切段
         seg_len = int(self.seg_len_var.get().strip() or DEFAULT_SEG_LEN)
         segments = split_text(content, seg_len)
@@ -807,7 +966,7 @@ class App:
 
         # 启动后台线程
         self.worker_thread = threading.Thread(
-            target=self._work, args=(segments, cfg), daemon=True)
+            target=self._work, args=(segments, cfg, None, None), daemon=True)
         self.worker_thread.start()
 
     def _stop(self):
@@ -923,20 +1082,62 @@ class App:
 
         threading.Thread(target=_do_test, daemon=True).start()
 
-    def _work(self, segments, cfg):
-        """后台线程：逐段调用 worker 生成音频"""
+    def _cleanup_progress(self):
+        """清理所有旧的进度文件（新任务开始时调用）"""
+        try:
+            for f in PROGRESS_DIR.glob("task_*.json"):
+                try:
+                    f.unlink()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+    def _work(self, segments, cfg, resume_task_id=None, resume_progress=None):
+        """后台线程：逐段调用 worker 生成音频，支持断点续转"""
         out_dir = cfg.get("out_dir") or DEFAULT_OUT_DIR
         os.makedirs(out_dir, exist_ok=True)
         speed = float(cfg.get("speed") or 1.0)
         fmt = (cfg.get("format") or "wav").lower()
         total = len(segments)
 
-        ts = time.strftime("%Y%m%d_%H%M%S")
-        wav_paths = build_out_paths(out_dir, total, {**cfg, "format": "wav"}, ts)
+        # ── 断点续转：恢复进度状态 ──
+        task_id = resume_task_id
+        completed_set = set()
         final_paths = []
+
+        if resume_progress:
+            completed_set = set(resume_progress.get("completed_indices", []))
+            final_paths = list(resume_progress.get("final_paths", []))
+            ts = resume_progress.get("timestamp", "")
+            start_idx = len(completed_set)
+            self._thread_log(f"[断点续转] 跳过已完成 {start_idx} 段，从第 {start_idx+1} 段继续")
+        else:
+            # 新任务：计算 task_id 并清理旧进度
+            self._cleanup_progress()
+            task_id = _compute_task_id("\n".join(segments), cfg)
+            ts = time.strftime("%Y%m%d_%H%M%S")
+
+        wav_paths = build_out_paths(out_dir, total, {**cfg, "format": "wav"}, ts)
+
+        # 保存初始进度
+        if task_id:
+            _save_progress(task_id, {
+                "text": "\n".join(segments),
+                "cfg": cfg,
+                "segments": segments,
+                "completed_indices": sorted(completed_set),
+                "final_paths": list(final_paths),
+                "timestamp": ts,
+                "total": total,
+            })
 
         try:
             for idx, text in enumerate(segments, start=1):
+                # 跳过已完成的段（断点续转）
+                if (idx - 1) in completed_set:
+                    continue
+
                 if self._stop_event.is_set():
                     self.msg_queue.put(("stopped", f"已在第 {idx-1}/{total} 段后停止"))
                     return
@@ -983,7 +1184,22 @@ class App:
                     final_paths.append(wav_path)
                     self._thread_log(f"  [完成] {os.path.basename(wav_path)}")
 
-            # 全部完成
+                # ── 保存进度 checkpoint ──
+                completed_set.add(idx - 1)
+                if task_id:
+                    _save_progress(task_id, {
+                        "text": "\n".join(segments),
+                        "cfg": cfg,
+                        "segments": segments,
+                        "completed_indices": sorted(completed_set),
+                        "final_paths": list(final_paths),
+                        "timestamp": ts,
+                        "total": total,
+                    })
+
+            # 全部完成，删除进度文件
+            if task_id:
+                _delete_progress(task_id)
             self.msg_queue.put(("done", final_paths, out_dir))
         except Exception as e:
             traceback.print_exc()

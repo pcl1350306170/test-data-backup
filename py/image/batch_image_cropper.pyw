@@ -497,9 +497,11 @@ class BatchImageCropperApp:
             crop_w = int(crop_w * scale)
             crop_h = int(crop_h * scale)
 
-            # 确保不超过图片边界
-            crop_w = min(crop_w, img_w)
-            crop_h = min(crop_h, img_h)
+            # 确保不超过图片边界，同时保持目标比例
+            max_w_by_ratio = int(img_h * target_ratio) if target_ratio >= 1 else img_w
+            max_h_by_ratio = int(img_w / target_ratio) if target_ratio <= 1 else img_h
+            crop_w = min(crop_w, max_w_by_ratio, img_w)
+            crop_h = min(crop_h, max_h_by_ratio, img_h)
 
         # 以主体为中心放置裁剪框
         crop_x1 = max(0, min(img_w - crop_w, subject_cx - crop_w // 2))

@@ -135,28 +135,8 @@
             "script": "yarward\\wsl_update_deployer.py",
             "description": "WSL部署我的geeker和API"
         },
-        {
-            "name": "图片裁剪（生成新文件）",
-            "keywords": [
-                "tp1",
-                "tupian",
-                "tupm",
-                "tupmcljm"
-            ],
-            "script": "image\\crop_logo_recursive.pyw",
-            "description": "裁剪图片【生成新文件，单任务】"
-        },
-        {
-            "name": "图片裁剪并替换原图",
-            "keywords": [
-                "tp2",
-                "tupian",
-                "tupm",
-                "tupmcljmbytihryrtu"
-            ],
-            "script": "image\\crop_logo_recursive_replace.pyw",
-            "description": "裁剪并替换原图【单任务】"
-        },
+        
+       
         {
             "name": "可视化图片裁剪任务",
             "keywords": [
