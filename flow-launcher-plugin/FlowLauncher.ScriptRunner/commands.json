@@ -1102,5 +1102,20 @@
             "script": "craw\\测试可视化获取网页数据.py",
             "description": "测试-可视化获取网页数据"
         }
+,
+        {
+            "name": "MD对话转TXT",
+            "keywords": [
+                "md",
+                "txt",
+                "mdwztxt",
+                "mdzhuantxt",
+                "文件",
+                "grok",
+                "file"
+            ],
+            "script": "other\\md对话转txt.pyw",
+            "description": "md对话记录转纯文本txt"
+        }
     ]
 }
