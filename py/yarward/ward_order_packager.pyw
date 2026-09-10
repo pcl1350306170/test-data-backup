@@ -87,6 +87,7 @@ DEFAULT_CONFIG = {
     "keyword": "",
     "auto_commit_svn": True,
     "node_version": DEFAULT_NODE_VERSION,
+    "is_new_version": False,
     "history_records": [],
 }
 
@@ -187,6 +188,75 @@ def find_bash_executable():
 
 
 # ==============================
+# Volta 路径探测与 PATH 注入
+# ==============================
+def find_volta_dir():
+    """
+    探测 Volta 安装目录，返回包含 volta.exe 的目录绝对路径，未找到则返回 None。
+    优先看当前 PATH，其次探测常见安装位置（兼容非默认路径）。
+    """
+    # 1. 当前 PATH 中已能定位
+    volta_exe = shutil.which("volta")
+    if volta_exe:
+        return str(Path(volta_exe).parent)
+
+    # 2. 常见安装位置
+    local_appdata = os.environ.get('LOCALAPPDATA', '')
+    user_profile = os.environ.get('USERPROFILE', '')
+    program_files = os.environ.get('ProgramFiles', r'C:\Program Files')
+    program_files_x86 = os.environ.get('ProgramFiles(x86)', r'C:\Program Files (x86)')
+
+    candidates = []
+    if local_appdata:
+        candidates.append(Path(local_appdata) / 'Volta' / 'bin')
+        candidates.append(Path(local_appdata) / 'Volta')
+    if user_profile:
+        candidates.append(Path(user_profile) / '.volta' / 'bin')
+    candidates.append(Path(program_files) / 'Volta')
+    candidates.append(Path(program_files) / 'Volta' / 'bin')
+    candidates.append(Path(program_files_x86) / 'Volta')
+
+    for p in candidates:
+        try:
+            if (p / 'volta.exe').exists():
+                return str(p)
+        except OSError:
+            continue
+    return None
+
+
+def build_subprocess_env(log=None):
+    """
+    基于当前 os.environ 构建子进程 env，必要时把 Volta 目录前置到 PATH。
+    背景：Flow Launcher 等常驻进程启动时捕获的 PATH 可能不包含 Volta，
+    导致 deploy-micro.sh 内部 npm 调用 volta 时报“不是内部或外部命令”。
+    """
+    env = os.environ.copy()
+
+    def _log(msg):
+        if log:
+            log(msg)
+
+    volta_dir = find_volta_dir()
+    if not volta_dir:
+        _log("ℹ️ 未探测到 Volta 安装目录（若项目不需要 volta 可忽略）")
+        return env
+
+    current_path = env.get('PATH', '')
+    parts = current_path.split(os.pathsep) if current_path else []
+    # 去重（大小写不敏感，Windows 路径常见差异）
+    norm = {p.rstrip('\\/').lower() for p in parts if p}
+    if volta_dir.rstrip('\\/').lower() in norm:
+        _log(f"✅ PATH 已包含 Volta: {volta_dir}")
+        return env
+
+    parts.insert(0, volta_dir)
+    env['PATH'] = os.pathsep.join(parts)
+    _log(f"🔧 已为子进程注入 Volta 路径: {volta_dir}")
+    return env
+
+
+# ==============================
 # Git / SVN 工具函数
 # ==============================
 def get_git_branch(directory):
@@ -248,9 +318,9 @@ def find_svn_dirs_by_keyword(base_dir, keyword):
     return results
 
 
-def find_deploy_script(project_dir):
-    """查找项目目录下的 deploy.sh"""
-    deploy_path = project_dir / "deploy.sh"
+def find_deploy_script(project_dir, script_name="deploy.sh"):
+    """查找项目目录下的部署脚本（默认 deploy.sh，web 3.4.4+ 版本使用 deploy-micro.sh）"""
+    deploy_path = project_dir / script_name
     if deploy_path.exists():
         return deploy_path
     return None
@@ -458,6 +528,7 @@ class WardOrderPackagerGUI:
         self.keyword = StringVar(value=self.config.get("keyword", ""))
         self.auto_commit_svn = BooleanVar(value=self.config.get("auto_commit_svn", True))
         self.node_version = StringVar(value=self.config.get("node_version", DEFAULT_NODE_VERSION))
+        self.is_new_version = BooleanVar(value=self.config.get("is_new_version", False))
 
         # 匹配结果
         self.matched_project_dirs = []  # [(path, branch_name), ...]
@@ -488,6 +559,16 @@ class WardOrderPackagerGUI:
         )
         type_combo.pack(side=LEFT, padx=5)
         ttk.Label(type_frame, text="选择需要打包的项目类型", foreground="gray").pack(side=LEFT, padx=10)
+
+        # web 项目专用：是否是 3.4.4+ 版本（决定使用 deploy-micro.sh 还是 deploy.sh）
+        self.web_version_check = ttk.Checkbutton(
+            type_frame,
+            text="是否是 3.4.4+ 版本（使用 deploy-micro.sh）",
+            variable=self.is_new_version
+        )
+        # 项目类型切换时联动显示/隐藏
+        self.project_type.trace_add('write', self._on_project_type_change)
+        self._on_project_type_change()
 
         # --- 订单关键字 ---
         kw_frame = ttk.LabelFrame(config_tab, text="🔍 订单关键字", padding=8)
@@ -611,6 +692,15 @@ class WardOrderPackagerGUI:
         self.root.update_idletasks()
 
     # ---------- 扫描匹配 ----------
+    def _on_project_type_change(self, *args):
+        """项目类型切换时，仅在 web 类型下显示 3.4.4+ 版本选项"""
+        if not hasattr(self, 'web_version_check'):
+            return
+        if self.project_type.get() == "web":
+            self.web_version_check.pack(side=LEFT, padx=(20, 5))
+        else:
+            self.web_version_check.pack_forget()
+
     def _start_scan(self):
         project_type = self.project_type.get()
         keyword = self.keyword.get().strip()
@@ -788,13 +878,19 @@ class WardOrderPackagerGUI:
             messagebox.showerror("错误", "请先扫描并选择SVN目标目录！")
             return
 
-        # 检查 deploy.sh
-        deploy_script = find_deploy_script(self.selected_project_dir)
+        # 根据项目类型和 3.4.4+ 版本选项决定使用哪个部署脚本
+        project_type = self.project_type.get()
+        if project_type == "web" and self.is_new_version.get():
+            script_name = "deploy-micro.sh"
+        else:
+            script_name = "deploy.sh"
+
+        # 检查部署脚本
+        deploy_script = find_deploy_script(self.selected_project_dir, script_name)
         if not deploy_script:
-            messagebox.showerror("错误", f"项目目录下未找到 deploy.sh:\n{self.selected_project_dir}")
+            messagebox.showerror("错误", f"项目目录下未找到 {script_name}:\n{self.selected_project_dir}")
             return
 
-        project_type = self.project_type.get()
         self.btn_start.config(state=DISABLED)
         self.btn_scan.config(state=DISABLED)
         self.is_packaging = True
@@ -802,9 +898,9 @@ class WardOrderPackagerGUI:
         # 切换到日志标签页
         self.notebook.select(1)
 
-        threading.Thread(target=self._do_package, args=(project_type,), daemon=True).start()
+        threading.Thread(target=self._do_package, args=(project_type, script_name), daemon=True).start()
 
-    def _do_package(self, project_type):
+    def _do_package(self, project_type, script_name="deploy.sh"):
         try:
             def log(msg):
                 self.root.after(0, lambda: self._log(msg))
@@ -817,13 +913,14 @@ class WardOrderPackagerGUI:
             log(f"🚀 开始打包：项目类型={project_type}")
             log(f"📁 项目目录: {project_dir}")
             log(f"💾 SVN目录: {svn_dir}")
+            log(f"📜 部署脚本: {script_name}")
 
-            # 1. 检查 deploy.sh
-            deploy_script = find_deploy_script(project_dir)
+            # 1. 检查部署脚本
+            deploy_script = find_deploy_script(project_dir, script_name)
             if not deploy_script:
-                log("❌ 未找到 deploy.sh，停止打包")
+                log(f"❌ 未找到 {script_name}，停止打包")
                 return
-            log(f"✅ 找到 deploy.sh: {deploy_script}")
+            log(f"✅ 找到 {script_name}: {deploy_script}")
 
             # 2. 确定SVN操作目录（如果存在"前端"子目录则进入）
             svn_work_dir = svn_dir
@@ -846,14 +943,14 @@ class WardOrderPackagerGUI:
             else:
                 log(f"✅ Node 版本已为 v{target_node_ver}，无需切换")
 
-            # 3. 执行 deploy.sh
-            log(f"🔄 执行 deploy.sh ...")
+            # 3. 执行部署脚本
+            log(f"🔄 执行 {script_name} ...")
             build_start = datetime.now()
             success = self._run_deploy_script(project_dir, deploy_script, log)
             if not success:
-                log("❌ deploy.sh 执行失败，停止打包")
+                log(f"❌ {script_name} 执行失败，停止打包")
                 return
-            log("✅ deploy.sh 执行完成")
+            log(f"✅ {script_name} 执行完成")
 
             # 4. 查找打包产物
             package_file = find_built_package(project_dir, prefix)
@@ -868,8 +965,8 @@ class WardOrderPackagerGUI:
                 return
             log(f"✅ 找到打包产物: {package_file.name}")
 
-            # 5. 处理SVN目录中的旧包
-            self._clean_old_packages(svn_work_dir, prefix, log)
+            # 5. 处理SVN目录中的旧包（按新包名提取时间戳前缀，匹配同系列旧包）
+            self._clean_old_packages(svn_work_dir, package_file.name, log)
 
             # 6. 剪切包到SVN目录
             target_path = svn_work_dir / package_file.name
@@ -904,7 +1001,7 @@ class WardOrderPackagerGUI:
             self.root.after(0, self._package_finished)
 
     def _run_deploy_script(self, project_dir, deploy_script, log):
-        """执行 deploy.sh 脚本（脚本自身的非零返回码不视为失败，以是否产出包为准）"""
+        """执行部署脚本（脚本自身的非零返回码不视为失败，以是否产出包为准）"""
         try:
             # 查找 bash 可执行文件
             bash_path = find_bash_executable()
@@ -917,7 +1014,10 @@ class WardOrderPackagerGUI:
 
             log(f"使用 bash: {bash_path}")
 
-            # 使用 bash 执行 deploy.sh（转正斜杠，避免 bash 把反斜杠当转义符）
+            # 构建子进程 env：必要时注入 Volta 路径，避免 Flow Launcher 等启动时 PATH 陈旧
+            sub_env = build_subprocess_env(log)
+
+            # 使用 bash 执行部署脚本（转正斜杠，避免 bash 把反斜杠当转义符）
             process = subprocess.Popen(
                 [bash_path, Path(deploy_script).as_posix()],
                 cwd=Path(project_dir).as_posix(),
@@ -925,7 +1025,8 @@ class WardOrderPackagerGUI:
                 stderr=subprocess.STDOUT,
                 text=True,
                 encoding='utf-8',
-                errors='replace'
+                errors='replace',
+                env=sub_env
             )
 
             while process.poll() is None:
@@ -942,24 +1043,61 @@ class WardOrderPackagerGUI:
                         if line.strip():
                             log(line.strip())
 
-            # deploy.sh 内部存在非致命报错（如末尾 tar 多带一个已不存在的历史参数，返回码 2），
+            # 部署脚本内部存在非致命报错（如末尾 tar 多带一个已不存在的历史参数，返回码 2），
             # 但压缩包照常生成，所以不用返回码中止，后面由“是否找到打包产物”兜底
             if process.returncode != 0:
-                log(f"⚠️ deploy.sh 返回码: {process.returncode}（脚本自身报错，忽略，继续检查打包产物）")
+                log(f"⚠️ 部署脚本返回码: {process.returncode}（脚本自身报错，忽略，继续检查打包产物）")
             return True
 
         except Exception as e:
-            log(f"❌ 执行 deploy.sh 出错: {e}")
+            log(f"❌ 执行部署脚本出错: {e}")
             return False
 
-    def _clean_old_packages(self, svn_dir, prefix, log):
-        """删除SVN目录中旧的打包产物，并使用 svn delete 标记删除"""
-        if prefix == "dist":
-            pattern = "dist.tar.gz"
-        else:
-            pattern = f"{prefix}-*.tar.gz"
+    def _clean_old_packages(self, svn_dir, new_package_name, log):
+        """
+        删除 SVN 目录中与新包同系列（同前缀、不同时间戳）的旧包，
+        优先使用 svn delete 标记删除，以便后续 commit 时同时体现“删除+新增”。
 
-        for f in Path(svn_dir).glob(pattern):
+        匹配规则：
+          - 从新包名提取“时间戳前的前缀”，例：
+              web-micro-3.4.4_上海蓝十字脑科医院有限公司_202609101434.tar.gz
+            → 前缀 "web-micro-3.4.4_上海蓝十字脑科医院有限公司_"
+            → glob  "web-micro-3.4.4_上海蓝十字脑科医院有限公司_*.tar.gz"
+          - 新包名本身会被排除（即使已被 move 到 svn_dir 也不会误删）
+          - 无法提取时间戳时（如 dist.tar.gz）退化为“同名精确匹配”
+        """
+        svn_path = Path(svn_dir)
+        if not svn_path.exists():
+            return
+
+        # 去掉 .tar.gz / .tgz / .zip 后缀，得到真正的 stem
+        # 注：Path('xxx.tar.gz').stem 只会去掉 .gz，必须手动处理
+        name = new_package_name
+        for ext in ('.tar.gz', '.tgz', '.zip'):
+            if name.lower().endswith(ext):
+                name = name[:-len(ext)]
+                break
+        else:
+            name = Path(name).stem
+        stem = name
+        # 贪婪匹配最后一个 _ 或 - 后接 10~14 位时间戳（兼容 YYYYMMDDHHMM / YYMMDDHHMM 等）
+        m = re.match(r'^(.*[_-])\d{10,14}$', stem)
+        if m:
+            prefix_part = m.group(1)
+            pattern = f"{prefix_part}*.tar.gz"
+        else:
+            # 无时间戳（如 dist.tar.gz），直接同名匹配
+            pattern = new_package_name
+
+        matched = sorted(svn_path.glob(pattern))
+        old_files = [f for f in matched if f.name != new_package_name]
+
+        if not old_files:
+            log(f"ℹ️ SVN 目录未发现同系列旧包（pattern: {pattern}）")
+            return
+
+        log(f"🔍 匹配到 {len(old_files)} 个同系列旧包（pattern: {pattern}）")
+        for f in old_files:
             try:
                 # 先尝试 svn delete 标记删除（如果文件在SVN版本控制中）
                 try:
@@ -969,11 +1107,11 @@ class WardOrderPackagerGUI:
                         capture_output=True, text=True, encoding='utf-8', timeout=15
                     )
                     if result.returncode == 0:
-                        log(f"🗑️ SVN标记删除旧包: {f.name}")
+                        log(f"🗑️ SVN 标记删除旧包: {f.name}")
                     else:
                         # 文件可能不在SVN控制中，直接删除
                         f.unlink()
-                        log(f"🗑️ 删除旧包: {f.name}")
+                        log(f"🗑️ 删除旧包（未纳入SVN）: {f.name}")
                 except FileNotFoundError:
                     # svn命令不存在，直接删除
                     f.unlink()
@@ -1051,6 +1189,7 @@ class WardOrderPackagerGUI:
             "keyword": self.keyword.get().strip(),
             "auto_commit_svn": self.auto_commit_svn.get(),
             "node_version": self.node_version.get(),
+            "is_new_version": self.is_new_version.get(),
             "branch": branch,
         }
 
@@ -1088,6 +1227,7 @@ class WardOrderPackagerGUI:
         self.keyword.set(record.get("keyword", ""))
         self.auto_commit_svn.set(record.get("auto_commit_svn", True))
         self.node_version.set(record.get("node_version", DEFAULT_NODE_VERSION))
+        self.is_new_version.set(record.get("is_new_version", False))
 
         saved_proj = record.get("project_dir", "")
         saved_svn = record.get("svn_dir", "")
@@ -1159,6 +1299,7 @@ class WardOrderPackagerGUI:
         self.config["keyword"] = self.keyword.get().strip()
         self.config["auto_commit_svn"] = self.auto_commit_svn.get()
         self.config["node_version"] = self.node_version.get()
+        self.config["is_new_version"] = self.is_new_version.get()
         save_config(self.config)
         messagebox.showinfo("成功", "配置已保存！")
 
