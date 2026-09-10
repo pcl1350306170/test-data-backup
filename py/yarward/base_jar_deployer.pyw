@@ -97,7 +97,7 @@ def show_toast(title, message, color="#4CAF50", duration=180000):
 
 def launch_linked_script():
     """以独立进程启动对应的另一个升级脚本"""
-    script_path = SCRIPT_DIR / "base_web_uploader.pyw"
+    script_path = SCRIPT_DIR / "web工具部署.pyw"
     try:
         subprocess.Popen([sys.executable, str(script_path)],
                          cwd=str(SCRIPT_DIR),

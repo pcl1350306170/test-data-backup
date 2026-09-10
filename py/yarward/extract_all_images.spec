@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['D:/CODE/Python/test-data-backup/py/image/extract_all_images.pyw'],
+    ['D:/CODE/Python/test-data-backup/py/image/提取压缩图片.pyw'],
     pathex=[],
     binaries=[],
     datas=[],

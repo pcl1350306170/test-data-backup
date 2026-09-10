@@ -9,7 +9,7 @@
                 "browser",
                 "vidyffbmlvlqljqi"
             ],
-            "script": "yarward\\resolution_browser.pyw",
+            "script": "yarward\\指定分辨率浏览器.pyw",
             "description": "开启一个指定分辨率的浏览器"
         },
         {
@@ -18,7 +18,7 @@
                 "mzdb",
                 "mfvfdabk"
             ],
-            "script": "yarward\\menz_order_packager.pyw",
+            "script": "yarward\\门诊打包.pyw",
             "description": "门诊-打包（关键字匹配）"
         },
         {
@@ -27,7 +27,7 @@
                 "mcsj",
                 "mfvfugji"
             ],
-            "script": "yarward\\menz_upgrade.pyw",
+            "script": "yarward\\门诊升级.pyw",
             "description": "门诊-升级"
         },
         {
@@ -37,7 +37,7 @@
                 "gh",
                 "mfvfpildgwhk"
             ],
-            "script": "yarward\\api_batch_tester.pyw",
+            "script": "yarward\\门诊批量挂号.pyw",
             "description": "门诊-批量挂号"
         },
         {
@@ -46,7 +46,7 @@
                 "bfdb",
                 "byfhdabk"
             ],
-            "script": "yarward\\ward_order_packager.pyw",
+            "script": "yarward\\病房打包.pyw",
             "description": "病房-打包并提svn"
         },
         {
@@ -55,7 +55,7 @@
                 "bfsj",
                 "byfhugji"
             ],
-            "script": "yarward\\ward_upgrade.pyw",
+            "script": "yarward\\病房升级.pyw",
             "description": "病房-前端升级"
         },
         {
@@ -64,7 +64,7 @@
                 "bfcdk",
                 "byfhidtbkasql"
             ],
-            "script": "yarward\\bed_card_sql_generator.pyw",
+            "script": "yarward\\床头卡SQL生成.pyw",
             "description": "病房-生成床头卡SQL"
         },
         {
@@ -75,7 +75,7 @@
                 "scrcpy",
                 "adbuebzgrli"
             ],
-            "script": "yarward\\adb_device_manager.pyw",
+            "script": "yarward\\adb设备管理.pyw",
             "description": "adb连接设备【qt-scrcpy版】"
         },
         {
@@ -85,7 +85,7 @@
                 "scrcpy",
                 "adbuebzgrli"
             ],
-            "script": "yarward\\adb_device_manager_scrcpy.pyw",
+            "script": "yarward\\adb设备管理scrcpy版.pyw",
             "description": "adb连接设备【scrcpy版】"
         },
         {
@@ -95,7 +95,7 @@
                 "branch",
                 "kysuidjmgitffvi"
             ],
-            "script": "yarward\\git_branch_creator.pyw",
+            "script": "yarward\\快速创建git分支.pyw",
             "description": "快速创建git分支"
         },
         {
@@ -104,7 +104,7 @@
                 "svn",
                 "idjmsvnmulubyjmiu"
             ],
-            "script": "yarward\\svn_quick_checkout.pyw",
+            "script": "yarward\\svn快速检出.pyw",
             "description": "创建svn目录并检出"
         },
         {
@@ -117,7 +117,7 @@
                 "java",
                 "buuubaseiowebgsju"
             ],
-            "script": "yarward\\base_web_uploader.pyw",
+            "script": "yarward\\web工具部署.pyw",
             "description": "部署我的web工具"
         },
         {
@@ -132,32 +132,35 @@
                 "java",
                 "wslbuuuwodegeekerheapiqmdr"
             ],
-            "script": "yarward\\wsl_update_deployer.py",
+            "script": "yarward\\wsl更新部署.py",
             "description": "WSL部署我的geeker和API"
         },
-        
-       
         {
             "name": "可视化图片裁剪任务",
             "keywords": [
                 "tp3",
                 "tupian",
                 "tupm",
-                "keuihwtupmcljmrfwu"
+                "keuihwtupmcljmrfwu",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\crop_logo_advanced.pyw",
+            "script": "image\\可视化裁剪任务.pyw",
             "description": "可视化图片裁剪任务"
         },
-        
         {
             "name": "随机复制图片",
             "keywords": [
                 "tp8",
                 "tupian",
                 "tupm",
-                "svjifuvitupm"
+                "svjifuvitupm",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\random_copy_vertical_images.pyw",
+            "script": "image\\随机复制竖图.pyw",
             "description": "从A目录复制X张到B目录"
         },
         {
@@ -166,44 +169,49 @@
                 "程序",
                 "pythonjcbfdabkwzexe"
             ],
-            "script": "yarward\\pyinstaller_gui.py",
+            "script": "yarward\\py脚本打包exe.py",
             "description": "Python脚本打包为exe"
         },
-       
-        
         {
             "name": "可视化裁剪工具",
             "keywords": [
                 "tp11",
                 "tupian",
                 "tupm",
-                "keuihwcljmgsju"
+                "keuihwcljmgsju",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\image_cropper_app.pyw",
+            "script": "image\\可视化裁剪工具.pyw",
             "description": "可视化裁剪工具"
         },
-     
         {
             "name": "图片格式转换",
             "keywords": [
                 "tp13",
                 "tupian",
                 "tupm",
-                "tupmgeuivrhr"
+                "tupmgeuivrhr",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\image_format_converter.pyw",
+            "script": "image\\图片格式转换.pyw",
             "description": "图片格式转换"
         },
-     
         {
             "name": "图片横竖重命名",
             "keywords": [
                 "tp20",
                 "tupian",
                 "tupm",
-                "tupmhguuismymy"
+                "tupmhguuismymy",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\image_rename_by_orientation.pyw",
+            "script": "image\\按横竖屏重命名.pyw",
             "description": "按横竖屏重命名"
         },
         {
@@ -212,9 +220,12 @@
                 "tp21",
                 "tupian",
                 "tupm",
-                "tupmtiqubyyaso"
+                "tupmtiqubyyaso",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\extract_all_images.pyw",
+            "script": "image\\提取压缩图片.pyw",
             "description": "目录下的图片并压缩"
         },
         {
@@ -223,9 +234,12 @@
                 "tp22",
                 "tupian",
                 "tupm",
-                "pildaicljm"
+                "pildaicljm",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\batch_image_cropper.pyw",
+            "script": "image\\批量裁剪AI识图.pyw",
             "description": "批量裁剪[AI识图]"
         },
         {
@@ -234,9 +248,12 @@
                 "tp23",
                 "tupian",
                 "tupm",
-                "aitupmfhdazgqd"
+                "aitupmfhdazgqd",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\image_enhancer.pyw",
+            "script": "image\\AI放大增强.pyw",
             "description": "AI放大增强[Real-ESRGAN+GFPGAN]"
         },
         {
@@ -245,21 +262,26 @@
                 "tp23",
                 "tupian",
                 "tupm",
-                "aitupmfhdazgqd"
+                "aitupmfhdazgqd",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\image_enhancer_vulkan.pyw",
+            "script": "image\\AI放大增强Vulkan版.pyw",
             "description": "AI放大增强[Real-ESRGAN]"
         },
-     
         {
             "name": "PDF转图片",
             "keywords": [
                 "tp25",
                 "tupian",
                 "tupm",
-                "pdfvrtupm"
+                "pdfvrtupm",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\pdf_to_images.pyw",
+            "script": "image\\pdf转图片.pyw",
             "description": "pdf转images"
         },
         {
@@ -269,9 +291,12 @@
                 "tupian",
                 "tupm",
                 "wfoj",
-                "bokehvbftupm"
+                "bokehvbftupm",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "image\\batch_add_text_to_images.pyw",
+            "script": "image\\图片批量加字.pyw",
             "description": "批量在图片上增加文案扩展或覆盖"
         },
         {
@@ -280,81 +305,99 @@
                 "tp26",
                 "tupian",
                 "tupm",
-                "angrjmciujiuwfjm"
+                "angrjmciujiuwfjm",
+                "文件",
+                "file"
             ],
-            "script": "image\\file_keyword_deleter.pyw",
+            "script": "image\\关键词删除文件.pyw",
             "description": "根据关键词删除文件"
         },
         {
             "name": "文件按个数分组",
             "keywords": [
                 "wj1",
-                "wfjmangeuuffzu"
+                "wfjmangeuuffzu",
+                "文件",
+                "file"
             ],
-            "script": "other\\group_files_by_num.pyw",
+            "script": "other\\文件按个数分组.pyw",
             "description": "把目录下的文件按照个数分组"
         },
         {
             "name": "批量重命名【过滤章节回标点等】",
             "keywords": [
                 "wj2",
-                "pildismymy"
+                "pildismymy",
+                "文件",
+                "file"
             ],
-            "script": "other\\batch_renamer.pyw",
+            "script": "other\\批量重命名.pyw",
             "description": "批量重命名【过滤章节回标点等】"
         },
         {
             "name": "移动文件",
             "keywords": [
                 "wj3",
-                "yidswfjm"
+                "yidswfjm",
+                "文件",
+                "file"
             ],
-            "script": "other\\file_mover.pyw",
+            "script": "other\\移动文件.pyw",
             "description": "移动文件"
         },
         {
             "name": "批量打包ZIP加密",
             "keywords": [
                 "wj4",
-                "pilddabkzipjwmi"
+                "pilddabkzipjwmi",
+                "文件",
+                "file"
             ],
-            "script": "image\\batch_zipper.pyw",
+            "script": "image\\批量打包zip.pyw",
             "description": "批量打包zip可加密"
         },
         {
             "name": "清理空目录",
             "keywords": [
                 "wj5",
-                "qyliksmulu"
+                "qyliksmulu",
+                "文件",
+                "file"
             ],
-            "script": "other\\clean_empty_dirs.pyw",
+            "script": "other\\清理空目录.pyw",
             "description": "清理空目录"
         },
         {
             "name": "压缩包密码破解",
             "keywords": [
                 "wj6",
-                "yasobkmimapojx"
+                "yasobkmimapojx",
+                "文件",
+                "file"
             ],
-            "script": "other\\zip_password_crack_7z.py",
+            "script": "other\\压缩包密码破解.py",
             "description": "尝试压缩包密码"
         },
         {
             "name": "文件重命名【增加前缀、后缀】",
             "keywords": [
                 "wj7",
-                "wfjmismymy"
+                "wfjmismymy",
+                "文件",
+                "file"
             ],
-            "script": "other\\file_renamer.pyw",
+            "script": "other\\文件重命名.pyw",
             "description": "重命名增加前缀、后缀"
         },
         {
             "name": "按后缀名移动文件",
             "keywords": [
                 "wj8",
-                "anhbvvmyyidswfjm"
+                "anhbvvmyyidswfjm",
+                "文件",
+                "file"
             ],
-            "script": "other\\audio_mover.pyw",
+            "script": "other\\按后缀移动文件.pyw",
             "description": "根据后缀名移动文件"
         },
         {
@@ -363,9 +406,12 @@
                 "wj9",
                 "tupian",
                 "tupm",
-                "pptvrtupmhepdf"
+                "pptvrtupmhepdf",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "other\\ppt_to_imagesandpdf.pyw",
+            "script": "other\\PPT转图片和PDF.pyw",
             "description": "ppt转图片和pdf"
         },
         {
@@ -374,9 +420,12 @@
                 "wj10",
                 "tupian",
                 "tupm",
-                "tupmvrpdf"
+                "tupmvrpdf",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "other\\images_to_pdf.pyw",
+            "script": "other\\图片转PDF.pyw",
             "description": "图片转pdf"
         },
         {
@@ -385,25 +434,29 @@
                 "wj11",
                 "pdfheby"
             ],
-            "script": "other\\merge_pdfs.pyw",
+            "script": "other\\PDF合并.pyw",
             "description": "PDF合并"
         },
         {
             "name": "文件重命名为数字",
             "keywords": [
-                "wj12",                
-                "wfjmismymywzuuzi"
+                "wj12",
+                "wfjmismymywzuuzi",
+                "文件",
+                "file"
             ],
-            "script": "other\\rename_by_mtime.pyw",
+            "script": "other\\重命名为数字.pyw",
             "description": "重命名为数字"
         },
         {
             "name": "按子目录同名清理",
             "keywords": [
                 "wj13",
-                "anzimulutsmyqyli"
+                "anzimulutsmyqyli",
+                "文件",
+                "file"
             ],
-            "script": "other\\imgfile_del.pyw",
+            "script": "other\\按子目录同名清理.pyw",
             "description": "根据子目录相同文件名清理文件"
         },
         {
@@ -412,79 +465,98 @@
                 "wj14",
                 "tupian",
                 "tupm",
-                "gittupmrawdivipnjx"
+                "gittupmrawdivipnjx",
+                "图片",
+                "image",
+                "img"
             ],
-            "script": "other\\git_image_raw_url_builder.pyw",
+            "script": "other\\Git图片Raw地址拼接.pyw",
             "description": "Git项目图片Raw地址拼接工具"
         },
         {
             "name": "MP4转MP3",
             "keywords": [
                 "qt1",
-                "mp4vrmp3"
+                "mp4vrmp3",
+                "音频",
+                "audio"
             ],
-            "script": "other\\mp4_to_mp3_converter.pyw",
+            "script": "other\\MP4转MP3.pyw",
             "description": "mp4转mp3"
         },
         {
             "name": "PC录音",
             "keywords": [
                 "qt2",
-                "pcluyn"
+                "pcluyn",
+                "音频",
+                "audio"
             ],
-            "script": "other\\record_system_audio.pyw",
+            "script": "other\\PC录音.pyw",
             "description": "pc录音【需要配置声音源】"
         },
         {
             "name": "PC自动录音",
             "keywords": [
                 "qt3",
-                "pczidsluyn"
+                "pczidsluyn",
+                "音频",
+                "audio"
             ],
-            "script": "other\\auto_record_vad_gui.pyw",
+            "script": "other\\PC自动录音.pyw",
             "description": "pc自动录音"
         },
         {
             "name": "音频转视频",
             "keywords": [
                 "qt4",
-                "ynpnvruipn"
+                "ynpnvruipn",
+                "音频",
+                "audio"
             ],
-            "script": "other\\audio_to_video.pyw",
+            "script": "other\\音频转视频.pyw",
             "description": "音频转视频"
         },
         {
             "name": "TXT文本替换",
             "keywords": [
                 "dz1",
-                "txtwfbftihr"
+                "txtwfbftihr",
+                "epub",
+                "电子书"
             ],
-            "script": "book\\txt_replace.pyw",
+            "script": "book\\txt文本替换.py",
             "description": "txt文本替换（库和配置）"
         },
         {
             "name": "可视化TXT转EPUB",
             "keywords": [
                 "dz2",
-                "keuihwtxtvrepub"
+                "keuihwtxtvrepub",
+                "epub",
+                "电子书"
             ],
-            "script": "book\\txt_to_epub_img.pyw",
+            "script": "book\\txt 转 epub 带插图【主力使用】.pyw",
             "description": "可视化txt转epub"
         },
         {
             "name": "EPUB替换封面和关键字",
             "keywords": [
                 "dz3",
-                "epubtihrfgmmhegrjmzi"
+                "epubtihrfgmmhegrjmzi",
+                "epub",
+                "电子书"
             ],
-            "script": "book\\epub_replace_txt_cover.pyw",
+            "script": "book\\epub替换封面关键字.pyw",
             "description": "epub替换封面和关键字"
         },
         {
             "name": "快速创建TXT",
             "keywords": [
                 "dz4",
-                "kysuidjmtxt"
+                "kysuidjmtxt",
+                "epub",
+                "电子书"
             ],
             "script": "book\\create_txt_file.pyw",
             "description": "快速创建txt文件"
@@ -493,18 +565,22 @@
             "name": "快速粘贴创建TXT",
             "keywords": [
                 "dz5",
-                "kysuvjtxidjmtxt"
+                "kysuvjtxidjmtxt",
+                "epub",
+                "电子书"
             ],
-            "script": "book\\clipboard_collector.pyw",
+            "script": "book\\剪贴板收集建txt.pyw",
             "description": "快速粘贴并创建txt"
         },
         {
             "name": "批量合并TXT为EPUB",
             "keywords": [
                 "dz6",
-                "pildhebytxtwzepub"
+                "pildhebytxtwzepub",
+                "epub",
+                "电子书"
             ],
-            "script": "book\\batch_txt_to_epub.pyw",
+            "script": "book\\批量txt合并epub.pyw",
             "description": "批量合并txt为epub"
         },
         {
@@ -513,18 +589,25 @@
                 "dz7",
                 "tupian",
                 "tupm",
-                "tupmvghewzepub"
+                "tupmvghewzepub",
+                "图片",
+                "image",
+                "img",
+                "epub",
+                "电子书"
             ],
-            "script": "book\\img2book.py",
+            "script": "book\\图片整合epub.py",
             "description": "图片整合为epub"
         },
         {
             "name": "TXT文件合并",
             "keywords": [
                 "dz8",
-                "txtwfjmheby"
+                "txtwfjmheby",
+                "epub",
+                "电子书"
             ],
-            "script": "book\\txt_merge.pyw",
+            "script": "book\\txt文件合并.pyw",
             "description": "TXT文件合并工具"
         },
         {
@@ -532,9 +615,11 @@
             "keywords": [
                 "jj",
                 "junction",
-                "mululmjxidjmgsju"
+                "mululmjxidjmgsju",
+                "文件",
+                "file"
             ],
-            "script": "other\\junction_creator.pyw",
+            "script": "other\\目录联接创建.pyw",
             "description": "创建目录联接(Junction)"
         },
         {
@@ -542,9 +627,12 @@
             "keywords": [
                 "youtube",
                 "craw",
-                "youtubeuipnxwzl"
+                "youtubeuipnxwzl",
+                "爬虫",
+                "视频",
+                "video"
             ],
-            "script": "craw\\youtube_downloader_gpt.pyw",
+            "script": "craw\\youtube视频下载.pyw",
             "description": "youtube视频下载"
         },
         {
@@ -552,7 +640,9 @@
             "keywords": [
                 "qt5",
                 "hbpb",
-                "hbbypyscqr"
+                "hbbypyscqr",
+                "音频",
+                "audio"
             ],
             "script": "other\\绘本旁白音频生成器.py",
             "description": "AI绘本旁白音频生成（edge-tts/pyttsx3/sherpa-onnx/cosyvoice）"
@@ -561,9 +651,11 @@
             "name": "cosyvoice文字转音频",
             "keywords": [
                 "cosyvoice",
-                "wfziynpn"
+                "wfziynpn",
+                "音频",
+                "audio"
             ],
-            "script": "other\\cosyvoice_tts.py",
+            "script": "other\\CosyVoice语音合成.py",
             "description": "AI文字转音频（cosyvoice）"
         },
         {
@@ -573,7 +665,11 @@
                 "yp",
                 "uipn",
                 "yphb",
-                "yphbzsp"
+                "yphbzsp",
+                "音频",
+                "audio",
+                "视频",
+                "video"
             ],
             "script": "other\\音频合并转视频.pyw",
             "description": "合并WAV音频+BGM+图片转视频"
@@ -583,7 +679,9 @@
             "keywords": [
                 "hbyjsc",
                 "hb",
-                "huijb"
+                "huijb",
+                "视频",
+                "video"
             ],
             "script": "other\\绘本一键生成.py",
             "description": "绘本一键生成：输入关键字自动匹配JSON、生成音频、合成视频"
@@ -595,20 +693,414 @@
                 "yp",
                 "ynpnheb;",
                 "yphb",
-                "yphbzsp"
+                "yphbzsp",
+                "音频",
+                "audio"
             ],
             "script": "other\\音频合并工具.pyw",
             "description": "音频合并+BGM"
-        }
-        ,
+        },
         {
             "name": "音频格式转换WAVtoMP3",
-            "keywords": [               
-                "yp",                
-                "ynpngeuivrhr"
+            "keywords": [
+                "yp",
+                "ynpngeuivrhr",
+                "音频",
+                "audio"
             ],
             "script": "other\\WAV转MP3.pyw",
             "description": "音频格式转换WAVtoMP3"
+        },
+        {
+            "name": "TXT转拼音",
+            "keywords": [
+                "pinyin",
+                "py",
+                "txtvzmspy",
+                "epub",
+                "电子书"
+            ],
+            "script": "book\\chinese_to_pinyin.py",
+            "description": "txt转为拼音【平台不能读】"
+        },
+        {
+            "name": "EPUB插入图片",
+            "keywords": [
+                "epubcr",
+                "epubimg",
+                "epubtupian",
+                "图片",
+                "image",
+                "img",
+                "epub",
+                "电子书"
+            ],
+            "script": "book\\epub插入图片.pyw",
+            "description": "给epub文件插入图片"
+        },
+        {
+            "name": "EPUB拆分",
+            "keywords": [
+                "epubcf",
+                "epubsplit",
+                "epubchaifen",
+                "epub",
+                "电子书"
+            ],
+            "script": "book\\epub拆分.pyw",
+            "description": "拆分epub为多个文件"
+        },
+        {
+            "name": "导出替换字典",
+            "keywords": [
+                "dchtzd",
+                "novelmapping",
+                "daochu",
+                "epub",
+                "电子书"
+            ],
+            "script": "book\\导出替换字典.pyw",
+            "description": "导出替换字符生成字典"
+        },
+        {
+            "name": "TXT替换还原",
+            "keywords": [
+                "txtthy",
+                "textrestore",
+                "txttihuanhuanyuan",
+                "epub",
+                "电子书"
+            ],
+            "script": "book\\txt替换还原.pyw",
+            "description": "txt替换关键字还原"
+        },
+        {
+            "name": "TXT拆分JSON",
+            "keywords": [
+                "txtcf",
+                "txtsplitjson",
+                "txtchaifenjson",
+                "epub",
+                "电子书"
+            ],
+            "script": "book\\txt拆分json.py",
+            "description": "txt按关键字拆分生成json"
+        },
+        {
+            "name": "TXT转EPUB带封面",
+            "keywords": [
+                "txtzfm",
+                "txtcover",
+                "txtzhuanepubfengmian",
+                "epub",
+                "电子书"
+            ],
+            "script": "book\\txt转epub封面.pyw",
+            "description": "txt转epub（带封面和插图）"
+        },
+        {
+            "name": "音频图片合成视频",
+            "keywords": [
+                "yp",
+                "tp",
+                "audiobook",
+                "ypsptpsp",
+                "图片",
+                "image",
+                "img",
+                "音频",
+                "audio",
+                "视频",
+                "video"
+            ],
+            "script": "image\\音频图片合成视频.pyw",
+            "description": "合并音频和图片为视频"
+        },
+        {
+            "name": "过滤不合格图片",
+            "keywords": [
+                "nsfw",
+                "bhg",
+                "glbhgtp",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\过滤不合格图片.pyw",
+            "description": "过滤不合格的图片"
+        },
+        {
+            "name": "裁剪图片新文件",
+            "keywords": [
+                "cj",
+                "cjxwj",
+                "cjptscxwj",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\裁剪图片新文件.pyw",
+            "description": "裁剪图片生成新文件"
+        },
+        {
+            "name": "裁剪替换原图",
+            "keywords": [
+                "cjth",
+                "cjthyt",
+                "cjbthyt",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\裁剪替换原图.pyw",
+            "description": "裁剪并替换原图"
+        },
+        {
+            "name": "卡贴比例裁剪",
+            "keywords": [
+                "kt",
+                "ktblcj",
+                "katiecai",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\卡贴比例裁剪.pyw",
+            "description": "图片处理为卡贴打印比例"
+        },
+        {
+            "name": "按修改时间移动图片",
+            "keywords": [
+                "xgsj",
+                "xgsjyd",
+                "anxgsjyidong",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\按修改时间移动图片.pyw",
+            "description": "按修改时间剪切图片到目标目录"
+        },
+        {
+            "name": "删除小图片",
+            "keywords": [
+                "scx",
+                "scxtp",
+                "shanchuxiao",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\删除小图片.pyw",
+            "description": "删除小图片"
+        },
+        {
+            "name": "获取图片EXIF",
+            "keywords": [
+                "exif",
+                "hqexif",
+                "huoquexif",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\获取图片exif.pyw",
+            "description": "选择图片获取exif信息"
+        },
+        {
+            "name": "获取EXIF废弃版",
+            "keywords": [
+                "exif2",
+                "feiqi",
+                "exiffeiqi",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\获取exif废弃版.pyw",
+            "description": "废弃-获取图片EXIF数据"
+        },
+        {
+            "name": "图片合并背景",
+            "keywords": [
+                "hbbj",
+                "beijing",
+                "tupianhebing",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\图片合并背景.pyw",
+            "description": "图片合并或加纯色背景"
+        },
+        {
+            "name": "横竖图片分类",
+            "keywords": [
+                "hs",
+                "hsfl",
+                "hengshufenlei",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\横竖图片分类.pyw",
+            "description": "根据横竖屏分类图片"
+        },
+        {
+            "name": "图片转ICO",
+            "keywords": [
+                "ico",
+                "tpico",
+                "tupianzhuanico",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\图片转ico.py",
+            "description": "图片转为ico图标"
+        },
+        {
+            "name": "超长图三栏处理",
+            "keywords": [
+                "cc",
+                "cct",
+                "chaochangtu",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\超长图三栏处理.pyw",
+            "description": "超长图片处理为三栏"
+        },
+        {
+            "name": "人物切图",
+            "keywords": [
+                "rwqt",
+                "person",
+                "renwuqietu",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "image\\人物切图.pyw",
+            "description": "提取图片中的人物切图"
+        },
+        {
+            "name": "网页图片下载V33",
+            "keywords": [
+                "v33",
+                "tpwzxz",
+                "wangyexiazai",
+                "craw",
+                "爬虫",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "craw\\网页图片下载V33.py",
+            "description": "根据URL爬取网页里图片V33"
+        },
+        {
+            "name": "批量下载图片入库",
+            "keywords": [
+                "plxztp",
+                "pixz",
+                "piliangxiazai",
+                "craw",
+                "爬虫",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "craw\\批量下载图片入库.py",
+            "description": "批量下载图片保存到数据库"
+        },
+        {
+            "name": "Reddit需要用户名",
+            "keywords": [
+                "reddit",
+                "rdyhm",
+                "reddityonghu",
+                "craw",
+                "爬虫"
+            ],
+            "script": "craw\\reddit需要用户名.pyw",
+            "description": "Reddit需要用户名，暂不可用"
+        },
+        {
+            "name": "Reddit抓取脚本版",
+            "keywords": [
+                "rdjb",
+                "redditpy",
+                "redditjiaoben",
+                "craw",
+                "爬虫"
+            ],
+            "script": "craw\\reddit抓取脚本版.py",
+            "description": "reddit抓取脚本版（py）"
+        },
+        {
+            "name": "Reddit游客可视化",
+            "keywords": [
+                "rd",
+                "reddityk",
+                "reddityouke",
+                "craw",
+                "爬虫"
+            ],
+            "script": "craw\\reddit游客可视化.pyw",
+            "description": "reddit游客可视化"
+        },
+        {
+            "name": "Reddit带日志",
+            "keywords": [
+                "rdlog",
+                "rdrz",
+                "redditdairizhi",
+                "craw",
+                "爬虫"
+            ],
+            "script": "craw\\reddit带日志.pyw",
+            "description": "reddit带日志版"
+        },
+        {
+            "name": "98糖小说追踪",
+            "keywords": [
+                "98t",
+                "98tang",
+                "tangxiaoshuo",
+                "craw",
+                "爬虫"
+            ],
+            "script": "craw\\98糖小说追踪.pyw",
+            "description": "98糖小说追踪"
+        },
+        {
+            "name": "浏览器打开详情页获取图片",
+            "keywords": [
+                "xqy",
+                "xiangqingye",
+                "liulanqitu",
+                "craw",
+                "爬虫",
+                "图片",
+                "image",
+                "img"
+            ],
+            "script": "craw\\浏览器打开详情页获取图片.pyw",
+            "description": "浏览器打开详情页获取图片"
+        },
+        {
+            "name": "测试可视化获取网页数据",
+            "keywords": [
+                "wjdata",
+                "keshihua",
+                "testweb",
+                "craw",
+                "爬虫"
+            ],
+            "script": "craw\\测试可视化获取网页数据.py",
+            "description": "测试-可视化获取网页数据"
         }
     ]
 }
