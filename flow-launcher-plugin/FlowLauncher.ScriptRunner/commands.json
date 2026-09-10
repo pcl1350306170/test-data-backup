@@ -1117,5 +1117,18 @@
             "script": "other\\md对话转txt.pyw",
             "description": "md对话记录转纯文本txt"
         }
+,
+        {
+            "name": "微软TTS语音合成",
+            "keywords": [
+                "tts",
+                "yhdc",
+                "yuyinhecheng",
+                "音频",
+                "audio"
+            ],
+            "script": "other\\微软TTS语音合成.pyw",
+            "description": "微软TTS语音合成（Edge-TTS）"
+        }
     ]
 }
