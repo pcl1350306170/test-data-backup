@@ -408,8 +408,15 @@ def build_out_paths(out_dir, segments_count, cfg, timestamp=None):
     """根据段数生成输出文件路径列表"""
     ts = timestamp or time.strftime("%Y%m%d_%H%M%S")
     prefix = _safe_name(cfg.get("prefix") or "")
-    spk = _safe_name(cfg.get("spk") or DEFAULT_SPK)
-    style = _safe_name(cfg.get("style") or "")
+    prompt_audio = (cfg.get("prompt_audio") or "").strip()
+    if prompt_audio:
+        # 使用参考音色：音色名=参考音频文件名，风格置空，不加时间
+        spk = _safe_name(Path(prompt_audio).stem)
+        style = ""
+        ts = ""
+    else:
+        spk = _safe_name(cfg.get("spk") or DEFAULT_SPK)
+        style = _safe_name(cfg.get("style") or "")
     base_parts = [p for p in (prefix or spk, style, ts) if p]
     base = "_".join(base_parts)
 
@@ -1037,11 +1044,14 @@ class App:
         os.makedirs(out_dir, exist_ok=True)
 
         # 输出文件名
-        ts = time.strftime("%Y%m%d_%H%M%S")
-        spk_name = os.path.basename(prompt_audio) if prompt_audio else cfg.get("spk", "测试")
-        spk_name = os.path.splitext(spk_name)[0] if prompt_audio else spk_name
         fmt = (cfg.get("format") or "wav").lower()
-        out_name = f"测试_{_safe_name(spk_name)}_{ts}.{fmt}"
+        if prompt_audio:
+            spk_name = Path(prompt_audio).stem
+            out_name = f"测试_{_safe_name(spk_name)}.{fmt}"
+        else:
+            ts = time.strftime("%Y%m%d_%H%M%S")
+            spk_name = cfg.get("spk", "测试")
+            out_name = f"测试_{_safe_name(spk_name)}_{ts}.{fmt}"
         out_path = os.path.join(out_dir, out_name)
         wav_path = os.path.splitext(out_path)[0] + ".wav"
 
