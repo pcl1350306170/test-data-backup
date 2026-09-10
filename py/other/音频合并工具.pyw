@@ -513,6 +513,17 @@ class AudioBatchMergerApp:
         ext = "mp3" if fmt == "mp3" else "wav"
         tag = "[测试] " if is_test else ""
 
+        # 输出目录不存在则自动创建
+        try:
+            os.makedirs(out_dir, exist_ok=True)
+            logger.info("输出目录已就绪: %s", out_dir)
+        except Exception as e:
+            logger.error("创建输出目录失败 %s: %s", out_dir, e)
+            self.root.after(0, lambda err=str(e): self._show_toast(
+                "错误", f"无法创建输出目录: {err}", level="error"))
+            self.root.after(0, self._reset_ui)
+            return
+
         # 分组
         self.root.after(0, self.status_text.set, f"{tag}正在分析文件时长...")
         batches = self._group_files()

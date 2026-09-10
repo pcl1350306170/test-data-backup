@@ -37,6 +37,9 @@ vue.config.js
 **/json/config_*.json
 **/json/testServer.json
 
+# 任务进度目录（不提交）
+/py/other/json/progress/
+
 /py/yarward/build/*
 /py/yarward/dist/*
 

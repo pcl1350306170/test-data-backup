@@ -38,7 +38,8 @@ logger = logging.getLogger()
 DEFAULT_CONFIG = {
     "target_dir": "",
     "sort_method": "mtime",  # 排序方式（mtime 或 filename）
-    "numbering_format": "0010"  # 编号格式：001（间隔1）或 0010（间隔10）
+    "numbering_format": "0010",  # 编号格式：001（间隔1）或 0010（间隔10）
+    "prefix": ""  # 文件名前缀，如 "艺术感-"
 }
 
 # 排序选项映射
@@ -58,8 +59,8 @@ REVERSE_NUMBERING_MAP = {v: k for k, v in NUMBERING_OPTIONS.items()}
 # ==============================
 # 核心重命名函数
 # ==============================
-def rename_files_by_mtime(target_dir: Path, sort_method: str, numbering_format: str = "0010"):
-    """按指定方式排序，重命名为指定编号格式"""
+def rename_files_by_mtime(target_dir: Path, sort_method: str, numbering_format: str = "0010", prefix: str = ""):
+    """按指定方式排序，重命名为指定编号格式，可选前缀"""
     if not target_dir.is_dir():
         return False, "目标路径不是有效文件夹"
 
@@ -89,7 +90,7 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str, numbering_format: 
     # 预生成新文件名，检查冲突
     new_names = []
     for i, file in enumerate(files, start=1):
-        new_name = f"{(i * step):0{width}d}{file.suffix}"
+        new_name = f"{prefix}{(i * step):0{width}d}{file.suffix}"
         new_path = target_dir / new_name
         new_names.append(new_path)
 
@@ -115,7 +116,7 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str, numbering_format: 
 
         # 再从临时目录按序重命名回原目录
         for i, temp_file in enumerate(temp_files, start=1):
-            new_name = f"{(i * step):0{width}d}{temp_file.suffix}"
+            new_name = f"{prefix}{(i * step):0{width}d}{temp_file.suffix}"
             final_path = target_dir / new_name
             shutil.move(str(temp_file), str(final_path))
             logger.info(f"重命名: {temp_file.name} → {new_name}")
@@ -136,7 +137,8 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str, numbering_format: 
         return False, "\n".join(errors)
     sort_label = '修改时间' if sort_method == 'mtime' else '文件名'
     fmt_label = '001,002...' if numbering_format == '001' else '0010,0020...'
-    return True, f"成功重命名 {renamed} 个文件（按{sort_label}排序，编号{fmt_label}）"
+    prefix_label = f'，前缀"{prefix}"' if prefix else ''
+    return True, f"成功重命名 {renamed} 个文件（按{sort_label}排序，编号{fmt_label}{prefix_label}）"
 
 # ==============================
 # GUI 主类
@@ -166,6 +168,13 @@ class RenameByMtimeGUI:
         sort_combo = ttk.Combobox(sort_frame, textvariable=self.sort_var, values=list(SORT_OPTIONS.keys()), state="readonly", width=15)
         sort_combo.pack(side=LEFT)
         Label(sort_frame, text="（默认：修改时间）", font=("Arial", 8), fg="gray").pack(side=LEFT, padx=(5, 0))
+
+        # 前缀输入
+        prefix_frame = LabelFrame(self.root, text="✏️ 文件名前缀（可选）", padx=10, pady=8)
+        prefix_frame.pack(fill=X, padx=10, pady=5)
+        self.prefix_var = StringVar(value=self.config.get("prefix", ""))
+        Entry(prefix_frame, textvariable=self.prefix_var, font=("Consolas", 9), width=30).pack(side=LEFT)
+        Label(prefix_frame, text="示例：艺术感-  →  艺术感-001.xxx", font=("Arial", 8), fg="gray").pack(side=LEFT, padx=(8, 0))
 
         # 编号格式选择
         num_frame = LabelFrame(self.root, text="🔢 编号格式", padx=10, pady=8)
@@ -212,6 +221,7 @@ class RenameByMtimeGUI:
         target_dir = Path(self.dir_var.get().strip())
         sort_method = SORT_OPTIONS.get(self.sort_var.get(), "mtime")  # 映射到英文键
         numbering_format = NUMBERING_OPTIONS.get(self.num_var.get(), "0010")  # 映射到编号格式
+        prefix = self.prefix_var.get().strip()
 
         if not target_dir or not target_dir.exists():
             messagebox.showwarning("警告", "请选择一个有效的文件夹！")
@@ -221,7 +231,8 @@ class RenameByMtimeGUI:
         current_config = {
             "target_dir": str(target_dir),
             "sort_method": sort_method,
-            "numbering_format": numbering_format
+            "numbering_format": numbering_format,
+            "prefix": prefix
         }
         save_config(current_config)
 
@@ -230,13 +241,14 @@ class RenameByMtimeGUI:
         self.status_var.set("正在处理...")
         sort_label = '修改时间' if sort_method == 'mtime' else '文件名'
         num_label = '001,002...' if numbering_format == '001' else '0010,0020...'
-        self.log_message(f"开始处理文件夹: {target_dir}，排序: {sort_label}，编号: {num_label}")
+        prefix_info = f'，前缀"{prefix}"' if prefix else ''
+        self.log_message(f"开始处理文件夹: {target_dir}，排序: {sort_label}，编号: {num_label}{prefix_info}")
 
-        thread = threading.Thread(target=self.run_rename, args=(target_dir, sort_method, numbering_format), daemon=True)
+        thread = threading.Thread(target=self.run_rename, args=(target_dir, sort_method, numbering_format, prefix), daemon=True)
         thread.start()
 
-    def run_rename(self, target_dir, sort_method, numbering_format):
-        success, msg = rename_files_by_mtime(target_dir, sort_method, numbering_format)
+    def run_rename(self, target_dir, sort_method, numbering_format, prefix=""):
+        success, msg = rename_files_by_mtime(target_dir, sort_method, numbering_format, prefix)
         self.root.after(0, self.on_rename_complete, success, msg)
 
     def on_rename_complete(self, success, msg):
