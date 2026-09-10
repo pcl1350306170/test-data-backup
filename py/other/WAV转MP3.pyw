@@ -389,6 +389,15 @@ class Wav2Mp3App:
         out_dir = self.output_dir.get()
         tag = "[测试] " if is_test else ""
 
+        # 自动创建输出目录（如果不存在）
+        try:
+            os.makedirs(out_dir, exist_ok=True)
+        except Exception as e:
+            self.root.after(0, lambda err=str(e): self._show_toast(
+                "错误", f"无法创建输出目录: {err}", level="error"))
+            self.root.after(0, self._reset_ui)
+            return
+
         files = self.wav_files[:1] if is_test else self.wav_files
         total = len(files)
 

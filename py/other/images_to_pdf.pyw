@@ -252,6 +252,13 @@ class ImagesToPdfGUI:
             messagebox.showwarning("警告", "请指定输出目录！")
             return
 
+        # 自动创建输出目录（如果不存在）
+        try:
+            output_dir.mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            messagebox.showerror("错误", f"无法创建输出目录: {e}")
+            return
+
         # 获取所有子目录（1 层）
         subdirs = [d for d in input_dir.iterdir() if d.is_dir()]
         if not subdirs:
