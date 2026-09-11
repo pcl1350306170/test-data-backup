@@ -3,6 +3,7 @@
         "D:\\CODE",        
         "D:\\FILES\\糖蛋蛋(＾Ｕ＾)ノ~ＹＯ",
         "D:\\FILES\\IMG",
+        "D:\\FILES\\IMG\\v33",
         "D:\\FILES\\IMG\\A临时",
         "D:\\CODE\\Python\\test-data-backup\\AI Work Space",
         "D:\\CODE\\Python\\test-data-backup"
@@ -104,6 +105,14 @@
                 "头像"
             ],
             "path": "D:\\CODE\\Python\\test-data-backup\\img\\T"
+        },
+        {
+            "name": "在线头像目录全面",
+            "keywords": [
+                "tt",
+                "头像"
+            ],
+            "path": "D:\\CODE\\Miscellaneous\\GPT-IMG\\头像"
         }
     ]
 }
