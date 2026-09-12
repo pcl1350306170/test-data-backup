@@ -35,7 +35,8 @@ class TxtReplacerApp:
             "remove_duplicate_lines": False,  # ✅ 新增：是否清除重复行
             "filter_bracket_lines": False,    # ✅ 新增：是否过滤括号行
             "replace_spaces": False,          # ✅ 新增：是否替换空格（删除所有空格）
-            "filter_abnormal_spaces": True     # ✅ 新增：是否过滤文本间非正常空格
+            "filter_abnormal_spaces": True,    # ✅ 新增：是否过滤文本间非正常空格
+            "fix_abnormal_line_breaks": False  # ✅ 新增：是否修复非正常换行（上一行末尾无标点则合并）
         }
 
         # 数据存储
@@ -126,22 +127,27 @@ class TxtReplacerApp:
         ttk.Checkbutton(settings_frame, text="过滤文本间非正常空格（删除文本之间的多余空格，保留行首缩进）", variable=self.filter_abnormal_spaces_var).grid(
             row=7, column=0, sticky=tk.W, padx=5, pady=5)
 
+        # ✅ 新增：是否修复非正常换行
+        self.fix_abnormal_breaks_var = tk.BooleanVar(value=self.config.get("fix_abnormal_line_breaks", False))
+        ttk.Checkbutton(settings_frame, text="修复非正常换行（上一行末尾无标点则与下一行合并）", variable=self.fix_abnormal_breaks_var).grid(
+            row=8, column=0, sticky=tk.W, padx=5, pady=5)
+
         # 数据库连接测试
         ttk.Button(settings_frame, text="测试数据库连接", command=self.test_db_connection).grid(
-            row=8, column=0, padx=5, pady=10, sticky=tk.W)
+            row=9, column=0, padx=5, pady=10, sticky=tk.W)
 
         # JSON替换规则预览
         ttk.Label(settings_frame, text="JSON替换规则预览:").grid(
-            row=9, column=0, sticky=tk.NW, padx=5, pady=5)
+            row=10, column=0, sticky=tk.NW, padx=5, pady=5)
         self.json_preview = tk.Text(settings_frame, height=10, width=60)
-        self.json_preview.grid(row=10, column=0, padx=5, pady=5)
+        self.json_preview.grid(row=11, column=0, padx=5, pady=5)
         self.json_preview.config(state=tk.DISABLED)
 
         # 数据库替换规则预览
         ttk.Label(settings_frame, text="数据库替换规则预览:").grid(
-            row=11, column=0, sticky=tk.NW, padx=5, pady=5)
+            row=12, column=0, sticky=tk.NW, padx=5, pady=5)
         self.db_preview = tk.Text(settings_frame, height=10, width=60)
-        self.db_preview.grid(row=12, column=0, padx=5, pady=5)
+        self.db_preview.grid(row=13, column=0, padx=5, pady=5)
         self.db_preview.config(state=tk.DISABLED)
 
         # 3. 日志标签页
@@ -370,7 +376,8 @@ class TxtReplacerApp:
                 "remove_duplicate_lines": self.remove_duplicates.get(),  # ✅ 保存重复行清理选项
                 "filter_bracket_lines": self.filter_brackets_var.get(),  # ✅ 保存括号行过滤选项
                 "replace_spaces": self.replace_spaces_var.get(),          # ✅ 保存空格替换选项
-                "filter_abnormal_spaces": self.filter_abnormal_spaces_var.get()  # ✅ 保存非正常空格过滤选项
+                "filter_abnormal_spaces": self.filter_abnormal_spaces_var.get(),  # ✅ 保存非正常空格过滤选项
+                "fix_abnormal_line_breaks": self.fix_abnormal_breaks_var.get()  # ✅ 保存非正常换行修复选项
             }
 
             with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -548,6 +555,68 @@ class TxtReplacerApp:
             self.log(f"  - 共过滤 {removed} 个非正常空格")
         return new_content, removed
 
+    def fix_abnormal_line_breaks(self, content):
+        """修复非正常换行：如果上一行末尾没有任何标点符号，则视为异常断行，
+        去掉换行符，把当前行拼接到上一行末尾。
+        常见于 PDF/OCR 转 TXT 时按固定宽度强制换行导致的文字中间断裂。
+        """
+        # 行末合法标点集合（中英文常见标点 + 引号 + 括号）
+        end_punctuation = set(
+            '。，、；：？！…—～·《》〈〉「」『』【】（）〔〕'  # 中文标点
+            '.,;:?!()[]{}<>-_~'                                 # 英文标点
+            '"\''                                                # 英文引号
+            '\u201c\u201d\u2018\u2019'                          # 中文弯引号 “” ‘’
+        )
+
+        lines = content.split('\n')
+        if not lines:
+            return content, 0
+
+        merged_lines = []
+        merged_count = 0
+        example_logs = []
+
+        for line in lines:
+            # 当前行为空行时直接保留（空行由“清除空换行”功能处理）
+            if not line.strip():
+                merged_lines.append(line)
+                continue
+
+            # 首行无可对比的上一行，直接添加
+            if not merged_lines:
+                merged_lines.append(line)
+                continue
+
+            prev_line = merged_lines[-1]
+            prev_stripped = prev_line.rstrip()
+
+            # 上一行为空行，不做合并
+            if not prev_stripped:
+                merged_lines.append(line)
+                continue
+
+            last_char = prev_stripped[-1]
+            if last_char in end_punctuation:
+                # 上一行末尾有标点，视为正常换行
+                merged_lines.append(line)
+            else:
+                # 上一行末尾无标点，判定为非正常换行，合并到上一行
+                current_stripped = line.lstrip()
+                if len(example_logs) < 5:
+                    tail = prev_stripped[-15:]
+                    head = current_stripped[:15]
+                    example_logs.append(f"...{tail} | {head}...")
+                merged_lines[-1] = prev_stripped + current_stripped
+                merged_count += 1
+
+        for ex in example_logs:
+            self.log(f"  - 合并示例: {ex}")
+
+        if merged_count > 0:
+            self.log(f"  - 共合并 {merged_count} 处非正常换行")
+
+        return '\n'.join(merged_lines), merged_count
+
     def replace_text_content(self, content):
         """替换文本内容（合并JSON和数据库规则）"""
         replacements = {}
@@ -608,6 +677,12 @@ class TxtReplacerApp:
                 after_remove_line_count = len(content.splitlines())
                 self.log(f"  - 清除空行后行数: {after_remove_line_count}（删除 {removed_empty} 个空行）")
 
+            # ✅ 新增：修复非正常换行（如果启用）
+            if self.fix_abnormal_breaks_var.get():
+                content, merged_breaks = self.fix_abnormal_line_breaks(content)
+                after_fix_break_count = len(content.splitlines())
+                self.log(f"  - 修复非正常换行后行数: {after_fix_break_count}（合并 {merged_breaks} 处）")
+
             # ✅ 新增：清除重复行（如果启用）
             if self.remove_duplicates.get():
                 content, removed_duplicates = self.remove_duplicate_lines(content)
@@ -662,19 +737,17 @@ class TxtReplacerApp:
         if self.use_db.get():
             active_rules.update(self.db_replacements)
 
-        if not active_rules and not self.clean_chapters.get() and not self.remove_empty.get() and not self.remove_duplicates.get() and not self.filter_brackets_var.get() and not self.replace_spaces_var.get() and not self.filter_abnormal_spaces_var.get():
+        if not active_rules and not self.clean_chapters.get() and not self.remove_empty.get() and not self.remove_duplicates.get() and not self.filter_brackets_var.get() and not self.replace_spaces_var.get() and not self.filter_abnormal_spaces_var.get() and not self.fix_abnormal_breaks_var.get():
             if messagebox.askyesno("确认", "没有启用任何替换规则或清理选项，是否继续?"):
                 self.log("没有启用替换规则或章节清理，直接复制文件")
             else:
                 return
 
-        # 检查输出目录
-        output_dir = self.output_dir_var.get()
-        if not output_dir:
-            messagebox.showerror("错误", "请选择输出目录")
-            return
+        # 检查输出目录（未选择时直接替换原文件）
+        output_dir = self.output_dir_var.get().strip()
+        overwrite_original = not output_dir
 
-        if not os.path.exists(output_dir):
+        if not overwrite_original and not os.path.exists(output_dir):
             try:
                 os.makedirs(output_dir)
                 self.log(f"创建输出目录: {output_dir}")
@@ -689,13 +762,18 @@ class TxtReplacerApp:
 
         for input_path in self.selected_files:
             file_name = os.path.basename(input_path)
-            output_path = os.path.join(output_dir, file_name)
 
-            # 避免覆盖原文件
-            if os.path.abspath(input_path) == os.path.abspath(output_path):
-                name, ext = os.path.splitext(file_name)
-                output_path = os.path.join(output_dir, f"{name}_modified{ext}")
-                self.log(f"原文件路径与输出路径相同，自动重命名为: {os.path.basename(output_path)}")
+            if overwrite_original:
+                # 未选择输出目录，直接覆盖原文件
+                output_path = input_path
+            else:
+                output_path = os.path.join(output_dir, file_name)
+
+                # 避免覆盖原文件
+                if os.path.abspath(input_path) == os.path.abspath(output_path):
+                    name, ext = os.path.splitext(file_name)
+                    output_path = os.path.join(output_dir, f"{name}_modified{ext}")
+                    self.log(f"原文件路径与输出路径相同，自动重命名为: {os.path.basename(output_path)}")
 
             # 处理文件
             count = self.process_single_file(input_path, output_path)
@@ -712,12 +790,18 @@ class TxtReplacerApp:
         self.log(f"===== 处理完成 =====")
         self.log(f"成功处理 {success_count}/{len(self.selected_files)} 个文件")
         self.log(f"总计替换 {total_replacements} 处内容")
-        self.log(f"文件已保存至: {output_dir}")
+        if overwrite_original:
+            self.log("已直接替换原文件")
+            result_msg = (f"成功处理 {success_count}/{len(self.selected_files)} 个文件\n"
+                          f"总计替换 {total_replacements} 处内容\n"
+                          f"已直接替换原文件")
+        else:
+            self.log(f"文件已保存至: {output_dir}")
+            result_msg = (f"成功处理 {success_count}/{len(self.selected_files)} 个文件\n"
+                          f"总计替换 {total_replacements} 处内容\n"
+                          f"文件已保存至: {output_dir}")
 
-        messagebox.showinfo("完成",
-                            f"成功处理 {success_count}/{len(self.selected_files)} 个文件\n"
-                            f"总计替换 {total_replacements} 处内容\n"
-                            f"文件已保存至: {output_dir}")
+        messagebox.showinfo("完成", result_msg)
 
 if __name__ == "__main__":
     # 检查依赖
