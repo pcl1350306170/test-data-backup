@@ -2,11 +2,12 @@
     "root_dirs": [      
         "D:\\CODE",        
         "D:\\FILES\\糖蛋蛋(＾Ｕ＾)ノ~ＹＯ",
-        "D:\\FILES\\IMG",
+        "D:\\FILES\\IMG\\AI自定义",
         "D:\\FILES\\IMG\\v33",
+        "D:\\FILES\\music",
         "D:\\FILES\\IMG\\A临时",
         "D:\\CODE\\Python\\test-data-backup\\AI Work Space",
-        "D:\\CODE\\Python\\test-data-backup"
+        "D:\\CODE\\Python\\test-data-backup\\img"
     ],
     "exclude_dirs": [
         "node_modules",

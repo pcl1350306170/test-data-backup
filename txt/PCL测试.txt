@@ -40,7 +40,10 @@ shutdown -s -t 900
 文件名保留原名，扩展名改为 .png
 
 
-
+竖屏实例：
+https://cdn.jsdelivr.net/gh/pcl1350306170/Miscellaneous@refs/heads/main/GPT-IMG/蒂法高清/竖屏-蒂法高清-mu623c.jpg
+头像实例：
+https://cdn.jsdelivr.net/gh/pcl1350306170/Miscellaneous@refs/heads/main/GPT-IMG/头像/头像-头像-q3arc2.jpg
 
 1-12
 
@@ -394,7 +397,7 @@ u8NRwU02kHFgyiLtbhno
 135006170
 jd3ISTmebrKk8nfLuwzYcMR9t76oxvUDWXqNZEsJpVPlaG0i4Ah1FByO25QHCgnQXgpbd4PVlYnWy5za
 
-
+D:\CODE\Python\test-data-backup\py\image\image_enhancer.pyw
 
 	PQP1472583690
 	135246

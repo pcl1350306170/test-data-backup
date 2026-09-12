@@ -51,6 +51,7 @@ REVERSE_SORT_MAP = {v: k for k, v in SORT_OPTIONS.items()}  # 反向映射
 
 # 编号格式选项映射
 NUMBERING_OPTIONS = {
+    "01, 02, 03...": "01",
     "001, 002, 003...": "001",
     "0010, 0020, 0030...": "0010"
 }
@@ -82,7 +83,9 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str, numbering_format: 
     errors = []
 
     # 根据编号格式计算步长和补零位数
-    if numbering_format == "001":
+    if numbering_format == "01":
+        step, width = 1, 2   # 01, 02, 03...
+    elif numbering_format == "001":
         step, width = 1, 3   # 001, 002, 003...
     else:
         step, width = 10, 4  # 0010, 0020, 0030...
@@ -136,7 +139,12 @@ def rename_files_by_mtime(target_dir: Path, sort_method: str, numbering_format: 
     if errors:
         return False, "\n".join(errors)
     sort_label = '修改时间' if sort_method == 'mtime' else '文件名'
-    fmt_label = '001,002...' if numbering_format == '001' else '0010,0020...'
+    if numbering_format == '01':
+        fmt_label = '01,02...'
+    elif numbering_format == '001':
+        fmt_label = '001,002...'
+    else:
+        fmt_label = '0010,0020...'
     prefix_label = f'，前缀"{prefix}"' if prefix else ''
     return True, f"成功重命名 {renamed} 个文件（按{sort_label}排序，编号{fmt_label}{prefix_label}）"
 
@@ -205,8 +213,14 @@ class RenameByMtimeGUI:
         status_label = Label(self.root, textvariable=self.status_var, bd=1, relief=SUNKEN, anchor=W, fg="blue")
         status_label.pack(side=BOTTOM, fill=X)
 
+    def parse_path(self, raw: str) -> Path:
+        """解析路径，自动去除首尾引号/空格"""
+        cleaned = raw.strip().strip('"').strip("'").strip()
+        return Path(cleaned)
+
     def browse_dir(self):
-        folder = filedialog.askdirectory(title="选择要处理的文件夹", initialdir=self.dir_var.get())
+        current = str(self.parse_path(self.dir_var.get()))
+        folder = filedialog.askdirectory(title="选择要处理的文件夹", initialdir=current)
         if folder:
             self.dir_var.set(folder)
 
@@ -218,7 +232,10 @@ class RenameByMtimeGUI:
         logger.info(msg)
 
     def start_rename(self):
-        target_dir = Path(self.dir_var.get().strip())
+        raw_path = self.dir_var.get()
+        target_dir = self.parse_path(raw_path)
+        # 回写清洗后的路径到输入框
+        self.dir_var.set(str(target_dir))
         sort_method = SORT_OPTIONS.get(self.sort_var.get(), "mtime")  # 映射到英文键
         numbering_format = NUMBERING_OPTIONS.get(self.num_var.get(), "0010")  # 映射到编号格式
         prefix = self.prefix_var.get().strip()
@@ -240,7 +257,12 @@ class RenameByMtimeGUI:
         self.start_btn.config(state=DISABLED, text="🔄 处理中...")
         self.status_var.set("正在处理...")
         sort_label = '修改时间' if sort_method == 'mtime' else '文件名'
-        num_label = '001,002...' if numbering_format == '001' else '0010,0020...'
+        if numbering_format == '01':
+            num_label = '01,02...'
+        elif numbering_format == '001':
+            num_label = '001,002...'
+        else:
+            num_label = '0010,0020...'
         prefix_info = f'，前缀"{prefix}"' if prefix else ''
         self.log_message(f"开始处理文件夹: {target_dir}，排序: {sort_label}，编号: {num_label}{prefix_info}")
 
