@@ -1,4 +1,5 @@
 import os
+import io
 import json
 import queue
 import threading
@@ -39,7 +40,7 @@ class ImageFormatConverter:
     def __init__(self, root):
         self.root = root
         self.root.title("图片格式转换工具")
-        self.root.geometry("700x500")
+        self.root.geometry("700x600")
         self.root.resizable(True, True)
 
         # 加载配置
@@ -141,6 +142,37 @@ class ImageFormatConverter:
             variable=self.keep_structure_var
         ).grid(row=2, column=1, columnspan=2, sticky=tk.W, pady=5, padx=5)
 
+        # 替换源文件选项
+        self.replace_source_var = tk.BooleanVar(value=self.config.get("replace_source", False))
+        replace_cb = ttk.Checkbutton(
+            config_frame,
+            text="替换源文件（勾选后直接覆盖原文件，忽略输出目录）",
+            variable=self.replace_source_var,
+            command=self._on_replace_source_toggle
+        )
+        replace_cb.grid(row=3, column=1, columnspan=2, sticky=tk.W, pady=5, padx=5)
+
+        # 限制文件大小选项
+        self.limit_size_var = tk.BooleanVar(value=self.config.get("limit_size", False))
+        limit_cb = ttk.Checkbutton(
+            config_frame,
+            text="限制文件大小",
+            variable=self.limit_size_var,
+            command=self._on_limit_size_toggle
+        )
+        limit_cb.grid(row=4, column=1, sticky=tk.W, pady=5, padx=5)
+
+        self.limit_size_entry = ttk.Entry(config_frame, width=8)
+        self.limit_size_entry.grid(row=4, column=2, sticky=tk.W, pady=5, padx=(0, 5))
+        self.limit_size_label = ttk.Label(config_frame, text="MB")
+        self.limit_size_label.grid(row=4, column=3, sticky=tk.W, pady=5, padx=(0, 5))
+
+        # 初始化限制大小输入框状态
+        saved_limit = self.config.get("limit_size_mb", 5)
+        self.limit_size_entry.insert(0, str(saved_limit))
+        self._on_limit_size_toggle()  # 根据初始勾选状态设置启用/禁用
+        self._on_replace_source_toggle()  # 根据初始勾选状态设置输出目录启用/禁用
+
         # 配置列权重（让输入框自适应宽度）
         config_frame.columnconfigure(1, weight=1)
 
@@ -228,6 +260,31 @@ class ImageFormatConverter:
         self.scan_root = None
         self._show_toast("已清空", "已清空所有选中图片", "success")
 
+    def _on_replace_source_toggle(self):
+        """替换源文件复选框切换时，禁用/启用输出目录相关控件"""
+        state = "disabled" if self.replace_source_var.get() else "normal"
+        # 输出目录输入框和浏览按钮
+        for child in self._get_output_dir_widgets():
+            child.config(state=state)
+
+    def _get_output_dir_widgets(self):
+        """获取输出目录相关的控件列表（Entry + 浏览按钮）"""
+        # 在 config_frame 中 row=1 的 Entry 和 Button
+        widgets = []
+        for child in self.root.winfo_children():
+            for sub in child.winfo_children():
+                if isinstance(sub, ttk.LabelFrame) and "转换配置" in str(sub.cget("text")):
+                    for widget in sub.winfo_children():
+                        info = widget.grid_info()
+                        if info and info.get("row") == "1" and info.get("column") in ("1", "2"):
+                            widgets.append(widget)
+        return widgets
+
+    def _on_limit_size_toggle(self):
+        """限制大小复选框切换时，禁用/启用输入框"""
+        state = "normal" if self.limit_size_var.get() else "disabled"
+        self.limit_size_entry.config(state=state)
+
     def select_output_dir(self):
         """选择输出目录"""
         dir_path = filedialog.askdirectory(title="选择输出目录")
@@ -239,6 +296,12 @@ class ImageFormatConverter:
         self.config["output_format"] = self.format_var.get()
         self.config["output_dir"] = self.output_dir_var.get()
         self.config["keep_structure"] = self.keep_structure_var.get()
+        self.config["replace_source"] = self.replace_source_var.get()
+        self.config["limit_size"] = self.limit_size_var.get()
+        try:
+            self.config["limit_size_mb"] = float(self.limit_size_entry.get())
+        except (ValueError, TypeError):
+            self.config["limit_size_mb"] = 5
         self.save_config()
         self._show_toast("成功", "配置已保存", "success")
 
@@ -249,7 +312,77 @@ class ImageFormatConverter:
         self.status_text.see(tk.END)
         self.status_text.config(state=tk.DISABLED)
 
-    def _conversion_worker(self, output_format, output_ext, output_dir, keep_structure):
+    def _get_limit_size_bytes(self):
+        """获取用户设置的大小限制（字节），返回 None 表示不限制"""
+        if not self.limit_size_var.get():
+            return None
+        try:
+            mb = float(self.limit_size_entry.get())
+            if mb <= 0:
+                return None
+            return int(mb * 1024 * 1024)
+        except (ValueError, TypeError):
+            return None
+
+    def _compress_image(self, img, output_format, output_path, max_bytes):
+        """压缩图片直到文件大小不超过 max_bytes，返回最终输出路径"""
+        # 对于不支持质量参数的格式，通过缩小尺寸来压缩
+        quality_formats = {"JPEG", "WEBP"}
+
+        if output_format in quality_formats:
+            # 先以较高质量保存，逐步降低质量
+            quality = 90
+            while quality >= 10:
+                buf = io.BytesIO()
+                save_kwargs = {"format": output_format, "quality": quality, "optimize": True}
+                if output_format == "JPEG":
+                    save_kwargs["subsampling"] = "4:2:0"
+                img.save(buf, **save_kwargs)
+                if buf.tell() <= max_bytes:
+                    with open(output_path, "wb") as f:
+                        f.write(buf.getvalue())
+                    return output_path
+                quality -= 5
+            # 质量降到 10 仍超限，开始缩小尺寸
+            scale = 0.9
+            current_img = img.copy()
+            while scale >= 0.3:
+                w, h = current_img.size
+                new_size = (int(w * scale), int(h * scale))
+                resized = current_img.resize(new_size, Image.LANCZOS)
+                buf = io.BytesIO()
+                resized.save(buf, format=output_format, quality=10, optimize=True)
+                if buf.tell() <= max_bytes:
+                    with open(output_path, "wb") as f:
+                        f.write(buf.getvalue())
+                    return output_path
+                scale -= 0.1
+            # 最终兜底：以最小尺寸保存
+            with open(output_path, "wb") as f:
+                f.write(buf.getvalue())
+            return output_path
+        else:
+            # 不支持质量调节的格式，通过缩小尺寸
+            scale = 0.9
+            current_img = img.copy()
+            while scale >= 0.2:
+                w, h = current_img.size
+                new_size = (int(w * scale), int(h * scale))
+                resized = current_img.resize(new_size, Image.LANCZOS)
+                buf = io.BytesIO()
+                resized.save(buf, format=output_format)
+                if buf.tell() <= max_bytes:
+                    with open(output_path, "wb") as f:
+                        f.write(buf.getvalue())
+                    return output_path
+                scale -= 0.1
+            # 兜底
+            with open(output_path, "wb") as f:
+                f.write(buf.getvalue())
+            return output_path
+
+    def _conversion_worker(self, output_format, output_ext, output_dir, keep_structure,
+                           replace_source, max_bytes):
         """后台线程：逐个转换图片，日志通过队列回传主线程，避免界面卡死"""
         success_count = 0
         fail_count = 0
@@ -258,11 +391,15 @@ class ImageFormatConverter:
         for index, item in enumerate(self.selected_files, 1):
             file_path = item["abs"]
             try:
-                # 确定输出目录：保留目录结构时按原相对目录层级创建子目录
-                target_dir = output_dir
-                if keep_structure and item["rel"]:
-                    target_dir = os.path.join(output_dir, os.path.dirname(item["rel"]))
-                    os.makedirs(target_dir, exist_ok=True)
+                if replace_source:
+                    # 替换源文件模式：输出到原文件所在目录
+                    target_dir = os.path.dirname(file_path)
+                else:
+                    # 正常模式：输出到指定目录
+                    target_dir = output_dir
+                    if keep_structure and item["rel"]:
+                        target_dir = os.path.join(output_dir, os.path.dirname(item["rel"]))
+                        os.makedirs(target_dir, exist_ok=True)
 
                 # 构建输出文件名（保留原文件名，更换扩展名）
                 file_name = os.path.splitext(os.path.basename(file_path))[0]
@@ -290,8 +427,34 @@ class ImageFormatConverter:
                     else:
                         img.save(output_path, format=output_format)
 
+                    # 限制文件大小：保存后检查并压缩
+                    if max_bytes and os.path.exists(output_path):
+                        file_size = os.path.getsize(output_path)
+                        if file_size > max_bytes:
+                            # 先加载到内存，避免文件句柄冲突
+                            with Image.open(output_path) as saved_img:
+                                saved_img.load()
+                                if output_format == "JPEG" and saved_img.mode in ("RGBA", "P"):
+                                    saved_img = saved_img.convert("RGB")
+                                img_copy = saved_img.copy()
+                            self._compress_image(img_copy, output_format, output_path, max_bytes)
+
+                # 替换源文件模式且格式未变时，删除原文件（如果扩展名不同则保留转换结果）
+                if replace_source:
+                    src_ext = os.path.splitext(file_path)[1].lower()
+                    if src_ext != output_ext and os.path.exists(output_path):
+                        # 格式变了，输出文件是新文件，原文件可以删除
+                        try:
+                            os.remove(file_path)
+                        except OSError:
+                            pass  # 删除失败也不报错
+
                 success_count += 1
-                self.msg_queue.put(("log", f"[{index}/{total}] 成功: {os.path.basename(file_path)} → {os.path.basename(output_path)}"))
+                size_info = ""
+                if os.path.exists(output_path):
+                    kb = os.path.getsize(output_path) / 1024
+                    size_info = f" ({kb:.1f}KB)"
+                self.msg_queue.put(("log", f"[{index}/{total}] 成功: {os.path.basename(file_path)} → {os.path.basename(output_path)}{size_info}"))
 
             except Exception as e:
                 fail_count += 1
@@ -338,6 +501,12 @@ class ImageFormatConverter:
         self.config["output_format"] = self.format_var.get()
         self.config["output_dir"] = self.output_dir_var.get()
         self.config["keep_structure"] = self.keep_structure_var.get()
+        self.config["replace_source"] = self.replace_source_var.get()
+        self.config["limit_size"] = self.limit_size_var.get()
+        try:
+            self.config["limit_size_mb"] = float(self.limit_size_entry.get())
+        except (ValueError, TypeError):
+            self.config["limit_size_mb"] = 5
         self.save_config()
 
     def _show_toast(self, title, message, level="info", duration_ms=3500):
@@ -394,20 +563,34 @@ class ImageFormatConverter:
         output_ext = SUPPORTED_FORMATS[output_format].lower()
         output_dir = self.output_dir_var.get()
         keep_structure = self.keep_structure_var.get()
+        replace_source = self.replace_source_var.get()
+        max_bytes = self._get_limit_size_bytes()
 
-        # 确保输出目录存在
-        try:
-            os.makedirs(output_dir, exist_ok=True)
-        except Exception as e:
-            self._show_toast("目录错误", f"无法创建输出目录: {str(e)}", "error")
-            return
+        # 替换源文件模式下的确认提示
+        if replace_source:
+            if not messagebox.askyesno("确认替换", f"已勾选「替换源文件」，转换后将直接覆盖 {len(self.selected_files)} 张原图片！\n\n此操作不可撤销，是否继续？"):
+                return
+
+        # 确保输出目录存在（替换模式下使用临时目录保底）
+        if not replace_source:
+            try:
+                os.makedirs(output_dir, exist_ok=True)
+            except Exception as e:
+                self._show_toast("目录错误", f"无法创建输出目录: {str(e)}", "error")
+                return
+
+        # 限制大小信息
+        size_hint = ""
+        if max_bytes:
+            size_hint = f"，大小限制: {max_bytes / 1024 / 1024:.0f}MB"
 
         # 清空状态
         self.status_text.config(state=tk.NORMAL)
         self.status_text.delete(1.0, tk.END)
         self.status_text.config(state=tk.DISABLED)
 
-        self.update_status(f"开始转换，目标格式: {output_format}，共 {len(self.selected_files)} 张图片")
+        mode_hint = "替换源文件" if replace_source else f"输出到: {output_dir}"
+        self.update_status(f"开始转换，目标格式: {output_format}，{mode_hint}{size_hint}，共 {len(self.selected_files)} 张图片")
         self._running = True
         self.convert_btn.config(state=tk.DISABLED, text="转换中...")
         self.msg_queue = queue.Queue()
@@ -415,7 +598,8 @@ class ImageFormatConverter:
         # 后台线程执行转换，主线程保持响应，日志通过队列批量回显
         worker = threading.Thread(
             target=self._conversion_worker,
-            args=(output_format, output_ext, output_dir, keep_structure),
+            args=(output_format, output_ext, output_dir, keep_structure,
+                  replace_source, max_bytes),
             daemon=True
         )
         worker.start()

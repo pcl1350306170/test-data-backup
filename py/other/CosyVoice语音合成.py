@@ -33,6 +33,14 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import messagebox, ttk, filedialog
 
+# ---------- pydub 可选依赖（结尾淡出用） ----------
+try:
+    from pydub import AudioSegment
+    HAS_PYDUB = True
+except Exception:
+    AudioSegment = None
+    HAS_PYDUB = False
+
 # ---------- 路径与常量 ----------
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
 SCRIPT_NAME = "cosyvoice_tts"
@@ -55,6 +63,9 @@ DEFAULT_SPEED = 1.0
 DEFAULT_FORMAT = "wav"
 DEFAULT_OUT_DIR = r"C:\Users\PCL13\Downloads"
 DEFAULT_SEG_LEN = 500
+DEFAULT_FADE = True
+DEFAULT_FADE_MS = 1200
+DEFAULT_TAIL_MS = 900
 
 # 预置音色（可手动输入自定义值）
 SPK_OPTIONS = ["中文女", "中文男", "英文女", "英文男", "日语男", "粤语女", "韩语女"]
@@ -74,6 +85,84 @@ SPEED_OPTIONS = ["0.8", "1.0", "1.2", "1.5"]
 
 # subprocess 静默标记（Windows）
 _NO_WINDOW = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+
+
+# ---------- ffmpeg 管道加载/导出（避免黑窗） ----------
+def _ffmpeg_convert(input_path, output_path):
+    """用 ffmpeg 将任意格式音频转为 WAV（不弹黑窗）"""
+    subprocess.run(
+        ["ffmpeg", "-y", "-i", input_path,
+         "-acodec", "pcm_s16le", output_path],
+        capture_output=True, creationflags=_NO_WINDOW)
+
+
+def _ffmpeg_export_wav(audio_segment, output_path):
+    """通过 ffmpeg 管道导出 AudioSegment 为 WAV（不弹黑窗）"""
+    subprocess.run(
+        ["ffmpeg", "-y",
+         "-f", "s16le", "-ar", str(audio_segment.frame_rate),
+         "-ac", str(audio_segment.channels), "-i", "pipe:0",
+         "-acodec", "pcm_s16le", output_path],
+        input=audio_segment.raw_data,
+        capture_output=True, creationflags=_NO_WINDOW)
+
+
+def _ffmpeg_load_audio(filepath):
+    """通过 ffmpeg 管道加载音频为 AudioSegment（不弹黑窗）"""
+    probe = subprocess.run(
+        ["ffprobe", "-v", "quiet", "-show_entries",
+         "stream=sample_rate,channels",
+         "-of", "csv=p=0:nk=1", filepath],
+        capture_output=True, encoding="utf-8", errors="replace",
+        creationflags=_NO_WINDOW)
+    sample_rate, channels = 22050, 1
+    for line in (probe.stdout or "").strip().split("\n"):
+        parts = line.strip().split(",")
+        if len(parts) >= 2:
+            try:
+                sample_rate = int(parts[0])
+                channels = int(parts[1])
+                break
+            except (ValueError, IndexError):
+                pass
+    raw_result = subprocess.run(
+        ["ffmpeg", "-y", "-i", filepath,
+         "-f", "s16le", "-acodec", "pcm_s16le",
+         "-ar", str(sample_rate), "-ac", str(channels), "pipe:1"],
+        capture_output=True, creationflags=_NO_WINDOW)
+    return AudioSegment(
+        data=raw_result.stdout,
+        sample_width=2, frame_rate=sample_rate, channels=channels)
+
+
+# ============================================================
+# 结尾淡出处理
+# ============================================================
+def apply_fade_out(wav_path, fade_ms=1200, tail_ms=900, log=print):
+    """末尾淡出 + 补一段静音余韵。优先 ffmpeg 加载避免黑窗。"""
+    if not HAS_PYDUB:
+        log("  [警告] pydub 未安装，无法应用淡出效果")
+        return
+    if not os.path.isfile(wav_path):
+        return
+    try:
+        if shutil.which("ffmpeg"):
+            audio = _ffmpeg_load_audio(wav_path)
+        else:
+            audio = AudioSegment.from_wav(wav_path)
+        duration = len(audio)
+        fade = min(fade_ms, int(duration * 0.3))
+        audio = audio.fade_out(fade)
+        if tail_ms > 0:
+            audio = audio + AudioSegment.silent(duration=tail_ms)
+        if shutil.which("ffmpeg"):
+            _ffmpeg_export_wav(audio, wav_path)
+        else:
+            audio.export(wav_path, format="wav")
+        log(f"  [淡出] 已处理: fade={fade}ms, tail={tail_ms}ms")
+    except Exception as e:
+        log(f"  [错误] 淡出处理失败: {e}")
+        logger.error("淡出处理失败: %s", e)
 
 # ---------- 日志模块（可选依赖，失败降级） ----------
 _PY_DIR = str(SCRIPT_DIR.parent)
@@ -465,6 +554,9 @@ class App:
         self.out_dir_var = tk.StringVar(value=DEFAULT_OUT_DIR)
         self.prefix_var = tk.StringVar(value="")
         self.seg_len_var = tk.StringVar(value=str(DEFAULT_SEG_LEN))
+        self.fade_var = tk.BooleanVar(value=DEFAULT_FADE)
+        self.fade_ms_var = tk.StringVar(value=str(DEFAULT_FADE_MS))
+        self.tail_ms_var = tk.StringVar(value=str(DEFAULT_TAIL_MS))
         self.model_dir_var = tk.StringVar(value=DEFAULT_MODEL_DIR)
         self.repo_dir_var = tk.StringVar(value=DEFAULT_REPO_DIR)
         self.conda_py_var = tk.StringVar(value=DEFAULT_CONDA_PY)
@@ -611,6 +703,20 @@ class App:
         ttk.Label(row2, text="文件名前缀:").pack(side="left", padx=(16, 0))
         ttk.Entry(row2, textvariable=self.prefix_var, width=18).pack(side="left", padx=6)
         ttk.Label(row2, text="（留空则用音色名）", foreground="#888").pack(side="left")
+
+        # --- 结尾处理（淡出 + 补静音） ---
+        frm_fade = ttk.LabelFrame(cfg_tab, text="2c. 结尾处理（避免戛然而止）")
+        frm_fade.pack(fill="x", padx=10, pady=4)
+        ttk.Checkbutton(frm_fade, text="结尾淡出 + 补静音余韵（需安装 pydub）",
+                        variable=self.fade_var).pack(anchor="w", padx=8, pady=2)
+        row_fade = ttk.Frame(frm_fade)
+        row_fade.pack(anchor="w", padx=8, pady=2)
+        ttk.Label(row_fade, text="淡出时长(ms):").pack(side="left")
+        ttk.Entry(row_fade, textvariable=self.fade_ms_var, width=8).pack(side="left", padx=6)
+        ttk.Label(row_fade, text="结尾补静音(ms):").pack(side="left", padx=(16, 0))
+        ttk.Entry(row_fade, textvariable=self.tail_ms_var, width=8).pack(side="left", padx=6)
+        if not HAS_PYDUB:
+            ttk.Label(row_fade, text="（pydub 未安装，此功能不可用）", foreground="#c00").pack(side="left", padx=8)
 
         # --- 参考音频（Zero-Shot 音色复刻） ---
         frm_clone = ttk.LabelFrame(cfg_tab, text="2b. 参考音频（Zero-Shot 音色复刻，可选）")
@@ -821,6 +927,12 @@ class App:
         self.out_dir_var.set(cfg.get("out_dir", DEFAULT_OUT_DIR))
         self.prefix_var.set(cfg.get("prefix", ""))
         self.seg_len_var.set(str(cfg.get("seg_len", DEFAULT_SEG_LEN)))
+        if "fade" in cfg:
+            self.fade_var.set(cfg["fade"])
+        if cfg.get("fade_ms"):
+            self.fade_ms_var.set(str(cfg["fade_ms"]))
+        if cfg.get("tail_ms"):
+            self.tail_ms_var.set(str(cfg["tail_ms"]))
         self.model_dir_var.set(cfg.get("model_dir", DEFAULT_MODEL_DIR))
         self.repo_dir_var.set(cfg.get("repo_dir", DEFAULT_REPO_DIR))
         self.conda_py_var.set(cfg.get("conda_python", DEFAULT_CONDA_PY))
@@ -838,6 +950,9 @@ class App:
             "out_dir": self.out_dir_var.get().strip(),
             "prefix": self.prefix_var.get().strip(),
             "seg_len": int(self.seg_len_var.get().strip() or DEFAULT_SEG_LEN),
+            "fade": self.fade_var.get(),
+            "fade_ms": int(self.fade_ms_var.get().strip() or DEFAULT_FADE_MS),
+            "tail_ms": int(self.tail_ms_var.get().strip() or DEFAULT_TAIL_MS),
             "model_dir": self.model_dir_var.get().strip(),
             "repo_dir": self.repo_dir_var.get().strip(),
             "conda_python": self.conda_py_var.get().strip(),
@@ -1176,6 +1291,13 @@ class App:
                 # 语速调整
                 if abs(speed - 1.0) >= 0.01:
                     apply_speed(wav_path, speed, log=self._thread_log)
+
+                # 结尾淡出处理
+                fade = cfg.get("fade", DEFAULT_FADE)
+                if fade and HAS_PYDUB:
+                    fade_ms = int(cfg.get("fade_ms", DEFAULT_FADE_MS) or DEFAULT_FADE_MS)
+                    tail_ms = int(cfg.get("tail_ms", DEFAULT_TAIL_MS) or DEFAULT_TAIL_MS)
+                    apply_fade_out(wav_path, fade_ms, tail_ms, log=self._thread_log)
 
                 # 格式转换
                 if fmt == "mp3":

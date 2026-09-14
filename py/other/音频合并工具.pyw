@@ -80,11 +80,12 @@ def _ffmpeg_load_audio(filepath):
         sample_width=sw, frame_rate=sample_rate, channels=channels)
 
 
-def _ffmpeg_export_audio(audio_segment, output_path, fmt="wav", metadata=None, cover_path=None):
+def _ffmpeg_export_audio(audio_segment, output_path, fmt="wav", metadata=None, cover_path=None, bg_image_path=None):
     """通过 ffmpeg 管道导出 AudioSegment（避免 pydub 弹黑窗）
     :param fmt: "wav" 或 "mp3"
     :param metadata: 可选元数据字典，如 {"title": "xxx", "artist": "xxx"}
-    :param cover_path: 可选封面图片路径（仅 MP3 有效）
+    :param cover_path: 可选封面图片路径（仅 MP3 有效，APIC 类型 Cover (front)）
+    :param bg_image_path: 可选播放背景图路径（仅 MP3 有效，APIC 类型 Other）
     """
     if fmt == "mp3":
         codec_args = ["-acodec", "libmp3lame", "-q:a", "2"]
@@ -98,11 +99,27 @@ def _ffmpeg_export_audio(audio_segment, output_path, fmt="wav", metadata=None, c
     cmd = ["ffmpeg", "-y", "-loglevel", "error",
            "-f", "s16le", "-ar", str(audio_segment.frame_rate),
            "-ac", str(audio_segment.channels), "-i", "pipe:0"]
-    if cover_path and fmt == "mp3" and os.path.isfile(cover_path):
-        cmd += ["-i", cover_path, "-map", "0:a", "-map", "1:0",
-                "-c:v", "mjpeg", "-id3v2_version", "3",
-                "-metadata:s:v", "title=Album cover",
-                "-metadata:s:v", "comment=Cover (front)"]
+
+    # 收集所有需要嵌入的图片（仅 MP3 有效）
+    images = []
+    if fmt == "mp3":
+        if cover_path and os.path.isfile(cover_path):
+            images.append((cover_path, "Album cover", "Cover (front)"))
+        if bg_image_path and os.path.isfile(bg_image_path):
+            images.append((bg_image_path, "Background", "Other"))
+
+    if images:
+        for img_path, _t, _c in images:
+            cmd += ["-i", img_path]
+        # 音频映射为流 0，图片依次为流 1..N
+        cmd += ["-map", "0:a"]
+        for idx in range(1, len(images) + 1):
+            cmd += ["-map", f"{idx}:0"]
+        cmd += ["-c:v", "mjpeg", "-id3v2_version", "3"]
+        for idx, (_p, title, comment) in enumerate(images):
+            cmd += [f"-metadata:s:v:{idx}", f"title={title}",
+                    f"-metadata:s:v:{idx}", f"comment={comment}"]
+
     cmd += [*codec_args, *meta_args, output_path]
     result = subprocess.run(cmd,
         input=audio_segment.raw_data,
@@ -116,8 +133,8 @@ class AudioBatchMergerApp:
     def __init__(self, root: tk.Tk):
         self.root = root
         root.title(SCRIPT_NAME)
-        root.geometry("700x860")
-        root.minsize(650, 820)
+        root.geometry("720x960")
+        root.minsize(680, 900)
 
         # 变量
         self.input_dir = tk.StringVar()
@@ -132,7 +149,9 @@ class AudioBatchMergerApp:
         self.meta_date = tk.StringVar()
         self.meta_comment = tk.StringVar()
         self.cover_path = tk.StringVar()
+        self.bg_image_path = tk.StringVar()
         self._cover_photo = None
+        self._bg_image_photo = None
         self.file_count = tk.StringVar(value="共 0 个文件")
         self.status_text = tk.StringVar(value="就绪")
         self.progress_var = tk.DoubleVar(value=0)
@@ -229,16 +248,40 @@ class AudioBatchMergerApp:
         ttk.Entry(meta_grid, textvariable=self.meta_comment).grid(
             row=2, column=1, columnspan=3, sticky="ew", pady=2)
 
-        # ---------- 专辑封面 ----------
+        # ---------- 专辑封面 & 播放背景图 ----------
         f_cover = ttk.Frame(f_meta)
         f_cover.pack(fill="x", padx=10, pady=(0, 5))
         ttk.Label(f_cover, text="封面:").pack(side="left")
         ttk.Entry(f_cover, textvariable=self.cover_path).pack(
             side="left", fill="x", expand=True, padx=5)
         ttk.Button(f_cover, text="浏览", command=self._browse_cover).pack(
-            side="left")
-        self.cover_preview = ttk.Label(f_meta, anchor="center")
-        self.cover_preview.pack(pady=(0, 5))
+            side="left", padx=(0, 5))
+        ttk.Button(f_cover, text="清除", width=5,
+                   command=self._clear_cover).pack(side="left")
+
+        f_bgimg = ttk.Frame(f_meta)
+        f_bgimg.pack(fill="x", padx=10, pady=(0, 5))
+        ttk.Label(f_bgimg, text="播放背景图:").pack(side="left")
+        ttk.Entry(f_bgimg, textvariable=self.bg_image_path).pack(
+            side="left", fill="x", expand=True, padx=5)
+        ttk.Button(f_bgimg, text="浏览", command=self._browse_bg_image).pack(
+            side="left", padx=(0, 5))
+        ttk.Button(f_bgimg, text="清除", width=5,
+                   command=self._clear_bg_image).pack(side="left")
+
+        # 预览容器：左封面，右背景图
+        preview_row = ttk.Frame(f_meta)
+        preview_row.pack(fill="x", padx=10, pady=(0, 5))
+        cover_box = ttk.Frame(preview_row)
+        cover_box.pack(side="left", expand=True)
+        ttk.Label(cover_box, text="封面预览", anchor="center").pack()
+        self.cover_preview = ttk.Label(cover_box, anchor="center")
+        self.cover_preview.pack()
+        bg_box = ttk.Frame(preview_row)
+        bg_box.pack(side="left", expand=True)
+        ttk.Label(bg_box, text="背景图预览", anchor="center").pack()
+        self.bg_image_preview = ttk.Label(bg_box, anchor="center")
+        self.bg_image_preview.pack()
 
         # ---------- 文件列表 ----------
         f_list = ttk.LabelFrame(self.root, text="音频文件列表")
@@ -343,6 +386,27 @@ class AudioBatchMergerApp:
             self._update_cover_preview()
             self._auto_save()
 
+    def _clear_cover(self):
+        self.cover_path.set("")
+        self._update_cover_preview()
+        self._auto_save()
+
+    def _browse_bg_image(self):
+        path = filedialog.askopenfilename(
+            title="选择播放背景图",
+            initialdir=self.input_dir.get() or None,
+            filetypes=[("图片文件", "*.jpg;*.jpeg;*.png"),
+                       ("所有文件", "*.*")])
+        if path:
+            self.bg_image_path.set(path)
+            self._update_bg_image_preview()
+            self._auto_save()
+
+    def _clear_bg_image(self):
+        self.bg_image_path.set("")
+        self._update_bg_image_preview()
+        self._auto_save()
+
     def _update_cover_preview(self):
         path = self.cover_path.get().strip()
         if not path or not os.path.isfile(path):
@@ -352,7 +416,7 @@ class AudioBatchMergerApp:
         try:
             from PIL import Image
             img = Image.open(path)
-            img.thumbnail((80, 80))
+            img.thumbnail((120, 120))
             import io as _io
             buf = _io.BytesIO()
             img.save(buf, format="PNG")
@@ -361,6 +425,25 @@ class AudioBatchMergerApp:
         except Exception:
             self._cover_photo = None
             self.cover_preview.config(image="", text=os.path.basename(path))
+
+    def _update_bg_image_preview(self):
+        path = self.bg_image_path.get().strip()
+        if not path or not os.path.isfile(path):
+            self.bg_image_preview.config(image="", text="")
+            self._bg_image_photo = None
+            return
+        try:
+            from PIL import Image
+            img = Image.open(path)
+            img.thumbnail((120, 120))
+            import io as _io
+            buf = _io.BytesIO()
+            img.save(buf, format="PNG")
+            self._bg_image_photo = tk.PhotoImage(data=buf.getvalue())
+            self.bg_image_preview.config(image=self._bg_image_photo, text="")
+        except Exception:
+            self._bg_image_photo = None
+            self.bg_image_preview.config(image="", text=os.path.basename(path))
 
     def _scan_files(self):
         """扫描输入目录下的所有 wav 文件"""
@@ -607,7 +690,10 @@ class AudioBatchMergerApp:
 
             try:
                 metadata = self._build_metadata(part_num, total_batches)
-                _ffmpeg_export_audio(combined, output_path, fmt, metadata, self.cover_path.get().strip())
+                _ffmpeg_export_audio(
+                    combined, output_path, fmt, metadata,
+                    self.cover_path.get().strip(),
+                    self.bg_image_path.get().strip())
                 duration_sec = len(combined) / 1000
                 logger.info("第 %d 组导出成功: %s (%.1f秒, %d个文件)",
                             part_num, output_path, duration_sec, len(batch_files))
@@ -689,6 +775,7 @@ class AudioBatchMergerApp:
             "meta_date": self.meta_date.get(),
             "meta_comment": self.meta_comment.get(),
             "cover_path": self.cover_path.get(),
+            "bg_image_path": self.bg_image_path.get(),
         }
         try:
             with open(CONFIG_PATH, "w", encoding="utf-8") as f:
@@ -733,6 +820,9 @@ class AudioBatchMergerApp:
                 if cfg.get("cover_path"):
                     self.cover_path.set(cfg["cover_path"])
                     self._update_cover_preview()
+                if cfg.get("bg_image_path"):
+                    self.bg_image_path.set(cfg["bg_image_path"])
+                    self._update_bg_image_preview()
                 logger.info("已加载配置: %s", CONFIG_PATH)
         except Exception as e:
             logger.error("加载配置失败: %s", e)

@@ -1,5 +1,8 @@
 {
   "output_format": "JPEG",
-  "output_dir": "D:\\CODE\\Miscellaneous\\GPT-IMG\\头像",
-  "keep_structure": true
+  "output_dir": "C:/Users/PCL13/Downloads",
+  "keep_structure": true,
+  "replace_source": true,
+  "limit_size": true,
+  "limit_size_mb": 5.0
 }
