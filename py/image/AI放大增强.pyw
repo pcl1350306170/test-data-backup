@@ -96,6 +96,7 @@ class ImageEnhancerApp:
         # 模型实例（延迟初始化）
         self.upsampler = None
         self.face_enhancer = None
+        self._process_lock = threading.Lock()  # 保护模型推理，防止多线程竞争导致全黑/半黑输出
 
         # 创建UI组件
         self.create_widgets()
@@ -435,7 +436,7 @@ class ImageEnhancerApp:
                 model=model,
                 tile=256,  # 分块处理，降低内存占用（CPU 模式必须开启）
                 tile_pad=10,
-                pre_pad=0,
+                pre_pad=10,  # 边缘填充，避免边缘 tile 因缺少上下文产生黑边（需与 tile_pad 匹配）
                 half=False  # True 使用半精度（需要 GPU 支持）
             )
 
@@ -641,18 +642,19 @@ class ImageEnhancerApp:
             self.root.after(0, lambda: self.stop_btn.config(state=tk.DISABLED))
 
     def _enhance_with_retry(self, img):
-        """增强图片，tile模式失败时自动回退到整图模式重试"""
+        """增强图片，tile模式失败时自动回退到整图模式重试。线程安全：内部加锁保护模型推理"""
         # 第一次尝试：tile 分块模式（内存友好）
         try:
-            if self.face_enhance.get() and self.face_enhancer:
-                _, _, output = self.face_enhancer.enhance(
-                    img, has_aligned=False, only_center_face=False,
-                    paste_back=True, weight=0.5
-                )
-            else:
-                output, _ = self.upsampler.enhance(
-                    img, outscale=self.upscale_factor.get()
-                )
+            with self._process_lock:
+                if self.face_enhance.get() and self.face_enhancer:
+                    _, _, output = self.face_enhancer.enhance(
+                        img, has_aligned=False, only_center_face=False,
+                        paste_back=True, weight=0.5
+                    )
+                else:
+                    output, _ = self.upsampler.enhance(
+                        img, outscale=self.upscale_factor.get()
+                    )
             return output
         except RuntimeError as e:
             if 'tile' not in str(e).lower() and 'size' not in str(e).lower():
@@ -664,15 +666,16 @@ class ImageEnhancerApp:
         original_tile = self.upsampler.tile
         try:
             self.upsampler.tile = 0
-            if self.face_enhance.get() and self.face_enhancer:
-                _, _, output = self.face_enhancer.enhance(
-                    img, has_aligned=False, only_center_face=False,
-                    paste_back=True, weight=0.5
-                )
-            else:
-                output, _ = self.upsampler.enhance(
-                    img, outscale=self.upscale_factor.get()
-                )
+            with self._process_lock:
+                if self.face_enhance.get() and self.face_enhancer:
+                    _, _, output = self.face_enhancer.enhance(
+                        img, has_aligned=False, only_center_face=False,
+                        paste_back=True, weight=0.5
+                    )
+                else:
+                    output, _ = self.upsampler.enhance(
+                        img, outscale=self.upscale_factor.get()
+                    )
             return output
         finally:
             self.upsampler.tile = original_tile
@@ -691,6 +694,17 @@ class ImageEnhancerApp:
             
             if img is None:
                 raise ValueError(f"无法读取图片: {image_path}")
+
+            # 统一转为 3 通道 uint8 BGR（防御性处理：灰度图、RGBA、16bit 等异常格式）
+            if img.ndim == 2:  # 灰度图 → BGR
+                img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+            elif img.ndim == 3:
+                if img.shape[2] == 4:  # BGRA → BGR
+                    img = cv2.cvtColor(img, cv2.COLOR_BGRA2BGR)
+                elif img.shape[2] > 4:
+                    img = img[:, :, :3]
+                if img.dtype != np.uint8:  # 16bit 等 → uint8
+                    img = (img / (img.max() / 255.0)).clip(0, 255).astype(np.uint8)
 
             # 获取原始尺寸
             h, w = img.shape[:2]

@@ -41,6 +41,7 @@ class FileMoverApp:
         self.target_dir = tk.StringVar()
         self.keyword = tk.StringVar()  # 新增：移动关键字
         self.project_dir = tk.StringVar()
+        self.preserve_structure = tk.BooleanVar(value=True)  # 是否保留目录层级
         self.is_moving = False
 
         # 创建UI
@@ -73,6 +74,12 @@ class FileMoverApp:
         ttk.Label(dir_frame, text="移动关键字:").grid(row=2, column=0, padx=5, pady=10, sticky=tk.W)
         ttk.Entry(dir_frame, textvariable=self.keyword, width=50).grid(row=2, column=1, padx=5, pady=10, sticky=tk.EW)
         ttk.Label(dir_frame, text="(留空则移动所有文件)", font=("微软雅黑", 8)).grid(row=2, column=2, padx=5, pady=10, sticky=tk.W)
+
+        # 保留目录层级选项
+        ttk.Checkbutton(dir_frame, text="保留目录层级", variable=self.preserve_structure).grid(
+            row=3, column=0, columnspan=2, padx=5, pady=5, sticky=tk.W)
+        ttk.Label(dir_frame, text="(不勾选则将所有文件直接平铺到目标目录)", font=("微软雅黑", 8)).grid(
+            row=3, column=2, padx=5, pady=5, sticky=tk.W)
 
         dir_frame.columnconfigure(1, weight=1)
 
@@ -140,11 +147,13 @@ class FileMoverApp:
         self.move_btn.config(state=tk.DISABLED)
         self._log(f"开始移动文件... (关键字: '{keyword}' 为空则移动全部)")
 
-        # 在新线程中执行移动操作
-        threading.Thread(target=self._move_files, args=(source, target, keyword), daemon=True).start()
+        preserve = self.preserve_structure.get()
 
-    def _move_files(self, source, target, keyword):
-        """执行文件移动（保留目录结构）"""
+        # 在新线程中执行移动操作
+        threading.Thread(target=self._move_files, args=(source, target, keyword, preserve), daemon=True).start()
+
+    def _move_files(self, source, target, keyword, preserve_structure):
+        """执行文件移动（可选是否保留目录结构）"""
         try:
             # 确保目标目录存在
             os.makedirs(target, exist_ok=True)
@@ -161,9 +170,12 @@ class FileMoverApp:
 
             # 遍历源目录
             for root, dirs, files in os.walk(source):
-                # 创建对应的目标子目录
-                relative_path = os.path.relpath(root, source)
-                target_subdir = os.path.join(target, relative_path)
+                # 根据选项决定目标子目录
+                if preserve_structure:
+                    relative_path = os.path.relpath(root, source)
+                    target_subdir = os.path.join(target, relative_path)
+                else:
+                    target_subdir = target
                 os.makedirs(target_subdir, exist_ok=True)
 
                 # 移动文件
@@ -175,11 +187,14 @@ class FileMoverApp:
                     source_file = os.path.join(root, file)
                     target_file = os.path.join(target_subdir, file)
 
-                    # 处理文件已存在的情况
+                    # 处理文件名冲突（平铺模式下不同目录可能有同名文件）
                     if os.path.exists(target_file):
-                        self._log(f"文件已存在，跳过: {target_file}", logging.WARNING)
-                        error_files += 1
-                        continue
+                        name, ext = os.path.splitext(file)
+                        counter = 1
+                        while os.path.exists(target_file):
+                            target_file = os.path.join(target_subdir, f"{name}_{counter}{ext}")
+                            counter += 1
+                        self._log(f"文件名冲突，重命名为: {os.path.basename(target_file)}", logging.WARNING)
 
                     try:
                         shutil.move(source_file, target_file)  # shutil.move 自动处理跨磁盘移动
@@ -239,6 +254,7 @@ class FileMoverApp:
             "source_dir": self.source_dir.get(),
             "target_dir": self.target_dir.get(),
             "keyword": self.keyword.get(),  # 保存关键字
+            "preserve_structure": self.preserve_structure.get(),  # 保存目录层级选项
             "project_dir": self.project_dir.get()
         }
 
@@ -264,6 +280,8 @@ class FileMoverApp:
                     self.target_dir.set(config["target_dir"])
                 if "keyword" in config:  # 加载关键字
                     self.keyword.set(config["keyword"])
+                if "preserve_structure" in config:
+                    self.preserve_structure.set(config["preserve_structure"])
                 if "project_dir" in config:
                     self.project_dir.set(config["project_dir"])
 

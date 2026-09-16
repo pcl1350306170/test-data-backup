@@ -5,6 +5,8 @@ import os
 import sys
 import json
 import queue
+import random
+import string
 import threading
 from pathlib import Path
 from datetime import datetime
@@ -66,6 +68,10 @@ class BatchImageCropperApp:
         self.crop_ratio = tk.StringVar(value="自动")
         self.thread_count = tk.IntVar(value=5)
         self.subject_aware = tk.BooleanVar(value=True)
+        self.traverse_subdirs = tk.BooleanVar(value=True)
+        self.traverse_subdirs.trace_add('write', self._on_traverse_subdirs_changed)
+        self.preserve_dir_structure = tk.BooleanVar(value=True)
+        self.rename_mode = tk.StringVar(value="不重命名")
         self._stop_event = threading.Event()  # 线程安全的停止信号
         self.is_processing = False
         self.log_queue = queue.Queue()
@@ -75,6 +81,9 @@ class BatchImageCropperApp:
 
         # 加载配置
         self.load_config()
+
+        # 初始化联动状态
+        self._on_traverse_subdirs_changed()
 
         # 启动日志队列轮询
         self._poll_log_queue()
@@ -133,6 +142,30 @@ class BatchImageCropperApp:
             variable=self.subject_aware
         ).grid(row=1, column=0, columnspan=4, sticky=tk.W, pady=(10, 0))
 
+        ttk.Checkbutton(
+            param_frame,
+            text="遍历子目录",
+            variable=self.traverse_subdirs
+        ).grid(row=2, column=0, sticky=tk.W, pady=(5, 0))
+
+        self.preserve_dir_cb = ttk.Checkbutton(
+            param_frame,
+            text="输出保留目录结构",
+            variable=self.preserve_dir_structure
+        )
+        self.preserve_dir_cb.grid(row=2, column=1, sticky=tk.W, padx=(20, 0), pady=(5, 0))
+
+        # 重命名设置
+        ttk.Label(param_frame, text="重命名:").grid(row=3, column=0, sticky=tk.W, padx=(0, 5), pady=(5, 0))
+        rename_combo = ttk.Combobox(
+            param_frame,
+            textvariable=self.rename_mode,
+            values=["不重命名", "数字序号(0001,0002,...)", "随机字母数字"],
+            state="readonly",
+            width=22
+        )
+        rename_combo.grid(row=3, column=1, columnspan=3, sticky=tk.W, padx=5, pady=(5, 0))
+
         # 检测库状态提示
         lib_status = []
         if HAS_REMBG:
@@ -148,7 +181,7 @@ class BatchImageCropperApp:
             status_color = "orange"
 
         ttk.Label(param_frame, text=status_text, foreground=status_color, font=("SimHei", 8)).grid(
-            row=2, column=0, columnspan=4, sticky=tk.W, pady=(5, 0)
+            row=4, column=0, columnspan=4, sticky=tk.W, pady=(5, 0)
         )
 
         # 控制按钮
@@ -184,6 +217,14 @@ class BatchImageCropperApp:
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.log_text.config(yscrollcommand=scrollbar.set)
 
+    def _on_traverse_subdirs_changed(self, *args):
+        """联动：不遍历子目录时，禁用“输出保留目录结构”并取消勾选"""
+        if not self.traverse_subdirs.get():
+            self.preserve_dir_structure.set(False)
+            self.preserve_dir_cb.config(state=tk.DISABLED)
+        else:
+            self.preserve_dir_cb.config(state=tk.NORMAL)
+
     def select_input_dir(self):
         directory = filedialog.askdirectory(title="选择图片所在目录")
         if directory:
@@ -207,6 +248,9 @@ class BatchImageCropperApp:
                     self.crop_ratio.set(config.get('crop_ratio', '1:1'))
                     self.thread_count.set(config.get('thread_count', 5))
                     self.subject_aware.set(config.get('subject_aware', True))
+                    self.traverse_subdirs.set(config.get('traverse_subdirs', True))
+                    self.preserve_dir_structure.set(config.get('preserve_dir_structure', True))
+                    self.rename_mode.set(config.get('rename_mode', '不重命名'))
                 logger.info("配置加载成功")
         except Exception as e:
             logger.warning(f"加载配置失败: {e}")
@@ -219,7 +263,10 @@ class BatchImageCropperApp:
                 'output_dir': self.output_dir.get(),
                 'crop_ratio': self.crop_ratio.get(),
                 'thread_count': self.thread_count.get(),
-                'subject_aware': self.subject_aware.get()
+                'subject_aware': self.subject_aware.get(),
+                'traverse_subdirs': self.traverse_subdirs.get(),
+                'preserve_dir_structure': self.preserve_dir_structure.get(),
+                'rename_mode': self.rename_mode.get()
             }
             with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
                 json.dump(config, f, ensure_ascii=False, indent=2)
@@ -272,9 +319,17 @@ class BatchImageCropperApp:
         image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.webp'}
         image_files = []
         
-        for file_path in Path(input_dir).rglob('*'):
-            if file_path.is_file() and file_path.suffix.lower() in image_extensions:
-                image_files.append(str(file_path))
+        input_path = Path(input_dir)
+        if self.traverse_subdirs.get():
+            # 递归遍历子目录
+            for file_path in input_path.rglob('*'):
+                if file_path.is_file() and file_path.suffix.lower() in image_extensions:
+                    image_files.append(str(file_path))
+        else:
+            # 仅扫描当前目录
+            for file_path in input_path.glob('*'):
+                if file_path.is_file() and file_path.suffix.lower() in image_extensions:
+                    image_files.append(str(file_path))
 
         if not image_files:
             messagebox.showwarning("警告", "未找到图片文件")
@@ -302,7 +357,7 @@ class BatchImageCropperApp:
         # 启动处理线程
         thread = threading.Thread(
             target=self._process_images,
-            args=(image_files, output_dir),
+            args=(image_files, output_dir, self.rename_mode.get()),
             daemon=True
         )
         thread.start()
@@ -313,7 +368,7 @@ class BatchImageCropperApp:
         self.is_processing = False
         self.log("⚠️ 正在停止，等待当前任务完成...")
 
-    def _process_images(self, image_files, output_dir):
+    def _process_images(self, image_files, output_dir, rename_mode):
         """在工作线程中处理图片"""
         executor = None
         try:
@@ -333,14 +388,16 @@ class BatchImageCropperApp:
             futures = {}
 
             # 提交任务阶段：逐个提交，遇到停止信号立即中断
-            for image_path in image_files:
+            for idx, image_path in enumerate(image_files, start=1):
                 if self._stop_event.is_set():
                     break
                 future = executor.submit(
                     self._process_single_image,
                     image_path,
                     output_dir,
-                    fixed_target_ratio
+                    fixed_target_ratio,
+                    idx,
+                    rename_mode
                 )
                 futures[future] = image_path
 
@@ -511,7 +568,7 @@ class BatchImageCropperApp:
 
         return (crop_x1, crop_y1, crop_x2, crop_y2, None)
 
-    def _process_single_image(self, image_path, output_dir, fixed_target_ratio):
+    def _process_single_image(self, image_path, output_dir, fixed_target_ratio, file_index=0, rename_mode="不重命名"):
         """处理单张图片，返回是否成功"""
         try:
             # 打开图片
@@ -556,8 +613,34 @@ class BatchImageCropperApp:
             cropped = img.crop((orig_x1, orig_y1, orig_x2, orig_y2))
 
             # 生成输出路径
-            rel_path = os.path.relpath(image_path, self.input_dir.get())
-            output_path = os.path.join(output_dir, rel_path)
+            _, ext = os.path.splitext(image_path)
+            ext = ext.lower()
+
+            # 确定文件名
+            if rename_mode == "数字序号(0001,0002,...)":
+                new_name = f"{file_index:04d}{ext}"
+            elif rename_mode == "随机字母数字":
+                new_name = ''.join(random.choices(string.ascii_letters + string.digits, k=8)) + ext
+            else:
+                new_name = None  # 使用原文件名
+
+            if self.preserve_dir_structure.get():
+                # 保留目录结构
+                rel_path = os.path.relpath(image_path, self.input_dir.get())
+                if new_name:
+                    rel_dir = os.path.dirname(rel_path)
+                    rel_path = os.path.join(rel_dir, new_name) if rel_dir else new_name
+                output_path = os.path.join(output_dir, rel_path)
+            else:
+                # 平铺到输出目录
+                filename = new_name if new_name else os.path.basename(image_path)
+                output_path = os.path.join(output_dir, filename)
+                if os.path.exists(output_path):
+                    name_part, ext_part = os.path.splitext(filename)
+                    counter = 1
+                    while os.path.exists(output_path):
+                        output_path = os.path.join(output_dir, f"{name_part}_{counter}{ext_part}")
+                        counter += 1
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
             # 保存
