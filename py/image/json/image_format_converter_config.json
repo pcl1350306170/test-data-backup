@@ -1,8 +1,8 @@
 {
   "output_format": "JPEG",
-  "output_dir": "C:/Users/PCL13/Downloads",
-  "keep_structure": true,
-  "replace_source": true,
+  "output_dir": "D:/FILES/IMG/AI超清精选",
+  "keep_structure": false,
+  "replace_source": false,
   "limit_size": true,
   "limit_size_mb": 5.0
 }

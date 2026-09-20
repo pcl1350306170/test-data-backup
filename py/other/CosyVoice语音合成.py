@@ -64,7 +64,7 @@ DEFAULT_FORMAT = "wav"
 DEFAULT_OUT_DIR = r"C:\Users\PCL13\Downloads"
 DEFAULT_SEG_LEN = 500
 DEFAULT_FADE = True
-DEFAULT_FADE_MS = 1200
+DEFAULT_FADE_MS = 0
 DEFAULT_TAIL_MS = 900
 
 # 预置音色（可手动输入自定义值）
@@ -138,7 +138,7 @@ def _ffmpeg_load_audio(filepath):
 # ============================================================
 # 结尾淡出处理
 # ============================================================
-def apply_fade_out(wav_path, fade_ms=1200, tail_ms=900, log=print):
+def apply_fade_out(wav_path, fade_ms=0, tail_ms=900, log=print):
     """末尾淡出 + 补一段静音余韵。优先 ffmpeg 加载避免黑窗。"""
     if not HAS_PYDUB:
         log("  [警告] pydub 未安装，无法应用淡出效果")
@@ -151,15 +151,19 @@ def apply_fade_out(wav_path, fade_ms=1200, tail_ms=900, log=print):
         else:
             audio = AudioSegment.from_wav(wav_path)
         duration = len(audio)
-        fade = min(fade_ms, int(duration * 0.3))
-        audio = audio.fade_out(fade)
+        if not isinstance(duration, int) or duration <= 0:
+            log(f"  [警告] 音频时长无效({duration})，跳过淡出处理")
+            return
+        if fade_ms > 0:
+            fade = min(fade_ms, int(duration * 0.3))
+            audio = audio.fade_out(fade)
         if tail_ms > 0:
             audio = audio + AudioSegment.silent(duration=tail_ms)
         if shutil.which("ffmpeg"):
             _ffmpeg_export_wav(audio, wav_path)
         else:
             audio.export(wav_path, format="wav")
-        log(f"  [淡出] 已处理: fade={fade}ms, tail={tail_ms}ms")
+        log(f"  [淡出] 已处理: fade={min(fade_ms, int(duration * 0.3)) if fade_ms > 0 else 0}ms, tail={tail_ms}ms")
     except Exception as e:
         log(f"  [错误] 淡出处理失败: {e}")
         logger.error("淡出处理失败: %s", e)

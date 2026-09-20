@@ -1,0 +1,740 @@
+{
+  "cached_at": "2026-09-18 15:24:50",
+  "repos": [
+    {
+      "rel": "A_Test/theme-preview",
+      "url": "https://github.com/ElementUI/theme-preview.git",
+      "branch": "master"
+    },
+    {
+      "rel": "A_WorkSpace/IDEA/BlogAPI-Font-FL/my-blog-api",
+      "url": "https://github.com/pcl1350306170/my-blog-api.git",
+      "branch": "master-simple"
+    },
+    {
+      "rel": "A_WorkSpace/IDEA/BlogAPI-Font-FL/pcl1350306170.github.io",
+      "url": "https://github.com/pcl1350306170/pcl1350306170.github.io.git",
+      "branch": "simple-blog"
+    },
+    {
+      "rel": "A_WorkSpace/IDEA/Geeker-Admin-FL/Geeker-Admin",
+      "url": "https://github.com/pcl1350306170/Geeker-Admin.git",
+      "branch": "feature/personal-asset-mgmt"
+    },
+    {
+      "rel": "A_WorkSpace/IDEA/Geeker-Admin-FL/Geeker-Admin-Java",
+      "url": "https://github.com/pcl1350306170/Geeker-Admin-Java.git",
+      "branch": "main"
+    },
+    {
+      "rel": "A_WorkSpace/IDEA/Geeker-Admin-FL/image-cdn",
+      "url": "https://github.com/pcl1350306170/image-cdn.git",
+      "branch": "main"
+    },
+    {
+      "rel": "A_WorkSpace/IDEA/MenZhen/1.3南通附院-模板+中间层/template-resource",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801S-Group/low-code-template-resource.git",
+      "branch": "dev_1.5.0_上海市徐汇区中心医院"
+    },
+    {
+      "rel": "A_WorkSpace/IDEA/MenZhen/1.3南通附院-模板+中间层/template1.3.0",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/self-low-code-template.git",
+      "branch": "dev_1.3.1_南通大学附属医院"
+    },
+    {
+      "rel": "FontEnd/CeruMusic",
+      "url": "https://github.com/pcl1350306170/CeruMusic.git",
+      "branch": "V-2.0-单机"
+    },
+    {
+      "rel": "FontEnd/Geeker-Admin",
+      "url": "https://github.com/pcl1350306170/Geeker-Admin.git",
+      "branch": "feature/personal-asset-mgmt"
+    },
+    {
+      "rel": "FontEnd/build-claude-code",
+      "url": "https://github.com/OPBR/build-claude-code.git",
+      "branch": "main"
+    },
+    {
+      "rel": "FontEnd/dashy",
+      "url": "https://github.com/pcl1350306170/font-dashy.git",
+      "branch": "master"
+    },
+    {
+      "rel": "FontEnd/edukiz",
+      "url": "https://github.com/pcl1350306170/edukidgame.git",
+      "branch": "main"
+    },
+    {
+      "rel": "FontEnd/koodo-reader",
+      "url": "https://github.com/pcl1350306170/koodo-reader.git",
+      "branch": "master"
+    },
+    {
+      "rel": "FontEnd/mage",
+      "url": "https://github.com/pcl1350306170/font-mage.git",
+      "branch": "main"
+    },
+    {
+      "rel": "FontEnd/myblog",
+      "url": "https://github.com/pcl1350306170/myblog.git",
+      "branch": "master"
+    },
+    {
+      "rel": "FontEnd/mywww",
+      "url": "https://gitee.com/pcl11350306170/mywww.git",
+      "branch": "master"
+    },
+    {
+      "rel": "FontEnd/pcl1350306170.github.io",
+      "url": "https://github.com/pcl1350306170/pcl1350306170.github.io.git",
+      "branch": "simple-blog"
+    },
+    {
+      "rel": "FontEnd/vscode-background-cover",
+      "url": "https://github.com/pcl1350306170/vscode-background-cover.git",
+      "branch": "master"
+    },
+    {
+      "rel": "FontEnd/zyfun",
+      "url": "https://github.com/pcl1350306170/zyfun.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Harmony/HarmonyOS6-Dev-Guide",
+      "url": "https://github.com/pcl1350306170/HarmonyOS6-Dev-Guide.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Harmony/Login",
+      "url": "https://gitee.com/harmonyos_codelabs/Login.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/MyFirstProject",
+      "url": "https://gitee.com/pcl11350306170/hongmeng-practice-project.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/RemoteCommunicationPlatform",
+      "url": "https://gitee.com/harmonyos_samples/RemoteCommunicationPlatform.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/grid-hybrid",
+      "url": "https://gitee.com/harmonyos_samples/grid-hybrid.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/harmonyos-todolist",
+      "url": "https://gitee.com/bananana-ice/harmonyos-todolist.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/hmosworld",
+      "url": "https://gitee.com/pcl11350306170/hmosworld.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/multi-tab-navigation",
+      "url": "https://gitee.com/harmonyos_samples/multi-tab-navigation.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/multi-ticket-class",
+      "url": "https://gitee.com/harmonyos_samples/multi-ticket-class.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/oh-bill",
+      "url": "https://gitee.com/ericple/oh-bill.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Harmony/system-router-map",
+      "url": "https://gitee.com/harmonyos_samples/system-router-map.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Java/Geeker-Admin-Java",
+      "url": "https://github.com/pcl1350306170/Geeker-Admin-Java.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Java/JavaGuide",
+      "url": "https://github.com/Snailclimb/JavaGuide.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Java/JeecgBoot",
+      "url": "https://github.com/jeecgboot/JeecgBoot.git",
+      "branch": "springboot3"
+    },
+    {
+      "rel": "Java/WxJava",
+      "url": "https://github.com/binarywang/WxJava.git",
+      "branch": "develop"
+    },
+    {
+      "rel": "Java/heima_ai",
+      "url": "https://gitee.com/pcl11350306170/heima_ai.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Java/hello-algo",
+      "url": "https://github.com/krahets/hello-algo.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Java/java-design-patterns",
+      "url": "https://gitee.com/pcl11350306170/java-design-patterns.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Java/my-blog-api",
+      "url": "https://github.com/pcl1350306170/my-blog-api.git",
+      "branch": "master-simple"
+    },
+    {
+      "rel": "Java/spring-boot-study",
+      "url": "https://gitee.com/CandyWall/spring-boot-study.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Java/springboot教学徐庶",
+      "url": "https://gitee.com/pcl11350306170/springboot_parent.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Java/sz-boot-parent",
+      "url": "https://gitee.com/pcl11350306170/sz-boot-parent.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Miscellaneous",
+      "url": "https://github.com/pcl1350306170/Miscellaneous.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Python/Amazing-Python-Scripts",
+      "url": "https://github.com/pcl1350306170/Amazing-Python-Scripts.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Python/Awesome-Python-Scripts",
+      "url": "https://github.com/pcl1350306170/Awesome-Python-Scripts.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Python/DDCS",
+      "url": "https://github.com/asxez/DDCS.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Python/Python-Scripts",
+      "url": "https://github.com/DhanushNehru/Python-Scripts.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Python/SeleniumBase",
+      "url": "https://github.com/seleniumbase/SeleniumBase.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Python/ZipCracker",
+      "url": "https://github.com/asaotomo/ZipCracker.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Python/alzebra",
+      "url": "https://github.com/moreshk/alzebra.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Python/hackingtool",
+      "url": "https://github.com/pcl1350306170/hackingtool.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Python/test-data",
+      "url": "https://github.com/pcl1350306170/test-data-backup.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Python/test-data-backup",
+      "url": "https://github.com/pcl1350306170/test-data-backup.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Server/Node/Node-Ghost",
+      "url": "https://github.com/pcl1350306170/Node-Ghost.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Server/Node/Node-strapi",
+      "url": "https://github.com/pcl1350306170/Node-strapi.git",
+      "branch": "develop"
+    },
+    {
+      "rel": "Server/Node/directus",
+      "url": "https://github.com/pcl1350306170/server-directus.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Server/Node/medusa",
+      "url": "https://github.com/pcl1350306170/server-medusa.git",
+      "branch": "develop"
+    },
+    {
+      "rel": "Server/Node/payload",
+      "url": "https://github.com/payloadcms/payload.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Server/Node/realworld",
+      "url": "https://github.com/realworld-apps/realworld.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Server/Node/server-appsmith",
+      "url": "https://github.com/pcl1350306170/server-appsmith.git",
+      "branch": "release"
+    },
+    {
+      "rel": "Skill/nuwa-skill",
+      "url": "https://github.com/alchaincyf/nuwa-skill.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Yarward/Android/a10_2.1",
+      "url": "http://192.168.30.151:8090/smartward-android/a10/a10_2.1.git",
+      "branch": "苏州市独墅湖医院_v3.4.3"
+    },
+    {
+      "rel": "Yarward/A纯代码/bnms【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-bnms-frontEnd-group/yarward-bnms-frontend.git",
+      "branch": "1.5.0.10_济医太白湖院区_病房"
+    },
+    {
+      "rel": "Yarward/A纯代码/develop-纯代码",
+      "url": "http://192.168.30.151:8090/tanqichun/develop_sams",
+      "branch": "3.1.3_广州医科大学第二附属医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/develop_sams【纯代码】",
+      "url": "http://192.168.30.151:8090/tanqichun/develop_sams.git",
+      "branch": "3.0.0_合肥滨湖"
+    },
+    {
+      "rel": "Yarward/A纯代码/nrms【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-nrms-frontEnd-group/yarward-nrms-frontend.git",
+      "branch": "3.1.4-济宁兖州区人民医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/omms【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-omms-frontEnd-group/yarward-omms-frontEnd.git",
+      "branch": "3.0.0_合肥市滨湖医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/tdms【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-tdms-frontEnd-group/yarward-tdms-frontEnd.git",
+      "branch": "3.1.0-九江市中医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/template【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/self-low-code-template.git",
+      "branch": "dev_1.5.6_宁波市奉化区人民医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/web-frontEn(门诊纯代码)",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801S-Group/clinic-qccp-web-frontEn.git",
+      "branch": "dev_1.5.1_丹东市中心医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/wnms-纯代码",
+      "url": "http://192.168.30.151:8090/yarward-wnms-frontEnd-group/yarward-wnms-frontEnd.git",
+      "branch": "3.1.4-菏泽第三人民医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/yarward-nsms【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-nsms-server-group/yarward-nsms.git",
+      "branch": "V2.1.12_北京世纪坛医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/宣教【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-hpms-frontEnd-group/yarward-hpms-frontEnd.git",
+      "branch": "3.1.4-三亚市中医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/床头-纯代码",
+      "url": "http://192.168.30.151:8090/dingchun/zhbf-bedhead-frontend.git",
+      "branch": "V2.01.0.09-四川大学华西医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/床头-纯代码1",
+      "url": "http://192.168.30.151:8090/dingchun/zhbf-bedhead-frontend.git",
+      "branch": "3.1.5-安徽医科大学第二附属医院(南区)"
+    },
+    {
+      "rel": "Yarward/A纯代码/床旁-纯代码",
+      "url": "http://192.168.30.151:8090/zhaichong/zhbf-fontend.git",
+      "branch": "3.1.4-河南科技大学第一附属医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/新-病房web【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-frontend-group/yarward-web-frontend.git",
+      "branch": "3.4.0_蛇口自贸区医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/看板【纯代码】",
+      "url": "http://192.168.30.151:8090/yarward-bnms-frontEnd-group/yarward-ntv-frontend.git",
+      "branch": "3.1.4-无锡市惠山区人民医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/远程探视小程序",
+      "url": "http://192.168.30.151:8090/yarward-vims-frontend-group/yarward-remote-visit-lan.git",
+      "branch": "1.0.0_蛇口自贸区医院"
+    },
+    {
+      "rel": "Yarward/A纯代码/问卷【代码】",
+      "url": "http://192.168.30.151:8090/yarward-qsms-frontEnd-group/yarward-qsms-frontEnd.git",
+      "branch": "3.3.0"
+    },
+    {
+      "rel": "Yarward/FontEnd/yarward-remote-visit-lan",
+      "url": "http://192.168.30.151:8090/yarward-vims-frontend-group/yarward-remote-visit-lan",
+      "branch": "1.0.0_苏州独墅湖医院(来自南山)"
+    },
+    {
+      "rel": "Yarward/a10_1.0",
+      "url": "http://192.168.30.151:8090/smartward-server/a10/a10_1.0.git",
+      "branch": "dev"
+    },
+    {
+      "rel": "Yarward/ai-usage-dashboard",
+      "url": "http://192.168.30.151:8090/hanshuai1/ai-usage-dashboard.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Yarward/server/801S/clinic-qccp-platform",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801S-Group/clinic-qccp-platform.git",
+      "branch": "feature_重庆儿童医院宜宾院区"
+    },
+    {
+      "rel": "Yarward/server/BF/avcs",
+      "url": "http://192.168.30.151:8090/yarward-avcs-server-group/yarward-avcs.git",
+      "branch": "3.1.3"
+    },
+    {
+      "rel": "Yarward/server/BF/bnms",
+      "url": "http://192.168.30.151:8090/yarward-bnms-server-group/yarward-bnms.git",
+      "branch": "3.1.6"
+    },
+    {
+      "rel": "Yarward/server/BF/nsms",
+      "url": "http://192.168.30.151:8090/yarward-nsms-server-group/yarward-nsms.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/server/BF/omms",
+      "url": "http://192.168.30.151:8090/yarward-omms-server-group/yarward-omms.git",
+      "branch": "3.1.4"
+    },
+    {
+      "rel": "Yarward/server/BF/tdms",
+      "url": "http://192.168.30.151:8090/yarward-tdms-server-group/yarward-tdms.git",
+      "branch": "3.2.1"
+    },
+    {
+      "rel": "Yarward/server/BF/wnas",
+      "url": "http://192.168.30.151:8090/yarward-wnas-server-group/yarward-wnas.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/server/BF/wnms",
+      "url": "http://192.168.30.151:8090/yarward-wnms-server-group/yarward-wnms.git",
+      "branch": "3.1.4"
+    },
+    {
+      "rel": "Yarward/server/BF/wsms",
+      "url": "http://192.168.30.151:8090/yarward-wsms-server-group/yarward-wsms.git",
+      "branch": "3.1.3"
+    },
+    {
+      "rel": "Yarward/server/Ward_V3_2_1_Plus/avcs",
+      "url": "http://192.168.30.151:8090/yarward-avcs-server-group/yarward-avcs.git",
+      "branch": "3.1.3"
+    },
+    {
+      "rel": "Yarward/server/Ward_V3_2_1_Plus/bnms",
+      "url": "http://192.168.30.151:8090/yarward-bnms-server-group/yarward-bnms.git",
+      "branch": "3.2.1_济南中心医院东院区"
+    },
+    {
+      "rel": "Yarward/server/Ward_V3_2_1_Plus/nsms",
+      "url": "http://192.168.30.151:8090/yarward-nsms-server-group/yarward-nsms.git",
+      "branch": "3.2.1"
+    },
+    {
+      "rel": "Yarward/server/Ward_V3_2_1_Plus/omms",
+      "url": "http://192.168.30.151:8090/yarward-omms-server-group/yarward-omms.git",
+      "branch": "3.2.1"
+    },
+    {
+      "rel": "Yarward/server/Ward_V3_2_1_Plus/tdms",
+      "url": "http://192.168.30.151:8090/yarward-tdms-server-group/yarward-tdms.git",
+      "branch": "3.2.1"
+    },
+    {
+      "rel": "Yarward/server/Ward_V3_2_1_Plus/wnas",
+      "url": "http://192.168.30.151:8090/yarward-wnas-server-group/yarward-wnas.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/server/Ward_V3_2_1_Plus/wnms",
+      "url": "http://192.168.30.151:8090/yarward-wnms-server-group/yarward-wnms.git",
+      "branch": "3.1.4"
+    },
+    {
+      "rel": "Yarward/server/Ward_V3_2_1_Plus/wsms",
+      "url": "http://192.168.30.151:8090/yarward-wsms-server-group/yarward-wsms.git",
+      "branch": "3.1.3"
+    },
+    {
+      "rel": "Yarward/病房/bedheadcard-frontend",
+      "url": "http://192.168.30.151:8090/wanghuichao/yarward-bedheadcard-frontend.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Yarward/病房/web/web3.1.4",
+      "url": "http://192.168.30.151:8090/yarward-frontend-group/yarward-web-frontend.git",
+      "branch": "3.4.3"
+    },
+    {
+      "rel": "Yarward/病房/web/web3.4",
+      "url": "http://192.168.30.151:8090/yarward-frontend-group/yarward-web-frontend.git",
+      "branch": "3.4.4_上海蓝十字脑科医院有限公司"
+    },
+    {
+      "rel": "Yarward/病房/web/web4.0",
+      "url": "http://192.168.30.151:8090/yarward-frontend-group/zhbf-web",
+      "branch": "4.0.2_四川华西医院锦江院区_T"
+    },
+    {
+      "rel": "Yarward/病房/web/webDev2.X",
+      "url": "http://192.168.30.151:8090/tanqichun/develop_sams.git",
+      "branch": "2.1.12_北京世纪坛医院"
+    },
+    {
+      "rel": "Yarward/病房/web/webDev3.X",
+      "url": "http://192.168.30.151:8090/tanqichun/develop_sams.git",
+      "branch": "3.1.3"
+    },
+    {
+      "rel": "Yarward/病房/web/yarward-micro-menu",
+      "url": "http://192.168.30.151:8090/yarward-frontend-group/yarward-micro-menu.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Yarward/病房/web/yarward-nova-ai",
+      "url": "http://192.168.30.151:8090/yarward-frontend-group/yarward-nova-ai.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Yarward/病房/床头/床头10",
+      "url": "http://192.168.30.151:8090/dingchun/zhbf-bedhead-frontend.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/病房/床头/床头3.0",
+      "url": "http://192.168.30.151:8090/dingchun/zhbf-bedhead-frontend.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/病房/床头/床头3.1",
+      "url": "http://192.168.30.151:8090/dingchun/zhbf-bedhead-frontend.git",
+      "branch": "3.1.3-华中科技大学附属同济医院"
+    },
+    {
+      "rel": "Yarward/病房/床头/床头3.4",
+      "url": "http://192.168.30.151:8090/dingchun/zhbf-bedhead-frontend.git",
+      "branch": "3.4.3_北京朝阳医院(西院)"
+    },
+    {
+      "rel": "Yarward/病房/床旁/床旁10",
+      "url": "http://192.168.30.151:8090/zhaichong/zhbf-fontend.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/病房/床旁/床旁3.0",
+      "url": "http://192.168.30.151:8090/zhaichong/zhbf-fontend.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/病房/床旁/床旁3.1",
+      "url": "http://192.168.30.151:8090/zhaichong/zhbf-fontend.git",
+      "branch": "3.1.6-上海市徐汇区大华医院医院"
+    },
+    {
+      "rel": "Yarward/病房/床旁/床旁3.2",
+      "url": "http://192.168.30.151:8090/zhaichong/zhbf-fontend.git",
+      "branch": "3.4.4"
+    },
+    {
+      "rel": "Yarward/病房/床旁/床旁4.0",
+      "url": "http://192.168.30.151:8090/zhaichong/zhbf-fontend.git",
+      "branch": "4.0.2_华西锦江二期"
+    },
+    {
+      "rel": "Yarward/病房/看板/yarward-ntv-frontend",
+      "url": "http://192.168.30.151:8090/yarward-bnms-frontEnd-group/yarward-ntv-frontend.git",
+      "branch": "3.1.4_如皋市人民医院"
+    },
+    {
+      "rel": "Yarward/病房/看板/看板3.1",
+      "url": "http://192.168.30.151:8090/yarward-bnms-frontEnd-group/yarward-ntv-frontend.git",
+      "branch": "3.1.6_厦门妇幼保健院"
+    },
+    {
+      "rel": "Yarward/病房/看板/看板3.4",
+      "url": "http://192.168.30.151:8090/yarward-bnms-frontEnd-group/yarward-ntv-frontend.git",
+      "branch": "3.4.2_九江市第一人民医院（活水院区、八里湖院区）-鸿蒙"
+    },
+    {
+      "rel": "Yarward/病房/看板/看板4.0",
+      "url": "http://192.168.30.151:8090/yarward-bnms-frontEnd-group/yarward-ntv-frontend.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/801/server/peis",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801-Group/PEIS-GROUP/peis.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/801/web/apothecary-frontEn",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801-Group/YM-801-WEB/yarward-qcms-apothecary-frontEn.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/801/web/intelligent-guidance-fronten",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801-Group/YM-801-WEB/yarward-qcms-intelligent-guidance-fronten.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/801/web/self-service-fronten",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801-Group/YM-801-WEB/yarward-qcms-self-service-fronten.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/801/web/template-fronten",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801-Group/YM-801-WEB/yarward-qcms-template-fronten.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/801/web/template-vue-frontEn",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801-Group/YM-801-WEB/yarward-qcms-template-vue-frontEn.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/801/web/web-frontEn",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801-Group/YM-801-WEB/yarward-qcms-web-frontEn.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/801/web/webPublicSys-frontEn",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801-Group/YM-801-WEB/yarward-qcms-webPublicSys-frontEn.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yarward/门诊/clinic-kiosks-web",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/clinic-kiosks-web.git",
+      "branch": "dev_1.5.5重庆儿童医院宜宾院区"
+    },
+    {
+      "rel": "Yarward/门诊/template",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/self-low-code-template.git",
+      "branch": "dev_1.5.2_自贡市第四人民医院"
+    },
+    {
+      "rel": "Yarward/门诊/template-resource",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801S-Group/low-code-template-resource.git",
+      "branch": "dev_1.5.0_上海市徐汇区中心医院"
+    },
+    {
+      "rel": "Yarward/门诊/template1.3.0",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/self-low-code-template.git",
+      "branch": "dev_1.3.1_南通大学附属医院"
+    },
+    {
+      "rel": "Yarward/门诊/template1.5.0",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/self-low-code-template.git",
+      "branch": "dev_1.5.0_衡水市第四人民医院"
+    },
+    {
+      "rel": "Yarward/门诊/template1.5.2",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/self-low-code-template.git",
+      "branch": "dev_1.5.2_自贡市第四人民医院"
+    },
+    {
+      "rel": "Yarward/门诊/template1.5.4",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/self-low-code-template.git",
+      "branch": "dev_1.5.4_宝鸡中医院西院区"
+    },
+    {
+      "rel": "Yarward/门诊/template1.5.6",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/self-low-code-template.git",
+      "branch": "dev_1.5.6_天津市宁河区中医医院"
+    },
+    {
+      "rel": "Yarward/门诊/todonew",
+      "url": "http://192.168.30.151:8090/yarward-qcms-frontEnd-group/todonew.git",
+      "branch": "main"
+    },
+    {
+      "rel": "Yarward/门诊/web-frontEn",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801S-Group/clinic-qccp-web-frontEn.git",
+      "branch": "dev_1.4.0_南通大学附属医院"
+    },
+    {
+      "rel": "Yarward/门诊/web-frontEn1.5.4",
+      "url": "http://192.168.30.151:8090/SmartClinic/YM-801S-Group/clinic-qccp-web-frontEn.git",
+      "branch": "dev_1.5.6_西乡县新东方医院"
+    },
+    {
+      "rel": "Yudao/SpringBoot-Labs",
+      "url": "https://github.com/yudaocode/SpringBoot-Labs.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yudao/ruoyi-vue-pro",
+      "url": "https://github.com/YunaiV/ruoyi-vue-pro.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yudao/yudao-cloud",
+      "url": "https://github.com/YunaiV/yudao-cloud.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yudao/yudao-ui-admin-vben",
+      "url": "https://github.com/yudaocode/yudao-ui-admin-vben.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yudao/yudao-ui-admin-vue3",
+      "url": "https://github.com/yudaocode/yudao-ui-admin-vue3.git",
+      "branch": "master"
+    },
+    {
+      "rel": "Yudao/yudao-ui-go-view",
+      "url": "https://github.com/yudaocode/yudao-ui-go-view.git",
+      "branch": "master"
+    },
+    {
+      "rel": "image-cdn",
+      "url": "https://github.com/pcl1350306170/image-cdn.git",
+      "branch": "main"
+    }
+  ]
+}

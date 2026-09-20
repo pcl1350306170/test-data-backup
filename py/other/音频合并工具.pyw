@@ -480,7 +480,7 @@ class AudioBatchMergerApp:
         return result[:target_duration_ms]
 
     def _group_files(self):
-        """按平均时长将文件分组（总时长 / 组数，避免最后一组过短）
+        """按动态目标时长将文件分组，确保各组时长均匀
         :return: [[文件名, ...], ...]
         """
         target_ms = self.target_duration.get() * 60 * 1000
@@ -500,27 +500,35 @@ class AudioBatchMergerApp:
         if not file_durs:
             return []
 
-        # 计算总时长和组数，用平均值作为每组的实际目标
+        # 计算总时长和组数
         import math
         total_dur = sum(d for _, d in file_durs)
         num_batches = max(1, math.ceil(total_dur / target_ms))
-        avg_ms = total_dur / num_batches
-        logger.info("音频总时长 %.1f 分钟，目标 %d 分钟，分为 %d 组，平均 %.1f 分钟/组",
-                    total_dur / 60000, self.target_duration.get(), num_batches, avg_ms / 60000)
+        logger.info("音频总时长 %.1f 分钟，目标 %d 分钟，分为 %d 组",
+                    total_dur / 60000, self.target_duration.get(), num_batches)
 
-        # 第二遍：按平均时长分组
+        # 第二遍：动态分组，每组切分后重新计算剩余目标
         batches = []
         current_batch = []
         current_dur = 0
+        remaining_dur = total_dur
+        remaining_batches = num_batches
 
         for fname, dur in file_durs:
-            if current_batch and current_dur + dur > avg_ms:
-                batches.append(current_batch)
+            if current_batch:
+                dynamic_avg = remaining_dur / remaining_batches
+                if current_dur + dur > dynamic_avg:
+                    batches.append(current_batch)
+                    remaining_dur -= current_dur
+                    remaining_batches -= 1
+                    current_batch = [fname]
+                    current_dur = dur
+                else:
+                    current_batch.append(fname)
+                    current_dur += dur
+            else:
                 current_batch = [fname]
                 current_dur = dur
-            else:
-                current_batch.append(fname)
-                current_dur += dur
 
         if current_batch:
             batches.append(current_batch)
@@ -869,7 +877,7 @@ def main_cli():
         except Exception as e:
             print(f"[WARN] BGM 加载失败: {e}")
 
-    # 按平均时长分组（总时长 / 组数，避免最后一组过短）
+    # 按动态目标时长分组，确保各组时长均匀
     import math
     target_ms = args.duration * 60 * 1000
     file_durs = []
@@ -885,21 +893,29 @@ def main_cli():
     if file_durs:
         total_dur = sum(d for _, d in file_durs)
         num_batches = max(1, math.ceil(total_dur / target_ms))
-        avg_ms = total_dur / num_batches
         print(f"[INFO] 总时长 {total_dur / 60000:.1f} 分钟，目标 {args.duration} 分钟，"
-              f"分为 {num_batches} 组，平均 {avg_ms / 60000:.1f} 分钟/组")
+              f"分为 {num_batches} 组")
 
     batches = []
     current_batch = []
     current_dur = 0
+    remaining_dur = total_dur if file_durs else 0
+    remaining_batches = num_batches if file_durs else 1
     for fname, dur in file_durs:
-        if current_batch and current_dur + dur > avg_ms:
-            batches.append(current_batch)
+        if current_batch:
+            dynamic_avg = remaining_dur / remaining_batches
+            if current_dur + dur > dynamic_avg:
+                batches.append(current_batch)
+                remaining_dur -= current_dur
+                remaining_batches -= 1
+                current_batch = [fname]
+                current_dur = dur
+            else:
+                current_batch.append(fname)
+                current_dur += dur
+        else:
             current_batch = [fname]
             current_dur = dur
-        else:
-            current_batch.append(fname)
-            current_dur += dur
     if current_batch:
         batches.append(current_batch)
 
