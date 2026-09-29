@@ -1,0 +1,94 @@
+/* ===== 浮动按钮容器 ===== */
+#grok-copy-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 2147483647;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ===== 主按钮 ===== */
+#grok-copy-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a73e8, #0d47a1);
+    color: white;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.2s ease, background 0.3s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#grok-copy-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+#grok-copy-btn.running {
+    background: linear-gradient(135deg, #e53935, #b71c1c);
+    animation: grok-pulse 1.2s infinite;
+}
+
+#grok-copy-btn.running:hover {
+    transform: scale(1.1);
+}
+
+#grok-copy-btn.dragging {
+    opacity: 0.8;
+    cursor: grabbing;
+    transition: none;
+}
+
+@keyframes grok-pulse {
+    0%, 100% { box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3); }
+    50% { box-shadow: 0 4px 20px rgba(229, 57, 53, 0.6); }
+}
+
+/* ===== 状态标签 ===== */
+.grok-copy-status {
+    font-size: 11px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.65);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+    pointer-events: none;
+    min-height: 18px;
+    line-height: 14px;
+}
+
+/* ===== Toast 提示 ===== */
+#grok-copy-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    z-index: 2147483647;
+    padding: 10px 24px;
+    background: #333;
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+}
+
+#grok-copy-toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+#grok-copy-toast.success { background: #2E7D32; }
+#grok-copy-toast.error { background: #c62828; }
+#grok-copy-toast.info { background: #1565C0; }

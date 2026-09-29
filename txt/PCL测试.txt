@@ -225,8 +225,10 @@ Yahua@3585668
 亚华数据库
     username: root
     password:  Yahua3585668yh
-
-
+门诊：
+用户名： root
+端口： 7200
+password: Yahua3585668ym801
 配置本地接口：
 proxy: {
       '/nrms': {
@@ -244,6 +246,49 @@ proxy: {
       },
 
     }
+	
+门诊前端连接本地后台：
+// 代理服务器
+    devServer: {
+        open: true,
+        port: "8080",
+        proxy: {
+            '^/clinic': {
+                changeOrigin: true, //是否跨域
+                target: `http://localhost:7101`, // 远端地址
+                pathRewrite: { '^/clinic': '' },
+            },
+            '^/tpleditor': {
+                changeOrigin: true, //是否跨域
+                target: `http://192.168.16.118:7000/tpleditor`, // 远端地址
+                pathRewrite: { '^/tpleditor': '' },
+            },
+            '^/design': {
+                changeOrigin: true, //是否跨域
+                target: `http://192.168.16.118:7000/design`, // 远端地址
+                pathRewrite: { '^/design': '' },
+            },
+            '^/templateFront': {
+                changeOrigin: true, //是否跨域
+                target: `http://192.168.16.118:7000/templateFront`, // 远端地址
+                pathRewrite: { '^/templateFront': '' },
+            },
+            '^/upload': {
+                changeOrigin: true, //是否跨域
+                target: `http://192.168.16.118:7000/upload`, // 远端地址
+                pathRewrite: { '^/upload': '' },
+            },
+            '^/mock': {
+                changeOrigin: true, //是否跨域
+                target: `http://192.168.16.118:7000/mock`, // 远端地址
+                pathRewrite: { '^/mock': '' },
+            },
+            '^/resource': {
+                changeOrigin: true, //是否跨域
+                target: `http://192.168.16.118:7000`, // 远端地址
+            },
+        },
+    },	
 上海十一：
 
 http://localhost:8080/#/tempView?modelId=1962715079420493825
