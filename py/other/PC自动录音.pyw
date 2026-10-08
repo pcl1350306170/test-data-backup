@@ -5,11 +5,12 @@ import logging
 import threading
 import time
 import random
+from collections import deque
 from datetime import datetime
 from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
-import pyaudio
+import sounddevice as sd
 import wave
 import subprocess
 import shutil
@@ -41,11 +42,14 @@ DEFAULT_CONFIG = {
 }
 
 # 录音参数（固定）
-FORMAT = pyaudio.paInt16
+# FORMAT = pyaudio.paInt16  # sounddevice 使用 dtype='int16'
 CHANNELS = 2
 RATE = 48000
 CHUNK = 1024
 TEMP_WAV = SCRIPT_DIR / "temp_recording.wav"
+
+# 预缓冲时长（秒）：检测到声音前保留的音频，补进开头避免丢失
+PRE_ROLL_SECONDS = 1.0
 
 # 支持的虚拟音频设备关键词
 VIRTUAL_CABLE_KEYWORDS = [
@@ -54,22 +58,39 @@ VIRTUAL_CABLE_KEYWORDS = [
 ]
 
 # ================== 工具函数 ==================
+# ffmpeg 绝对路径（优先，避免 PATH 未刷新导致找不到）
+FFMPEG_PATH = r"D:\dev\ffmpeg\bin\ffmpeg.exe"
+
 def ensure_ffmpeg():
+    if os.path.exists(FFMPEG_PATH):
+        return FFMPEG_PATH
     if not shutil.which("ffmpeg"):
         raise EnvironmentError("未找到 ffmpeg，请安装并确保可在命令行中运行！")
+    return shutil.which("ffmpeg")
 
 def convert_wav_to_mp3(wav_path, mp3_path):
+    """返回 (success: bool, error_msg: str)"""
     try:
+        ffmpeg = ensure_ffmpeg()
         result = subprocess.run([
-            "ffmpeg", "-y", "-i", str(wav_path),
+            ffmpeg, "-y", "-i", str(wav_path),
             "-acodec", "libmp3lame", "-b:a", "192k", str(mp3_path)
-        ], capture_output=True, text=True, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
-        return result.returncode == 0
-    except Exception:
-        return False
+        ], capture_output=True, text=True, encoding='utf-8', errors='replace',
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+        if result.returncode != 0:
+            err = result.stderr.strip()[-500:] if result.stderr else "无错误输出"
+            logger.error(f"ffmpeg 转换失败, returncode={result.returncode}, stderr: {err}")
+            return False, f"ffmpeg返回{result.returncode}: {err}"
+        return True, ""
+    except Exception as e:
+        logger.error(f"ffmpeg 转换异常: {e}")
+        return False, str(e)
 
 def rms(data):
     import struct
+    # sounddevice 的 read() 返回 numpy 数组，先转成 bytes
+    if hasattr(data, 'tobytes'):
+        data = data.tobytes()
     count = len(data) // 2
     if count == 0:
         return 0
@@ -88,7 +109,6 @@ class AutoRecorderApp:
         # 状态
         self.is_monitoring = False
         self.monitor_thread = None
-        self.p = None
         self.stream = None
 
         # 配置变量（绑定到 UI）
@@ -226,13 +246,12 @@ class AutoRecorderApp:
 
     def _monitor_loop(self):
         try:
-            # 初始化 PyAudio
-            self.p = pyaudio.PyAudio()
+            # 初始化 sounddevice，枚举虚拟音频输入设备
             device_index = None
-            for i in range(self.p.get_device_count()):
-                dev_info = self.p.get_device_info_by_index(i)
-                if dev_info['maxInputChannels'] > 0:
-                    name_lower = dev_info['name'].lower()
+            devices = sd.query_devices()
+            for i, dev_info in enumerate(devices):
+                if dev_info['max_input_channels'] > 0:
+                    name_lower = str(dev_info['name']).lower()
                     if any(kw in name_lower for kw in VIRTUAL_CABLE_KEYWORDS):
                         device_index = i
                         break
@@ -245,19 +264,23 @@ class AutoRecorderApp:
                 self.root.after(0, self._stop_monitoring)
                 return
 
-            self.stream = self.p.open(
-                format=FORMAT,
+            self.stream = sd.InputStream(
+                samplerate=RATE,
                 channels=CHANNELS,
-                rate=RATE,
-                input=True,
-                input_device_index=device_index,
-                frames_per_buffer=CHUNK
+                dtype='int16',
+                device=device_index,
+                blocksize=CHUNK
             )
+            self.stream.start()
 
             # 获取当前参数
             SILENCE_THRESHOLD = self.silence_threshold.get()
             SILENCE_DURATION = self.silence_duration.get()
             MIN_RECORDING_DURATION = self.min_recording_duration.get()
+
+            # 预缓冲：持续保留最近 PRE_ROLL_SECONDS 秒音频，触发时补上开头
+            pre_roll_chunks = max(1, round(PRE_ROLL_SECONDS * RATE / CHUNK))
+            pre_buffer = deque(maxlen=pre_roll_chunks)
 
             recording = False
             frames = []
@@ -268,25 +291,28 @@ class AutoRecorderApp:
 
             while self.is_monitoring:
                 try:
-                    data = self.stream.read(CHUNK, exception_on_overflow=False)
+                    data, _ = self.stream.read(CHUNK)
                 except Exception as e:
                     self._log(f"读取音频流失败: {e}")
                     continue
 
-                volume = rms(data)
+                raw = data.tobytes()
+                pre_buffer.append(raw)
+                volume = rms(raw)
 
                 if volume > SILENCE_THRESHOLD:
                     last_sound_time = time.time()
                     if not recording:
                         recording = True
-                        frames = [data]
+                        # 用预缓冲补上声音开头，避免前几个字丢失
+                        frames = list(pre_buffer)
                         start_time = time.time()
                         self._log("🔊 检测到声音，开始录制...")
                     else:
-                        frames.append(data)
+                        frames.append(raw)
                 else:
                     if recording:
-                        frames.append(data)
+                        frames.append(raw)
                         silence_elapsed = time.time() - last_sound_time
                         if silence_elapsed >= SILENCE_DURATION:
                             duration = time.time() - start_time
@@ -305,10 +331,8 @@ class AutoRecorderApp:
             self._log(f"监听过程中出错: {e}")
         finally:
             if self.stream:
-                self.stream.stop_stream()
+                self.stream.stop()
                 self.stream.close()
-            if self.p:
-                self.p.terminate()
             self.root.after(0, self._stop_monitoring)
 
     def _save_recording(self, frames):
@@ -316,7 +340,7 @@ class AutoRecorderApp:
         try:
             with wave.open(str(TEMP_WAV), 'wb') as wf:
                 wf.setnchannels(CHANNELS)
-                wf.setsampwidth(self.p.get_sample_size(FORMAT))
+                wf.setsampwidth(2)  # int16 = 2 字节
                 wf.setframerate(RATE)
                 wf.writeframes(b''.join(frames))
 
@@ -327,13 +351,14 @@ class AutoRecorderApp:
             mp3_path = export_dir / f"{date_str}-{rand_num}.mp3"
 
             ensure_ffmpeg()
-            if convert_wav_to_mp3(TEMP_WAV, mp3_path):
+            ok, err_msg = convert_wav_to_mp3(TEMP_WAV, mp3_path)
+            if ok:
                 self._log(f"✅ 录音已保存: {mp3_path.name}")
+                if TEMP_WAV.exists():
+                    TEMP_WAV.unlink()
             else:
-                self._log("❌ MP3 转换失败")
-
-            if TEMP_WAV.exists():
-                TEMP_WAV.unlink()
+                self._log(f"❌ MP3 转换失败: {err_msg}")
+                self._log(f"⚠️ WAV 文件已保留: {TEMP_WAV}")
 
         except Exception as e:
             self._log(f"保存录音失败: {e}")
@@ -341,9 +366,9 @@ class AutoRecorderApp:
 # ================== 启动程序 ==================
 if __name__ == "__main__":
     try:
-        import pyaudio
+        import sounddevice
     except ImportError:
-        messagebox.showerror("依赖缺失", "请先安装 pyaudio:\n\npip install pyaudio")
+        messagebox.showerror("依赖缺失", "请先安装 sounddevice:\n\npip install sounddevice")
         exit(1)
 
     root = tk.Tk()

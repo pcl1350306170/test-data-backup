@@ -9,7 +9,7 @@ from datetime import datetime
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, scrolledtext
 from pathlib import Path
-import pyaudio
+import sounddevice as sd
 import wave
 import subprocess
 import shutil
@@ -45,11 +45,14 @@ logging.basicConfig(
 )
 
 # 录音参数
-FORMAT = pyaudio.paInt16
+# FORMAT = pyaudio.paInt16  # sounddevice 使用 dtype='int16'
 CHANNELS = 2
 RATE = 44100
 CHUNK = 1024
 TEMP_WAV = SCRIPT_DIR / "temp_recording.wav"
+
+# ffmpeg 绝对路径（优先，避免 PATH 未刷新导致找不到）
+FFMPEG_PATH = r"D:\dev\ffmpeg\bin\ffmpeg.exe"
 
 
 # ================== 主应用类 ==================
@@ -64,7 +67,6 @@ class AudioRecorderApp:
         self.is_recording = False
         self.audio_thread = None
         self.stream = None
-        self.p = None
         self.start_time = None
 
         # 配置变量
@@ -171,14 +173,13 @@ class AudioRecorderApp:
 
     def _start_recording(self):
         try:
-            self.p = pyaudio.PyAudio()
             # 尝试查找“立体声混音”或默认输入设备
             device_index = None
-            for i in range(self.p.get_device_count()):
-                dev_info = self.p.get_device_info_by_index(i)
-                if dev_info['maxInputChannels'] > 0:
+            devices = sd.query_devices()
+            for i, dev_info in enumerate(devices):
+                if dev_info['max_input_channels'] > 0:
                     # 优先匹配包含 "stereo mix" 或 "what you hear" 的设备（Windows）
-                    name_lower = dev_info['name'].lower()
+                    name_lower = str(dev_info['name']).lower()
                     if any(kw in name_lower for kw in VIRTUAL_CABLE_KEYWORDS):
                         device_index = i
                         break
@@ -193,18 +194,16 @@ class AudioRecorderApp:
                     "4. 启用「立体声混音」并设为默认设备"
                 )
                 self._log("未找到系统声音录制设备", logging.ERROR)
-                return  # ← 直接返回，不启动录音
-                # 若未找到，使用默认输入设备（可能录不到系统声音！）
-                device_index = self.p.get_default_input_device_info()['index']
+                return  # 不启动录音
 
-            self.stream = self.p.open(
-                format=FORMAT,
+            self.stream = sd.InputStream(
+                samplerate=RATE,
                 channels=CHANNELS,
-                rate=RATE,
-                input=True,
-                input_device_index=device_index,
-                frames_per_buffer=CHUNK
+                dtype='int16',
+                device=device_index,
+                blocksize=CHUNK
             )
+            self.stream.start()
 
             self.is_recording = True
             self.start_time = time.time()
@@ -225,8 +224,8 @@ class AudioRecorderApp:
         frames = []
         while self.is_recording:
             try:
-                data = self.stream.read(CHUNK, exception_on_overflow=False)
-                frames.append(data)
+                data, _ = self.stream.read(CHUNK)
+                frames.append(data.tobytes())
             except Exception as e:
                 self._log(f"录音过程中出错: {e}", logging.WARNING)
                 break
@@ -235,7 +234,7 @@ class AudioRecorderApp:
         try:
             with wave.open(str(TEMP_WAV), 'wb') as wf:
                 wf.setnchannels(CHANNELS)
-                wf.setsampwidth(self.p.get_sample_size(FORMAT))
+                wf.setsampwidth(2)  # int16 = 2 字节
                 wf.setframerate(RATE)
                 wf.writeframes(b''.join(frames))
             self._log(f"临时音频已保存: {TEMP_WAV}")
@@ -247,10 +246,8 @@ class AudioRecorderApp:
         self.status_var.set("正在停止...")
 
         if self.stream:
-            self.stream.stop_stream()
+            self.stream.stop()
             self.stream.close()
-        if self.p:
-            self.p.terminate()
 
         # 转换为 MP3
         self.root.after(100, self._convert_to_mp3)
@@ -268,8 +265,12 @@ class AudioRecorderApp:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         mp3_path = os.path.join(export_dir, f"recording_{timestamp}.mp3")
 
-        # 检查 ffmpeg 是否可用
-        if not shutil.which("ffmpeg"):
+        # 检查 ffmpeg 是否可用（优先绝对路径，避免 PATH 未刷新）
+        if os.path.exists(FFMPEG_PATH):
+            ffmpeg = FFMPEG_PATH
+        elif shutil.which("ffmpeg"):
+            ffmpeg = shutil.which("ffmpeg")
+        else:
             self._log("错误: 未找到 ffmpeg，请安装 ffmpeg 并加入系统 PATH！", logging.ERROR)
             messagebox.showerror("依赖缺失", "请先安装 ffmpeg 并确保可在命令行中运行！")
             self._reset_ui()
@@ -279,7 +280,7 @@ class AudioRecorderApp:
         try:
             self._log(f"正在转换为 MP3: {mp3_path}")
             result = subprocess.run([
-                "ffmpeg", "-y",
+                ffmpeg, "-y",
                 "-i", str(TEMP_WAV),
                 "-acodec", "libmp3lame",
                 "-b:a", "192k",
@@ -314,9 +315,9 @@ class AudioRecorderApp:
 if __name__ == "__main__":
     # 检查必要依赖
     try:
-        import pyaudio
+        import sounddevice
     except ImportError:
-        messagebox.showerror("依赖缺失", "请先安装 pyaudio:\n\npip install pyaudio")
+        messagebox.showerror("依赖缺失", "请先安装 sounddevice:\n\npip install sounddevice")
         exit(1)
 
     root = tk.Tk()

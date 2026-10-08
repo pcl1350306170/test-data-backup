@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>本地AI小说服务</title>
+<style>
+:root{--paper:#f6f1e3;--paper2:#fffdf5;--ink:#2b2a26;--soft:#6b675c;--line:#ddd5c2;--accent:#a3352b;--ok:#3d7a4f;--bad:#b03a2e;--warn:#8a6d1f;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;}
+.wrap{max-width:980px;margin:0 auto;padding:16px;}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:14px 4px 12px;border-bottom:2px solid var(--ink);margin-bottom:14px;}
+h1{font-size:21px;letter-spacing:2px;}
+.status{font-size:13px;color:var(--soft);display:flex;align-items:center;gap:6px;}
+.dot{width:9px;height:9px;border-radius:50%;background:#aaa;display:inline-block;}
+.dot.ok{background:var(--ok);}.dot.bad{background:var(--bad);}.dot.run{background:var(--warn);animation:blink 1s infinite;}
+@keyframes blink{50%{opacity:.3}}
+.card{background:var(--paper2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.card h2{font-size:15px;margin-bottom:10px;color:var(--ink);border-left:3px solid var(--accent);padding-left:8px;}
+.row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-bottom:8px;}
+.row label{font-size:13px;color:var(--soft);display:inline-flex;align-items:center;gap:6px;}
+input,select,textarea{padding:6px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:14px;color:var(--ink);font-family:inherit;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+textarea{width:100%;min-height:76px;resize:vertical;}
+.btns{display:flex;flex-wrap:wrap;gap:10px;}
+button{padding:8px 18px;border:none;border-radius:8px;font-size:14px;cursor:pointer;background:#e8e2d2;color:var(--ink);transition:filter .15s;}
+button:hover{filter:brightness(.94);}
+button.primary{background:var(--accent);color:#fff;}
+button:disabled{opacity:.45;cursor:not-allowed;}
+button.small{padding:3px 10px;font-size:12px;}
+.hint{font-size:12px;color:var(--soft);}
+.progress{height:10px;background:#ece5d3;border-radius:6px;overflow:hidden;margin:8px 0;}
+.progress>div{height:100%;background:var(--accent);width:0;transition:width .5s;}
+#logBox{background:#2b2a26;color:#d9d2bf;font-family:Consolas,"Courier New",monospace;font-size:12px;border-radius:8px;padding:10px 12px;max-height:260px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;display:none;}
+.outline-wrap{display:none;margin-top:10px;}
+.outline-wrap h3{font-size:14px;margin:10px 0 4px;}
+.ov{background:#f3eddd;border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+.ov h4{font-size:13px;color:var(--accent);}
+.ov p{font-size:13px;color:var(--soft);margin:2px 0 6px;}
+.ch{font-size:13px;padding:3px 0;border-bottom:1px dashed var(--line);}
+.ch b{color:var(--ink);}
+.ch .st{font-size:12px;color:var(--soft);}
+.ch .st.done{color:var(--ok);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);}
+th{color:var(--soft);font-weight:normal;}
+.msg{font-size:13px;margin-top:8px;}
+.msg.err{color:var(--bad);}
+.msg.ok{color:var(--ok);}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;}
+.modal .box{background:#fffdf5;border-radius:10px;max-width:720px;width:92%;max-height:80vh;display:flex;flex-direction:column;padding:16px;}
+.modal .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.modal pre{flex:1;overflow:auto;white-space:pre-wrap;font-family:"Songti SC","STSong",serif;font-size:15px;line-height:1.9;background:#faf6ea;border-radius:8px;padding:12px;}
+.modal .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;}
+footer{font-size:12px;color:var(--soft);text-align:center;padding:12px 0 24px;}
+@media (max-width:600px){h1{font-size:17px;}button{flex:1;min-width:96px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>本地 AI 服务</h1>
+  <div class="status"><span class="dot" id="dot"></span><span id="statusText">检测中…</span></div>
+</header>
+
+<!-- 模型选择 -->
+<div class="card" style="padding:8px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <label class="hint">写作模型</label>
+  <select id="modelSel" style="min-width:220px"></select>
+  <button class="small" id="btnSwitchModel">切换模型</button>
+  <span class="hint" id="modelMsg" style="max-width:420px"></span>
+  <span class="hint" style="margin-left:auto">切换立即生效：当前进行中的任务不受影响，新任务使用所选模型</span>
+</div>
+
+<!-- 任务恢复 -->
+<div class="card" style="padding:8px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;">
+  <label class="hint">最近任务</label>
+  <select id="jobSel" style="min-width:280px"><option value="">（无历史任务）</option></select>
+  <button class="small" id="btnRestoreJob">恢复显示</button>
+  <span class="hint" id="jobRestoreMsg" style="max-width:420px">网页重开后可在这里找回之前的任务（需服务未重启）</span>
+</div>
+
+<!-- 设置与大纲 -->
+<div class="card">
+  <h2>① 生成大纲</h2>
+  <div class="row">
+    <label>题材 <input id="genre" placeholder="如：都市悬疑 / 仙侠 / 科幻" style="width:180px"></label>
+    <label>风格 <input id="style" placeholder="如：轻松 / 冷峻 / 细腻" style="width:140px"></label>
+    <label>总字数 <input id="totalWords" type="number" value="100000" style="width:90px"></label>
+    <label>每章字数 <input id="chapterChars" type="number" value="2000" style="width:80px"></label>
+  </div>
+  <div class="row"><label>补充要求 <input id="extra" placeholder="可选：主角设定、禁忌、参考作品等" style="flex:1;min-width:200px"></label></div>
+  <div class="btns">
+    <button class="primary" id="btnOutline">生成大纲</button>
+    <button id="btnOutlineStop" disabled>停止大纲</button>
+  </div>
+  <div class="msg" id="outlineMsg"></div>
+  <div class="outline-wrap" id="outlineWrap">
+    <h3 id="outlineTitle"></h3>
+    <div id="outlineBody"></div>
+  </div>
+</div>
+
+<!-- 写作任务 -->
+<div class="card">
+  <h2>② 按大纲写作</h2>
+  <div class="row">
+    <label>书籍
+      <select id="bookSel" style="min-width:220px"><option value="">（先生成大纲）</option></select>
+    </label>
+    <label>从第几章 <input id="startChapter" type="number" value="0" style="width:70px"> <span class="hint">0=从进度自动续写</span></label>
+    <label class="hint" id="bookInfo"></label>
+  </div>
+  <div class="btns">
+    <button class="primary" id="btnWrite">开始写作</button>
+    <button id="btnPause" disabled>暂停</button>
+    <button id="btnResume" disabled>继续</button>
+    <button id="btnStop" disabled>停止</button>
+    <button id="btnRefreshBooks">刷新书籍</button>
+  </div>
+  <div class="progress"><div id="progBar"></div></div>
+  <div class="row"><span class="hint" id="progText"></span></div>
+  <div class="msg" id="jobMsg"></div>
+  <div id="logBox"></div>
+</div>
+
+<!-- 章节管理 -->
+<div class="card">
+  <h2>③ 章节管理</h2>
+  <div class="msg" id="bookMsg"></div>
+  <div style="overflow-x:auto"><table>
+    <thead><tr><th style="width:56px">章</th><th>标题</th><th style="width:90px">状态</th><th style="width:150px">操作</th></tr></thead>
+    <tbody id="chapterTbody"></tbody>
+  </table></div>
+  <div class="btns" style="margin-top:10px"><button id="btnDownload">下载全本 (.txt)</button></div>
+</div>
+
+<footer>数据完全在本机运行 · 局域网访问需防火墙放行端口 · 生成速度约1字/秒，请耐心等待<br>写一章约30~50分钟，建议夜间定时跑，白天人工审稿</footer>
+</div>
+
+<!-- 章节阅读弹窗 -->
+<div class="modal" id="modal">
+  <div class="box">
+    <div class="head"><b id="modalTitle"></b><button class="small" id="modalClose">关闭</button></div>
+    <pre id="modalBody"></pre>
+    <div class="foot"><button class="small" id="modalRewrite">重写本章</button></div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let TOKEN = localStorage.getItem('novel_token') || '';
+let jobId = null, pollTimer = null, books = [];
+
+async function api(path, opts={}){
+  const headers = Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if (TOKEN) headers['X-Auth-Token'] = TOKEN;
+  let resp = await fetch(path, Object.assign({}, opts, {headers}));
+  if (resp.status === 401){
+    const pw = prompt('该服务设置了口令，请输入：');
+    if (pw === null) throw new Error('需要口令');
+    TOKEN = pw; localStorage.setItem('novel_token', TOKEN);
+    headers['X-Auth-Token'] = TOKEN;
+    resp = await fetch(path, Object.assign({}, opts, {headers}));
+  }
+  if (resp.status === 409){
+    const j = await resp.json().catch(()=>({}));
+    throw new Error(j.detail || '任务冲突');
+  }
+  if (!resp.ok){
+    const j = await resp.json().catch(()=>({}));
+    throw new Error(j.detail || ('HTTP '+resp.status));
+  }
+  return resp.json();
+}
+
+/* ---- 状态 ---- */
+async function refreshHealth(){
+  const dot=$('dot'), txt=$('statusText');
+  try{
+    const h = await api('/api/health');
+    dot.className='dot ok';
+    txt.textContent = '服务正常 · 模型 '+h.model + (h.ollama_online?' · Ollama 在线':' · ⚠ Ollama 未运行');
+    if(!h.ollama_online) dot.className='dot bad';
+  }catch(e){
+    dot.className='dot bad';
+    txt.textContent='服务不可用：'+e.message;
+  }
+}
+
+/* ---- 模型切换 ---- */
+async function loadModels(){
+  try{
+    const r = await api('/api/models');
+    const sel = $('modelSel');
+    sel.innerHTML = '';
+    (r.models||[]).forEach(m=>{
+      const op = document.createElement('option');
+      op.value = m; op.textContent = m;
+      sel.appendChild(op);
+    });
+    if(r.current) sel.value = r.current;
+  }catch(e){
+    $('modelMsg').textContent = '读取模型列表失败：'+e.message;
+    $('modelMsg').className = 'msg err';
+  }
+}
+
+async function switchModel(){
+  const m = $('modelSel').value;
+  if(!m) return;
+  try{
+    $('btnSwitchModel').disabled = true;
+    const r = await api('/api/models', {method:'POST', body:JSON.stringify({model:m})});
+    $('modelMsg').textContent = '已切换到 '+r.model+'（已写入 config.json，重启后仍生效）';
+    $('modelMsg').className = 'msg ok';
+    refreshHealth();
+  }catch(e){
+    $('modelMsg').textContent = '切换失败：'+e.message;
+    $('modelMsg').className = 'msg err';
+  }finally{
+    $('btnSwitchModel').disabled = false;
+  }
+}
+
+/* ---- 任务恢复 ---- */
+function saveJobId(id){ localStorage.setItem('novel_job_id', id); }
+async function loadRecentJobs(){
+  try{
+    const r = await api('/api/jobs');
+    const sel = $('jobSel');
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">（选择要恢复的任务）</option>';
+    (r.jobs||[]).forEach(j=>{
+      const op = document.createElement('option');
+      op.value = j.id;
+      const labels={outline:'大纲',novel:'写正文',chapter:'重写章节'};
+      const st={queued:'排队中',running:'运行中',paused:'已暂停',stopped:'已停止',done:'完成',error:'出错'};
+      op.textContent = '['+(labels[j.type]||j.type)+' · '+(st[j.state]||j.state)+'] '+j.created_at+(j.completed?'（'+j.completed+'完成）':'');
+      sel.appendChild(op);
+    });
+    if(prev && [...sel.options].some(o=>o.value===prev)) sel.value = prev;
+  }catch(e){}
+}
+async function restoreJob(){
+  const id = localStorage.getItem('novel_job_id');
+  if(!id) return;
+  try{
+    const j = await api('/api/jobs/'+id);
+    jobId = id;
+    const type = j.type==='outline'?'outline':'novel';
+    renderJob(j, type);
+    if(['queued','running','paused'].includes(j.state)) startPolling(type);
+    else $('jobRestoreMsg').textContent = '上次任务已结束（'+(j.state)+'）';
+  }catch(e){
+    localStorage.removeItem('novel_job_id');
+    $('jobRestoreMsg').textContent = '服务已重启，原任务不在了（已写入的章节文件仍保留）';
+  }
+}
+async function restoreSelectedJob(){
+  const id = $('jobSel').value;
+  if(!id) return;
+  localStorage.setItem('novel_job_id', id);
+  $('jobRestoreMsg').textContent = '';
+  restoreJob();
+}
+
+/* ---- 大纲 ---- */
+async function genOutline(){
+  try{
+    $('outlineMsg').textContent='';
+    $('outlineMsg').className='msg';
+    $('btnOutline').disabled=true; $('btnOutlineStop').disabled=false;
+    const spec = {
+      genre:$('genre').value.trim(),
+      style:$('style').value.trim(),
+      total_words:parseInt($('totalWords').value)||0,
+      chapter_chars:parseInt($('chapterChars').value)||0,
+      extra:$('extra').value.trim(),
+    };
+    if(!spec.genre && !spec.style && !spec.extra) throw new Error('请至少填写题材或补充要求');
+    const r = await api('/api/jobs', {method:'POST', body:JSON.stringify({type:'outline', spec})});
+    jobId = r.job_id; saveJobId(r.job_id);
+    startPolling('outline');
+  }catch(e){
+    $('outlineMsg').textContent='错误：'+e.message;
+    $('outlineMsg').className='msg err';
+    $('btnOutline').disabled=false; $('btnOutlineStop').disabled=true;
+  }
+}
+
+function renderOutline(ov){
+  $('outlineTitle').textContent = '《'+ov.title+'》 · '+ov.genre+' · 目标'+ov.target_words+'字';
+  let html = '<p class="hint">简介：'+esc(ov.synopsis||'')+'</p>';
+  html += '<p class="hint">世界观：'+esc(ov.world||'')+'</p>';
+  if(ov.characters && ov.characters.length){
+    html += '<h3>人物</h3>';
+    ov.characters.forEach(c=>{ html += '<div class="ch"><b>'+esc(c.name)+'</b>（'+esc(c.role||'')+'）：'+esc(c.desc||'')+'</div>'; });
+  }
+  let n=0;
+  (ov.volumes||[]).forEach(v=>{
+    html += '<div class="ov"><h4>卷：'+esc(v.title)+'</h4><p>'+esc(v.summary||'')+'</p>';
+    (v.chapters||[]).forEach(ch=>{
+      n++;
+      html += '<div class="ch"><b>第'+n+'章 '+esc(ch.title)+'</b>：'+esc(ch.points||'')+'<br><span class="st">钩子：'+esc(ch.hook||'')+'</span></div>';
+    });
+    html += '</div>';
+  });
+  $('outlineBody').innerHTML = html;
+  $('outlineWrap').style.display='block';
+}
+
+/* ---- 任务轮询 ---- */
+function startPolling(type){
+  stopPolling();
+  pollTimer = setInterval(async ()=>{
+    try{
+      const j = await api('/api/jobs/'+jobId);
+      renderJob(j, type);
+      if(['done','stopped','error'].includes(j.state)){ stopPolling(); loadRecentJobs(); }
+    }catch(e){ renderJobError(e); stopPolling(); }
+  }, 3000);
+  // 立即刷一次
+  api('/api/jobs/'+jobId).then(j=>{renderJob(j,type);if(['done','stopped','error'].includes(j.state)){stopPolling();loadRecentJobs();}}).catch(renderJobError);
+}
+
+function renderJob(j, type){
+  const labels={queued:'排队中',running:'运行中',paused:'已暂停',stopped:'已停止',done:'完成',error:'出错'};
+  const st = labels[j.state]||j.state;
+  if(type==='outline'){
+    $('outlineMsg').textContent = '大纲任务：'+st + (j.completed>0?'（已完成'+j.completed+'）':'');
+    $('outlineMsg').className = 'msg '+(j.state==='error'?'err':(j.state==='done'?'ok':''));
+    if(j.state==='done'){
+      $('btnOutline').disabled=false; $('btnOutlineStop').disabled=true;
+      loadBooks().then(()=>{
+        const dir = j.result && j.result.book_dir;
+        if(dir){
+          const name = dir.split(/[\\/]/).pop();
+          api('/api/books/'+encodeURIComponent(name)+'/outline').then(renderOutline).catch(()=>{});
+        }
+      });
+    }
+  }else{
+    const total = j.total||0, cur = j.current_chapter||0;
+    const pct = total? Math.round((cur/total)*100) : 0;
+    $('progBar').style.width = pct+'%';
+    $('progText').textContent = st + (total? ' · 第 '+cur+'/'+total+' 章 · '+pct+'%':'');
+    $('btnPause').disabled = !(j.state==='running');
+    $('btnResume').disabled = !(j.state==='paused');
+    $('btnStop').disabled = !(['running','paused'].includes(j.state));
+    $('jobMsg').textContent = '写作任务：'+st;
+    $('jobMsg').className='msg'+(j.state==='error'?' err':(j.state==='done'?' ok':''));
+    if(j.state==='done'){ refreshBookList(); }
+  }
+  $('logBox').style.display='block';
+  $('logBox').textContent = (j.log||[]).join('\n');
+  $('logBox').scrollTop = $('logBox').scrollHeight;
+}
+
+function renderJobError(e){
+  $('jobMsg').textContent='错误：'+e.message;
+  $('jobMsg').className='msg err';
+}
+
+function stopPolling(){ if(pollTimer){clearInterval(pollTimer);pollTimer=null;} }
+
+/* ---- 写作 ---- */
+async function startWrite(){
+  const book = $('bookSel').value;
+  if(!book){ $('jobMsg').textContent='请先选择书籍（需先生成大纲）。'; $('jobMsg').className='msg err'; return; }
+  try{
+    $('jobMsg').textContent='';
+    const r = await api('/api/jobs', {method:'POST', body:JSON.stringify({
+      type:'novel', book, start_chapter:parseInt($('startChapter').value)||0
+    })});
+    jobId=r.job_id; saveJobId(r.job_id); startPolling('novel');
+    $('btnWrite').disabled=true;
+  }catch(e){ $('jobMsg').textContent='错误：'+e.message; $('jobMsg').className='msg err'; }
+}
+
+async function jobAction(action){
+  if(!jobId) return;
+  try{ await api('/api/jobs/'+jobId+'/action', {method:'POST', body:JSON.stringify({action})}); }
+  catch(e){ $('jobMsg').textContent='错误：'+e.message; $('jobMsg').className='msg err'; }
+}
+
+/* ---- 书籍与章节 ---- */
+async function loadBooks(){
+  const r = await api('/api/books');
+  books = r.books;
+  const sel = $('bookSel');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">（选择书籍）</option>';
+  books.forEach(b=>{
+    const op = document.createElement('option');
+    op.value = b.name; op.textContent = '《'+b.title+'》 '+b.completed+'/'+b.total+'章';
+    sel.appendChild(op);
+  });
+  if(books.some(b=>b.name===prev)) sel.value = prev;
+  renderChapterTable();
+  return books;
+}
+
+function renderChapterTable(){
+  const sel = $('bookSel').value;
+  const tb = $('chapterTbody');
+  tb.innerHTML='';
+  const b = books.find(x=>x.name===sel);
+  if(!b){ $('bookInfo').textContent=''; $('bookMsg').textContent='选择书籍后显示章节。'; return; }
+  $('bookInfo').textContent = '《'+b.title+'》 已写 '+b.completed+'/'+b.total+' 章 · 更新于 '+b.updated_at;
+  $('bookMsg').textContent='';
+  for(let i=1;i<=b.total;i++){
+    const ch = b.chapters.find(c=>c.n===i);
+    const tr=document.createElement('tr');
+    tr.innerHTML = '<td>'+i+'</td><td>'+esc(ch?ch.title:'（未写）')+'</td>'+
+      '<td>'+(ch?'<span class="st done">已完成</span>':'<span class="st">未写</span>')+'</td>'+
+      '<td>'+(ch?'<button class="small" data-view="'+i+'">查看</button> <button class="small" data-rw="'+i+'">重写</button>':'')+'</td>';
+    tb.appendChild(tr);
+  }
+}
+
+async function refreshBookList(){
+  await loadBooks();
+  $('btnWrite').disabled=false;
+}
+
+async function viewChapter(n){
+  const book=$('bookSel').value; if(!book) return;
+  try{
+    const r = await api('/api/books/'+encodeURIComponent(book)+'/chapters/'+n);
+    $('modalTitle').textContent = '第'+n+'章 '+r.title;
+    $('modalBody').textContent = r.content.replace(/^#\s.*\n+/,'');
+    $('modal').style.display='flex';
+    $('modal').dataset.book=book; $('modal').dataset.n=n;
+  }catch(e){ alert('读取失败：'+e.message); }
+}
+
+async function rewriteChapter(){
+  const book=$('modal').dataset.book, n=parseInt($('modal').dataset.n);
+  $('modal').style.display='none';
+  try{
+    const r = await api('/api/jobs', {method:'POST', body:JSON.stringify({type:'chapter', book, chapter:n})});
+    jobId=r.job_id; saveJobId(r.job_id); startPolling('novel');
+    $('btnWrite').disabled=true;
+  }catch(e){ alert('错误：'+e.message); }
+}
+
+async function downloadBook(){
+  const book=$('bookSel').value; if(!book){alert('请先选择书籍');return;}
+  try{
+    const resp = await fetch('/api/books/'+encodeURIComponent(book)+'/download', {headers: TOKEN?{'X-Auth-Token':TOKEN}:{}});
+    if(resp.status===401){ alert('需要口令，请刷新后重试'); return; }
+    if(!resp.ok){ const j=await resp.json().catch(()=>({})); alert(j.detail||'下载失败'); return; }
+    const blob = await resp.blob();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    const b = books.find(x=>x.name===book);
+    a.download = (b?b.title:book)+'.txt';
+    a.click(); URL.revokeObjectURL(a.href);
+  }catch(e){ alert('下载失败：'+e.message); }
+}
+
+/* ---- 工具 ---- */
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ---- 事件绑定 ---- */
+$('btnOutline').onclick = genOutline;
+$('btnOutlineStop').onclick = ()=>jobAction('stop');
+$('btnWrite').onclick = startWrite;
+$('btnPause').onclick = ()=>jobAction('pause');
+$('btnResume').onclick = ()=>jobAction('resume');
+$('btnStop').onclick = ()=>jobAction('stop');
+$('btnRefreshBooks').onclick = ()=>refreshBookList();
+$('btnDownload').onclick = downloadBook;
+$('btnSwitchModel').onclick = switchModel;
+$('btnRestoreJob').onclick = restoreSelectedJob;
+$('bookSel').onchange = renderChapterTable;
+$('modalClose').onclick = ()=>$('modal').style.display='none';
+$('modalRewrite').onclick = rewriteChapter;
+$('modal').onclick = e=>{ if(e.target===$('modal')) $('modal').style.display='none'; };
+$('chapterTbody').addEventListener('click', e=>{
+  const v=e.target.dataset.view, rw=e.target.dataset.rw;
+  if(v) viewChapter(parseInt(v));
+  else if(rw){ if(confirm('重写第 '+rw+' 章？将覆盖原内容。')) { rewriteChapterFromList(parseInt(rw)); } }
+});
+async function rewriteChapterFromList(n){
+  const book=$('bookSel').value; if(!book) return;
+  try{
+    const r = await api('/api/jobs', {method:'POST', body:JSON.stringify({type:'chapter', book, chapter:n})});
+    jobId=r.job_id; saveJobId(r.job_id); startPolling('novel'); $('btnWrite').disabled=true;
+  }catch(e){ alert('错误：'+e.message); }
+}
+
+/* ---- 初始化 ---- */
+refreshHealth();
+loadBooks().catch(()=>{});
+loadModels().catch(()=>{});
+restoreJob();
+loadRecentJobs().catch(()=>{});
+setInterval(refreshHealth, 30000);
+</script>
+</body>
+</html>
