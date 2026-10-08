@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>AI 聊天写作 · 本地写作站</title>
+<style>
+:root{--paper:#f6f1e3;--paper2:#fffdf5;--ink:#2b2a26;--ink-soft:#6b675c;--line:#ddd5c2;--accent:#3d7a4f;--accent-soft:#e7f0e9;--ok:#3d7a4f;--bad:#b03a2e;--warn:#c8a24a;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",system-ui,sans-serif;background:var(--paper);color:var(--ink);line-height:1.7;}
+.wrap{max-width:880px;margin:0 auto;padding:16px;}
+header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:16px 4px 12px;border-bottom:2px solid var(--ink);margin-bottom:16px;}
+h1{font-size:22px;letter-spacing:3px;}
+.back{font-size:13px;color:var(--ink-soft);text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;background:#fff;}
+.back:hover{border-color:var(--accent);color:var(--accent);}
+.status{font-size:13px;display:flex;align-items:center;gap:7px;color:var(--ink-soft);}
+.dot{width:9px;height:9px;border-radius:50%;background:#aaa;display:inline-block;flex:none;}
+.dot.ok{background:var(--ok);}.dot.bad{background:var(--bad);}.dot.loading{background:var(--warn);animation:blink 1s infinite;}
+@keyframes blink{50%{opacity:.3}}
+.card{background:var(--paper2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.row{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin-bottom:8px;}
+.row:last-child{margin-bottom:0;}
+.row label{font-size:13px;color:var(--ink-soft);display:inline-flex;align-items:center;gap:6px;}
+select{padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;font-size:14px;color:var(--ink);}
+textarea{width:100%;min-height:110px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:15px;resize:vertical;background:#fff;outline:none;color:var(--ink);}
+textarea:focus{border-color:var(--accent);}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+button{padding:9px 20px;border:none;border-radius:8px;font-size:15px;cursor:pointer;background:#e8e2d2;color:var(--ink);transition:filter .15s;}
+button:hover{filter:brightness(.94);}
+button.primary{background:var(--accent);color:#fff;}
+button:disabled{opacity:.45;cursor:not-allowed;}
+.hint{font-size:12px;color:var(--ink-soft);}
+#log{min-height:200px;max-height:560px;overflow-y:auto;padding:6px 2px;}
+#log .story{font-family:"Songti SC","STSong","SimSun","Noto Serif CJK SC",serif;font-size:16.5px;line-height:2;white-space:pre-wrap;word-break:break-word;}
+.prompt-line{font-size:12px;color:var(--ink-soft);margin:14px 0 2px;border-left:3px solid var(--line);padding-left:8px;word-break:break-word;}
+#log .cur{outline:none;}
+.meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:12px;color:var(--ink-soft);margin-top:10px;}
+.err{color:var(--bad);font-size:13px;margin-top:8px;word-break:break-word;}
+footer{font-size:12px;color:var(--ink-soft);text-align:center;padding:14px 0 24px;}
+@media (max-width:560px){h1{font-size:18px;}button{flex:1;min-width:100px;}}
+@media (prefers-color-scheme: dark){
+:root{--paper:#1c1a16;--paper2:#26231e;--ink:#e8e1d0;--ink-soft:#a39a88;--line:#3d392f;--accent:#5aa676;--accent-soft:#22302a;--ok:#5aa676;--bad:#e07060;--warn:#c8a24a;}
+select,textarea,.back{background:#2c2923;color:var(--ink);}
+button{background:#3a352c;color:var(--ink);}
+button.primary{background:var(--accent);color:#fff;}
+.card{box-shadow:none;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <h1>AI 聊天写作</h1>
+      <a class="back" href="/">← 返回首页</a>
+    </div>
+    <div class="status"><span class="dot" id="dot"></span><span id="statusText">正在检测服务…</span></div>
+  </header>
+
+  <div class="card">
+    <div class="row">
+      <label>模型
+        <select id="model"></select>
+      </label>
+      <label>上下文
+        <select id="numCtx">
+          <option value="4096">4096（省内存）</option>
+          <option value="8192" selected>8192（推荐）</option>
+          <option value="16384">16384（长文）</option>
+          <option value="32768">32768（超长，吃内存）</option>
+        </select>
+      </label>
+      <label>单次长度
+        <select id="maxTokens">
+          <option value="512">512</option>
+          <option value="1024" selected>1024（推荐）</option>
+          <option value="2048">2048</option>
+          <option value="4096">4096</option>
+        </select>
+      </label>
+      <label>温度
+        <input type="range" id="temp" min="0.5" max="1.2" step="0.05" value="0.85" style="width:110px">
+        <span id="tempVal" class="hint">0.85</span>
+      </label>
+    </div>
+    <textarea id="input" placeholder="输入写作指令，例如：&#10;· 写一个都市悬疑小说的开篇，主角是一名夜班出租车司机，800字左右&#10;· 续写上一段情节，制造一个转折&#10;· 为人物的妹妹设计一段出场戏，性格反差要大"></textarea>
+    <div class="row" style="margin-bottom:6px;">
+      <label>预设要求
+        <select id="presetSel" style="min-width:190px;">
+          <option value="">手动输入（不使用预设）</option>
+        </select>
+      </label>
+      <button id="btnSavePreset" style="padding:4px 12px;font-size:12px;">把当前内容存为预设</button>
+      <button id="btnUpdPreset" style="padding:4px 12px;font-size:12px;">更新选中预设</button>
+      <button id="btnDelPreset" style="padding:4px 12px;font-size:12px;">删除选中预设</button>
+    </div>
+    <label style="font-size:13px;color:var(--ink-soft);display:block;margin:4px 0 6px;">整体要求（系统设定：每次对话自动带在最前面，留空则不带；刷新后自动保留）</label>
+    <textarea id="systemPrompt" style="min-height:56px;margin-bottom:4px;font-size:14px;" placeholder="例如：你是一个专业的英语老师，会把我提供的单词做深度解析（词根/词源/常见搭配/近义辨析），并造2个地道例句。"></textarea>
+    <div class="btns">
+      <button class="primary" id="btnWrite">开始写作</button>
+      <button id="btnCont">续写下一段</button>
+      <button id="btnStop" disabled>停止</button>
+      <button id="btnClear">清空</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="log"><span class="hint">写点什么吧。生成过程会实时显示在这里。</span></div>
+    <div class="meta">
+      <span id="wordCount">字数：0</span>
+      <span>
+        <button id="btnCopy" style="padding:4px 12px;font-size:13px">复制全文</button>
+        <button id="btnSave" style="padding:4px 12px;font-size:13px">下载 .txt</button>
+      </span>
+    </div>
+    <div class="err" id="err"></div>
+  </div>
+
+  <footer>请求由本机服务转发到 Ollama，局域网任何设备都可使用 · 首次生成需加载模型，等待稍长属正常</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let messages = [];
+let abortCtrl = null;
+let generating = false;
+let history = [];
+let storyText = '';
+
+function authHeaders(extra){
+  const h = Object.assign({'Content-Type':'application/json'}, extra||{});
+  const t = localStorage.getItem('novel_token');
+  if (t) h['X-Auth-Token'] = t;
+  return h;
+}
+
+/* ---------- 整体要求（system 设定） ---------- */
+function buildMessages(){
+  const sp = $('systemPrompt').value.trim();
+  return sp ? [{role:'system', content: sp}].concat(history) : history;
+}
+$('systemPrompt').value = localStorage.getItem('novel_sys_prompt') || '';
+$('systemPrompt').addEventListener('input', () => {
+  localStorage.setItem('novel_sys_prompt', $('systemPrompt').value);
+});
+
+/* ---------- 预设要求（后端 prompts.json，局域网共享） ---------- */
+let presets = [];
+async function loadPresets(){
+  try{
+    const r = await fetch('/api/prompts', {headers: authHeaders()});
+    const j = await r.json();
+    presets = j.prompts || [];
+    const sel = $('presetSel');
+    sel.innerHTML = '<option value="">手动输入（不使用预设）</option>';
+    presets.forEach(p => {
+      const op = document.createElement('option');
+      op.value = p.id; op.textContent = p.name;
+      sel.appendChild(op);
+    });
+  }catch(e){}
+}
+$('presetSel').addEventListener('change', () => {
+  const p = presets.find(x => x.id === $('presetSel').value);
+  if(p) $('systemPrompt').value = p.content;
+});
+$('btnSavePreset').addEventListener('click', async () => {
+  const content = $('systemPrompt').value.trim();
+  if(!content){ showErr('请先在整体要求框里写内容。'); return; }
+  const name = prompt('给这个预设起个名字（例如：英语老师）：');
+  if(!name) return;
+  try{
+    await fetch('/api/prompts', {method:'POST', headers: authHeaders(), body: JSON.stringify({name: name, content: content})});
+    await loadPresets();
+    showErr('已保存预设：' + name);
+  }catch(e){ showErr('保存失败：' + e.message); }
+});
+$('btnUpdPreset').addEventListener('click', async () => {
+  const id = $('presetSel').value;
+  if(!id){ showErr('先在下拉里选中要更新的预设。'); return; }
+  const content = $('systemPrompt').value.trim();
+  if(!content){ showErr('整体要求框是空的，没有可保存的内容。'); return; }
+  const old = presets.find(x => x.id === id);
+  const name = prompt('更新这个预设的名字（原：' + (old?old.name:'') + '）：', old ? old.name : '');
+  if(name === null) return;
+  try{
+    await fetch('/api/prompts/' + id, {method:'PUT', headers: authHeaders(), body: JSON.stringify({name: name, content: content})});
+    await loadPresets();
+    $('presetSel').value = id;
+    showErr('已更新预设。');
+  }catch(e){ showErr('更新失败：' + e.message); }
+});
+$('btnDelPreset').addEventListener('click', async () => {
+  const id = $('presetSel').value;
+  if(!id){ showErr('先在下拉里选中要删除的预设。'); return; }
+  if(!confirm('确定删除这个预设？')) return;
+  try{
+    await fetch('/api/prompts/' + id, {method:'DELETE', headers: authHeaders()});
+    await loadPresets();
+    showErr('已删除。');
+  }catch(e){ showErr('删除失败：' + e.message); }
+});
+loadPresets();
+
+/* ---------- 服务状态检测 ---------- */
+async function checkStatus(){
+  const dot = $('dot'), txt = $('statusText');
+  dot.className = 'dot loading';
+  txt.textContent = '正在检测服务…';
+  try {
+    const r = await fetch('/api/health', {headers: authHeaders(), signal: AbortSignal.timeout(5000)});
+    const h = await r.json();
+    if (h.ollama_online) {
+      dot.className = 'dot ok';
+      txt.textContent = '服务正常（模型：' + h.model + '）';
+      loadModels();
+    } else {
+      dot.className = 'dot bad';
+      txt.textContent = 'Ollama 未运行，请启动本服务（start.bat 会自动拉起）';
+    }
+  } catch(e) {
+    dot.className = 'dot bad';
+    txt.textContent = '未连接服务：请先启动 start.bat';
+  }
+}
+
+/* ---------- 模型列表 ---------- */
+async function loadModels(){
+  try {
+    const r = await fetch('/api/models', {headers: authHeaders(), signal: AbortSignal.timeout(5000)});
+    const j = await r.json();
+    const sel = $('model');
+    const names = (j.models || []).filter(n => n);
+    if (!names.length) throw new Error('empty');
+    sel.innerHTML = '';
+    names.forEach(n => {
+      const op = document.createElement('option');
+      op.value = n; op.textContent = n;
+      sel.appendChild(op);
+    });
+    if (j.current && names.includes(j.current)) sel.value = j.current;
+    else if (names.includes('mynovel:latest')) sel.value = 'mynovel:latest';
+  } catch(e) {
+    const sel = $('model');
+    if (!sel.options.length) {
+      ['mynovel:latest','qwen2.5:7b'].forEach(n => {
+        const op = document.createElement('option');
+        op.value = n; op.textContent = n;
+        sel.appendChild(op);
+      });
+    }
+  }
+}
+
+/* ---------- 生成 ---------- */
+async function generate(){
+  if (generating) return;
+  const input = $('input').value.trim();
+  if (!input) { showErr('请先输入写作指令。'); return; }
+  history.push({role:'user', content: input});
+  appendPrompt('▶ ' + input);
+  await callModel();
+}
+
+async function continueWriting(){
+  if (generating) return;
+  if (!history.length) { showErr('还没有任何内容，请先「开始写作」。'); return; }
+  history.push({role:'user', content:'请自然地接着上面的内容继续写下一段，保持人设、文风和节奏一致，篇幅与前文单段相当。'});
+  appendPrompt('▶ [续写] 接着上文继续写下一段');
+  await callModel();
+}
+
+async function callModel(){
+  generating = true;
+  $('btnWrite').disabled = $('btnCont').disabled = true;
+  $('btnStop').disabled = false;
+  showErr('');
+
+  const cur = document.createElement('div');
+  cur.className = 'story cur';
+  $('log').appendChild(cur);
+
+  abortCtrl = new AbortController();
+  const payload = {
+    model: $('model').value,
+    messages: buildMessages(),
+    options: {
+      temperature: parseFloat($('temp').value),
+      num_ctx: parseInt($('numCtx').value, 10),
+      num_predict: parseInt($('maxTokens').value, 10)
+    }
+  };
+  try {
+    const resp = await fetch('/api/ollama/chat', {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify(payload),
+      signal: abortCtrl.signal
+    });
+    if (!resp.ok) {
+      let msg = 'HTTP ' + resp.status;
+      try { const j = await resp.json(); msg = (j.detail || j.error || msg); } catch(e){}
+      throw new Error(msg);
+    }
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let buf = '', answer = '';
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, {stream:true});
+      let idx;
+      while ((idx = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, idx).trim();
+        buf = buf.slice(idx + 1);
+        if (!line) continue;
+        try {
+          const obj = JSON.parse(line);
+          const piece = (obj.message && obj.message.content) || '';
+          if (piece) {
+            answer += piece;
+            cur.textContent = answer;
+            updateCount();
+            $('log').scrollTop = $('log').scrollHeight;
+          }
+        } catch(e) { }
+      }
+    }
+    cur.classList.remove('cur');
+    storyText += answer;
+    if (answer) history.push({role:'assistant', content: answer});
+    updateCount();
+  } catch(e) {
+    cur.classList.remove('cur');
+    if (e.name === 'AbortError') {
+      showErr('已停止生成。以上为已生成的部分。');
+      if (cur.textContent.trim()) history.push({role:'assistant', content: cur.textContent});
+    } else {
+      showErr('生成失败：' + e.message);
+    }
+  } finally {
+    generating = false;
+    $('btnWrite').disabled = $('btnCont').disabled = false;
+    $('btnStop').disabled = true;
+    abortCtrl = null;
+  }
+}
+
+/* ---------- 工具函数 ---------- */
+function appendPrompt(text){
+  const div = document.createElement('div');
+  div.className = 'prompt-line';
+  div.textContent = text;
+  $('log').appendChild(div);
+  $('log').scrollTop = $('log').scrollHeight;
+}
+function showErr(t){ $('err').textContent = t; }
+function updateCount(){
+  let n = storyText.replace(/\s/g,'').length;
+  const curEl = document.querySelector('#log .story.cur');
+  if (curEl) n += curEl.textContent.replace(/\s/g,'').length;
+  $('wordCount').textContent = '字数：' + n;
+}
+function getFullText(){
+  let t = '';
+  $('log').childNodes.forEach(node => {
+    if (node.nodeType === 3) t += node.textContent;
+    else if (node.textContent) t += node.textContent + '\n';
+  });
+  return t.trim();
+}
+
+$('btnWrite').addEventListener('click', generate);
+$('btnCont').addEventListener('click', continueWriting);
+$('btnStop').addEventListener('click', () => { if (abortCtrl) abortCtrl.abort(); });
+$('btnClear').addEventListener('click', () => {
+  history = []; storyText = '';
+  $('log').innerHTML = '<span class="hint">写点什么吧。生成过程会实时显示在这里。</span>';
+  $('wordCount').textContent = '字数：0';
+  showErr('');
+});
+$('temp').addEventListener('input', e => { $('tempVal').textContent = parseFloat(e.target.value).toFixed(2); });
+$('btnCopy').addEventListener('click', async () => {
+  const t = getFullText();
+  if (!t) { showErr('还没有内容可复制。'); return; }
+  try { await navigator.clipboard.writeText(t); showErr('已复制全文。'); }
+  catch(e){ showErr('复制失败，请手动选择文本复制。'); }
+});
+$('btnSave').addEventListener('click', () => {
+  const t = getFullText();
+  if (!t) { showErr('还没有内容可保存。'); return; }
+  const blob = new Blob([t], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'novel-' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+checkStatus();
+</script>
+</body>
+</html>

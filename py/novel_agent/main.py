@@ -17,7 +17,7 @@ import datetime
 import requests
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
 from pydantic import BaseModel
 
 import novel_writer as nw
@@ -170,6 +170,103 @@ class ModelChange(BaseModel):
 @app.get("/")
 def index():
     return FileResponse(os.path.join(BASE, "index.html"))
+
+@app.get("/console")
+def console_page():
+    return FileResponse(os.path.join(BASE, "task.html"))
+
+@app.get("/chat")
+def chat_page():
+    return FileResponse(os.path.join(BASE, "chat.html"))
+
+class OllamaChatBody(BaseModel):
+    model: str
+    messages: list
+    options: dict = {}
+
+@app.post("/api/ollama/chat")
+def ollama_chat_proxy(body: OllamaChatBody, request: Request):
+    check_auth(request)
+    ollama = nw.CONFIG["ollama_host"].rstrip("/")
+    payload = {
+        "model": body.model,
+        "messages": body.messages,
+        "stream": True,
+        "options": body.options,
+    }
+    try:
+        r = requests.post(ollama + "/api/chat", json=payload, stream=True, timeout=(30, 300))
+    except Exception as e:
+        raise HTTPException(status_code=502, detail="Ollama 连接失败: %s" % e)
+    def gen():
+        try:
+            for line in r.iter_lines():
+                if line:
+                    yield line + b"\n"
+        finally:
+            r.close()
+    return StreamingResponse(gen(), media_type="application/x-ndjson")
+
+# ---------- 整体要求预设（存 prompts.json，局域网共享） ----------
+PROMPTS_PATH = os.path.join(BASE, "prompts.json")
+
+class PromptItem(BaseModel):
+    name: str
+    content: str
+
+def _load_prompts():
+    if not os.path.exists(PROMPTS_PATH):
+        return []
+    try:
+        with open(PROMPTS_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+def _save_prompts(items):
+    with open(PROMPTS_PATH, "w", encoding="utf-8") as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+
+@app.get("/api/prompts")
+def get_prompts(request: Request):
+    check_auth(request)
+    return {"prompts": _load_prompts()}
+
+@app.post("/api/prompts")
+def add_prompt(item: PromptItem, request: Request):
+    check_auth(request)
+    name = item.name.strip()
+    if not name or not item.content.strip():
+        raise HTTPException(status_code=400, detail="名称和内容不能为空")
+    items = _load_prompts()
+    new = {"id": uuid.uuid4().hex[:8], "name": name, "content": item.content}
+    items.append(new)
+    _save_prompts(items)
+    return {"ok": True, "item": new}
+
+@app.delete("/api/prompts/{pid}")
+def del_prompt(pid: str, request: Request):
+    check_auth(request)
+    items = [x for x in _load_prompts() if x.get("id") != pid]
+    _save_prompts(items)
+    return {"ok": True}
+
+@app.put("/api/prompts/{pid}")
+def upd_prompt(pid: str, item: PromptItem, request: Request):
+    check_auth(request)
+    name = item.name.strip()
+    if not name or not item.content.strip():
+        raise HTTPException(status_code=400, detail="名称和内容不能为空")
+    items = _load_prompts()
+    for x in items:
+        if x.get("id") == pid:
+            x["name"] = name
+            x["content"] = item.content
+            break
+    else:
+        raise HTTPException(status_code=404, detail="预设不存在")
+    _save_prompts(items)
+    return {"ok": True}
 
 
 # ---------------------------------------------------------------- API
