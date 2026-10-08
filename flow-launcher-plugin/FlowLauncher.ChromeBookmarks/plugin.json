@@ -1,0 +1,13 @@
+{
+    "ID": "A1B2C3D4E5F647889900112233445566",
+    "ActionKeyword": "bm",
+    "Name": "Chrome Bookmarks",
+    "Description": "快速搜索和打开 Chrome 浏览器书签，支持模糊匹配",
+    "Author": "PCL",
+    "Version": "1.0.0",
+    "Language": "python",
+    "Website": "https://github.com/Flow-Launcher/Flow.Launcher",
+    "IcoPath": "Images\\icon.png",
+    "ExecuteFileName": "main.py",
+    "MinimumAppVersion": "1.8.0"
+}
