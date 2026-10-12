@@ -258,13 +258,102 @@
     }
 
     // ==============================
+    // 读取当前页面的登录 token（Sa-Token / RuoYi-Vue-Plus）
+    // 页面业务接口通过 axios 拦截器自动附加 Authorization 头，
+    // 而本插件用原生 fetch 调用，绕过了拦截器，需手动从页面存储中
+    // 读取 token 并附加，否则服务端会返回“登录已过期，请重新登录”。
+    // ==============================
+    const TOKEN_KEYS = ['Admin-Token', 'Login-Token', 'token', 'access_token', 'accessToken', 'Authorization', 'satoken'];
+
+    // 从 storage / cookie 按已知键名读取 token
+    function readTokenByKey() {
+        const readStore = (store) => {
+            if (!store) return '';
+            for (const k of TOKEN_KEYS) {
+                try {
+                    const v = store.getItem(k);
+                    if (v) return v;
+                } catch (e) { /* ignore */ }
+            }
+            return '';
+        };
+        const readCookie = () => {
+            try {
+                for (const part of document.cookie.split(';')) {
+                    const idx = part.indexOf('=');
+                    if (idx === -1) continue;
+                    const name = part.slice(0, idx).trim();
+                    const val = decodeURIComponent(part.slice(idx + 1).trim());
+                    if (TOKEN_KEYS.includes(name) && val) return val;
+                }
+            } catch (e) { /* ignore */ }
+            return '';
+        };
+        return readStore(window.localStorage) || readStore(window.sessionStorage) || readCookie();
+    }
+
+    // 兜底：扫描 storage 里任意像 JWT(eyJ...) 的值
+    function scanJwtToken() {
+        const scan = (store) => {
+            if (!store) return '';
+            try {
+                for (let i = 0; i < store.length; i++) {
+                    const v = store.getItem(store.key(i));
+                    const m = v && v.match(/eyJ[\w-]+\.[\w-]+\.[\w-]+/);
+                    if (m) return m[0];
+                }
+            } catch (e) { /* ignore */ }
+            return '';
+        };
+        return scan(window.localStorage) || scan(window.sessionStorage);
+    }
+
+    function getStoredToken() {
+        let raw = readTokenByKey() || scanJwtToken();
+        if (!raw) return '';
+        raw = raw.replace(/^"|"$/g, '').trim();          // 去掉可能的 JSON 引号包装
+        const m = raw.match(/eyJ[\w-]+\.[\w-]+\.[\w-]+/); // 提取纯 JWT
+        return m ? m[0] : raw;
+    }
+
+    // 获取 clientid：优先读存储，其次从 JWT payload 解析
+    function getClientId(jwt) {
+        const readStore = (store) => {
+            if (!store) return '';
+            try { return store.getItem('clientid') || store.getItem('clientId') || ''; } catch (e) { return ''; }
+        };
+        const cid = readStore(window.localStorage) || readStore(window.sessionStorage);
+        if (cid) return cid;
+        try {
+            const payload = jwt.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            const json = JSON.parse(atob(payload));
+            if (json.clientid) return json.clientid;
+        } catch (e) { /* ignore */ }
+        return '';
+    }
+
+    // 构造带鉴权信息的请求头
+    function getPageAuthHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+        const token = getStoredToken();
+        if (token) {
+            headers['Authorization'] = 'Bearer ' + token;
+            const cid = getClientId(token);
+            if (cid) headers['clientid'] = cid;
+        } else {
+            console.warn('[Ward] 未能从页面存储中获取登录 token，接口可能返回“登录已过期”，请确认当前页面已登录');
+        }
+        return headers;
+    }
+
+    // ==============================
     // 调用当前页面服务的接口（通用）
     // ==============================
     async function callPageApi(path, data) {
         const apiUrl = url.origin + path;
         const response = await fetch(apiUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getPageAuthHeaders(),
             body: JSON.stringify(data)
         });
         const res = await response.json();
@@ -283,7 +372,7 @@
         const apiUrl = url.origin + path + (query ? '?' + query : '');
         const response = await fetch(apiUrl, {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: getPageAuthHeaders()
         });
         const res = await response.json();
         if (res.status === 200) {
@@ -710,8 +799,10 @@
             <div class="ward-dialog-body">
                 <div class="ward-form-row">
                     <div class="ward-form-group">
-                        <label>科室ID (deptId)</label>
-                        <input type="text" name="deptId" value="${defaultDeptId}" placeholder="从 localStorage 自动获取">
+                        <label>科室 (deptId)</label>
+                        <select name="deptId">
+                            <option value="">⏳ 正在加载科室...</option>
+                        </select>
                     </div>
                     <div class="ward-form-group">
                         <label>设备类型</label>
@@ -739,6 +830,35 @@
         overlay.addEventListener('click', () => overlay.remove());
         dialog.querySelector('.ward-dialog-close').addEventListener('click', () => overlay.remove());
 
+        // 拉取科室列表并填充下拉框（支持多级科室，子科室缩进展示）
+        const flattenDepts = (list, depth = 0, out = []) => {
+            for (const d of (list || [])) {
+                out.push({ deptId: d.deptId, deptName: d.deptName, depth });
+                if (d.children && d.children.length) flattenDepts(d.children, depth + 1, out);
+            }
+            return out;
+        };
+        (async () => {
+            const deptSelect = dialog.querySelector('select[name="deptId"]');
+            try {
+                const res = await callPageApiGet('/ifms/web-org/depts');
+                const depts = flattenDepts((res.data && res.data.list) || []);
+                if (!depts.length) {
+                    deptSelect.innerHTML = '<option value="">（无科室数据）</option>';
+                    return;
+                }
+                deptSelect.innerHTML = depts.map(d =>
+                    `<option value="${d.deptId}"${d.deptId === defaultDeptId ? ' selected' : ''}>${'　'.repeat(d.depth)}${d.deptName}</option>`
+                ).join('');
+                // localStorage 中的 deptId 未命中列表时，默认选中第一个
+                if (defaultDeptId && !depts.some(d => d.deptId === defaultDeptId)) {
+                    deptSelect.value = depts[0].deptId;
+                }
+            } catch (e) {
+                deptSelect.innerHTML = `<option value="">❌ 加载失败：${e.message}</option>`;
+            }
+        })();
+
         // 存储匹配数据
         let matchedItems = [];
         let DataPatient = null;
@@ -746,8 +866,8 @@
 
         // 查询
         dialog.querySelector('.ward-query-btn').addEventListener('click', async () => {
-            const deptId = dialog.querySelector('input[name="deptId"]').value.trim();
-            if (!deptId) { showToast('❌ 请输入科室ID', 'error'); return; }
+            const deptId = dialog.querySelector('select[name="deptId"]').value.trim();
+            if (!deptId) { showToast('❌ 请选择科室', 'error'); return; }
             const deviceType = dialog.querySelector('select[name="deviceType"]').value;
 
             const matchEl = dialog.querySelector('.ward-mock-match');
@@ -1062,7 +1182,7 @@
                 <div class="ward-section-title">设备配置</div>
                 <div class="ward-form-row">
                     <div class="ward-form-group"><label>机构ID</label><div style="display:flex;gap:6px;align-items:center"><input type="text" name="orgId" value="${orgId}" placeholder="从 localStorage 自动获取" style="flex:1"><button type="button" class="ward-fetch-org-btn" style="white-space:nowrap;padding:4px 10px;font-size:12px">获取</button></div><span class="ward-hint" id="ward-org-status">${orgId ? '✅ 已从 localStorage 获取' : '⚠️ 未获取到，可点击获取或手动填写'}</span></div>
-                    <div class="ward-form-group"><label>科室ID（可选）</label><input type="text" name="deptId" value="${defaultDeptId}" placeholder="从 localStorage dataDeptInfoList 自动获取"></div>
+                    <div class="ward-form-group"><label>科室（可选）</label><select name="deptId"><option value="">⏳ 正在加载科室...</option></select></div>
                 </div>
                 <div class="ward-form-row">
                     <div class="ward-form-group"><label>设备类型</label><select name="deviceType">${deviceTypeOptions}</select></div>
@@ -1106,6 +1226,28 @@
         dialog.querySelector('textarea[name="versionsJson"]').value = defaultVersions;
         dialog.querySelector('textarea[name="paramsJson"]').value = defaultParams;
         dialog.querySelector('textarea[name="positionsJson"]').value = defaultPositions;
+
+        // 拉取科室列表填充下拉框（科室为可选，含“不指定”项；多级科室子项缩进展示）
+        const flattenDepts = (list, depth = 0, out = []) => {
+            for (const d of (list || [])) {
+                out.push({ deptId: d.deptId, deptName: d.deptName, depth });
+                if (d.children && d.children.length) flattenDepts(d.children, depth + 1, out);
+            }
+            return out;
+        };
+        (async () => {
+            const deptSelect = dialog.querySelector('select[name="deptId"]');
+            const emptyOpt = '<option value="">（不指定科室）</option>';
+            try {
+                const res = await callPageApiGet('/ifms/web-org/depts');
+                const depts = flattenDepts((res.data && res.data.list) || []);
+                deptSelect.innerHTML = emptyOpt + depts.map(d =>
+                    `<option value="${d.deptId}"${d.deptId === defaultDeptId ? ' selected' : ''}>${'　'.repeat(d.depth)}${d.deptName}</option>`
+                ).join('');
+            } catch (e) {
+                deptSelect.innerHTML = emptyOpt + `<option value="">❌ 加载失败：${e.message}</option>`;
+            }
+        })();
 
         // 设备类型切换时更新名称前缀
         const deviceTypeSelect = dialog.querySelector('select[name="deviceType"]');
@@ -1279,7 +1421,7 @@
             if (!formData.serverIp) { showToast('❌ 请输入服务器IP', 'error'); return; }
             if (!formData.orgId) { showToast('❌ 请输入机构ID', 'error'); return; }
             if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(formData.startIp)) { showToast('❌ 起始IP格式不正确', 'error'); return; }
-            if (formData.deviceType === 'bnNursingTV' && !formData.deptId) { showToast('❌ 护理看板需要科室ID，请确认 localStorage 存在 dataDeptInfoList 或手动填写', 'error'); return; }
+            if (formData.deviceType === 'bnNursingTV' && !formData.deptId) { showToast('❌ 护理看板需要科室，请从下拉框选择科室', 'error'); return; }
 
             const btn = dialog.querySelector('.ward-submit-btn');
             const progressDiv = dialog.querySelector('.ward-device-progress');

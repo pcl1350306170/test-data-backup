@@ -227,7 +227,7 @@ class BrowserWindow(DraggableFramelessWindow):
             self.setFixedSize(config["width"], config["height"])
         else:
             self.resize(config["width"], config["height"])
-            self.setMinimumSize(400, 200)
+            self.setMinimumSize(1, 1)
 
         # 加载 URL
         self.web_view.setUrl(QUrl(config["url"]))
