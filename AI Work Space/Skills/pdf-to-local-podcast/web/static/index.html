@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>本地播客制作系统</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header id="header">
+    <div class="logo">🎙️ 本地播客制作系统</div>
+    <nav id="tabs">
+      <button class="tab active" data-tab="scripts">📄 脚本</button>
+      <button class="tab" data-tab="voices">🎤 音色</button>
+      <button class="tab" data-tab="task">⚡ 任务</button>
+      <button class="tab" data-tab="player">🎵 成品</button>
+      <button class="tab" data-tab="settings">⚙️ 设置</button>
+    </nav>
+  </header>
+
+  <main id="content">
+    <!-- ═══ 脚本管理 ═══ -->
+    <section id="tab-scripts" class="tab-content active">
+      <div class="panel-toolbar">
+        <button id="btn-new-script" class="btn btn-primary">+ 新建</button>
+        <button id="btn-upload-script" class="btn">📤 上传</button>
+        <input type="file" id="input-upload-script" accept=".md" hidden>
+        <button id="btn-delete-script" class="btn btn-danger">🗑️ 删除</button>
+        <span class="toolbar-sep"></span>
+        <button id="btn-parse-script" class="btn btn-info">📊 预解析</button>
+        <button id="btn-send-task" class="btn btn-success">🚀 发送到任务</button>
+      </div>
+      <div class="split-view">
+        <div class="split-left">
+          <div id="script-list" class="file-list"></div>
+        </div>
+        <div class="split-right">
+          <div id="parse-result" class="info-box" style="display:none"></div>
+          <textarea id="script-editor" placeholder="选择或新建一个脚本文件..." spellcheck="false"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 音色管理 ═══ -->
+    <section id="tab-voices" class="tab-content">
+      <div class="panel-toolbar">
+        <button id="btn-scan-voices" class="btn btn-primary">🔍 扫描 TTS 目录</button>
+        <button id="btn-add-voice" class="btn">+ 手动注册</button>
+      </div>
+      <div id="voice-list" class="card-grid"></div>
+
+      <!-- 扫描结果弹窗 -->
+      <div id="scan-modal" class="modal" style="display:none">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>未注册的音频文件</h3>
+            <button class="modal-close" onclick="App.closeModal('scan-modal')">&times;</button>
+          </div>
+          <div id="scan-results" class="modal-body"></div>
+        </div>
+      </div>
+
+      <!-- 手动注册弹窗 -->
+      <div id="voice-modal" class="modal" style="display:none">
+        <div class="modal-content modal-sm">
+          <div class="modal-header">
+            <h3>注册新音色</h3>
+            <button class="modal-close" onclick="App.closeModal('voice-modal')">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>音色名称</label>
+              <input type="text" id="voice-name" placeholder="如：小美">
+            </div>
+            <div class="form-group">
+              <label>参考音频</label>
+              <select id="voice-audio-file"></select>
+            </div>
+            <div class="form-group">
+              <label>声音类型</label>
+              <select id="voice-type">
+                <option value="男声">男声</option>
+                <option value="女声">女声</option>
+                <option value="男童">男童</option>
+                <option value="女童">女童</option>
+                <option value="童声">童声</option>
+                <option value="未知">未知</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>prompt_text（音频原文）</label>
+              <textarea id="voice-prompt-text" rows="2" placeholder="留空使用默认值"></textarea>
+            </div>
+            <button id="btn-confirm-add-voice" class="btn btn-primary btn-block">确认注册</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 任务控制 ═══ -->
+    <section id="tab-task" class="tab-content">
+      <div class="task-config">
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>选择脚本</label>
+            <select id="task-script"><option value="">-- 请选择 --</option></select>
+          </div>
+          <div class="form-group">
+            <label>输出文件名</label>
+            <input type="text" id="task-output-name" placeholder="自动取脚本书名">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>BGM 文件</label>
+            <div class="bgm-picker">
+              <select id="task-bgm"><option value="">-- 无 BGM --</option></select>
+              <button id="btn-upload-bgm" class="btn btn-sm">📤 上传</button>
+              <input type="file" id="input-upload-bgm" accept="audio/*" hidden>
+            </div>
+          </div>
+          <div class="form-group" id="bgm-volume-group" style="display:none">
+            <label>BGM 音量: <span id="bgm-volume-val">30</span></label>
+            <input type="range" id="task-bgm-volume" min="0" max="100" value="30">
+          </div>
+        </div>
+        <details class="advanced-toggle">
+          <summary>高级参数</summary>
+          <div class="form-row">
+            <div class="form-group">
+              <label>目标响度 (LUFS)</label>
+              <input type="number" id="task-lufs" value="-16" step="1">
+            </div>
+            <div class="form-group">
+              <label>块间静音 (ms)</label>
+              <input type="number" id="task-gap-ms" value="400" step="50">
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="task-actions">
+        <button id="btn-start-task" class="btn btn-success btn-lg">▶ 开始生成</button>
+        <button id="btn-pause-task" class="btn btn-warning" style="display:none">⏸ 暂停</button>
+        <button id="btn-resume-task" class="btn btn-success" style="display:none">▶ 继续</button>
+        <button id="btn-cancel-task" class="btn btn-danger" disabled>⏹ 停止</button>
+        <button id="btn-retry-task" class="btn btn-warning" style="display:none">🔄 重试失败块</button>
+      </div>
+
+      <div id="task-progress" class="progress-section" style="display:none">
+        <div class="progress-bar-wrap">
+          <div id="progress-bar" class="progress-bar" style="width:0%"></div>
+        </div>
+        <div class="progress-info">
+          <span id="progress-text">0/0</span>
+          <span id="progress-percent">0%</span>
+          <span id="progress-eta"></span>
+        </div>
+        <div id="current-block" class="current-block"></div>
+      </div>
+
+      <div id="block-list" class="block-list"></div>
+    </section>
+
+    <!-- ═══ 成品管理 ═══ -->
+    <section id="tab-player" class="tab-content">
+      <div class="panel-toolbar">
+        <button id="btn-refresh-podcasts" class="btn">🔄 刷新</button>
+        <button id="btn-clean-audio" class="btn btn-danger">🧹 清理中间产物</button>
+      </div>
+      <div id="podcast-list" class="podcast-list"></div>
+    </section>
+
+    <!-- ═══ 设置 ═══ -->
+    <section id="tab-settings" class="tab-content">
+      <div class="settings-form">
+        <h3>目录配置</h3>
+        <div class="form-group">
+          <label>脚本扫描目录（每行一个）</label>
+          <textarea id="cfg-script-dirs" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>成品输出目录</label>
+          <input type="text" id="cfg-output-dir">
+        </div>
+        <div class="form-group">
+          <label>中间产物目录（wav）</label>
+          <input type="text" id="cfg-audio-dir">
+        </div>
+        <div class="form-group">
+          <label>TTS 参考音频目录</label>
+          <input type="text" id="cfg-tts-dir">
+        </div>
+        <details class="advanced-toggle">
+          <summary>CosyVoice 环境（一般不需修改）</summary>
+          <div class="form-group">
+            <label>Conda Python 路径</label>
+            <input type="text" id="cfg-conda-python">
+          </div>
+          <div class="form-group">
+            <label>模型目录</label>
+            <input type="text" id="cfg-model-dir">
+          </div>
+          <div class="form-group">
+            <label>仓库目录</label>
+            <input type="text" id="cfg-repo-dir">
+          </div>
+          <div class="form-group">
+            <label>Worker 脚本路径</label>
+            <input type="text" id="cfg-worker-script">
+          </div>
+        </details>
+        <button id="btn-save-config" class="btn btn-primary">💾 保存配置</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 全局通知 -->
+  <div id="toast" class="toast"></div>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/scripts.js"></script>
+  <script src="/static/js/voices.js"></script>
+  <script src="/static/js/task.js"></script>
+  <script src="/static/js/player.js"></script>
+</body>
+</html>

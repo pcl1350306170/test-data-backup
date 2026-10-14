@@ -113,6 +113,17 @@
                 "头像"
             ],
             "path": "D:\\CODE\\Miscellaneous\\GPT-IMG\\头像"
+        },
+        {
+            "name": "本地AI播客制作任务启动器",
+            "keywords": [
+                "播客",
+                "podcast",
+                "AI",
+                "TTS",
+                "语音"
+            ],
+            "path": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\Skills\\pdf-to-local-podcast\\web\\start.bat"
         }
     ]
 }
