@@ -33,20 +33,65 @@
         return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
     }
 
-    // ===== 解析 Raw Headers =====
-    function parseRawHeaders(rawStr) {
-        const headers = {};
-        if (!rawStr || !rawStr.trim()) return headers;
-        rawStr.trim().split('\n').forEach(line => {
-            const idx = line.indexOf(':');
-            if (idx > 0) {
-                const key = line.substring(0, idx).trim();
-                const value = line.substring(idx + 1).trim();
-                if (key && value) headers[key] = value;
-            }
-        });
-        return headers;
+    // ===== 自动从 localStorage 获取 Token 并构建请求头 =====
+    const CLIENT_ID = 'e5cd7e4891bf95d1d19206ce24a7b32e';
+
+    function getTokenFromPage() {
+        // web 项目通过 useStorage('Admin-Token') 存储 token，底层是 localStorage
+        const raw = localStorage.getItem('Admin-Token');
+        if (!raw) return null;
+        // useStorage 存储的值带双引号，需要去除
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return raw;
+        }
     }
+
+    function buildAutoHeaders() {
+        const token = getTokenFromPage();
+        if (!token) return null;
+        return {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json;charset=UTF-8',
+            'clientid': CLIENT_ID
+        };
+    }
+
+    // ===== 拦截 XHR 请求，自动捕获模拟挂号参数 =====
+    const REGISTER_API_PATTERN = '/api/qcss/register/made';
+
+    (function interceptXHR() {
+        const originalOpen = XMLHttpRequest.prototype.open;
+        const originalSend = XMLHttpRequest.prototype.send;
+
+        XMLHttpRequest.prototype.open = function (method, url, ...args) {
+            this._tple_url = url;
+            this._tple_method = method;
+            return originalOpen.call(this, method, url, ...args);
+        };
+
+        XMLHttpRequest.prototype.send = function (body) {
+            if (
+                this._tple_method === 'POST' &&
+                this._tple_url &&
+                this._tple_url.includes(REGISTER_API_PATTERN) &&
+                body
+            ) {
+                try {
+                    const parsed = JSON.parse(body);
+                    // 格式化存储
+                    const formatted = JSON.stringify(parsed, null, 2);
+                    chrome.storage.local.set({ tple_request_body: formatted });
+                    showToast('✅ 已捕获模拟挂号参数，自动填充到批量挂号面板', 'success');
+                    console.log('[TPLE] 捕获到挂号请求参数:', parsed);
+                } catch (e) {
+                    console.warn('[TPLE] 解析挂号请求体失败:', e);
+                }
+            }
+            return originalSend.call(this, body);
+        };
+    })();
 
     // ===== Toast 提示 =====
     function showToast(message, type) {
@@ -346,14 +391,8 @@
     }
 
     // ==============================
-    // 功能 3：模拟批量挂号（手动输入 Headers + Body）
+    // 功能 3：模拟批量挂号（自动获取 Token）
     // ==============================
-    const DEFAULT_RAW_HEADERS = `POST /clinic/api/qcss/register/made HTTP/1.1
-Accept: application/json, text/plain, */*
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9
-Content-Type: application/json;charset=UTF-8
-clientid: e5cd7e4891bf95d1d19206ce24a7b32e`;
-
     const DEFAULT_BODY = JSON.stringify({
         "hasBook": 1,
         "registerTime": "2026-07-30 17:19:00",
@@ -374,15 +413,20 @@ clientid: e5cd7e4891bf95d1d19206ce24a7b32e`;
 
         const apiUrl = `${url.protocol}//${url.host}${config.batchApiPath}`;
 
-        // 从 storage 读取上次使用的 headers 和 body
-        chrome.storage.local.get(['tple_raw_headers', 'tple_request_body'], (result) => {
-            const savedHeaders = result.tple_raw_headers || DEFAULT_RAW_HEADERS;
+        // 从 storage 读取上次使用的 body
+        chrome.storage.local.get(['tple_request_body'], (result) => {
             const savedBody = result.tple_request_body || DEFAULT_BODY;
-            buildPanel(config, apiUrl, savedHeaders, savedBody);
+            buildPanel(config, apiUrl, savedBody);
         });
     }
 
-    function buildPanel(config, apiUrl, savedHeaders, savedBody) {
+    function buildPanel(config, apiUrl, savedBody) {
+        // 检测当前页面是否已登录（能否获取到 token）
+        const token = getTokenFromPage();
+        const tokenStatusHtml = token
+            ? `<span style="color:#2E7D32">✅ 已检测到登录状态，Token 将自动获取</span>`
+            : `<span style="color:#c62828">⚠️ 未检测到 Token，请先登录系统</span>`;
+
         const panel = document.createElement('div');
         panel.id = 'tple-batch-panel';
         panel.innerHTML = `
@@ -396,6 +440,7 @@ clientid: e5cd7e4891bf95d1d19206ce24a7b32e`;
             <div class="panel-body">
                 <label>接口地址</label>
                 <input type="text" id="tple-batch-url" value="${apiUrl}" readonly>
+                <div class="tple-token-status">${tokenStatusHtml}</div>
                 <div class="panel-row">
                     <div>
                         <label>调用次数</label>
@@ -410,10 +455,8 @@ clientid: e5cd7e4891bf95d1d19206ce24a7b32e`;
                         <input type="text" id="tple-batch-dynamic" value="patientName,patientIdNo">
                     </div>
                 </div>
-                <label>📤 请求头 (Raw 格式，从 DevTools Network 复制)</label>
-                <textarea id="tple-raw-headers" rows="6" placeholder="粘贴完整 Request Headers...">${savedHeaders}</textarea>
                 <label>📥 请求体 (JSON)</label>
-                <textarea id="tple-raw-body" rows="8" placeholder="粘贴 JSON 请求体...">${savedBody}</textarea>
+                <textarea id="tple-raw-body" rows="10" placeholder="粘贴 JSON 请求体...">${savedBody}</textarea>
                 <button class="panel-btn" id="tple-batch-start">🚀 开始批量挂号</button>
                 <div class="tple-progress-bar" id="tple-batch-progress" style="display:none">
                     <div class="tple-progress-fill" id="tple-batch-progress-fill"></div>
@@ -432,30 +475,23 @@ clientid: e5cd7e4891bf95d1d19206ce24a7b32e`;
         // 保存配置
         panel.querySelector('#tple-save-config').addEventListener('click', (e) => {
             e.stopPropagation();
-            const rawHeaders = panel.querySelector('#tple-raw-headers').value;
             const rawBody = panel.querySelector('#tple-raw-body').value;
-            chrome.storage.local.set({ tple_raw_headers: rawHeaders, tple_request_body: rawBody });
+            chrome.storage.local.set({ tple_request_body: rawBody });
             showToast('✅ 配置已保存', 'success');
         });
 
         // 开始批量挂号
         panel.querySelector('#tple-batch-start').addEventListener('click', (e) => {
             e.stopPropagation();
-            const rawHeadersStr = panel.querySelector('#tple-raw-headers').value.trim();
             const bodyStr = panel.querySelector('#tple-raw-body').value.trim();
             const times = parseInt(panel.querySelector('#tple-batch-times').value) || 10;
             const startId = parseInt(panel.querySelector('#tple-batch-start-id').value) || 1;
             const dynamicFields = panel.querySelector('#tple-batch-dynamic').value || 'patientName,patientIdNo';
 
-            if (!rawHeadersStr) {
-                showToast('❌ 请粘贴请求头', 'error');
-                return;
-            }
-
-            // 解析 headers
-            const headers = parseRawHeaders(rawHeadersStr);
-            if (Object.keys(headers).length === 0) {
-                showToast('❌ 未解析到有效 Headers，请检查格式', 'error');
+            // 自动构建请求头
+            const headers = buildAutoHeaders();
+            if (!headers) {
+                showToast('❌ 未检测到 Token，请先登录系统后再试', 'error');
                 return;
             }
 
@@ -469,7 +505,7 @@ clientid: e5cd7e4891bf95d1d19206ce24a7b32e`;
             }
 
             // 自动保存
-            chrome.storage.local.set({ tple_raw_headers: rawHeadersStr, tple_request_body: bodyStr });
+            chrome.storage.local.set({ tple_request_body: bodyStr });
 
             executeBatchRegister(apiUrl, headers, templateBody, times, startId, dynamicFields, panel);
         });
@@ -488,16 +524,11 @@ clientid: e5cd7e4891bf95d1d19206ce24a7b32e`;
         resultLog.style.display = 'block';
         resultLog.innerHTML = '';
 
-        // 确保 Content-Type
-        if (!Object.keys(headers).some(k => k.toLowerCase() === 'content-type')) {
-            headers['Content-Type'] = 'application/json;charset=UTF-8';
-        }
-
         const fields = dynamicFields.split(',').map(f => f.trim());
         let successCount = 0;
 
         console.log('[TPLE] 批量挂号开始:', { apiUrl, times, startId, headerCount: Object.keys(headers).length });
-        addResultItem(resultLog, `📋 发起 ${times} 次请求 | Headers: ${Object.keys(headers).length} 个字段`, 'info');
+        addResultItem(resultLog, `📋 发起 ${times} 次请求 | Token: 自动获取 ✅`, 'info');
 
         for (let i = 0; i < times; i++) {
             const body = { ...templateBody };

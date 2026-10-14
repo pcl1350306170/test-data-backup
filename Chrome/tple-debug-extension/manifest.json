@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "门诊 web 调试页面加载",
   "version": "2.0",
-  "description": "在 7000 端口项目页面添加调试工具菜单，支持打开调试页面、复制localStorage、模拟批量挂号（手动输入Headers和参数）",
+  "description": "在 7000 端口项目页面添加调试工具菜单，支持打开调试页面、复制localStorage、模拟批量挂号（自动获取Token）",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
