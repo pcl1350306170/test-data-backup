@@ -34,13 +34,136 @@ except Exception:
         def debug(self, *a, **kw): pass
     logger = _DummyLogger()
 
-# ---------- 音频处理（可选依赖） ----------
+# ---------- 音频处理（可选依赖，仅用于兼容旧接口） ----------
 try:
     from pydub import AudioSegment
 except Exception:
     AudioSegment = None
 
 _NO_WINDOW = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+
+# 统一的目标音频参数（所有输入都会被规范化到此参数，避免拼接时参数不一致）
+_TARGET_SAMPLE_RATE = 44100
+_TARGET_CHANNELS = 2
+
+
+def _ffprobe_duration(filepath):
+    """通过 ffprobe 快速获取音频时长（秒），不解码音频数据"""
+    result = subprocess.run(
+        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
+         "-of", "csv=p=0", filepath],
+        capture_output=True, encoding="utf-8", errors="replace",
+        creationflags=_NO_WINDOW, timeout=30)
+    if result.returncode != 0:
+        raise RuntimeError("ffprobe 失败: %s" % (
+            (result.stderr or "").strip()[-300:]))
+    text = (result.stdout or "").strip()
+    try:
+        return float(text)
+    except (ValueError, TypeError):
+        raise RuntimeError("无法解析时长: %s (输出=%r)" % (filepath, text))
+
+
+def _ffmpeg_concat_batch(file_paths, output_wav):
+    """使用 ffmpeg concat demuxer 合并音频文件列表到统一格式的 WAV
+    相比 pydub 内存拼接，避免大量数据在 Python 中处理导致的串台问题
+    """
+    import tempfile
+    list_fd, list_path = tempfile.mkstemp(suffix=".txt", prefix="audio_merge_concat_")
+    try:
+        with os.fdopen(list_fd, "w", encoding="utf-8") as f:
+            for fp in file_paths:
+                # ffmpeg concat 文件路径规范：使用正斜杠，单引号需转义
+                safe = fp.replace("\\", "/").replace("'", "'\\''")
+                f.write("file '%s'\n" % safe)
+        cmd = ["ffmpeg", "-y", "-loglevel", "error", "-nostdin",
+               "-f", "concat", "-safe", "0", "-i", list_path,
+               "-ar", str(_TARGET_SAMPLE_RATE), "-ac", str(_TARGET_CHANNELS),
+               "-acodec", "pcm_s16le", output_wav]
+        result = subprocess.run(cmd, capture_output=True,
+                                creationflags=_NO_WINDOW, timeout=1800)
+        if result.returncode != 0:
+            raise RuntimeError("ffmpeg concat 失败: %s" % (
+                (result.stderr or b"").decode("utf-8", errors="replace")[-500:]))
+        if not os.path.isfile(output_wav) or os.path.getsize(output_wav) == 0:
+            raise RuntimeError("ffmpeg concat 未生成有效文件: %s" % output_wav)
+    finally:
+        try:
+            os.unlink(list_path)
+        except Exception:
+            pass
+
+
+def _ffmpeg_finalize(input_wav, output_path, fmt="wav",
+                     bgm_path=None, bgm_volume=30, total_duration=0.0,
+                     metadata=None, cover_path=None, bg_image_path=None):
+    """最终处理：可选 BGM 叠加 + 元数据/封面嵌入 + 格式转换
+    全部由 ffmpeg 一次完成，不再经由 Python 内存
+    """
+    has_bgm = bool(bgm_path) and os.path.isfile(bgm_path) and bgm_volume > 0
+
+    cmd = ["ffmpeg", "-y", "-loglevel", "error", "-nostdin", "-i", input_wav]
+    next_input = 1
+
+    filter_parts = []
+    if has_bgm:
+        cmd += ["-i", bgm_path]
+        gain_db = -30.0 + (bgm_volume / 100.0) * 30.0
+        fade_start = max(0.0, total_duration - 2.0)
+        filter_parts.append(
+            "[1:a]volume=%.2fdB,aloop=loop=-1:size=2147483647,"
+            "atrim=duration=%.3f,afade=t=out:st=%.3f:d=2,"
+            "aformat=sample_rates=%d:channel_layouts=stereo[bgm]" % (
+                gain_db, total_duration, fade_start, _TARGET_SAMPLE_RATE))
+        filter_parts.append(
+            "[0:a][bgm]amix=inputs=2:duration=first:normalize=0[out]")
+        next_input = 2
+
+    # 收集图片输入（仅 MP3）
+    images = []
+    if fmt == "mp3":
+        if cover_path and os.path.isfile(cover_path):
+            images.append((cover_path, "Album cover", "Cover (front)"))
+        if bg_image_path and os.path.isfile(bg_image_path):
+            images.append((bg_image_path, "Background", "Other"))
+        for img_path, _t, _c in images:
+            cmd += ["-i", img_path]
+
+    # 音频流映射
+    if filter_parts:
+        cmd += ["-filter_complex", ";".join(filter_parts), "-map", "[out]"]
+    else:
+        cmd += ["-map", "0:a"]
+
+    # 图片流映射
+    img_start = next_input
+    if images:
+        for idx in range(len(images)):
+            cmd += ["-map", "%d:0" % (img_start + idx)]
+        cmd += ["-c:v", "mjpeg", "-id3v2_version", "3"]
+        for idx, (_p, title, comment) in enumerate(images):
+            cmd += ["-metadata:s:v:%d" % idx, "title=%s" % title,
+                    "-metadata:s:v:%d" % idx, "comment=%s" % comment]
+
+    # 编码参数
+    if fmt == "mp3":
+        cmd += ["-acodec", "libmp3lame", "-q:a", "2"]
+    else:
+        cmd += ["-acodec", "pcm_s16le"]
+
+    # 元数据
+    if metadata:
+        for k, v in metadata.items():
+            if v:
+                cmd += ["-metadata", "%s=%s" % (k, v)]
+
+    cmd += [output_path]
+
+    result = subprocess.run(cmd, capture_output=True,
+                            creationflags=_NO_WINDOW, timeout=1800)
+    if result.returncode != 0:
+        raise RuntimeError("ffmpeg 最终处理失败: %s" % (
+            (result.stderr or b"").decode("utf-8", errors="replace")[-500:]))
 
 
 def _ffmpeg_load_audio(filepath):
@@ -358,20 +481,19 @@ class AudioBatchMergerApp:
                        ("所有音频", "*.wav;*.mp3;*.m4a;*.flac"),
                        ("所有文件", "*.*")])
         if path:
-            ext = os.path.splitext(path)[1].lower()
-            if ext != ".wav" and not self._check_ffmpeg():
+            if not self._check_ffmpeg():
                 self._show_toast(
                     "缺少 ffmpeg",
-                    f"加载 {ext} 格式需要 ffmpeg，请确保已安装并添加到环境变量。",
+                    "合并需要 ffmpeg，请确保已安装并添加到环境变量。",
                     level="error", duration_ms=6000)
                 return
             self.bgm_path.set(path)
+            # 仅验证文件可读，不再加载到内存（合并时由 ffmpeg 直接读取）
             try:
-                self.bgm_audio = _ffmpeg_load_audio(path)
-                logger.info("背景音乐已加载(ffmpeg): %s", path)
+                dur = _ffprobe_duration(path)
+                logger.info("背景音乐已验证: %s (%.1f秒)", path, dur)
             except Exception as e:
-                self._show_toast("错误", f"无法加载背景音乐: {e}", level="error")
-                self.bgm_audio = None
+                self._show_toast("错误", f"无法读取背景音乐: {e}", level="error")
                 self.bgm_path.set("")
             self._auto_save()
 
@@ -486,13 +608,13 @@ class AudioBatchMergerApp:
         target_ms = self.target_duration.get() * 60 * 1000
         dir_path = self.input_dir.get()
 
-        # 第一遍：获取每个文件的时长
+        # 第一遍：快速获取每个文件的时长（仅读取头信息，不解码音频数据）
         file_durs = []
         for fname in self.wav_files:
             fpath = os.path.join(dir_path, fname)
             try:
-                seg = _ffmpeg_load_audio(fpath)
-                file_durs.append((fname, len(seg)))
+                dur_sec = _ffprobe_duration(fpath)
+                file_durs.append((fname, int(dur_sec * 1000)))  # 转为毫秒
             except Exception as e:
                 logger.warning("跳过文件 %s: %s", fname, e)
                 continue
@@ -539,8 +661,8 @@ class AudioBatchMergerApp:
 
     def _test_merge(self):
         """测试模式：只合并第一组"""
-        if AudioSegment is None:
-            self._show_toast("错误", "缺少 pydub 库，请执行: pip install pydub", level="error")
+        if not self._check_ffmpeg():
+            self._show_toast("错误", "缺少 ffmpeg，请确保已安装并添加到环境变量", level="error")
             return
         if not self.wav_files:
             self._show_toast("提示", "请先选择音频目录", level="warning")
@@ -557,8 +679,8 @@ class AudioBatchMergerApp:
 
     def _start_merge(self):
         """全量合并"""
-        if AudioSegment is None:
-            self._show_toast("错误", "缺少 pydub 库，请执行: pip install pydub", level="error")
+        if not self._check_ffmpeg():
+            self._show_toast("错误", "缺少 ffmpeg，请确保已安装并添加到环境变量", level="error")
             return
         if not self.wav_files:
             self._show_toast("提示", "请先选择音频目录", level="warning")
@@ -613,7 +735,7 @@ class AudioBatchMergerApp:
         return {k: v for k, v in metadata.items() if v}
 
     def _do_merge(self, is_test=False):
-        """执行合并（后台线程）"""
+        """执行合并（后台线程）—— 使用 ffmpeg concat 代替 pydub 内存拼接"""
         dir_path = self.input_dir.get()
         out_dir = self.output_dir.get()
         fmt = self.output_format.get()
@@ -650,66 +772,73 @@ class AudioBatchMergerApp:
         from datetime import date
         date_str = date.today().strftime("%Y%m%d")
         dir_name = os.path.basename(os.path.normpath(out_dir))
+        bgm_file = self.bgm_path.get().strip()
+        bgm_vol = self.bgm_volume.get()
 
         for batch_idx, batch_files in enumerate(batches):
             if self._stop_flag:
                 break
 
-            # 合并当前批次
-            combined = AudioSegment.empty()
-            for i, fname in enumerate(batch_files):
-                if self._stop_flag:
-                    break
-                fpath = os.path.join(dir_path, fname)
-                self.root.after(0, self.status_text.set,
-                                f"{tag}第 {batch_idx + 1}/{total_batches} 组: {fname}")
-                try:
-                    seg = _ffmpeg_load_audio(fpath)
-                    combined += seg
-                except Exception as e:
-                    logger.error("读取失败 %s: %s", fname, e)
-                    continue
-
-            if self._stop_flag or len(combined) == 0:
-                break
-
-            # 背景音乐叠加
-            if self.bgm_audio and not self._stop_flag:
-                vol = self.bgm_volume.get()
-                if vol > 0:
-                    gain = -30.0 + (vol / 100.0) * 30.0
-                    bgm = self.bgm_audio.apply_gain(gain)
-                    bgm = self._match_channels(bgm, combined)
-                    bgm = self._loop_bgm(bgm, len(combined))
-                    fade_ms = min(2000, len(bgm))
-                    bgm = bgm.fade_out(fade_ms)
-                    combined = combined.overlay(bgm)
-                    logger.info("第 %d 组背景音乐已叠加 (音量=%d%%)", batch_idx + 1, vol)
-
-            # 导出
             part_num = batch_idx + 1
             filename = f"{dir_name}_{date_str}_{part_num:02d}.{ext}"
             output_path = os.path.join(out_dir, filename)
+            temp_wav = os.path.join(out_dir, f"_temp_concat_{part_num:02d}.wav")
 
+            # 构建完整文件路径列表
+            file_paths = [os.path.join(dir_path, f) for f in batch_files]
+
+            # Step 1: ffmpeg concat 合并到临时 WAV
+            self.root.after(0, self.status_text.set,
+                            f"{tag}第 {part_num}/{total_batches} 组: 合并 {len(batch_files)} 个文件...")
+            try:
+                _ffmpeg_concat_batch(file_paths, temp_wav)
+            except Exception as e:
+                logger.error("第 %d 组合并失败: %s", part_num, e)
+                pn = part_num
+                self.root.after(0, lambda err=str(e), p=pn: self._show_toast(
+                    "错误", f"第 {p} 组合并失败: {err}", level="error"))
+                try:
+                    os.unlink(temp_wav)
+                except Exception:
+                    pass
+                continue
+
+            if self._stop_flag:
+                try:
+                    os.unlink(temp_wav)
+                except Exception:
+                    pass
+                break
+
+            # Step 2: 最终处理（BGM + 元数据 + 封面 + 格式转换）
             self.root.after(0, self.status_text.set,
                             f"{tag}导出 {part_num}/{total_batches}: {filename}")
             progress = ((batch_idx + 1) / total_batches) * 100
             self.root.after(0, self.progress_var.set, progress)
 
             try:
+                total_dur = _ffprobe_duration(temp_wav)
                 metadata = self._build_metadata(part_num, total_batches)
-                _ffmpeg_export_audio(
-                    combined, output_path, fmt, metadata,
-                    self.cover_path.get().strip(),
-                    self.bg_image_path.get().strip())
-                duration_sec = len(combined) / 1000
+                _ffmpeg_finalize(
+                    temp_wav, output_path, fmt,
+                    bgm_path=bgm_file if bgm_file else None,
+                    bgm_volume=bgm_vol,
+                    total_duration=total_dur,
+                    metadata=metadata,
+                    cover_path=self.cover_path.get().strip(),
+                    bg_image_path=self.bg_image_path.get().strip())
                 logger.info("第 %d 组导出成功: %s (%.1f秒, %d个文件)",
-                            part_num, output_path, duration_sec, len(batch_files))
+                            part_num, output_path, total_dur, len(batch_files))
             except Exception as e:
                 logger.error("第 %d 组导出失败: %s", part_num, e)
-                self.root.after(0, lambda err=str(e): self._show_toast(
-                    "错误", f"导出失败: {err}", level="error"))
-                continue
+                pn = part_num
+                self.root.after(0, lambda err=str(e), p=pn: self._show_toast(
+                    "错误", f"第 {p} 组导出失败: {err}", level="error"))
+            finally:
+                try:
+                    os.unlink(temp_wav)
+                except Exception:
+                    pass
 
         # 完成
         if not self._stop_flag:
@@ -807,12 +936,10 @@ class AudioBatchMergerApp:
                 if cfg.get("output_format"):
                     self.output_format.set(cfg["output_format"])
                 if cfg.get("bgm_path"):
-                    self.bgm_path.set(cfg["bgm_path"])
-                    try:
-                        self.bgm_audio = _ffmpeg_load_audio(cfg["bgm_path"])
-                    except Exception:
-                        self.bgm_audio = None
-                        self.bgm_path.set("")
+                    bgm = cfg["bgm_path"]
+                    if os.path.isfile(bgm):
+                        self.bgm_path.set(bgm)
+                    # 文件不存在则不设置，合并时由 ffmpeg 直接读取
                 if cfg.get("bgm_volume") is not None:
                     self.bgm_volume.set(cfg["bgm_volume"])
                 if cfg.get("meta_title"):
@@ -850,8 +977,8 @@ def main_cli():
     parser.add_argument("--bgm-volume", type=int, default=30, help="BGM音量 0-100（默认30）")
     args = parser.parse_args()
 
-    if AudioSegment is None:
-        print("[ERROR] 缺少 pydub 库，请执行: pip install pydub")
+    if not shutil.which("ffmpeg"):
+        print("[ERROR] 缺少 ffmpeg，请确保已安装并添加到环境变量")
         sys.exit(1)
 
     # 扫描音频文件
@@ -868,39 +995,44 @@ def main_cli():
 
     os.makedirs(args.output, exist_ok=True)
 
-    # 加载 BGM
-    bgm_audio = None
+    # 验证 BGM
+    bgm_file = None
     if args.bgm and os.path.isfile(args.bgm):
         try:
-            bgm_audio = _ffmpeg_load_audio(args.bgm)
-            print(f"[INFO] BGM 已加载(ffmpeg): {args.bgm}")
+            dur = _ffprobe_duration(args.bgm)
+            bgm_file = args.bgm
+            print(f"[INFO] BGM 已验证: {args.bgm} ({dur:.1f}秒)")
         except Exception as e:
-            print(f"[WARN] BGM 加载失败: {e}")
+            print(f"[WARN] BGM 验证失败: {e}")
 
-    # 按动态目标时长分组，确保各组时长均匀
+    # 用 ffprobe 快速获取时长（不解码音频数据）
     import math
     target_ms = args.duration * 60 * 1000
     file_durs = []
     for fname in wav_files:
         fpath = os.path.join(args.input, fname)
         try:
-            seg = _ffmpeg_load_audio(fpath)
-            file_durs.append((fname, len(seg)))
+            dur_sec = _ffprobe_duration(fpath)
+            file_durs.append((fname, int(dur_sec * 1000)))
         except Exception as e:
             print(f"[WARN] 跳过 {fname}: {e}")
             continue
 
-    if file_durs:
-        total_dur = sum(d for _, d in file_durs)
-        num_batches = max(1, math.ceil(total_dur / target_ms))
-        print(f"[INFO] 总时长 {total_dur / 60000:.1f} 分钟，目标 {args.duration} 分钟，"
-              f"分为 {num_batches} 组")
+    if not file_durs:
+        print("[ERROR] 没有可处理的音频文件")
+        sys.exit(1)
 
+    total_dur = sum(d for _, d in file_durs)
+    num_batches = max(1, math.ceil(total_dur / target_ms))
+    print(f"[INFO] 总时长 {total_dur / 60000:.1f} 分钟，目标 {args.duration} 分钟，"
+          f"分为 {num_batches} 组")
+
+    # 动态分组
     batches = []
     current_batch = []
     current_dur = 0
-    remaining_dur = total_dur if file_durs else 0
-    remaining_batches = num_batches if file_durs else 1
+    remaining_dur = total_dur
+    remaining_batches = num_batches
     for fname, dur in file_durs:
         if current_batch:
             dynamic_avg = remaining_dur / remaining_batches
@@ -925,40 +1057,35 @@ def main_cli():
     dir_name = os.path.basename(os.path.normpath(args.output))
 
     for batch_idx, batch_files in enumerate(batches):
-        print(f"\n[INFO] 第 {batch_idx + 1}/{len(batches)} 组 ({len(batch_files)} 个文件)")
-        combined = AudioSegment.empty()
-        for fname in batch_files:
-            fpath = os.path.join(args.input, fname)
-            print(f"  - {fname}")
-            try:
-                seg = _ffmpeg_load_audio(fpath)
-                combined += seg
-            except Exception as e:
-                print(f"  [ERROR] {fname}: {e}")
-
-        if len(combined) == 0:
-            print("  [WARN] 合并结果为空，跳过")
-            continue
-
-        # BGM
-        if bgm_audio and args.bgm_volume > 0:
-            gain = -30.0 + (args.bgm_volume / 100.0) * 30.0
-            bgm = bgm_audio.apply_gain(gain)
-            if bgm.channels != combined.channels:
-                bgm = bgm.set_channels(combined.channels)
-            if len(bgm) < len(combined):
-                loops = (len(combined) // len(bgm)) + 1
-                for _ in range(loops - 1):
-                    bgm = bgm + bgm_audio.apply_gain(gain)
-            bgm = bgm[:len(combined)].fade_out(2000)
-            combined = combined.overlay(bgm)
-
         part_num = batch_idx + 1
+        print(f"\n[INFO] 第 {part_num}/{len(batches)} 组 ({len(batch_files)} 个文件)")
+        for fname in batch_files:
+            print(f"  - {fname}")
+
+        file_paths = [os.path.join(args.input, f) for f in batch_files]
         filename = f"{dir_name}_{date_str}_{part_num:02d}.{ext}"
         output_path = os.path.join(args.output, filename)
-        _ffmpeg_export_audio(combined, output_path, ext)
-        duration_sec = len(combined) / 1000
-        print(f"  [OK] {filename} ({duration_sec:.1f}秒)")
+        temp_wav = os.path.join(args.output, f"_temp_concat_{part_num:02d}.wav")
+
+        try:
+            # Step 1: ffmpeg concat 合并
+            _ffmpeg_concat_batch(file_paths, temp_wav)
+            total_sec = _ffprobe_duration(temp_wav)
+
+            # Step 2: 最终处理（BGM + 格式转换）
+            _ffmpeg_finalize(
+                temp_wav, output_path, ext,
+                bgm_path=bgm_file,
+                bgm_volume=args.bgm_volume,
+                total_duration=total_sec)
+            print(f"  [OK] {filename} ({total_sec:.1f}秒)")
+        except Exception as e:
+            print(f"  [ERROR] 第 {part_num} 组失败: {e}")
+        finally:
+            try:
+                os.unlink(temp_wav)
+            except Exception:
+                pass
 
     print(f"\n[DONE] 全部完成，共输出 {len(batches)} 个文件到: {args.output}")
 
