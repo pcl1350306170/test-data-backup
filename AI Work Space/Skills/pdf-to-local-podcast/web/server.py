@@ -209,20 +209,23 @@ async def delete_voice(name: str):
 
 @app.post("/api/task/start")
 async def start_task(data: dict):
-    script_path = data.get("script_path", "")
+    # 支持多选脚本：script_paths 数组（或兼容旧的 script_path 单脚本）
+    paths = data.get("script_paths") or ([data["script_path"]] if data.get("script_path") else [])
+    paths = [p for p in paths if p and os.path.isfile(p)]
+    if not paths:
+        raise HTTPException(400, "未找到有效的脚本文件")
+
     output_name = data.get("output_name", "").strip()
-    if not script_path or not os.path.isfile(script_path):
-        raise HTTPException(400, "脚本文件不存在")
-    if not output_name:
-        # 默认取脚本书名
+    if not output_name and len(paths) == 1:
+        # 单任务未指定输出名时取脚本书名；多任务各自取书名
         try:
-            info, _, _ = script_parser.parse_script(script_path)
-            output_name = info.get("书名", os.path.splitext(os.path.basename(script_path))[0])
+            info, _, _ = script_parser.parse_script(paths[0])
+            output_name = info.get("书名", os.path.splitext(os.path.basename(paths[0]))[0])
         except Exception:
-            output_name = os.path.splitext(os.path.basename(script_path))[0]
+            output_name = os.path.splitext(os.path.basename(paths[0]))[0]
 
     ok, err = engine.start(
-        script_path=script_path,
+        script_paths=paths,
         output_name=output_name,
         bgm_path=data.get("bgm_path"),
         bgm_volume=data.get("bgm_volume", 30),
@@ -231,12 +234,16 @@ async def start_task(data: dict):
     )
     if not ok:
         raise HTTPException(409, err)
-    return {"ok": True, "output_name": output_name}
+    return {"ok": True, "total_jobs": len(paths)}
 
 
 @app.get("/api/task/status")
 async def task_status():
-    return engine.get_status()
+    st = engine.get_status()
+    # 取消进行中将队列拆掉，快照中直接反映为已取消
+    if st["status"] == "cancelling" and not engine._jobs:
+        st["status"] = "cancelled"
+    return st
 
 
 @app.post("/api/task/cancel")
@@ -338,18 +345,28 @@ async def download_audio(file: str = Query(...)):
 
 @app.post("/api/audio/clean")
 async def clean_audio():
-    """清理中间产物（audio 目录下的 wav 和子目录）。"""
+    """清理中间产物（任务子目录 audio_dir\\{输出名} 及旧布局的散wav）。"""
     cfg = _get_cfg()
     audio_dir = cfg.get("audio_dir", "")
     if not audio_dir or not os.path.isdir(audio_dir):
         return {"ok": True, "cleaned": 0}
+    # 跳过正在运行任务的目录
+    skip_dir = None
+    if engine.status in ("parsing", "generating", "merging", "paused", "cancelling"):
+        try:
+            skip_dir = os.path.realpath(engine._task_audio_dir())
+        except Exception:
+            pass
     count = 0
     for f in os.listdir(audio_dir):
         fp = os.path.join(audio_dir, f)
         if os.path.isfile(fp) and f.lower().endswith(".wav"):
             os.remove(fp)
             count += 1
-        elif os.path.isdir(fp) and f.startswith("_"):
+        elif os.path.isdir(fp):
+            # 任务子目录（含内部 _norm）整体删除；旧布局的 _ 开头临时目录同样处理
+            if os.path.realpath(fp) == skip_dir:
+                continue
             shutil.rmtree(fp, ignore_errors=True)
             count += 1
     return {"ok": True, "cleaned": count}

@@ -102,11 +102,17 @@
       <div class="task-config">
         <div class="form-row">
           <div class="form-group flex-2">
-            <label>选择脚本</label>
-            <select id="task-script"><option value="">-- 请选择 --</option></select>
+            <label>选择脚本（可加入多个，按顺序逐个生成）</label>
+            <div class="bgm-picker">
+              <select id="task-script-available"></select>
+              <button id="btn-add-to-queue" class="btn btn-sm">➕ 加入队列</button>
+              <button id="btn-clear-queue" class="btn btn-sm">🧹 清空</button>
+            </div>
+            <div id="script-queue" class="script-queue"></div>
+            <div class="queue-hint" id="queue-hint" style="display:none"></div>
           </div>
           <div class="form-group">
-            <label>输出文件名</label>
+            <label>输出文件名（仅单脚本时生效）</label>
             <input type="text" id="task-output-name" placeholder="自动取脚本书名">
           </div>
         </div>
@@ -190,6 +196,10 @@
         <div class="form-group">
           <label>TTS 参考音频目录</label>
           <input type="text" id="cfg-tts-dir">
+        </div>
+        <div class="form-group">
+          <label>BGM 音乐目录（任务页 BGM 列表将遍历此目录）</label>
+          <input type="text" id="cfg-bgm-dir">
         </div>
         <details class="advanced-toggle">
           <summary>CosyVoice 环境（一般不需修改）</summary>

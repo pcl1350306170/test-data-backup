@@ -235,6 +235,42 @@ input[type="range"] { width: 100%; margin-top: 4px; }
   align-items: center;
 }
 .bgm-picker { display: flex; gap: 6px; align-items: center; }
+
+/* 脚本队列 */
+.script-queue { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.queue-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+}
+.queue-item .queue-idx {
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 11px;
+}
+.queue-item .queue-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.queue-item .queue-actions { display: flex; gap: 4px; }
+.queue-item .queue-actions button {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0 2px;
+}
+.queue-item .queue-actions button:hover { color: var(--text); }
+.queue-hint { margin-top: 6px; font-size: 12px; color: var(--text-dim); }
 .advanced-toggle {
   margin-top: 8px;
   font-size: 13px;

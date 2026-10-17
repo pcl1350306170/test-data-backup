@@ -1,0 +1,17 @@
+{
+  "script_dirs": [
+    "D:\\FILES\\糖蛋蛋(＾Ｕ＾)ノ~ＹＯ\\播客脚本"
+  ],
+  "output_dir": "D:\\FILES\\糖蛋蛋(＾Ｕ＾)ノ~ＹＯ\\本地播客",
+  "audio_dir": "D:\\FILES\\糖蛋蛋(＾Ｕ＾)ノ~ＹＯ\\audio",
+  "tts_dir": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS",
+  "bgm_dir": "D:\\FILES\\music\\仙剑3音乐",
+  "bgm_path": "D:\\FILES\\music\\仙剑3音乐\\骆集益 - 玉满堂.mp3",
+  "bgm_volume": 20,
+  "default_lufs": -16,
+  "default_gap_ms": 400,
+  "conda_python": "D:\\TOOLS\\miniconda3\\envs\\cosyvoice\\python.exe",
+  "model_dir": "D:\\dev\\sherpa-models\\CosyVoice2-0.5B",
+  "repo_dir": "D:\\dev\\sherpa-models\\CosyVoice",
+  "worker_script": "D:\\CODE\\Python\\test-data-backup\\py\\other\\cosyvoice_tts_worker.py"
+}

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>语音速记本</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"Microsoft YaHei","PingFang SC",sans-serif;
+  background:#f3f4f6; color:#1f2937; min-height:100vh;
+}
+header {
+  position:sticky; top:0; z-index:10;
+  background:#ffffff; border-bottom:1px solid #e5e7eb;
+  padding:14px 16px; display:flex; align-items:center; justify-content:space-between;
+}
+header h1 { font-size:18px; font-weight:700; }
+#count { font-size:13px; color:#6b7280; }
+#addBtn {
+  display:block; width:calc(100% - 32px); margin:16px auto 4px;
+  padding:14px; font-size:16px; font-weight:700; color:#fff;
+  background:#2563eb; border:none; border-radius:12px; cursor:pointer;
+}
+#addBtn:active { background:#1d4ed8; }
+#list { list-style:none; padding:12px 16px 80px; }
+.card {
+  background:#fff; border-radius:12px; padding:14px; margin-bottom:12px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.08);
+}
+.card .time { font-size:12px; color:#6b7280; margin-bottom:6px; }
+.card .time .edited { color:#f59e0b; margin-left:6px; }
+.card .content { font-size:15px; line-height:1.7; white-space:pre-wrap; word-break:break-word; }
+.card .ops { display:flex; gap:14px; margin-top:10px; }
+.card .ops button { border:none; background:none; font-size:13px; cursor:pointer; padding:4px 2px; }
+.btn-edit { color:#2563eb; }
+.btn-del { color:#dc2626; }
+#empty { text-align:center; color:#9ca3af; font-size:14px; padding:60px 20px; }
+.hidden { display:none !important; }
+#overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:20;
+  display:flex; align-items:flex-end; justify-content:center;
+}
+.sheet {
+  width:100%; max-width:640px; background:#fff;
+  border-radius:16px 16px 0 0; padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+}
+.sheet-title { font-size:15px; font-weight:700; margin-bottom:12px; text-align:center; }
+#contentInput {
+  width:100%; min-height:120px; font-size:16px; line-height:1.7;
+  border:1px solid #d1d5db; border-radius:12px; padding:12px; resize:vertical;
+  outline:none; font-family:inherit;
+}
+#contentInput:focus { border-color:#2563eb; }
+.actions { display:flex; gap:12px; margin-top:14px; }
+.actions button { flex:1; padding:13px; font-size:16px; border:none; border-radius:12px; cursor:pointer; }
+#cancelBtn { background:#f3f4f6; color:#374151; }
+#saveBtn { background:#2563eb; color:#fff; font-weight:700; }
+#saveBtn:disabled { opacity:0.6; }
+@media (min-width:768px) {
+  #addBtn { width:100%; max-width:640px; margin-left:auto; margin-right:auto; }
+  #list { max-width:640px; margin:0 auto; }
+  #empty { max-width:640px; margin:0 auto; }
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🗒 语音速记</h1>
+  <span id="count"></span>
+</header>
+<button id="addBtn">＋ 新增</button>
+<ul id="list"></ul>
+<div id="empty" class="hidden">还没有记录，点「＋ 新增」说话保存</div>
+
+<div id="overlay" class="hidden">
+  <div class="sheet">
+    <div class="sheet-title" id="sheetTitle">新增记录</div>
+    <textarea id="contentInput" placeholder="点这里弹出输入法，按语音键说话…"></textarea>
+    <div class="actions">
+      <button id="cancelBtn">取消</button>
+      <button id="saveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var listEl = document.getElementById('list');
+  var emptyEl = document.getElementById('empty');
+  var countEl = document.getElementById('count');
+  var overlay = document.getElementById('overlay');
+  var input = document.getElementById('contentInput');
+  var saveBtn = document.getElementById('saveBtn');
+  var sheetTitle = document.getElementById('sheetTitle');
+
+  var notes = [];
+  var editingId = null;
+
+  function render() {
+    listEl.innerHTML = '';
+    if (notes.length) {
+      emptyEl.classList.add('hidden');
+    } else {
+      emptyEl.classList.remove('hidden');
+    }
+    countEl.textContent = notes.length ? notes.length + ' 条' : '';
+    notes.forEach(function (n) {
+      var li = document.createElement('li');
+      li.className = 'card';
+
+      var time = document.createElement('div');
+      time.className = 'time';
+      time.textContent = n.created_at;
+      if (n.updated_at) {
+        var edited = document.createElement('span');
+        edited.className = 'edited';
+        edited.textContent = '· 更新于 ' + n.updated_at;
+        time.appendChild(edited);
+      }
+      li.appendChild(time);
+
+      var content = document.createElement('div');
+      content.className = 'content';
+      content.textContent = n.content;
+      li.appendChild(content);
+
+      var ops = document.createElement('div');
+      ops.className = 'ops';
+
+      var btnE = document.createElement('button');
+      btnE.className = 'btn-edit';
+      btnE.textContent = '编辑';
+      btnE.addEventListener('click', function () { openEdit(n.id, n.content); });
+      ops.appendChild(btnE);
+
+      var btnD = document.createElement('button');
+      btnD.className = 'btn-del';
+      btnD.textContent = '删除';
+      btnD.addEventListener('click', function () { delNote(n.id); });
+      ops.appendChild(btnD);
+
+      li.appendChild(ops);
+      listEl.appendChild(li);
+    });
+  }
+
+  function load() {
+    fetch('/api/notes').then(function (r) { return r.json(); }).then(function (data) {
+      var next = data.notes || [];
+      if (JSON.stringify(next) !== JSON.stringify(notes)) {
+        notes = next;
+        render();
+      }
+    }).catch(function () {});
+  }
+
+  function openAdd() {
+    editingId = null;
+    sheetTitle.textContent = '新增记录';
+    input.value = '';
+    overlay.classList.remove('hidden');
+    setTimeout(function () { input.focus(); }, 100);
+  }
+
+  function openEdit(id, content) {
+    editingId = id;
+    sheetTitle.textContent = '编辑记录';
+    input.value = content;
+    overlay.classList.remove('hidden');
+    setTimeout(function () { input.focus(); }, 100);
+  }
+
+  function closeSheet() {
+    overlay.classList.add('hidden');
+    input.value = '';
+    editingId = null;
+  }
+
+  function save() {
+    var content = input.value.trim();
+    if (!content) { input.focus(); return; }
+    saveBtn.disabled = true;
+    var url = editingId ? '/api/notes/' + encodeURIComponent(editingId) : '/api/notes';
+    var method = editingId ? 'PUT' : 'POST';
+    fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: content })
+    }).then(function (r) {
+      if (!r.ok) throw new Error('保存失败');
+      return r.json();
+    }).then(function () {
+      closeSheet();
+      load();
+    }).catch(function (e) {
+      alert('保存失败：' + e.message);
+    }).finally(function () {
+      saveBtn.disabled = false;
+    });
+  }
+
+  function delNote(id) {
+    if (!confirm('确定删除这条记录吗？')) return;
+    fetch('/api/notes/' + encodeURIComponent(id), { method: 'DELETE' })
+      .then(function (r) { if (!r.ok) throw new Error('删除失败'); return r.json(); })
+      .then(function () { load(); })
+      .catch(function (e) { alert('删除失败：' + e.message); });
+  }
+
+  document.getElementById('addBtn').addEventListener('click', openAdd);
+  document.getElementById('cancelBtn').addEventListener('click', closeSheet);
+  saveBtn.addEventListener('click', save);
+
+  load();
+  // 自动同步：3 秒轮询；弹层打开时暂停，避免打断输入
+  setInterval(function () {
+    if (overlay.classList.contains('hidden')) load();
+  }, 3000);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && overlay.classList.contains('hidden')) load();
+  });
+})();
+</script>
+</body>
+</html>

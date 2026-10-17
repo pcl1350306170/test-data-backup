@@ -105,6 +105,7 @@ const Settings = {
     document.getElementById('cfg-output-dir').value = c.output_dir || '';
     document.getElementById('cfg-audio-dir').value = c.audio_dir || '';
     document.getElementById('cfg-tts-dir').value = c.tts_dir || '';
+    document.getElementById('cfg-bgm-dir').value = c.bgm_dir || '';
     document.getElementById('cfg-conda-python').value = c.conda_python || '';
     document.getElementById('cfg-model-dir').value = c.model_dir || '';
     document.getElementById('cfg-repo-dir').value = c.repo_dir || '';
@@ -117,6 +118,7 @@ const Settings = {
       output_dir: document.getElementById('cfg-output-dir').value.trim(),
       audio_dir: document.getElementById('cfg-audio-dir').value.trim(),
       tts_dir: document.getElementById('cfg-tts-dir').value.trim(),
+      bgm_dir: document.getElementById('cfg-bgm-dir').value.trim(),
       conda_python: document.getElementById('cfg-conda-python').value.trim(),
       model_dir: document.getElementById('cfg-model-dir').value.trim(),
       repo_dir: document.getElementById('cfg-repo-dir').value.trim(),

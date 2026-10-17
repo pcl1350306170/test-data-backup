@@ -6,6 +6,7 @@
 import asyncio
 import json
 import os
+import re
 import threading
 import time
 
@@ -42,6 +43,13 @@ class TaskEngine:
         # 任务配置（用于重试）
         self._task_config = {}
 
+        # 批量队列：多个脚本按顺序逐个执行
+        self._jobs = []
+        self._job_index = 0
+        self._total_jobs = 1
+        self._failed_jobs = []
+        self._last_output = None
+
     # ── 事件订阅 ──────────────────────────────────────────
 
     def subscribe(self):
@@ -69,35 +77,67 @@ class TaskEngine:
 
     # ── 任务控制 ──────────────────────────────────────────
 
-    def start(self, script_path, output_name, bgm_path=None,
-              bgm_volume=30, lufs=-16, gap_ms=400):
-        """启动新任务。"""
+    def start(self, script_paths, bgm_path=None,
+              bgm_volume=30, lufs=-16, gap_ms=400, output_name=""):
+        """启动任务队列（单个脚本也走队列），多个脚本按顺序逐个执行。"""
         if self.status not in ("idle", "done", "failed", "cancelled"):
             return False, "已有任务正在运行"
 
-        self._reset_state()
-        self.script_path = script_path
-        self.output_name = output_name
-        self._task_config = {
-            "script_path": script_path,
-            "output_name": output_name,
-            "bgm_path": bgm_path,
-            "bgm_volume": bgm_volume,
-            "lufs": lufs,
-            "gap_ms": gap_ms,
-        }
-        self.status = "parsing"
-        self.start_time = time.time()
-        self._emit({"type": "status", "status": "parsing", "message": "正在解析脚本..."})
+        paths = [p for p in (script_paths if isinstance(script_paths, list)
+                             else [script_paths]) if p]
+        if not paths:
+            return False, "未选择脚本"
 
-        # 解析脚本
+        self._reset_state()
+        self._jobs = [{"script_path": p, "output_name": ""} for p in paths]
+        # 单任务且指定了输出名时沿用，否则每个任务取脚本自带书名
+        if len(paths) == 1 and output_name:
+            self._jobs[0]["output_name"] = output_name
+        self._total_jobs = len(self._jobs)
+        self._job_index = 0
+        self._cancel_event.clear()
+        self.start_time = time.time()
+
+        # 解析第一个脚本（失败时由队列线程顺延到下一个）
+        self._parse_job(self._jobs[0])
+
+        # 启动后台线程
+        self._thread = threading.Thread(target=self._run_queue_worker, daemon=True)
+        self._thread.start()
+        return True, None
+
+    def _queue_ctx(self):
+        """当前队列上下文（仅多任务时返回，事件带此字段供前端区分批次进度）。"""
+        if self._total_jobs > 1:
+            return {"job": self._job_index + 1, "total": self._total_jobs,
+                    "script": os.path.basename(self.script_path or "")}
+        return None
+
+    def _parse_job(self, job):
+        """解析队列中的一个脚本并重置块状态；失败时发送带队列上下文的错误事件。"""
+        self.script_path = job["script_path"]
+        self._emit({"type": "status", "status": "parsing",
+                    "message": "正在解析脚本...", "queue": self._queue_ctx()})
         try:
             voices = voice_manager.get_all()
             info, blocks, warnings = script_parser.parse_script(
-                script_path, set(voices.keys())
+                job["script_path"], set(voices.keys())
             )
             self.blocks = blocks
             self.block_states = {b["idx"]: "pending" for b in blocks}
+            self.failed_blocks = []
+            if not job["output_name"]:
+                job["output_name"] = info.get("书名") or os.path.splitext(
+                    os.path.basename(job["script_path"]))[0]
+            self.output_name = job["output_name"]
+            self._task_config = {
+                "script_path": job["script_path"],
+                "output_name": job["output_name"],
+                "bgm_path": self._task_config.get("bgm_path"),
+                "bgm_volume": self._task_config.get("bgm_volume", 30),
+                "lufs": self._task_config.get("lufs", -16),
+                "gap_ms": self._task_config.get("gap_ms", 400),
+            }
             total_chars = sum(len(b["text"]) for b in blocks)
             self._emit({
                 "type": "parsed",
@@ -105,28 +145,34 @@ class TaskEngine:
                 "total_chars": total_chars,
                 "estimated_sec": script_parser.estimate_duration(blocks),
                 "warnings": warnings,
+                "queue": self._queue_ctx(),
             })
+            return True
         except Exception as e:
             self.status = "failed"
             self.error_message = str(e)
-            self.end_time = time.time()
-            self._emit({"type": "error", "message": "脚本解析失败: %s" % str(e)})
-            return True, None
-
-        # 启动后台线程
-        self._cancel_event.clear()
-        self._thread = threading.Thread(target=self._generate_worker, daemon=True)
-        self._thread.start()
-        return True, None
+            self._emit({"type": "error",
+                        "message": "脚本解析失败: %s" % str(e),
+                        "script": os.path.basename(job["script_path"]),
+                        "queue": self._queue_ctx(),
+                        "more": len(self._jobs) > 1})
+            return False
 
     def cancel(self):
-        """停止当前任务。"""
-        if self.status in ("generating", "merging", "parsing", "paused"):
+        """停止当前任务并清空待执行队列。"""
+        if self.status in ("generating", "merging", "parsing", "paused", "cancelling"):
+            # 队列线程已结束（取消晚于完成）：按实际结果落定，避免状态卡在 cancelling
+            if self._thread is not None and not self._thread.is_alive():
+                self.status = "cancelled" if self._cancel_event.is_set() else self.status
+                return True
             self._cancel_event.set()
             self._pause_event.set()  # 解除暂停阻塞，让线程能退出
             self.status = "cancelling"
             self.paused = False
-            self._emit({"type": "status", "status": "cancelling", "message": "正在停止..."})
+            self._emit({"type": "status", "status": "cancelling",
+                        "message": "正在停止...（剩余队列将清空）" if len(self._jobs) > 1
+                        else "正在停止...",
+                        "queue": self._queue_ctx()})
             return True
         return False
 
@@ -136,7 +182,8 @@ class TaskEngine:
             self.paused = True
             self._pause_event.clear()
             self.status = "paused"
-            self._emit({"type": "status", "status": "paused", "message": "已暂停（当前块完成后停止）"})
+            self._emit({"type": "status", "status": "paused",
+                        "message": "已暂停（当前块完成后停止）", "queue": self._queue_ctx()})
             return True
         return False
 
@@ -146,7 +193,8 @@ class TaskEngine:
             self.paused = False
             self.status = "generating"
             self._pause_event.set()
-            self._emit({"type": "status", "status": "generating", "message": "继续生成..."})
+            self._emit({"type": "status", "status": "generating", "message": "继续生成...",
+                        "queue": self._queue_ctx()})
             return True
         return False
 
@@ -154,6 +202,8 @@ class TaskEngine:
         """仅重新生成失败的块。"""
         if self.status not in ("done", "failed") or not self.failed_blocks:
             return False, "没有可重试的失败块"
+        if self._jobs:
+            return False, "队列中还有待执行任务，完成后可重试当前任务失败块"
 
         # 重置失败块状态
         for idx in self.failed_blocks:
@@ -179,6 +229,8 @@ class TaskEngine:
         self.output_path = None
         self.duration_sec = None
         self.error_message = None
+        self._failed_jobs = []
+        self._last_output = None
 
     def _get_voice_params(self):
         """获取音色参数和 worker 参数。"""
@@ -192,24 +244,74 @@ class TaskEngine:
         }
         return voices, params
 
-    def _generate_worker(self):
-        """后台线程：逐块生成 → 合并。"""
-        try:
-            self._do_generate()
-        except Exception as e:
+    def _task_audio_dir(self):
+        """当前任务的中间产物子目录：audio_dir/{输出名}，避免任务间互相污染。"""
+        cfg = config.load()
+        safe_name = re.sub(r'[\\/:*?"<>|\s]', "_", self._task_config.get("output_name")
+                           or self.output_name or "default")[:60].strip("._") or "default"
+        task_dir = os.path.join(cfg["audio_dir"], safe_name)
+        os.makedirs(task_dir, exist_ok=True)
+        return task_dir
+
+    def _run_queue_worker(self):
+        """后台线程：按顺序逐个执行队列中的脚本，完成或失败后进入下一个。"""
+        while self._jobs:
+            job = self._jobs[0]
+            if self._cancel_event.is_set():
+                break
+            # 队首非当前任务（如解析失败后顺延）时重新解析
+            if job["script_path"] != self.script_path and not self._parse_job(job):
+                self._failed_jobs.append({
+                    "script": os.path.basename(job["script_path"]),
+                    "error": (self.error_message or "解析失败")[:80],
+                })
+                self._jobs.pop(0)
+                self._job_index += 1
+                continue
+            try:
+                self._do_generate()
+            except Exception as e:
+                self.status = "failed"
+                self.error_message = str(e)
+                self._emit({"type": "error", "message": "任务异常: %s" % str(e),
+                            "queue": self._queue_ctx(),
+                            "more": len(self._jobs) > 1})
+            # 当前任务终态：done/failed 都继续下一个；取消则中止整批
+            if self.status == "cancelled":
+                break
+            if self.status == "failed":
+                self._failed_jobs.append({
+                    "script": os.path.basename(job["script_path"]),
+                    "error": (self.error_message or "失败")[:100],
+                })
+            self._jobs.pop(0)
+            self._job_index += 1
+
+        self.end_time = time.time()
+        if self.status == "cancelled" or (self._cancel_event.is_set() and not self._jobs):
+            self.status = "cancelled"
+            self._emit({"type": "cancelled", "message": "任务已取消，剩余队列已清空",
+                        "queue": None})
+        elif self._failed_jobs:
             self.status = "failed"
-            self.error_message = str(e)
-            self._emit({"type": "error", "message": "任务异常: %s" % str(e)})
-        finally:
-            if self.status not in ("cancelled",):
-                if self.status != "failed":
-                    self.status = "done"
-            self.end_time = time.time()
+            self.error_message = "%d/%d 个任务失败" % (
+                len(self._failed_jobs), self._total_jobs)
+            self._emit({"type": "error",
+                        "message": "%d/%d 个任务失败：%s" % (
+                            len(self._failed_jobs), self._total_jobs,
+                            "；".join(f["script"] for f in self._failed_jobs)),
+                        "failed_jobs": self._failed_jobs, "queue": None})
+        else:
+            self.status = "done"
+            if self._total_jobs > 1:
+                self._emit({"type": "complete", "queue": None, "batch": True,
+                            "output": os.path.basename(self._last_output or ""),
+                            "message": "全部 %d 个任务完成，最后一部: %s" % (
+                                self._total_jobs,
+                                os.path.basename(self._last_output or ""))})
 
     def _do_generate(self):
-        cfg = config.load()
-        audio_dir = cfg["audio_dir"]
-        os.makedirs(audio_dir, exist_ok=True)
+        audio_dir = self._task_audio_dir()
 
         voices, params = self._get_voice_params()
 
@@ -234,7 +336,8 @@ class TaskEngine:
 
         # 逐块生成
         self.status = "generating"
-        self._emit({"type": "status", "status": "generating", "message": "开始生成音频..."})
+        self._emit({"type": "status", "status": "generating",
+                    "message": "开始生成音频...", "queue": self._queue_ctx()})
 
         for block in self.blocks:
             if self._cancel_event.is_set():
@@ -280,7 +383,8 @@ class TaskEngine:
         # 检查取消
         if self._cancel_event.is_set():
             self.status = "cancelled"
-            self._emit({"type": "status", "status": "cancelled", "message": "任务已取消"})
+            self._emit({"type": "status", "status": "cancelled",
+                        "message": "任务已取消", "queue": self._queue_ctx()})
             return
 
         # 检查失败块
@@ -289,7 +393,8 @@ class TaskEngine:
             self.status = "failed"
             self._emit({"type": "error",
                          "message": "%d 个块生成失败" % len(self.failed_blocks),
-                         "failed_blocks": self.failed_blocks})
+                         "failed_blocks": self.failed_blocks,
+                         "queue": self._queue_ctx(), "more": len(self._jobs) > 1})
             return
 
         # 合并
@@ -298,8 +403,7 @@ class TaskEngine:
     def _retry_worker(self):
         """后台线程：仅重新生成失败块，然后合并。"""
         try:
-            cfg = config.load()
-            audio_dir = cfg["audio_dir"]
+            audio_dir = self._task_audio_dir()
             voices, params = self._get_voice_params()
 
             retry_blocks = [b for b in self.blocks
@@ -324,7 +428,8 @@ class TaskEngine:
                              "error": error[:100]})
 
             self._emit({"type": "status", "status": "generating",
-                         "message": "重试 %d 个失败块..." % len(retry_blocks)})
+                         "message": "重试 %d 个失败块..." % len(retry_blocks),
+                        "queue": self._queue_ctx()})
 
             for block in retry_blocks:
                 if self._cancel_event.is_set():
@@ -353,7 +458,8 @@ class TaskEngine:
 
             if self._cancel_event.is_set():
                 self.status = "cancelled"
-                self._emit({"type": "status", "status": "cancelled", "message": "已取消"})
+                self._emit({"type": "status", "status": "cancelled", "message": "已取消",
+                            "queue": self._queue_ctx()})
                 return
 
             self.failed_blocks = [idx for idx, s in self.block_states.items() if s == "failed"]
@@ -361,14 +467,16 @@ class TaskEngine:
                 self.status = "failed"
                 self._emit({"type": "error",
                              "message": "%d 个块仍然失败" % len(self.failed_blocks),
-                             "failed_blocks": self.failed_blocks})
+                             "failed_blocks": self.failed_blocks,
+                             "queue": self._queue_ctx(), "more": not self._jobs})
                 return
 
             self._do_merge()
         except Exception as e:
             self.status = "failed"
             self.error_message = str(e)
-            self._emit({"type": "error", "message": "重试异常: %s" % str(e)})
+            self._emit({"type": "error", "message": "重试异常: %s" % str(e),
+                        "queue": self._queue_ctx(), "more": not self._jobs})
         finally:
             if self.status not in ("cancelled", "failed"):
                 self.status = "done"
@@ -377,7 +485,8 @@ class TaskEngine:
     def _do_merge(self):
         """合并步骤。"""
         self.status = "merging"
-        self._emit({"type": "status", "status": "merging", "message": "正在合并音频..."})
+        self._emit({"type": "status", "status": "merging",
+                    "message": "正在合并音频...", "queue": self._queue_ctx()})
 
         cfg = config.load()
         tc = self._task_config
@@ -389,7 +498,7 @@ class TaskEngine:
                              "total": total, "message": message})
 
             result_path, dur = audio_merger.merge(
-                cfg["audio_dir"], output_path,
+                self._task_audio_dir(), output_path,
                 bgm_path=tc.get("bgm_path"),
                 bgm_volume=tc.get("bgm_volume", 30),
                 lufs=tc.get("lufs", -16),
@@ -398,6 +507,7 @@ class TaskEngine:
             )
             self.output_path = result_path
             self.duration_sec = dur
+            self._last_output = result_path
             self.status = "validating"
 
             # 时长校验
@@ -415,11 +525,14 @@ class TaskEngine:
                 "duration_sec": round(dur, 1) if dur else None,
                 "duration_min": round(dur / 60, 1) if dur else None,
                 "warning": warning,
+                "queue": self._queue_ctx(),
+                "more": not (self._cancel_event.is_set() and not self._jobs) and len(self._jobs) > 1,
             })
         except Exception as e:
             self.status = "failed"
             self.error_message = "合并失败: %s" % str(e)
-            self._emit({"type": "error", "message": self.error_message})
+            self._emit({"type": "error", "message": self.error_message,
+                        "queue": self._queue_ctx(), "more": len(self._jobs) > 1})
 
     def _emit_progress(self):
         """发送总进度事件。"""
@@ -450,6 +563,10 @@ class TaskEngine:
             "status": self.status,
             "script_path": self.script_path,
             "output_name": self.output_name,
+            "total_jobs": self._total_jobs,
+            "job_index": self._job_index,
+            "pending_scripts": [os.path.basename(j["script_path"]) for j in self._jobs[1:]],
+            "failed_jobs": list(self._failed_jobs),
             "total_blocks": len(self.blocks),
             "block_states": dict(self.block_states),
             "failed_blocks": list(self.failed_blocks),

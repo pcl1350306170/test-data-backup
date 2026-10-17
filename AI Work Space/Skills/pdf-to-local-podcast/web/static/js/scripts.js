@@ -134,7 +134,7 @@ const Scripts = {
     try {
       await App.api('/api/scripts', { method: 'POST', body: { path: this.currentPath, content } });
     } catch (e) { /* ignore */ }
-    // 跳转到任务 Tab 并预选脚本
+    // 跳转到任务 Tab 并加入脚本队列
     App.switchTab('task');
     Task.setScript(this.currentPath);
   },
