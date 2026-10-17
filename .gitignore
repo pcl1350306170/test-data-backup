@@ -36,6 +36,7 @@ vue.config.js
 # Script config files
 **/json/config_*.json
 **/json/testServer.json
+/py/voice_notes/notes.json
 
 # 任务进度目录（不提交）
 /py/other/json/progress/

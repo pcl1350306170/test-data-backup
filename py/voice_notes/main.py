@@ -3,6 +3,7 @@
 语音速记本（FastAPI 本地服务）
 - 手机/电脑浏览器访问 http://<本机IP>:8010
 - 手机端用输入法语音键转文字后保存，电脑端查看/编辑/删除
+- 记录支持分类（categories.json），手机/电脑两端同步
 - 数据存本地 notes.json，无口令，局域网免密
 启动：python main.py   或双击 start.bat
 """
@@ -19,7 +20,13 @@ from pydantic import BaseModel
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE, "notes.json")
+CAT_PATH = os.path.join(BASE, "categories.json")
 PORT = 8010
+
+DEFAULT_CATS = [
+    {"id": "cat_daily", "name": "日常记录"},
+    {"id": "cat_xianjian4", "name": "仙剑四游戏同人小说大纲"},
+]
 
 app = FastAPI(title="语音速记本")
 LOCK = threading.Lock()
@@ -29,6 +36,7 @@ def _now() -> str:
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+# ---------------------------------------------------------------- 记录
 def _load_notes() -> list:
     if not os.path.exists(DATA_PATH):
         return []
@@ -55,6 +63,34 @@ def _sort_notes(notes: list) -> list:
 
 class NoteBody(BaseModel):
     content: str = ""
+    created_at: str = ""    # 可选：客户端提供的录入时间（离线同步保留原时间）
+    client_id: str = ""     # 可选：客户端唯一 ID（幂等去重，防止重复推送）
+    category_id: str = ""   # 可选：所属分类
+
+
+# ---------------------------------------------------------------- 分类
+def _load_categories() -> list:
+    if not os.path.exists(CAT_PATH):
+        return [dict(c) for c in DEFAULT_CATS]
+    try:
+        with open(CAT_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list) and data:
+            return data
+        return [dict(c) for c in DEFAULT_CATS]
+    except Exception:
+        return [dict(c) for c in DEFAULT_CATS]
+
+
+def _save_categories(cats: list):
+    tmp = CAT_PATH + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(cats, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, CAT_PATH)
+
+
+class CategoryBody(BaseModel):
+    name: str = ""
 
 
 # ---------------------------------------------------------------- 页面
@@ -63,7 +99,60 @@ def index():
     return FileResponse(os.path.join(BASE, "index.html"))
 
 
-# ---------------------------------------------------------------- API
+# ---------------------------------------------------------------- 分类 API
+@app.get("/api/categories")
+def list_categories():
+    with LOCK:
+        cats = _load_categories()
+        notes = _load_notes()
+        counts = {}
+        for n in notes:
+            cid = n.get("category_id", "")
+            counts[cid] = counts.get(cid, 0) + 1
+        out = [{"id": c["id"], "name": c["name"], "count": counts.get(c["id"], 0)} for c in cats]
+        out.append({"id": "", "name": "未分类", "count": counts.get("", 0)})
+    return {"categories": out}
+
+
+@app.post("/api/categories")
+def create_category(body: CategoryBody):
+    name = (body.name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="分类名不能为空")
+    if len(name) > 20:
+        raise HTTPException(status_code=400, detail="分类名最长 20 字")
+    with LOCK:
+        cats = _load_categories()
+        for c in cats:
+            if c["name"] == name:
+                raise HTTPException(status_code=400, detail="分类已存在：%s" % name)
+        cat = {"id": uuid.uuid4().hex[:12], "name": name}
+        cats.append(cat)
+        _save_categories(cats)
+    return cat
+
+
+@app.delete("/api/categories/{cat_id}")
+def delete_category(cat_id: str):
+    with LOCK:
+        cats = _load_categories()
+        kept = [c for c in cats if c["id"] != cat_id]
+        if len(kept) == len(cats):
+            raise HTTPException(status_code=404, detail="分类不存在")
+        _save_categories(kept)
+        # 该分类下的记录归入"未分类"
+        notes = _load_notes()
+        changed = False
+        for n in notes:
+            if n.get("category_id", "") == cat_id:
+                n["category_id"] = ""
+                changed = True
+        if changed:
+            _save_notes(notes)
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------- 记录 API
 @app.get("/api/notes")
 def list_notes():
     with LOCK:
@@ -76,14 +165,29 @@ def create_note(body: NoteBody):
     content = (body.content or "").strip()
     if not content:
         raise HTTPException(status_code=400, detail="内容不能为空")
+    created_at = (body.created_at or "").strip()
+    if created_at:
+        try:
+            datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            created_at = ""
+    if not created_at:
+        created_at = _now()
     note = {
         "id": uuid.uuid4().hex[:12],
         "content": content,
-        "created_at": _now(),
+        "created_at": created_at,
         "updated_at": "",
+        "category_id": (body.category_id or "").strip(),
     }
+    if body.client_id:
+        note["client_id"] = body.client_id
     with LOCK:
         notes = _load_notes()
+        if body.client_id:
+            for n in notes:
+                if n.get("client_id") == body.client_id:
+                    return n  # 幂等：同一条记录重复推送时直接返回已有记录
         notes.append(note)
         _save_notes(notes)
     return note
@@ -100,6 +204,8 @@ def update_note(note_id: str, body: NoteBody):
             if n.get("id") == note_id:
                 n["content"] = content
                 n["updated_at"] = _now()
+                if body.category_id is not None:
+                    n["category_id"] = (body.category_id or "").strip()
                 _save_notes(notes)
                 return n
     raise HTTPException(status_code=404, detail="记录不存在")

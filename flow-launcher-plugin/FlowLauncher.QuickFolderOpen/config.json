@@ -124,6 +124,17 @@
                 "语音"
             ],
             "path": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\Skills\\pdf-to-local-podcast\\web\\start.bat"
+        },
+        {
+            "name": "手机快速录入文字",
+            "keywords": [
+                "voice",
+                "notes",
+                "语音",
+                "速记",
+                "录入"
+            ],
+            "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_notes\\start.bat"
         }
     ]
 }

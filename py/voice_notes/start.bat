@@ -1,15 +1,24 @@
 @echo off
 chcp 65001 >nul
 cd /d %~dp0
+
+set "PY=python"
 python -c "import uvicorn, fastapi" >nul 2>&1
 if errorlevel 1 (
-    echo [æç¤º] å½“å‰ Python ç¼ºå°‘ fastapi/uvicorn ä¾èµ–ï¼Œæ­£åœ¨è‡ªåŠ¨å®‰è£…...
-    python -m pip install fastapi uvicorn -q
+    py -3 -c "import uvicorn, fastapi" >nul 2>&1
+    if errorlevel 1 (
+        echo [´íÎó] Î´ÕÒµ½¿ÉÓÃµÄ Python£¨ĞèÒª fastapi/uvicorn ÒÀÀµ£©
+        echo ÇëÏÈ°²×°ÒÀÀµ£ºpython -m pip install fastapi uvicorn
+        pause
+        exit /b 1
+    )
+    set "PY=py -3"
 )
+
 echo ====================================
-echo   æ­£åœ¨å¯åŠ¨ è¯­éŸ³é€Ÿè®°æœ¬ æœåŠ¡...
-echo   æœ¬æœºè®¿é—®: http://127.0.0.1:8010
-echo   å…³é—­æœ¬çª—å£å³åœæ­¢æœåŠ¡
+echo   ÕıÔÚÆô¶¯ ÓïÒôËÙ¼Ç±¾ ·şÎñ...
+echo   ±¾»ú·ÃÎÊ: http://127.0.0.1:8010
+echo   ¹Ø±Õ±¾´°¿Ú¼´Í£Ö¹·şÎñ
 echo ====================================
-python main.py
+%PY% main.py
 pause
