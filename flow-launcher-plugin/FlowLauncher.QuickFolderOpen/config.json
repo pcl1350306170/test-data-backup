@@ -115,7 +115,7 @@
             "path": "D:\\CODE\\Miscellaneous\\GPT-IMG\\头像"
         },
         {
-            "name": "本地AI播客制作任务启动器",
+            "name": "快速启动web页面-本地AI播客制作任务",
             "keywords": [
                 "播客",
                 "podcast",
@@ -126,7 +126,7 @@
             "path": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\Skills\\pdf-to-local-podcast\\web\\start.bat"
         },
         {
-            "name": "手机快速录入文字",
+            "name": "快速启动web页面-手机录入文字",
             "keywords": [
                 "voice",
                 "notes",
@@ -135,6 +135,16 @@
                 "录入"
             ],
             "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_notes\\start.bat"
+        },
+        {
+            "name": "快速启动web页面-Cosyvoice文字转音频",
+            "keywords": [
+                "cosyvoice",
+                "tts",
+                "文字转音频",
+                "语音合成"
+            ],
+            "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_tts\\start.bat"
         }
     ]
 }

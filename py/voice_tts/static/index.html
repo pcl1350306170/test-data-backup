@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CosyVoice TTS</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header id="header">
+    <div class="logo">🎙️ CosyVoice 语音合成</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <nav id="tabs">
+        <button class="tab active" data-tab="synthesize">📝 合成</button>
+        <button class="tab" data-tab="tasks">📚 任务 <span id="taskBadge" class="badge" style="display:none">0</span></button>
+        <button class="tab" data-tab="results">🎵 成品</button>
+        <button class="tab" data-tab="settings">⚙️ 设置</button>
+      </nav>
+      <button id="themeBtn" class="theme-btn" title="切换明暗模式">🌙</button>
+    </div>
+  </header>
+
+  <main id="content">
+    <!-- ═══ 合成页 ═══ -->
+    <section id="tab-synthesize" class="tab-content active">
+      <!-- 任务名 -->
+      <div class="panel">
+        <div class="panel-title">任务名（可选，用于任务列表识别）</div>
+        <input type="text" id="taskNameInput" placeholder="留空则使用文本前20字自动生成">
+      </div>
+
+      <!-- 文本输入 -->
+      <div class="panel">
+        <div class="panel-title">文本内容</div>
+        <textarea id="textInput" placeholder="在此粘贴或输入要合成的文本…" spellcheck="false"></textarea>
+        <div class="text-toolbar">
+          <span class="hint" id="charCount">0 字符</span>
+          <div class="btn-group">
+            <button class="btn btn-sm" onclick="App.clearText()">清空</button>
+            <label class="btn btn-sm" style="margin:0;cursor:pointer;">
+              导入TXT<input type="file" accept=".txt" style="display:none" onchange="App.importTxt(event)">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 合成参数 -->
+      <div class="panel">
+        <div class="panel-title">合成参数</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>音色</label>
+            <select id="spkSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>情感风格</label>
+            <select id="styleSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>语速</label>
+            <select id="speedSelect"></select>
+          </div>
+          <div class="form-group">
+            <label>输出格式</label>
+            <select id="formatSelect">
+              <option value="wav">WAV</option>
+              <option value="mp3">MP3</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>切段字数</label>
+            <input type="number" id="segLenInput" value="500" min="50" max="2000">
+          </div>
+          <div class="form-group">
+            <label>文件名前缀</label>
+            <input type="text" id="prefixInput" placeholder="留空则用音色名">
+          </div>
+          <div class="form-group form-group-inline">
+            <label><input type="checkbox" id="fadeCheck" checked> 结尾淡出</label>
+          </div>
+          <div class="form-group" style="max-width:90px">
+            <label>淡出(ms)</label>
+            <input type="number" id="fadeMsInput" value="0" min="0" max="5000">
+          </div>
+          <div class="form-group" style="max-width:100px">
+            <label>补静音(ms)</label>
+            <input type="number" id="tailMsInput" value="900" min="0" max="5000">
+          </div>
+        </div>
+      </div>
+
+      <!-- 参考音频 -->
+      <div class="panel">
+        <div class="panel-title">参考音频（Zero-Shot 音色复刻，可选）</div>
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>选择参考音色</label>
+            <select id="promptAudioSelect"><option value="">(不使用)</option></select>
+          </div>
+          <div class="form-group flex-3">
+            <label>音频对应文本</label>
+            <input type="text" id="promptTextInput" placeholder="选择参考音频后自动填充">
+          </div>
+        </div>
+        <p class="hint">选择参考音频后将使用 Zero-Shot 模式复刻该音色，上方"音色"选项将被忽略。</p>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="task-actions">
+        <button id="btnStart" class="btn btn-success btn-lg" onclick="Task.start()">🚀 开始生成</button>
+        <button id="btnPause" class="btn btn-warning" style="display:none" onclick="Task.pause()">⏸ 暂停</button>
+        <button id="btnResume" class="btn btn-success" style="display:none" onclick="Task.resume()">▶ 继续</button>
+        <button id="btnStop" class="btn btn-danger" style="display:none" onclick="Task.stop()">⏹ 停止</button>
+        <button id="btnTest" class="btn" onclick="Task.test()">🧪 测试</button>
+      </div>
+
+      <!-- 当前任务信息条 -->
+      <div id="activeTaskBar" class="active-task-bar" style="display:none">
+        <span class="atb-label">当前任务：</span>
+        <span class="atb-name" id="atbName"></span>
+        <span class="atb-status" id="atbStatus"></span>
+      </div>
+
+      <!-- 进度 -->
+      <div id="progressSection" class="progress-section" style="display:none">
+        <div class="progress-bar-wrap">
+          <div id="progressBar" class="progress-bar" style="width:0%"></div>
+        </div>
+        <div class="progress-info">
+          <span id="progressText">0/0</span>
+          <span id="progressPercent">0%</span>
+        </div>
+      </div>
+
+      <!-- 日志 -->
+      <div id="logSection" class="panel" style="display:none">
+        <div class="panel-title">生成日志</div>
+        <div id="logBox" class="log-box"></div>
+      </div>
+    </section>
+
+    <!-- ═══ 任务列表页 ═══ -->
+    <section id="tab-tasks" class="tab-content">
+      <div class="panel-toolbar">
+        <button class="btn" onclick="App.loadTaskList()">🔄 刷新</button>
+        <span class="hint" id="taskListHint"></span>
+      </div>
+      <div id="taskList" class="task-list"></div>
+      <div id="taskEmpty" class="empty-hint">暂无任务记录</div>
+    </section>
+
+    <!-- ═══ 成品页 ═══ -->
+    <section id="tab-results" class="tab-content">
+      <div class="panel-toolbar">
+        <button class="btn" onclick="App.loadAudioList()">🔄 刷新</button>
+      </div>
+      <div id="audioList" class="audio-list"></div>
+      <div id="audioEmpty" class="empty-hint">暂无生成的音频文件</div>
+      <div id="playerWrap" class="player-wrap" style="display:none">
+        <audio id="audioPlayer" controls></audio>
+        <div class="player-name" id="playerName"></div>
+      </div>
+    </section>
+
+    <!-- ═══ 设置页 ═══ -->
+    <section id="tab-settings" class="tab-content">
+      <div class="settings-form">
+        <h3>目录配置</h3>
+        <div class="form-group">
+          <label>音频输出目录</label>
+          <input type="text" id="cfg-output-dir">
+        </div>
+        <div class="form-group">
+          <label>TTS 参考音频目录</label>
+          <input type="text" id="cfg-tts-dir">
+        </div>
+        <details class="advanced-toggle">
+          <summary>CosyVoice 环境（一般不需修改）</summary>
+          <div class="form-group">
+            <label>Conda Python 路径</label>
+            <input type="text" id="cfg-conda-python">
+          </div>
+          <div class="form-group">
+            <label>模型目录</label>
+            <input type="text" id="cfg-model-dir">
+          </div>
+          <div class="form-group">
+            <label>仓库目录</label>
+            <input type="text" id="cfg-repo-dir">
+          </div>
+          <div class="form-group">
+            <label>Worker 脚本路径</label>
+            <input type="text" id="cfg-worker-script">
+          </div>
+        </details>
+        <h3 style="margin-top:20px">默认合成参数</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>默认音色</label>
+            <input type="text" id="cfg-spk">
+          </div>
+          <div class="form-group">
+            <label>默认语速</label>
+            <input type="number" id="cfg-speed" step="0.1" min="0.5" max="2.0">
+          </div>
+          <div class="form-group">
+            <label>默认格式</label>
+            <select id="cfg-format"><option value="wav">WAV</option><option value="mp3">MP3</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="App.saveConfig()">💾 保存配置</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 删除任务确认对话框 -->
+  <div id="modal" class="modal-mask" style="display:none">
+    <div class="modal-box">
+      <div class="modal-title">删除任务「<span id="modalTaskName"></span>」</div>
+      <div class="modal-body">
+        <label class="check-row"><input type="checkbox" id="cleanTempCheck" checked> 清理中间文件（<code>output/_temp/{id}/</code>）</label>
+        <label class="check-row"><input type="checkbox" id="cleanOutputCheck"> 清理成品音频（<span id="cleanOutputCount"></span>）</label>
+        <p class="hint" style="margin-top:8px">任务记录本身将被删除，无法撤销。</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="App.closeModal()">取消</button>
+        <button class="btn btn-danger" onclick="App.confirmDeleteTask()">确认删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/task.js"></script>
+</body>
+</html>

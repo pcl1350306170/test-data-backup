@@ -1,0 +1,19 @@
+{
+  "conda_python": "D:\\TOOLS\\miniconda3\\envs\\cosyvoice\\python.exe",
+  "model_dir": "D:\\dev\\sherpa-models\\CosyVoice2-0.5B",
+  "repo_dir": "D:\\dev\\sherpa-models\\CosyVoice",
+  "worker_script": "D:\\CODE\\Python\\test-data-backup\\py\\other\\cosyvoice_tts_worker.py",
+  "output_dir": "D:\\FILES\\music\\AI音频\\中间产物",
+  "tts_dir": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS",
+  "spk": "中文女",
+  "style": "",
+  "speed": 1,
+  "format": "wav",
+  "seg_len": 500,
+  "fade": true,
+  "fade_ms": 0,
+  "tail_ms": 900,
+  "prompt_audio": "",
+  "prompt_text": "",
+  "default_prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。"
+}
