@@ -145,6 +145,16 @@
                 "语音合成"
             ],
             "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_tts\\start.bat"
+        },
+        {
+            "name": "本地服务大厅-Hub",
+            "keywords": [
+                "hub",
+                "服务大厅",
+                "本地服务",
+                "管理"
+            ],
+            "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\hub\\start.bat"
         }
     ]
 }
