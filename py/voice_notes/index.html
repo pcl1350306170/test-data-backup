@@ -165,9 +165,14 @@ header h1 { font-size:18px; font-weight:700; }
   padding:10px 4px; border-bottom:1px solid var(--border); font-size:14px;
 }
 .cat-item .cat-num { color:var(--muted); font-size:12px; margin-left:8px; }
+.cat-item .cat-ops { display:flex; gap:6px; }
 .cat-del {
   border:none; background:none; color:var(--del); font-size:13px; cursor:pointer; padding:4px 8px;
 }
+.cat-clear {
+  border:none; background:none; color:var(--edited); font-size:13px; cursor:pointer; padding:4px 8px;
+}
+.cat-clear:disabled { opacity:0.4; cursor:not-allowed; }
 #catCloseBtn {
   width:100%; padding:13px; font-size:16px; border:none; border-radius:12px;
   background:var(--btn-ghost); color:var(--btn-ghost-text); cursor:pointer;
@@ -530,11 +535,21 @@ header h1 { font-size:18px; font-weight:700; }
         name.appendChild(num);
         li.appendChild(name);
         if (c.id) {
+          var ops = document.createElement('div');
+          ops.className = 'cat-ops';
+          var clr = document.createElement('button');
+          clr.className = 'cat-clear';
+          clr.textContent = '清空';
+          clr.title = '清空该分类下的所有记录';
+          if (!c.count) clr.disabled = true;
+          clr.addEventListener('click', function () { clearCategoryNotes(c.id, c.name, c.count || 0); });
+          ops.appendChild(clr);
           var del = document.createElement('button');
           del.className = 'cat-del';
           del.textContent = '删除';
           del.addEventListener('click', function () { delCategory(c.id, c.name); });
-          li.appendChild(del);
+          ops.appendChild(del);
+          li.appendChild(ops);
         }
         catListEl.appendChild(li);
       });
@@ -575,6 +590,25 @@ header h1 { font-size:18px; font-weight:700; }
         toast('分类已删除');
       })
       .catch(function (e) { alert('删除失败：' + e.message); });
+  }
+
+  function clearCategoryNotes(id, name, count) {
+    if (!count) { toast('该分类下没有记录'); return; }
+    if (!confirm('确定清空分类「' + name + '」下的全部 ' + count + ' 条记录？此操作不可恢复。')) return;
+    fetch('/api/categories/' + encodeURIComponent(id) + '/notes', { method: 'DELETE' })
+      .then(function (r) {
+        return r.json().then(function (d) {
+          if (!r.ok) throw new Error(d.detail || '清空失败');
+          return d;
+        });
+      })
+      .then(function (d) {
+        renderCatManager();
+        loadCats();
+        load();
+        toast('已清空 ' + (d.removed || 0) + ' 条记录');
+      })
+      .catch(function (e) { alert('清空失败：' + e.message); });
   }
 
   /* ---------------- 离线保存 / 同步 ---------------- */

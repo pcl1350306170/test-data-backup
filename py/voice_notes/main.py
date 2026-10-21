@@ -152,6 +152,21 @@ def delete_category(cat_id: str):
     return {"ok": True}
 
 
+@app.delete("/api/categories/{cat_id}/notes")
+def clear_category_notes(cat_id: str):
+    """清空指定分类下的所有记录（保留分类本身）。"""
+    with LOCK:
+        cats = _load_categories()
+        if not any(c["id"] == cat_id for c in cats):
+            raise HTTPException(status_code=404, detail="分类不存在")
+        notes = _load_notes()
+        kept = [n for n in notes if n.get("category_id", "") != cat_id]
+        removed = len(notes) - len(kept)
+        if removed:
+            _save_notes(kept)
+    return {"ok": True, "removed": removed}
+
+
 # ---------------------------------------------------------------- 记录 API
 @app.get("/api/notes")
 def list_notes():
