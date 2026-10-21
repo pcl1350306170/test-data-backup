@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本地服务大厅</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header>
+    <h1>🗂 本地服务大厅</h1>
+    <div class="head-right">
+      <span class="hub-addr" id="hubAddr"></span>
+      <button class="btn" onclick="Hub.exportFL()">📋 导出 FL 配置</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="cardGrid" class="card-grid"></div>
+  </main>
+
+  <!-- 日志弹窗 -->
+  <div id="logModal" class="modal-mask" style="display:none">
+    <div class="modal-box">
+      <div class="modal-title" id="logModalTitle">运行日志</div>
+      <pre id="logBox" class="log-box"></pre>
+      <div class="modal-actions">
+        <button class="btn" onclick="Hub.refreshLog()">🔄 刷新</button>
+        <button class="btn" onclick="Hub.closeLog()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" style="display:none"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

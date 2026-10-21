@@ -72,6 +72,11 @@ class BatchImageCropperApp:
         self.traverse_subdirs.trace_add('write', self._on_traverse_subdirs_changed)
         self.preserve_dir_structure = tk.BooleanVar(value=True)
         self.rename_mode = tk.StringVar(value="不重命名")
+        self.enable_compress = tk.BooleanVar(value=False)
+        self.compress_max_kb = tk.StringVar(value="1000")
+        self.enable_compress.trace_add('write', self._on_enable_compress_changed)
+        self.no_subject_action = tk.StringVar(value="按比例居中裁剪")
+        self.subject_aware.trace_add('write', self._on_subject_aware_changed)
         self._stop_event = threading.Event()  # 线程安全的停止信号
         self.is_processing = False
         self.log_queue = queue.Queue()
@@ -84,6 +89,8 @@ class BatchImageCropperApp:
 
         # 初始化联动状态
         self._on_traverse_subdirs_changed()
+        self._on_enable_compress_changed()
+        self._on_subject_aware_changed()
 
         # 启动日志队列轮询
         self._poll_log_queue()
@@ -142,21 +149,33 @@ class BatchImageCropperApp:
             variable=self.subject_aware
         ).grid(row=1, column=0, columnspan=4, sticky=tk.W, pady=(10, 0))
 
+        # 未检测到主体时的处理方式
+        self.no_subject_label = ttk.Label(param_frame, text="未检测到主体:")
+        self.no_subject_label.grid(row=2, column=0, sticky=tk.W, padx=(0, 5), pady=(5, 0))
+        self.no_subject_combo = ttk.Combobox(
+            param_frame,
+            textvariable=self.no_subject_action,
+            values=["按比例居中裁剪", "原样输出", "忽略(跳过不输出)"],
+            state="readonly",
+            width=22
+        )
+        self.no_subject_combo.grid(row=2, column=1, columnspan=3, sticky=tk.W, padx=5, pady=(5, 0))
+
         ttk.Checkbutton(
             param_frame,
             text="遍历子目录",
             variable=self.traverse_subdirs
-        ).grid(row=2, column=0, sticky=tk.W, pady=(5, 0))
+        ).grid(row=3, column=0, sticky=tk.W, pady=(5, 0))
 
         self.preserve_dir_cb = ttk.Checkbutton(
             param_frame,
             text="输出保留目录结构",
             variable=self.preserve_dir_structure
         )
-        self.preserve_dir_cb.grid(row=2, column=1, sticky=tk.W, padx=(20, 0), pady=(5, 0))
+        self.preserve_dir_cb.grid(row=3, column=1, sticky=tk.W, padx=(20, 0), pady=(5, 0))
 
         # 重命名设置
-        ttk.Label(param_frame, text="重命名:").grid(row=3, column=0, sticky=tk.W, padx=(0, 5), pady=(5, 0))
+        ttk.Label(param_frame, text="重命名:").grid(row=4, column=0, sticky=tk.W, padx=(0, 5), pady=(5, 0))
         rename_combo = ttk.Combobox(
             param_frame,
             textvariable=self.rename_mode,
@@ -164,7 +183,18 @@ class BatchImageCropperApp:
             state="readonly",
             width=22
         )
-        rename_combo.grid(row=3, column=1, columnspan=3, sticky=tk.W, padx=5, pady=(5, 0))
+        rename_combo.grid(row=4, column=1, columnspan=3, sticky=tk.W, padx=5, pady=(5, 0))
+
+        # 压缩设置
+        ttk.Checkbutton(
+            param_frame,
+            text="压缩输出图片",
+            variable=self.enable_compress
+        ).grid(row=5, column=0, sticky=tk.W, pady=(5, 0))
+
+        ttk.Label(param_frame, text="压缩上限(KB):").grid(row=5, column=1, sticky=tk.E, padx=(20, 5), pady=(5, 0))
+        self.compress_entry = ttk.Entry(param_frame, textvariable=self.compress_max_kb, width=8)
+        self.compress_entry.grid(row=5, column=2, sticky=tk.W, pady=(5, 0))
 
         # 检测库状态提示
         lib_status = []
@@ -181,7 +211,7 @@ class BatchImageCropperApp:
             status_color = "orange"
 
         ttk.Label(param_frame, text=status_text, foreground=status_color, font=("SimHei", 8)).grid(
-            row=4, column=0, columnspan=4, sticky=tk.W, pady=(5, 0)
+            row=6, column=0, columnspan=4, sticky=tk.W, pady=(5, 0)
         )
 
         # 控制按钮
@@ -225,6 +255,26 @@ class BatchImageCropperApp:
         else:
             self.preserve_dir_cb.config(state=tk.NORMAL)
 
+    def _on_enable_compress_changed(self, *args):
+        """联动：未勾选压缩时，禁用压缩上限输入框"""
+        if not hasattr(self, 'compress_entry'):
+            return
+        if self.enable_compress.get():
+            self.compress_entry.config(state=tk.NORMAL)
+        else:
+            self.compress_entry.config(state=tk.DISABLED)
+
+    def _on_subject_aware_changed(self, *args):
+        """联动：未启用主体检测时，禁用“未检测到主体”处理选项"""
+        if not hasattr(self, 'no_subject_combo'):
+            return
+        if self.subject_aware.get():
+            self.no_subject_combo.config(state="readonly")
+            self.no_subject_label.config(state=tk.NORMAL)
+        else:
+            self.no_subject_combo.config(state=tk.DISABLED)
+            self.no_subject_label.config(state=tk.DISABLED)
+
     def select_input_dir(self):
         directory = filedialog.askdirectory(title="选择图片所在目录")
         if directory:
@@ -251,6 +301,9 @@ class BatchImageCropperApp:
                     self.traverse_subdirs.set(config.get('traverse_subdirs', True))
                     self.preserve_dir_structure.set(config.get('preserve_dir_structure', True))
                     self.rename_mode.set(config.get('rename_mode', '不重命名'))
+                    self.enable_compress.set(config.get('enable_compress', False))
+                    self.compress_max_kb.set(str(config.get('compress_max_kb', '1000')))
+                    self.no_subject_action.set(config.get('no_subject_action', '按比例居中裁剪'))
                 logger.info("配置加载成功")
         except Exception as e:
             logger.warning(f"加载配置失败: {e}")
@@ -266,7 +319,10 @@ class BatchImageCropperApp:
                 'subject_aware': self.subject_aware.get(),
                 'traverse_subdirs': self.traverse_subdirs.get(),
                 'preserve_dir_structure': self.preserve_dir_structure.get(),
-                'rename_mode': self.rename_mode.get()
+                'rename_mode': self.rename_mode.get(),
+                'enable_compress': self.enable_compress.get(),
+                'compress_max_kb': self.compress_max_kb.get(),
+                'no_subject_action': self.no_subject_action.get()
             }
             with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
                 json.dump(config, f, ensure_ascii=False, indent=2)
@@ -340,6 +396,12 @@ class BatchImageCropperApp:
         self.log(f"裁剪比例: {ratio_mode}" + ("（根据主体自动适配）" if ratio_mode == "自动" else ""))
         self.log(f"线程数: {self.thread_count.get()}")
         self.log(f"智能主体检测: {'启用' if self.subject_aware.get() else '禁用'}")
+        if self.subject_aware.get():
+            self.log(f"未检测到主体: {self.no_subject_action.get()}")
+        if self.enable_compress.get():
+            self.log(f"压缩输出: 启用（上限 {self.compress_max_kb.get()} KB）")
+        else:
+            self.log("压缩输出: 禁用")
 
         # 保存配置
         self.save_config()
@@ -381,6 +443,7 @@ class BatchImageCropperApp:
 
             success_count = 0
             fail_count = 0
+            skip_count = 0
             total = len(image_files)
 
             # 手动管理线程池，不用 with 语句（避免 __exit__ 阻塞等待）
@@ -439,7 +502,9 @@ class BatchImageCropperApp:
                     image_path = futures[future]
                     try:
                         result = future.result()
-                        if result:
+                        if result is None:
+                            skip_count += 1
+                        elif result:
                             success_count += 1
                         else:
                             fail_count += 1
@@ -448,17 +513,17 @@ class BatchImageCropperApp:
                         self.log(f"❌ {os.path.basename(image_path)}: {e}")
 
                     # 更新进度
-                    current = success_count + fail_count
+                    current = success_count + fail_count + skip_count
                     self.root.after(0, lambda v=current: self.progress.config(value=v))
-                    self.root.after(0, lambda s=success_count, f=fail_count, t=total:
-                                  self.progress_label.config(text=f"进度: {s + f}/{t} (成功: {s}, 失败: {f})"))
+                    self.root.after(0, lambda s=success_count, f=fail_count, k=skip_count, t=total:
+                                  self.progress_label.config(text=f"进度: {s + f + k}/{t} (成功: {s}, 跳过: {k}, 失败: {f})"))
 
             # 完成
             if self._stop_event.is_set():
-                self.log(f"⚠️ 处理已停止。已处理: {success_count + fail_count}/{total} (成功: {success_count}, 失败: {fail_count})")
+                self.log(f"⚠️ 处理已停止。已处理: {success_count + fail_count + skip_count}/{total} (成功: {success_count}, 跳过: {skip_count}, 失败: {fail_count})")
             else:
-                self.log(f"✅ 处理完成！成功: {success_count}, 失败: {fail_count}")
-                self.root.after(0, lambda: messagebox.showinfo("完成", f"批量裁剪完成！\n成功: {success_count}\n失败: {fail_count}"))
+                self.log(f"✅ 处理完成！成功: {success_count}, 跳过: {skip_count}, 失败: {fail_count}")
+                self.root.after(0, lambda: messagebox.showinfo("完成", f"批量裁剪完成！\n成功: {success_count}\n跳过: {skip_count}\n失败: {fail_count}"))
 
         except Exception as e:
             logger.error(f"批量处理出错: {e}")
@@ -531,36 +596,25 @@ class BatchImageCropperApp:
             actual_ratio = f"自动({crop_w}:{crop_h})"
             return (crop_x1, crop_y1, crop_x2, crop_y2, actual_ratio)
 
-        # 固定比例模式：确保主体完全包含在裁剪区域内
+        # 固定比例模式：取图片内能容纳的最大 target_ratio 裁剪框
+        # 说明：初始框已是图片内保持该比例的最大矩形，无法在保持比例的同时
+        # 再放大以完整包含主体；主体过大时只能以主体为中心取该最大框
         img_ratio = img_w / img_h
 
         if img_ratio > target_ratio:
             # 图片更宽，以高度为基准
             crop_h = img_h
-            crop_w = int(img_h * target_ratio)
+            crop_w = int(round(img_h * target_ratio))
         else:
             # 图片更高，以宽度为基准
             crop_w = img_w
-            crop_h = int(img_w / target_ratio)
+            crop_h = int(round(img_w / target_ratio))
 
-        # 检查主体是否能放入固定比例的裁剪框
-        if expanded_w > crop_w or expanded_h > crop_h:
-            # 主体太大，需要扩大裁剪框以包含主体
-            # 保持目标比例，但扩大尺寸
-            scale_w = expanded_w / crop_w if expanded_w > crop_w else 1.0
-            scale_h = expanded_h / crop_h if expanded_h > crop_h else 1.0
-            scale = max(scale_w, scale_h)
+        # 防止取整误差导致越界（不改变比例）
+        crop_w = min(crop_w, img_w)
+        crop_h = min(crop_h, img_h)
 
-            crop_w = int(crop_w * scale)
-            crop_h = int(crop_h * scale)
-
-            # 确保不超过图片边界，同时保持目标比例
-            max_w_by_ratio = int(img_h * target_ratio) if target_ratio >= 1 else img_w
-            max_h_by_ratio = int(img_w / target_ratio) if target_ratio <= 1 else img_h
-            crop_w = min(crop_w, max_w_by_ratio, img_w)
-            crop_h = min(crop_h, max_h_by_ratio, img_h)
-
-        # 以主体为中心放置裁剪框
+        # 以主体为中心放置裁剪框（自动 clamp 到图片边界内，保持比例不变）
         crop_x1 = max(0, min(img_w - crop_w, subject_cx - crop_w // 2))
         crop_y1 = max(0, min(img_h - crop_h, subject_cy - crop_h // 2))
         crop_x2 = crop_x1 + crop_w
@@ -568,46 +622,64 @@ class BatchImageCropperApp:
 
         return (crop_x1, crop_y1, crop_x2, crop_y2, None)
 
+    def _ratio_center_box(self, img_width, img_height, target_ratio):
+        """按目标比例计算居中裁剪框 (x1, y1, x2, y2)；target_ratio 为 None 时返回 None"""
+        if target_ratio is None:
+            return None
+        img_ratio = img_width / img_height
+        if img_ratio > target_ratio:
+            crop_h = img_height
+            crop_w = int(round(img_height * target_ratio))
+        else:
+            crop_w = img_width
+            crop_h = int(round(img_width / target_ratio))
+        crop_w = min(crop_w, img_width)
+        crop_h = min(crop_h, img_height)
+        x1 = (img_width - crop_w) // 2
+        y1 = (img_height - crop_h) // 2
+        return (x1, y1, x1 + crop_w, y1 + crop_h)
+
     def _process_single_image(self, image_path, output_dir, fixed_target_ratio, file_index=0, rename_mode="不重命名"):
-        """处理单张图片，返回是否成功"""
+        """处理单张图片，返回 True(成功)/False(失败)/None(跳过)"""
         try:
             # 打开图片
             img = Image.open(image_path)
             img_width, img_height = img.size
 
-            # 默认居中裁剪
-            orig_x1 = (img_width - img_width) // 2
-            orig_y1 = (img_height - img_height) // 2
-            orig_x2 = orig_x1 + img_width
-            orig_y2 = orig_y1 + img_height
+            # 默认整图（原样输出 / 自动模式且无主体时保留）
+            orig_x1, orig_y1 = 0, 0
+            orig_x2, orig_y2 = img_width, img_height
             actual_ratio_label = None
 
-            # 如果启用智能主体检测
+            crop_box = None  # (x1, y1, x2, y2, ratio_label)
             if self.subject_aware.get():
                 subject_box = self._detect_subject(img)
                 if subject_box:
-                    # 使用智能裁剪计算
-                    result = self._calc_crop_with_subject(
+                    crop_box = self._calc_crop_with_subject(
                         img_width, img_height,
                         fixed_target_ratio,
                         subject_box
                     )
-                    orig_x1, orig_y1, orig_x2, orig_y2, actual_ratio_label = result
-            else:
-                # 无主体检测，使用固定比例居中裁剪
-                if fixed_target_ratio is not None:
-                    img_ratio = img_width / img_height
-                    if img_ratio > fixed_target_ratio:
-                        crop_h = img_height
-                        crop_w = int(img_height * fixed_target_ratio)
+                else:
+                    # 未检测到主体，按用户选择的策略处理
+                    action = self.no_subject_action.get()
+                    if action.startswith("忽略"):
+                        self.log(f"⏭️ {os.path.basename(image_path)} 未检测到主体，已跳过")
+                        logger.info(f"跳过(未检测到主体): {image_path}")
+                        return None  # 不裁剪、不输出
+                    elif action.startswith("原样"):
+                        crop_box = None  # 保持整图，原样输出
                     else:
-                        crop_w = img_width
-                        crop_h = int(img_width / fixed_target_ratio)
+                        # 按比例居中裁剪
+                        box = self._ratio_center_box(img_width, img_height, fixed_target_ratio)
+                        crop_box = (*box, None) if box else None
+            else:
+                # 未启用主体检测：按固定比例居中裁剪
+                box = self._ratio_center_box(img_width, img_height, fixed_target_ratio)
+                crop_box = (*box, None) if box else None
 
-                    orig_x1 = (img_width - crop_w) // 2
-                    orig_y1 = (img_height - crop_h) // 2
-                    orig_x2 = orig_x1 + crop_w
-                    orig_y2 = orig_y1 + crop_h
+            if crop_box is not None:
+                orig_x1, orig_y1, orig_x2, orig_y2, actual_ratio_label = crop_box
 
             # 裁剪
             cropped = img.crop((orig_x1, orig_y1, orig_x2, orig_y2))
@@ -643,22 +715,92 @@ class BatchImageCropperApp:
                         counter += 1
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
-            # 保存
-            if output_path.lower().endswith('.png'):
-                cropped.save(output_path, 'PNG')
-            elif output_path.lower().endswith(('.jpg', '.jpeg')):
-                cropped.save(output_path, 'JPEG', quality=95)
-            else:
-                cropped.save(output_path)
+            # 保存（根据配置决定是否压缩）
+            compress_note = self._save_image(cropped, output_path)
 
             ratio_info = f" [{actual_ratio_label}]" if actual_ratio_label else ""
-            self.log(f"✅ {os.path.basename(image_path)}{ratio_info} → {os.path.basename(output_path)}")
-            logger.info(f"裁剪成功: {image_path} → {output_path}{ratio_info}")
+            self.log(f"✅ {os.path.basename(image_path)}{ratio_info} → {os.path.basename(output_path)}{compress_note}")
+            logger.info(f"裁剪成功: {image_path} → {output_path}{ratio_info}{compress_note}")
             return True
 
         except Exception as e:
             logger.error(f"处理失败: {image_path} | {e}")
             return False
+
+    def _save_image(self, img, output_path):
+        """保存图片；若启用压缩则控制文件大小不超过上限。返回日志备注字符串。"""
+        lower = output_path.lower()
+        is_jpeg = lower.endswith(('.jpg', '.jpeg'))
+        is_png = lower.endswith('.png')
+
+        # 未启用压缩：保持原有保存行为
+        if not self.enable_compress.get():
+            if is_png:
+                img.save(output_path, 'PNG')
+            elif is_jpeg:
+                img.save(output_path, 'JPEG', quality=95)
+            else:
+                img.save(output_path)
+            return ""
+
+        # 解析压缩上限（KB），非法值回退默认 1000KB
+        try:
+            max_kb = int(str(self.compress_max_kb.get()).strip())
+            if max_kb <= 0:
+                raise ValueError
+        except (ValueError, tk.TclError):
+            max_kb = 1000
+        max_bytes = max_kb * 1024
+
+        if is_jpeg:
+            quality = self._save_jpeg_compressed(img, output_path, max_bytes)
+            size_kb = os.path.getsize(output_path) // 1024
+            return f" [压缩 质量{quality}, {size_kb}KB]"
+        elif is_png:
+            colors = self._save_png_compressed(img, output_path, max_bytes)
+            size_kb = os.path.getsize(output_path) // 1024
+            if colors is None:
+                return f" [压缩 {size_kb}KB]"
+            return f" [压缩 {colors}色, {size_kb}KB]"
+        else:
+            img.save(output_path)
+            return ""
+
+    def _save_jpeg_compressed(self, img, output_path, max_bytes):
+        """逐步降低 JPEG 质量直到文件不超过上限，返回最终使用的质量值。"""
+        if img.mode in ('RGBA', 'P', 'LA'):
+            img = img.convert('RGB')
+        quality = 95
+        while quality >= 10:
+            img.save(output_path, 'JPEG', quality=quality, optimize=True)
+            if os.path.getsize(output_path) <= max_bytes:
+                return quality
+            quality -= 5
+        # 已到最低质量仍超限，以最低质量保存并返回
+        img.save(output_path, 'JPEG', quality=10, optimize=True)
+        return 10
+
+    def _save_png_compressed(self, img, output_path, max_bytes):
+        """先无损优化；仍超限则逐步降低颜色数量。返回最终颜色数，None 表示未降色。"""
+        img.save(output_path, 'PNG', optimize=True)
+        if os.path.getsize(output_path) <= max_bytes:
+            return None
+        # PNG 为无损格式，超限时通过减少调色板颜色数量压缩
+        base = img.convert('RGBA') if img.mode in ('RGBA', 'LA', 'P') else img.convert('RGB')
+        colors = 256
+        last_ok = None
+        while colors >= 16:
+            try:
+                quantized = base.quantize(colors=colors)
+                quantized.save(output_path, 'PNG', optimize=True)
+            except Exception:
+                break
+            last_ok = colors
+            if os.path.getsize(output_path) <= max_bytes:
+                return colors
+            colors //= 2
+        # 所有降色尝试后仍超限，保留最后一次降色结果
+        return last_ok
 
     def _detect_subject(self, img):
         """检测图片中的主体，返回边界框 (x1, y1, x2, y2) 或 None"""

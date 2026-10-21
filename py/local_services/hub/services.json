@@ -1,0 +1,66 @@
+{
+  "services": [
+    {
+      "id": "voice_tts",
+      "name": "CosyVoice 语音合成",
+      "icon": "🎙",
+      "desc": "文本分段转语音 / 任务持久化 / 音频合并",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_tts",
+      "cmd": ["python", "server.py"],
+      "port": 8020,
+      "health_path": "/",
+      "checks": [
+        {"type": "exe", "target": "ffmpeg", "label": "ffmpeg 在 PATH"},
+        {"type": "file", "target": "cfg:data/config.json#worker_script", "label": "worker 脚本"},
+        {"type": "file", "target": "cfg:data/config.json#conda_python", "label": "conda Python"},
+        {"type": "dir", "target": "cfg:data/config.json#model_dir", "label": "CosyVoice 模型目录"}
+      ]
+    },
+    {
+      "id": "podcast_web",
+      "name": "本地播客制作",
+      "icon": "🎧",
+      "desc": "PDF 转多人播客脚本 + 音频生成（pdf-to-local-podcast 技能 Web 界面）",
+      "path": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\Skills\\pdf-to-local-podcast\\web",
+      "cmd": ["python", "server.py"],
+      "port": 8642,
+      "health_path": "/",
+      "checks": [
+        {"type": "exe", "target": "ffmpeg", "label": "ffmpeg 在 PATH"},
+        {"type": "file", "target": "cfg:data/config.json#worker_script", "label": "worker 脚本"},
+        {"type": "file", "target": "cfg:data/config.json#conda_python", "label": "conda Python"},
+        {"type": "dir", "target": "cfg:data/config.json#model_dir", "label": "CosyVoice 模型目录"}
+      ]
+    },
+    {
+      "id": "voice_notes",
+      "name": "语音速记本",
+      "icon": "📝",
+      "desc": "录音速记 + 分类管理",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_notes",
+      "cmd": ["python", "main.py"],
+      "port": 8010,
+      "health_path": "/",
+      "checks": []
+    },
+    {
+      "id": "novel_agent",
+      "name": "AI 写小说",
+      "icon": "📖",
+      "desc": "Ollama + Qwen2.5 本地小说生成（启动前自动拉起 Ollama）",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\novel_agent",
+      "cmd": ["D:\\dev\\python\\python.exe", "main.py"],
+      "port": 8000,
+      "health_path": "/",
+      "checks": [
+        {"type": "file", "target": "D:\\dev\\python\\python.exe", "label": "专用 Python 解释器"},
+        {"type": "url", "target": "http://127.0.0.1:11434/api/version", "label": "Ollama 服务（未运行时会自动拉起）"}
+      ],
+      "ensure": {
+        "probe_url": "http://127.0.0.1:11434/api/version",
+        "cmd": ["C:\\Users\\PCL13\\AppData\\Local\\Programs\\Ollama\\ollama.exe", "serve"],
+        "wait_sec": 6
+      }
+    }
+  ]
+}
