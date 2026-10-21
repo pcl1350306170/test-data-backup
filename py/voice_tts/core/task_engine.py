@@ -288,6 +288,31 @@ class TaskEngine:
         os.makedirs(tmp_dir, exist_ok=True)
         return os.path.join(tmp_dir, f"{idx:03d}.wav")
 
+    def _cleanup_temp_dir(self) -> bool:
+        """删除本任务的中间产物目录 output/_temp/{task_id}/。"""
+        tmp_dir = os.path.join(self.cfg.get("output_dir", ""), "_temp", self.task_id)
+        if os.path.isdir(tmp_dir):
+            try:
+                shutil.rmtree(tmp_dir)
+                return True
+            except Exception:
+                return False
+        return False
+
+    def _remove_output_files(self) -> int:
+        """删除本任务已生成的成品文件，返回删除数量。"""
+        output_dir = self.cfg.get("output_dir", "")
+        n = 0
+        for name in self.files:
+            fp = os.path.join(output_dir, os.path.basename(name))
+            if os.path.isfile(fp):
+                try:
+                    os.remove(fp)
+                    n += 1
+                except Exception:
+                    pass
+        return n
+
     # ── 工作线程 ──────────────────────────────────────
 
     def _log(self, msg: str):
@@ -388,9 +413,13 @@ class TaskEngine:
                             "percent": round(idx / self.total * 100, 1),
                             "file": produced_name})
 
+            # 全部完成
             self.status = "done"
-            self._log(f"全部完成，共生成 {len(self.files)} 个文件")
             self._persist_snapshot(status="done")
+            # 自动清理中间文件，只保留成品音频（取消/失败时保留以便断点复用）
+            if self._cleanup_temp_dir():
+                self._log(f"已清理中间文件目录 _temp/{self.task_id}")
+            self._log(f"全部完成，共生成 {len(self.files)} 个文件")
             self._emit({"type": "complete", "files": self.files, "total": self.total})
 
         except Exception as e:
@@ -404,6 +433,14 @@ class TaskEngine:
     def _finalize_cancelled(self, done_idx: int):
         self.status = "cancelled"
         self._log(f"已在第 {done_idx}/{self.total} 段后停止")
+        # 已取消的任务不再续跑：直接删除成品 + 清理中间文件
+        removed = self._remove_output_files()
+        if removed:
+            self._log(f"已删除 {removed} 个成品文件")
+        if self._cleanup_temp_dir():
+            self._log(f"已清理中间文件目录 _temp/{self.task_id}")
+        self.files = []
+        self.completed_segments = set()
         self._persist_snapshot(status="cancelled")
         self._emit({"type": "cancelled"})
 

@@ -1,22 +1,32 @@
 {
+  "啊乐": {
+    "audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\Al啊乐-推荐阅读短视频播音男声.mp3",
+    "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
+    "type": "通用男声"
+  },
+  "桃子": {
+    "audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\豆包-桃子.mp3",
+    "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
+    "type": "通用女声"
+  },
   "郭靖": {
     "audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\Jing郭靖-推荐短视频男声.mp3",
     "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
-    "type": "男声"
+    "type": "老年男声"
   },
-  "豆包桃子": {
-    "audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\豆包-桃子.mp3",
+  "球球": {
+    "audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\Qiu球球-通用播音故事演讲女声.mp3",
     "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
-    "type": "女声"
+    "type": "老年女声"
   },
   "萌萌": {
     "audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\Mmeng萌萌-儿童男孩声音 Child.mp3",
     "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
-    "type": "男童"
+    "type": "儿童男声"
   },
   "雪花": {
     "audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\Huahua 雪花-儿童女孩声音 Child.mp3",
     "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
-    "type": "女童"
+    "type": "儿童女声"
   }
 }

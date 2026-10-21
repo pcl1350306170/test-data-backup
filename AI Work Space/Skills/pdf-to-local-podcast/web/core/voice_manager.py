@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """音色管理：动态注册/删除音色，扫描 TTS 目录获取参考音频。
 
-首次启动自动导入 4 个默认音色（郭靖/豆包桃子/萌萌/雪花）。
+首次启动自动导入 6 个默认音色（啊乐/桃子/郭靖/球球/萌萌/雪花）。
 """
 import json
 import os
@@ -51,28 +51,38 @@ def _save(voices):
 
 
 def _init_defaults():
-    """首次启动：导入 4 个默认音色。"""
+    """首次启动：导入 6 个默认音色。"""
     tts_dir = config.load().get("tts_dir", "")
     defaults = {
+        "啊乐": {
+            "audio": os.path.join(tts_dir, "Al啊乐-推荐阅读短视频播音男声.mp3"),
+            "prompt_text": DEFAULT_PROMPT_TEXT,
+            "type": "通用男声",
+        },
+        "桃子": {
+            "audio": os.path.join(tts_dir, "豆包-桃子.mp3"),
+            "prompt_text": DEFAULT_PROMPT_TEXT,
+            "type": "通用女声",
+        },
         "郭靖": {
             "audio": os.path.join(tts_dir, "Jing郭靖-推荐短视频男声.mp3"),
             "prompt_text": DEFAULT_PROMPT_TEXT,
-            "type": "男声",
+            "type": "老年男声",
         },
-        "豆包桃子": {
-            "audio": os.path.join(tts_dir, "豆包-桃子.mp3"),
+        "球球": {
+            "audio": os.path.join(tts_dir, "Qiu球球-通用播音故事演讲女声.mp3"),
             "prompt_text": DEFAULT_PROMPT_TEXT,
-            "type": "女声",
+            "type": "老年女声",
         },
         "萌萌": {
             "audio": os.path.join(tts_dir, "Mmeng萌萌-儿童男孩声音 Child.mp3"),
             "prompt_text": DEFAULT_PROMPT_TEXT,
-            "type": "男童",
+            "type": "儿童男声",
         },
         "雪花": {
             "audio": os.path.join(tts_dir, "Huahua 雪花-儿童女孩声音 Child.mp3"),
-            "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
-            "type": "女童",
+            "prompt_text": DEFAULT_PROMPT_TEXT,
+            "type": "儿童女声",
         },
     }
     # 仅当文件存在时才导入

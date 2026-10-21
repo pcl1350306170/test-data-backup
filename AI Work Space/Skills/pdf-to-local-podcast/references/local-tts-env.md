@@ -21,7 +21,7 @@ D:\TOOLS\miniconda3\envs\cosyvoice\python.exe cosyvoice_tts_worker.py `
   --text "台词文本" `
   --output "out\001.wav" `
   --spk "中文女" `
-  --prompt_audio "D:\CODE\Python\test-data-backup\AI Work Space\TTS\Jing郭靖-推荐短视频男声.mp3" `
+  --prompt_audio "D:\CODE\Python\test-data-backup\AI Work Space\TTS\Al啊乐-推荐阅读短视频播音男声.mp3" `
   --prompt_text "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来我们就来看一看这里发生的有趣故事。"
 ```
 

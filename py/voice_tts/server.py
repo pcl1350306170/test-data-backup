@@ -19,6 +19,7 @@ from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from core import config, task_store, tts_engine
+from core.merge_engine import MergeEngine, scan_media_dir
 from core.task_engine import TaskEngine
 
 # ── 初始化 ──────────────────────────────────────────────
@@ -28,6 +29,7 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 app = FastAPI(title="CosyVoice TTS Web")
 engine = TaskEngine()
+merge_engine = MergeEngine()
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -36,7 +38,9 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.on_event("startup")
 async def on_startup():
-    engine.set_loop(asyncio.get_event_loop())
+    loop = asyncio.get_event_loop()
+    engine.set_loop(loop)
+    merge_engine.set_loop(loop)
     changed = task_store.mark_interrupted()
     if changed:
         print("[startup] 标记 %d 个任务为 interrupted: %s" % (
@@ -92,6 +96,8 @@ async def list_prompt_audios():
 
 @app.post("/api/task/start")
 async def start_task(data: dict):
+    if merge_engine.busy():
+        raise HTTPException(409, "合并任务正在运行，请等待完成或停止后再生成")
     text = data.get("text", "")
     task_name = data.get("task_name", "")
     params = {k: v for k, v in data.items() if k not in ("text", "task_name")}
@@ -200,6 +206,79 @@ async def delete_task(task_id: str,
     removed = engine.cleanup_task_files(t, clean_temp, clean_output)
     task_store.delete(task_id)
     return {"ok": True, "removed": removed}
+
+
+# ── 合并任务 API ────────────────────────────────
+
+@app.post("/api/merge/preview")
+async def merge_preview(data: dict):
+    names = data.get("files") or []
+    target = int(data.get("target_duration") or 20)
+    return merge_engine.preview(names, target)
+
+
+@app.post("/api/merge/start")
+async def merge_start(data: dict):
+    if engine._busy():
+        raise HTTPException(409, "语音生成任务正在运行，请先停止后再合并")
+    names = data.get("files") or []
+    test = bool(data.get("test"))
+    ok, err = merge_engine.start(names, data, test=test,
+                                 source_name=data.get("source_name", ""))
+    if not ok:
+        raise HTTPException(409, err)
+    return {"ok": True, "total": merge_engine.total}
+
+
+@app.post("/api/merge/stop")
+async def merge_stop():
+    return {"ok": merge_engine.stop()}
+
+
+@app.get("/api/merge/status")
+async def merge_status():
+    return merge_engine.get_status()
+
+
+@app.get("/api/merge/progress")
+async def merge_progress():
+    """SSE 端点：实时推送合并进度。"""
+    queue, loop = merge_engine.subscribe()
+
+    async def event_stream():
+        try:
+            while True:
+                try:
+                    event = await asyncio.wait_for(queue.get(), timeout=30)
+                    yield "data: %s\n\n" % json.dumps(event, ensure_ascii=False)
+                    if event.get("type") in ("complete", "error", "cancelled"):
+                        break
+                except asyncio.TimeoutError:
+                    yield "data: %s\n\n" % json.dumps({"type": "heartbeat"})
+        except asyncio.CancelledError:
+            pass
+        finally:
+            merge_engine.unsubscribe(queue)
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+# ── 媒体目录扫描（BGM/图片选择） ────────────────────
+
+@app.get("/api/media_files")
+async def list_media_files(kind: str = Query("audio")):
+    cfg = _get_cfg()
+    if kind == "image":
+        d = cfg.get("image_dir", "")
+        files = scan_media_dir(d, images=True)
+    else:
+        d = cfg.get("bgm_dir", "")
+        files = scan_media_dir(d, images=False)
+    return {"dir": d, "files": files}
 
 
 # ── 测试生成 ──────────────────────────────────────────

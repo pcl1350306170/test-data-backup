@@ -404,6 +404,51 @@ async def list_bgm():
     return {"bgms": bgms}
 
 
+# ── 独立合并（重新合并 / 更换 BGM） ────────────────────
+
+@app.get("/api/audio/tasks")
+async def list_audio_tasks():
+    """列出 audio_dir 下可用的音频块任务目录。"""
+    import re as _re
+    cfg = _get_cfg()
+    audio_dir = cfg.get("audio_dir", "")
+    tasks = []
+    if audio_dir and os.path.isdir(audio_dir):
+        for name in sorted(os.listdir(audio_dir)):
+            fp = os.path.join(audio_dir, name)
+            if not os.path.isdir(fp) or name.startswith("_"):
+                continue
+            # 统计 wav 块数
+            wav_count = sum(1 for f in os.listdir(fp)
+                           if _re.match(r"^\d+\.wav$", f, _re.IGNORECASE))
+            if wav_count > 0:
+                tasks.append({
+                    "name": name,
+                    "blocks": wav_count,
+                })
+    return {"tasks": tasks}
+
+
+@app.post("/api/task/remerge")
+async def remerge_task(data: dict):
+    """独立合并：用已有音频块重新合并，可更换 BGM。"""
+    audio_task = data.get("audio_task", "").strip()
+    if not audio_task:
+        raise HTTPException(400, "未指定音频任务目录")
+
+    ok, err = engine.remerge(
+        audio_task=audio_task,
+        bgm_path=data.get("bgm_path") or None,
+        bgm_volume=data.get("bgm_volume", 30),
+        lufs=data.get("lufs", -16),
+        gap_ms=data.get("gap_ms", 400),
+        output_name=data.get("output_name", "").strip() or None,
+    )
+    if not ok:
+        raise HTTPException(409, err)
+    return {"ok": True}
+
+
 # ── 配置管理 ──────────────────────────────────────────
 
 @app.get("/api/config")

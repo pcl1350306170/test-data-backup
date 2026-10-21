@@ -145,7 +145,7 @@ def merge(input_dir, output_path, bgm_path=None, bgm_volume=30,
         af = (
             "[1:a]volume=%fdB,aloop=loop=-1:size=2e9,"
             "atrim=duration=%.3f,afade=t=out:st=%.3f:d=2,"
-            "aformat=channel_layouts=stereo,sample_rates=44100[bgm];"
+            "aformat=channel_layouts=stereo:sample_rates=44100[bgm];"
             "[0:a][bgm]amix=inputs=2:duration=first:"
             "dropout_transition=0:normalize=0[a]"
         ) % (gain_db, total_dur, fade_st)
@@ -154,7 +154,7 @@ def merge(input_dir, output_path, bgm_path=None, bgm_volume=30,
                   "-filter_complex", af, "-map", "[a]",
                   "-c:a", "pcm_s16le", mixed])
         if r.returncode != 0 or not os.path.isfile(mixed):
-            raise RuntimeError("BGM 叠加失败")
+            raise RuntimeError("BGM 叠加失败: %s" % (r.stderr or "")[-800:])
         os.replace(mixed, raw_wav)
 
     # 整体 loudnorm 收尾 → mp3

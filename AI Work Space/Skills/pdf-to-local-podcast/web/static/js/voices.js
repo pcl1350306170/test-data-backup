@@ -103,7 +103,7 @@ const Voices = {
     } catch (e) { /* ignore */ }
     document.getElementById('voice-name').value = '';
     document.getElementById('voice-prompt-text').value = '';
-    document.getElementById('voice-type').value = '男声';
+    document.getElementById('voice-type').value = '通用男声';
     App.openModal('voice-modal');
   },
 

@@ -124,9 +124,10 @@ var Task = (function () {
 
       case 'cancelled':
         setUIIdle();
-        App.toast('任务已停止（可稍后从任务列表恢复）');
+        App.toast('任务已停止，成品与中间文件已清理');
         disconnectSSE();
         App.loadTaskList();
+        App.loadAudioList();
         break;
 
       case 'error':

@@ -28,6 +28,21 @@ DEFAULTS = {
     "prompt_audio": "",
     "prompt_text": "",
     "default_prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
+    # 合并功能：媒体目录（供前端下拉选择）
+    "bgm_dir": r"D:\CODE\Python\test-data-backup\AI Work Space\TTS",
+    "image_dir": r"D:\CODE\Python\test-data-backup\img",
+    # 合并参数（选择一次后记住，下次自动加载）
+    "merge_target_duration": 20,
+    "merge_format": "mp3",
+    "merge_bgm_path": "",
+    "merge_bgm_volume": 30,
+    "merge_cover_path": "",
+    "merge_bg_image_path": "",
+    "meta_title": "",
+    "meta_artist": "",
+    "meta_album": "",
+    "meta_date": "",
+    "meta_comment": "",
 }
 
 # 预置选项（不可配置，固定列表）

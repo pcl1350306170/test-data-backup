@@ -13,6 +13,7 @@
       <nav id="tabs">
         <button class="tab active" data-tab="synthesize">📝 合成</button>
         <button class="tab" data-tab="tasks">📚 任务 <span id="taskBadge" class="badge" style="display:none">0</span></button>
+        <button class="tab" data-tab="merge">🔗 合并</button>
         <button class="tab" data-tab="results">🎵 成品</button>
         <button class="tab" data-tab="settings">⚙️ 设置</button>
       </nav>
@@ -151,6 +152,120 @@
       <div id="taskEmpty" class="empty-hint">暂无任务记录</div>
     </section>
 
+    <!-- ═══ 合并页 ═══ -->
+    <section id="tab-merge" class="tab-content">
+      <div class="panel">
+        <div class="panel-title">源文件</div>
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>从任务快速选择</label>
+            <select id="mergeTaskSelect"><option value="">（手动勾选下方文件）</option></select>
+          </div>
+          <div class="form-group" style="align-self:flex-end">
+            <div class="btn-group">
+              <button class="btn btn-sm" onclick="Merge.selectAll(true)">全选</button>
+              <button class="btn btn-sm" onclick="Merge.selectAll(false)">清空</button>
+              <button class="btn btn-sm" onclick="Merge.refresh()">🔄 刷新列表</button>
+            </div>
+          </div>
+        </div>
+        <div id="mergeFileList" class="file-check-list"></div>
+        <span class="hint" id="mergeFileCount">已选 0 个文件</span>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">合并选项</div>
+        <div class="form-row">
+          <div class="form-group" style="max-width:130px">
+            <label>目标时长(分钟)</label>
+            <input type="number" id="mergeDuration" value="20" min="1" max="999">
+          </div>
+          <div class="form-group" style="max-width:110px">
+            <label>输出格式</label>
+            <select id="mergeFormat"><option value="mp3">MP3</option><option value="wav">WAV</option></select>
+          </div>
+          <div class="form-group flex-2">
+            <label>来源名（用于输出文件名）</label>
+            <input type="text" id="mergeSourceName" placeholder="默认：任务名或“合并音频”">
+          </div>
+          <div class="form-group" style="align-self:flex-end">
+            <button class="btn" onclick="Merge.preview()">🔍 预览分组</button>
+          </div>
+        </div>
+        <div id="mergePreview" class="merge-preview" style="display:none"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">背景音乐（可选）</div>
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>从 BGM 目录选择</label>
+            <select id="mergeBgmSelect"><option value="">(不叠加)</option></select>
+          </div>
+          <div class="form-group flex-3">
+            <label>或自定义路径（服务器绝对路径）</label>
+            <input type="text" id="mergeBgmPath" placeholder="留空则用上方下拉选择">
+          </div>
+          <div class="form-group" style="max-width:180px">
+            <label>音量 <span id="mergeBgmVolLabel">30</span>%</label>
+            <input type="range" id="mergeBgmVolume" min="0" max="100" value="30">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">元数据 / 封面（仅 MP3 生效）</div>
+        <div class="form-row">
+          <div class="form-group"><label>标题</label><input type="text" id="metaTitle"></div>
+          <div class="form-group"><label>作者</label><input type="text" id="metaArtist"></div>
+          <div class="form-group"><label>专辑</label><input type="text" id="metaAlbum"></div>
+          <div class="form-group" style="max-width:110px"><label>日期</label><input type="text" id="metaDate" placeholder="默认今年"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>封面（图片目录）</label>
+            <select id="mergeCoverSelect"><option value="">(无)</option></select>
+          </div>
+          <div class="form-group flex-3">
+            <label>或封面自定义路径</label>
+            <input type="text" id="mergeCoverPath">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label>播放背景图（图片目录）</label>
+            <select id="mergeBgImgSelect"><option value="">(无)</option></select>
+          </div>
+          <div class="form-group flex-3">
+            <label>或背景图自定义路径</label>
+            <input type="text" id="mergeBgImagePath">
+          </div>
+        </div>
+        <div class="form-group"><label>备注</label><input type="text" id="metaComment"></div>
+      </div>
+
+      <div class="task-actions">
+        <button id="btnMergeTest" class="btn" onclick="Merge.start(true)">🧪 测试(第1组)</button>
+        <button id="btnMergeStart" class="btn btn-success btn-lg" onclick="Merge.start(false)">🔗 开始合并</button>
+        <button id="btnMergeStop" class="btn btn-danger" style="display:none" onclick="Merge.stop()">⏹ 停止</button>
+      </div>
+
+      <div id="mergeProgressSection" class="progress-section" style="display:none">
+        <div class="progress-bar-wrap">
+          <div id="mergeProgressBar" class="progress-bar" style="width:0%"></div>
+        </div>
+        <div class="progress-info">
+          <span id="mergeProgressText">0/0</span>
+          <span id="mergeProgressPercent">0%</span>
+        </div>
+      </div>
+
+      <div id="mergeLogSection" class="panel" style="display:none">
+        <div class="panel-title">合并日志</div>
+        <div id="mergeLogBox" class="log-box"></div>
+      </div>
+    </section>
+
     <!-- ═══ 成品页 ═══ -->
     <section id="tab-results" class="tab-content">
       <div class="panel-toolbar">
@@ -175,6 +290,14 @@
         <div class="form-group">
           <label>TTS 参考音频目录</label>
           <input type="text" id="cfg-tts-dir">
+        </div>
+        <div class="form-group">
+          <label>BGM 候选目录（合并页下拉）</label>
+          <input type="text" id="cfg-bgm-dir">
+        </div>
+        <div class="form-group">
+          <label>图片候选目录（封面/背景图下拉）</label>
+          <input type="text" id="cfg-image-dir">
         </div>
         <details class="advanced-toggle">
           <summary>CosyVoice 环境（一般不需修改）</summary>
@@ -235,5 +358,6 @@
 
   <script src="/static/js/app.js"></script>
   <script src="/static/js/task.js"></script>
+  <script src="/static/js/merge.js"></script>
 </body>
 </html>

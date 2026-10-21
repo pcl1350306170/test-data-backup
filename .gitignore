@@ -35,6 +35,7 @@ vue.config.js
 
 # Script config files
 **/json/config_*.json
+**/data/tasks.json
 **/json/testServer.json
 /py/voice_notes/notes.json
 

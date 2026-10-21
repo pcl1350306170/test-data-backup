@@ -98,6 +98,14 @@ class TaskEngine:
         self._cancel_event.clear()
         self.start_time = time.time()
 
+        # 将启动参数存入 _task_config，供后续 _parse_job / _do_merge 使用
+        self._task_config = {
+            "bgm_path": bgm_path,
+            "bgm_volume": bgm_volume,
+            "lufs": lufs,
+            "gap_ms": gap_ms,
+        }
+
         # 解析第一个脚本（失败时由队列线程顺延到下一个）
         self._parse_job(self._jobs[0])
 
@@ -554,6 +562,102 @@ class TaskEngine:
             "eta_sec": round(eta),
             "elapsed_sec": round(elapsed),
         })
+
+    # ── 独立合并（更换 BGM） ─────────────────────────────────
+
+    def remerge(self, audio_task, bgm_path=None, bgm_volume=30,
+                lufs=-16, gap_ms=400, output_name=None):
+        """独立合并：用已有音频块目录重新合并（可更换 BGM）。
+
+        Args:
+            audio_task: audio_dir 下的子目录名
+            bgm_path: BGM 文件路径（可选）
+            bgm_volume: BGM 音量 0-100
+            lufs: 目标响度
+            gap_ms: 块间静音毫秒
+            output_name: 输出文件名（不含扩展名），默认沿用 audio_task
+        """
+        if self.status in ("generating", "merging", "parsing", "paused", "cancelling"):
+            return False, "已有任务正在运行，请等待完成后再合并"
+
+        cfg = config.load()
+        input_dir = os.path.join(cfg["audio_dir"], audio_task)
+        if not os.path.isdir(input_dir):
+            return False, "音频目录不存在: %s" % audio_task
+
+        # 检查目录中是否有 wav 文件
+        import re as _re
+        has_wav = any(_re.match(r"^\d+\.wav$", f, _re.IGNORECASE)
+                      for f in os.listdir(input_dir))
+        if not has_wav:
+            return False, "目录中没有 001.wav…NNN.wav 格式的音频块"
+
+        out_name = output_name or audio_task
+        output_path = os.path.join(cfg["output_dir"], out_name + ".mp3")
+
+        self._reset_state()
+        self.status = "merging"
+        self.output_name = out_name
+        self.start_time = time.time()
+        self._cancel_event.clear()
+        self._pause_event.set()
+        self._total_jobs = 1
+        self._job_index = 0
+        self._jobs = []
+
+        self._emit({"type": "status", "status": "merging",
+                    "message": "正在重新合并（BGM: %s）..." % (
+                        os.path.basename(bgm_path) if bgm_path else "无"),
+                    "remerge": True})
+
+        self._thread = threading.Thread(
+            target=self._remerge_worker,
+            args=(input_dir, output_path, bgm_path, bgm_volume, lufs, gap_ms),
+            daemon=True)
+        self._thread.start()
+        return True, None
+
+    def _remerge_worker(self, input_dir, output_path, bgm_path, bgm_volume, lufs, gap_ms):
+        """后台线程：执行独立合并。"""
+        try:
+            def on_progress(current, total, message):
+                if self._cancel_event.is_set():
+                    raise RuntimeError("用户取消")
+                self._emit({"type": "merge_progress", "current": current,
+                            "total": total, "message": message, "remerge": True})
+
+            result_path, dur = audio_merger.merge(
+                input_dir, output_path,
+                bgm_path=bgm_path,
+                bgm_volume=bgm_volume,
+                lufs=lufs,
+                gap_ms=gap_ms,
+                on_progress=on_progress,
+            )
+            self.output_path = result_path
+            self.duration_sec = dur
+            self.status = "done"
+            self._emit({
+                "type": "complete",
+                "output": os.path.basename(result_path),
+                "duration_sec": round(dur, 1) if dur else None,
+                "duration_min": round(dur / 60, 1) if dur else None,
+                "remerge": True,
+            })
+        except RuntimeError as e:
+            if "取消" in str(e):
+                self.status = "cancelled"
+                self._emit({"type": "cancelled", "message": "合并已取消", "remerge": True})
+            else:
+                self.status = "failed"
+                self.error_message = "合并失败: %s" % str(e)
+                self._emit({"type": "error", "message": self.error_message, "remerge": True})
+        except Exception as e:
+            self.status = "failed"
+            self.error_message = "合并失败: %s" % str(e)
+            self._emit({"type": "error", "message": self.error_message, "remerge": True})
+        finally:
+            self.end_time = time.time()
 
     # ── 状态查询 ──────────────────────────────────────────
 

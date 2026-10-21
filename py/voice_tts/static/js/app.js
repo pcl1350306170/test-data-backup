@@ -64,6 +64,7 @@ var App = (function () {
         if (target) target.classList.add('active');
         if (btn.dataset.tab === 'results') loadAudioList();
         if (btn.dataset.tab === 'tasks') loadTaskList();
+        if (btn.dataset.tab === 'merge' && window.Merge) Merge.refresh();
       });
     });
   }
@@ -96,6 +97,8 @@ var App = (function () {
       $('tailMsInput').value = config.tail_ms || 900;
       // 设置页
       fillSettings(config);
+      // 合并页参数回填
+      if (window.Merge) Merge.applyConfig(config);
       // 加载参考音频
       loadPromptAudios();
     }).catch(function (e) { toast('加载配置失败: ' + e.message); });
@@ -104,6 +107,8 @@ var App = (function () {
   function fillSettings(cfg) {
     $('cfg-output-dir').value = cfg.output_dir || '';
     $('cfg-tts-dir').value = cfg.tts_dir || '';
+    $('cfg-bgm-dir').value = cfg.bgm_dir || '';
+    $('cfg-image-dir').value = cfg.image_dir || '';
     $('cfg-conda-python').value = cfg.conda_python || '';
     $('cfg-model-dir').value = cfg.model_dir || '';
     $('cfg-repo-dir').value = cfg.repo_dir || '';
@@ -172,6 +177,8 @@ var App = (function () {
     var data = {
       output_dir: $('cfg-output-dir').value.trim(),
       tts_dir: $('cfg-tts-dir').value.trim(),
+      bgm_dir: $('cfg-bgm-dir').value.trim(),
+      image_dir: $('cfg-image-dir').value.trim(),
       conda_python: $('cfg-conda-python').value.trim(),
       model_dir: $('cfg-model-dir').value.trim(),
       repo_dir: $('cfg-repo-dir').value.trim(),
@@ -309,7 +316,7 @@ var App = (function () {
         var pct = t.total > 0 ? Math.round(t.completed / t.total * 100) : 0;
         var isActive = (t.id === data.active_task_id);
         var resumable = !isActive && (t.status === 'interrupted' || t.status === 'paused'
-          || t.status === 'cancelled' || t.status === 'error');
+          || t.status === 'error');
         html += '<div class="task-card status-' + t.status + '">';
         html += '<div class="task-head">';
         html += '<div class="task-title" title="' + escHtml(t.name || '') + '">' + escHtml(t.name || '(未命名)') + '</div>';
@@ -335,6 +342,7 @@ var App = (function () {
         }
         if (t.output_count > 0) {
           html += '<button class="btn" onclick="App.viewTaskOutput(\'' + escHtml(t.id) + '\')">查看成品</button>';
+          html += '<button class="btn" onclick="App.gotoMergeWithTask(\'' + escHtml(t.id) + '\')">🔗 合并成品</button>';
         }
         html += '<button class="btn btn-danger" onclick="App.openDeleteModal(\'' + escHtml(t.id) + '\', \'' + escHtml(t.name || '(未命名)') + '\', ' + t.output_count + ')">🗑 删除</button>';
         html += '</div></div>';
@@ -360,6 +368,15 @@ var App = (function () {
   function viewTaskOutput(taskId) {
     document.querySelector('[data-tab="results"]').click();
     toast('已切换到成品列表（任务ID: ' + taskId + '）');
+  }
+
+  // 从任务列表跳到合并页，并预选该任务的成品
+  function gotoMergeWithTask(taskId) {
+    document.querySelector('[data-tab="merge"]').click();
+    // Merge.refresh 是异步渲染列表，稍后再勾选
+    setTimeout(function () {
+      if (window.Merge) Merge.selectTaskFiles(taskId);
+    }, 600);
   }
 
   function openDeleteModal(taskId, taskName, outputCount) {
@@ -429,6 +446,7 @@ var App = (function () {
     loadTaskList: loadTaskList,
     resumeTask: resumeTask,
     viewTaskOutput: viewTaskOutput,
+    gotoMergeWithTask: gotoMergeWithTask,
     openDeleteModal: openDeleteModal,
     closeModal: closeModal,
     confirmDeleteTask: confirmDeleteTask,

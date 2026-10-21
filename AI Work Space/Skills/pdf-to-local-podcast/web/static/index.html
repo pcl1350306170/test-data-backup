@@ -79,10 +79,12 @@
             <div class="form-group">
               <label>声音类型</label>
               <select id="voice-type">
-                <option value="男声">男声</option>
-                <option value="女声">女声</option>
-                <option value="男童">男童</option>
-                <option value="女童">女童</option>
+                <option value="通用男声">通用男声</option>
+                <option value="通用女声">通用女声</option>
+                <option value="老年男声">老年男声</option>
+                <option value="老年女声">老年女声</option>
+                <option value="儿童男声">儿童男声</option>
+                <option value="儿童女声">儿童女声</option>
                 <option value="童声">童声</option>
                 <option value="未知">未知</option>
               </select>
@@ -175,6 +177,54 @@
         <button id="btn-clean-audio" class="btn btn-danger">🧹 清理中间产物</button>
       </div>
       <div id="podcast-list" class="podcast-list"></div>
+
+      <!-- 重新合并区域 -->
+      <div class="remerge-section">
+        <h3>🔄 重新合并（更换 BGM）</h3>
+        <p class="section-desc">选择已生成的音频块目录，更换 BGM 或调整参数后重新合并为 MP3。</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>音频任务目录</label>
+            <select id="remerge-task"></select>
+          </div>
+          <div class="form-group">
+            <label>输出文件名（可选，默认同名覆盖）</label>
+            <input type="text" id="remerge-output-name" placeholder="留空则覆盖原文件">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>BGM 文件</label>
+            <select id="remerge-bgm"><option value="">-- 无 BGM --</option></select>
+          </div>
+          <div class="form-group" id="remerge-bgm-volume-group" style="display:none">
+            <label>BGM 音量: <span id="remerge-bgm-volume-val">30</span></label>
+            <input type="range" id="remerge-bgm-volume" min="0" max="100" value="30">
+          </div>
+        </div>
+        <details class="advanced-toggle">
+          <summary>高级参数</summary>
+          <div class="form-row">
+            <div class="form-group">
+              <label>目标响度 (LUFS)</label>
+              <input type="number" id="remerge-lufs" value="-16" step="1">
+            </div>
+            <div class="form-group">
+              <label>块间静音 (ms)</label>
+              <input type="number" id="remerge-gap-ms" value="400" step="50">
+            </div>
+          </div>
+        </details>
+        <div class="task-actions">
+          <button id="btn-remerge" class="btn btn-primary">🎵 开始合并</button>
+          <button id="btn-remerge-cancel" class="btn btn-danger" disabled>⏹ 停止</button>
+        </div>
+        <div id="remerge-progress" class="progress-section" style="display:none">
+          <div class="progress-info">
+            <span id="remerge-progress-text">准备中...</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- ═══ 设置 ═══ -->
