@@ -38,6 +38,8 @@ vue.config.js
 **/data/tasks.json
 **/json/testServer.json
 /py/voice_notes/notes.json
+/py/voice_notes/cert.pem
+/py/voice_notes/key.pem
 
 # 任务进度目录（不提交）
 /py/other/json/progress/

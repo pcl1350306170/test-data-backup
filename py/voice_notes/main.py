@@ -17,10 +17,13 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE, "notes.json")
 CAT_PATH = os.path.join(BASE, "categories.json")
+CERT_FILE = os.path.join(BASE, "cert.pem")
+KEY_FILE = os.path.join(BASE, "key.pem")
 PORT = 8010
 
 DEFAULT_CATS = [
@@ -29,6 +32,12 @@ DEFAULT_CATS = [
 ]
 
 app = FastAPI(title="语音速记本")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 LOCK = threading.Lock()
 
 
@@ -91,6 +100,12 @@ def _save_categories(cats: list):
 
 class CategoryBody(BaseModel):
     name: str = ""
+
+
+# ---------------------------------------------------------------- 健康检测
+@app.get("/api/ping")
+def ping():
+    return {"ok": True, "time": _now()}
 
 
 # ---------------------------------------------------------------- 页面
@@ -194,6 +209,8 @@ def create_note(body: NoteBody):
         "created_at": created_at,
         "updated_at": "",
         "category_id": (body.category_id or "").strip(),
+        "copy_count": 0,
+        "last_copied_at": "",
     }
     if body.client_id:
         note["client_id"] = body.client_id
@@ -237,16 +254,39 @@ def delete_note(note_id: str):
     return {"ok": True}
 
 
+@app.post("/api/notes/{note_id}/copy")
+def record_copy(note_id: str):
+    """记录一次复制行为，更新复制次数和最近复制时间。"""
+    with LOCK:
+        notes = _load_notes()
+        for n in notes:
+            if n.get("id") == note_id:
+                n["copy_count"] = n.get("copy_count", 0) + 1
+                n["last_copied_at"] = _now()
+                _save_notes(notes)
+                return n
+    raise HTTPException(status_code=404, detail="记录不存在")
+
+
 if __name__ == "__main__":
+    use_ssl = os.path.exists(CERT_FILE) and os.path.exists(KEY_FILE)
+    scheme = "https" if use_ssl else "http"
     print("=" * 52)
     print("  语音速记本已启动")
-    print("  本机访问:   http://127.0.0.1:%d" % PORT)
+    print("  本机访问:   %s://127.0.0.1:%d" % (scheme, PORT))
     import socket
     try:
         host = socket.gethostbyname(socket.gethostname())
-        print("  手机访问:   http://%s:%d  （需同一 WiFi）" % (host, PORT))
+        print("  手机访问:   %s://%s:%d  （需同一 WiFi）" % (scheme, host, PORT))
     except Exception:
         pass
+    if not use_ssl:
+        print("  ℹ 未检测到证书，仅 HTTP 模式（SW 离线不可用）")
+        print("    运行 gen_cert.bat 生成证书后重启，启用 HTTPS + 离线")
     print("  按 Ctrl+C 停止服务")
     print("=" * 52)
-    uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="warning")
+    kwargs = {"host": "0.0.0.0", "port": PORT, "log_level": "warning"}
+    if use_ssl:
+        kwargs["ssl_certfile"] = CERT_FILE
+        kwargs["ssl_keyfile"] = KEY_FILE
+    uvicorn.run(app, **kwargs)

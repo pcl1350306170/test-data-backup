@@ -32,7 +32,8 @@ var Hub = (function () {
 
   // 服务地址用当前页面的 host 拼，手机/其他电脑访问时点开也是局域网地址
   function svcUrl(s) {
-    return 'http://' + location.hostname + ':' + s.port + '/';
+    var scheme = s.scheme || 'http';
+    return scheme + '://' + location.hostname + ':' + s.port + '/';
   }
 
   // 只有从 Hub 所在机器访问时，“打开目录”才有意义
@@ -231,7 +232,36 @@ var Hub = (function () {
     $('logModal').style.display = 'none';
   }
 
+  // ── 夜间模式 ──────────────────────────────────────
+  function initTheme() {
+    var saved = localStorage.getItem('hub-theme');
+    var btn = $('themeToggle');
+    if (saved === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      btn.textContent = '☀️';
+      btn.title = '切换日间模式';
+    }
+    btn.addEventListener('click', toggleTheme);
+  }
+
+  function toggleTheme() {
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var btn = $('themeToggle');
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      btn.textContent = '🌙';
+      btn.title = '切换夜间模式';
+      localStorage.setItem('hub-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      btn.textContent = '☀️';
+      btn.title = '切换日间模式';
+      localStorage.setItem('hub-theme', 'dark');
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    initTheme();
     loadHubInfo();
     load();
     timer = setInterval(load, 5000);

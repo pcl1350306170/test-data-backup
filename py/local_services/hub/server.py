@@ -298,6 +298,7 @@ async def services_status():
             "icon": svc.get("icon", "🖥"),
             "desc": svc.get("desc", ""),
             "port": svc["port"],
+            "scheme": svc.get("scheme", "http"),
             "path": svc["path"],
             "status": st,
             "started_at": rec.get("started_at", "") if alive else "",

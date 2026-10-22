@@ -17,8 +17,11 @@ if errorlevel 1 (
 
 echo ====================================
 echo   正在启动 语音速记本 服务...
-echo   本机访问: http://127.0.0.1:8010
 echo   关闭本窗口即停止服务
 echo ====================================
+if not exist cert.pem (
+    echo [提示] 未检测到证书, 如需 HTTPS+离线请先运行 gen_cert.bat
+    echo.
+)
 %PY% main.py
 pause

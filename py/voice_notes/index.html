@@ -97,6 +97,7 @@ header h1 { font-size:18px; font-weight:700; }
 .card.pending-card { border-left:4px solid var(--pending); }
 .card .time { font-size:12px; color:var(--muted); margin-bottom:6px; display:flex; align-items:center; flex-wrap:wrap; }
 .card .time .edited { color:var(--edited); margin-left:6px; }
+.card .time .copy-info { color:var(--muted); margin-left:6px; }
 .card .badge {
   font-size:11px; color:var(--pending); background:var(--pending-bg);
   border-radius:8px; padding:2px 8px; margin-left:8px; font-weight:700;
@@ -185,6 +186,13 @@ header h1 { font-size:18px; font-weight:700; }
   max-width:80%; text-align:center;
 }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+#netStatus {
+  font-size:12px; padding:2px 8px; border-radius:8px; margin-right:8px;
+  background:#dcfce7; color:#15803d; font-weight:700;
+}
+#netStatus.offline { background:#fee2e2; color:#dc2626; }
+[data-theme="dark"] #netStatus { background:#064e3b; color:#6ee7b7; }
+[data-theme="dark"] #netStatus.offline { background:#7f1d1d; color:#fca5a5; }
 @media (min-width:768px) {
   #list { max-width:640px; margin:0 auto; }
   #empty { max-width:640px; margin:0 auto; }
@@ -197,6 +205,7 @@ header h1 { font-size:18px; font-weight:700; }
 <header>
   <h1>🗒 语音速记</h1>
   <div style="display:flex;align-items:center;">
+    <span id="netStatus">在线</span>
     <span id="count"></span>
     <button id="themeBtn" title="切换明暗模式">🌙</button>
   </div>
@@ -313,7 +322,11 @@ header h1 { font-size:18px; font-weight:700; }
   }
 
   function loadCats() {
-    fetch('/api/categories').then(function (r) { return r.json(); }).then(function (data) {
+    fetch('/api/categories').then(function (r) {
+      if (r.status === 503) return null;
+      return r.json();
+    }).then(function (data) {
+      if (!data) return;
       var next = [];
       (data.categories || []).forEach(function (c) { if (c.id) next.push({ id: c.id, name: c.name }); });
       categories = next;
@@ -386,13 +399,42 @@ header h1 { font-size:18px; font-weight:700; }
     var ok = false;
     try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
     document.body.removeChild(ta);
-    toast(ok ? '已复制' : '复制失败，请长按选择文字复制');
+    return ok;
   }
-  function copyText(text) {
+  function copyText(text, onSuccess) {
     if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(function () { toast('已复制'); })
-        .catch(function () { fallbackCopy(text); });
-    } else { fallbackCopy(text); }
+      navigator.clipboard.writeText(text).then(function () {
+        toast('已复制');
+        if (onSuccess) onSuccess();
+      }).catch(function () {
+        var ok = fallbackCopy(text);
+        toast(ok ? '已复制' : '复制失败，请长按选择文字复制');
+        if (ok && onSuccess) onSuccess();
+      });
+    } else {
+      var ok = fallbackCopy(text);
+      toast(ok ? '已复制' : '复制失败，请长按选择文字复制');
+      if (ok && onSuccess) onSuccess();
+    }
+  }
+  function copyAndTrack(n) {
+    copyText(n.content, function () {
+      if (n._pending || !n.id) return;
+      fetch('/api/notes/' + encodeURIComponent(n.id) + '/copy', { method: 'POST' })
+        .then(function (r) { return r.json(); })
+        .then(function (updated) {
+          // 同步本地 notes 中的复制统计
+          for (var i = 0; i < notes.length; i++) {
+            if (notes[i].id === updated.id) {
+              notes[i].copy_count = updated.copy_count;
+              notes[i].last_copied_at = updated.last_copied_at;
+              break;
+            }
+          }
+          render();
+        })
+        .catch(function () {});
+    });
   }
 
   /* ---------------- 列表渲染 ---------------- */
@@ -448,13 +490,20 @@ header h1 { font-size:18px; font-weight:700; }
         edited.textContent = '· 更新于 ' + n.updated_at;
         time.appendChild(edited);
       }
+      if (n.copy_count) {
+        var copyInfo = document.createElement('span');
+        copyInfo.className = 'copy-info';
+        copyInfo.textContent = '· 复制 ' + n.copy_count + ' 次';
+        if (n.last_copied_at) copyInfo.title = '最近复制：' + n.last_copied_at;
+        time.appendChild(copyInfo);
+      }
       li.appendChild(time);
 
       var content = document.createElement('div');
       content.className = 'content';
       content.title = '点击复制';
       content.textContent = n.content;
-      content.addEventListener('click', function () { copyText(n.content); });
+      content.addEventListener('click', function () { copyAndTrack(n); });
       li.appendChild(content);
 
       var ops = document.createElement('div');
@@ -463,7 +512,7 @@ header h1 { font-size:18px; font-weight:700; }
       var btnC = document.createElement('button');
       btnC.className = 'btn-copy';
       btnC.textContent = '复制';
-      btnC.addEventListener('click', function () { copyText(n.content); });
+      btnC.addEventListener('click', function () { copyAndTrack(n); });
       ops.appendChild(btnC);
 
       var btnE = document.createElement('button');
@@ -484,7 +533,11 @@ header h1 { font-size:18px; font-weight:700; }
   }
 
   function load() {
-    fetch('/api/notes').then(function (r) { return r.json(); }).then(function (data) {
+    fetch('/api/notes').then(function (r) {
+      if (r.status === 503) return null;
+      return r.json();
+    }).then(function (data) {
+      if (!data) return;
       var next = data.notes || [];
       if (JSON.stringify(next) !== JSON.stringify(notes)) {
         notes = next;
@@ -696,28 +749,36 @@ header h1 { font-size:18px; font-weight:700; }
     var method = (editing && editing.kind === 'server') ? 'PUT' : 'POST';
     var body = { content: content, category_id: catSelection };
     if (method === 'POST') body.client_id = genClientId();
-    fetch(url, {
-      method: method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    }).then(function (r) {
-      if (!r.ok) throw new Error('save_fail');
-      return r.json();
-    }).then(function () {
-      saveBtn.disabled = false;
+
+    // 立即处理保存
+    saveBtn.disabled = false;
+
+    if (method === 'POST') {
+      // 新增：不关闭弹窗，清空内容方便继续输入
+      input.value = '';
+      input.focus();
+      addPending({ client_id: body.client_id, content: content, created_at: localNow(), category_id: catSelection });
+      render();
+      syncPending();
+    } else {
+      // 编辑服务端记录：关闭弹窗，后台 PUT
       closeSheet();
-      load();
-    }).catch(function (e) {
-      saveBtn.disabled = false;
-      if (e && e.name === 'TypeError') {
-        addPending({ client_id: body.client_id, content: content, created_at: localNow(), category_id: catSelection });
-        closeSheet();
+      render();
+      fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      }).then(function (r) {
+        if (!r.ok) throw new Error('save_fail');
+        return r.json();
+      }).then(function () {
+        load();
+      }).catch(function () {
+        addPending({ client_id: genClientId(), content: content, created_at: localNow(), category_id: catSelection });
         render();
-        toast('已存到手机，连上电脑后自动同步');
-      } else {
-        alert('保存失败：' + (e && e.message ? e.message : '未知错误'));
-      }
-    });
+        toast('网络不可达，编辑已存本地待同步');
+      });
+    }
   }
 
   function delNote(n) {
@@ -754,6 +815,40 @@ header h1 { font-size:18px; font-weight:700; }
       if (loadPending().length) { syncPending(); } else { load(); }
     }
   });
+
+  /* ---------------- 网络状态检测 ---------------- */
+  var netStatusEl = document.getElementById('netStatus');
+  var serverOnline = true;
+  function checkServer() {
+    fetch('/api/ping').then(function (r) {
+      if (r.ok) return r.json();
+      throw new Error('offline');
+    }).then(function () {
+      if (!serverOnline) { serverOnline = true; updateNetUI(); }
+    }).catch(function () {
+      if (serverOnline) { serverOnline = false; updateNetUI(); }
+    });
+  }
+  function updateNetUI() {
+    if (serverOnline) {
+      netStatusEl.textContent = '在线';
+      netStatusEl.classList.remove('offline');
+    } else {
+      netStatusEl.textContent = '离线';
+      netStatusEl.classList.add('offline');
+    }
+  }
+  checkServer();
+  setInterval(checkServer, 5000);
+
+  /* ---------------- Service Worker 注册 ---------------- */
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('/sw.js').then(function (reg) {
+      console.log('SW registered:', reg.scope);
+    }).catch(function (err) {
+      console.warn('SW registration failed:', err);
+    });
+  }
 })();
 </script>
 </body>

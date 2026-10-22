@@ -36,12 +36,15 @@
       "id": "voice_notes",
       "name": "语音速记本",
       "icon": "📝",
-      "desc": "录音速记 + 分类管理",
+      "desc": "录音速记 + 分类管理 + PWA离线缓存 + 复制统计",
       "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_notes",
       "cmd": ["python", "main.py"],
       "port": 8010,
-      "health_path": "/",
-      "checks": []
+      "scheme": "https",
+      "health_path": "/api/ping",
+      "checks": [
+        {"type": "file", "target": "D:\\CODE\\Python\\test-data-backup\\py\\voice_notes\\cert.pem", "label": "HTTPS 证书（运行 gen_cert.bat 生成）"}
+      ]
     },
     {
       "id": "novel_agent",
