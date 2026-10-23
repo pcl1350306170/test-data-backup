@@ -83,13 +83,18 @@ def port_open(port: int, host: str = "127.0.0.1") -> bool:
         return False
 
 
-def http_alive(port: int, path: str = "/", timeout: float = 2.0) -> bool:
-    """HTTP 探测：能连上并返回任意状态码即视为存活（区分端口被 hang 死的进程占用）。"""
+def http_alive(port: int, path: str = "/", timeout: float = 2.0, scheme: str = "http") -> bool:
+    """HTTP/HTTPS 探测：能连上并返回任意状态码即视为存活。"""
+    url = "%s://127.0.0.1:%d%s" % (scheme, port, path)
     try:
-        req = urllib.request.Request(
-            "http://127.0.0.1:%d%s" % (port, path),
-            headers={"User-Agent": "svc-hub"})
-        urllib.request.urlopen(req, timeout=timeout)
+        ctx = None
+        if scheme == "https":
+            import ssl
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+        req = urllib.request.Request(url, headers={"User-Agent": "svc-hub"})
+        urllib.request.urlopen(req, timeout=timeout, context=ctx)
         return True
     except urllib.error.HTTPError:
         return True  # 有响应即存活
@@ -134,7 +139,8 @@ def _probe(svc: dict) -> str:
         return "stopped"
     rec = load_state().get(svc["id"])
     if rec:
-        return "running" if http_alive(svc["port"], svc.get("health_path", "/")) \
+        return "running" if http_alive(svc["port"], svc.get("health_path", "/"),
+                                       scheme=svc.get("scheme", "http")) \
             else "unresponsive"
     return "external"
 

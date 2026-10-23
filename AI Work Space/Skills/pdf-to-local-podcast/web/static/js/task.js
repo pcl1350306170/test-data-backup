@@ -308,6 +308,8 @@ const Task = {
           document.getElementById('btn-pause-task').disabled = true;
           document.getElementById('btn-resume-task').style.display = 'inline-block';
         }
+        // 状态变化时刷新执行队列显示
+        this._refreshExecQueue();
         break;
 
       case 'parsed':
@@ -430,6 +432,9 @@ const Task = {
       this.updateProgress({ done, total: status.total_blocks, percent: Math.round(done / status.total_blocks * 100) });
     }
 
+    // 执行队列状态显示
+    this.renderExecQueue(status);
+
     // 多任务批次信息展示
     const qEl = document.getElementById('progress-eta');
     if (status.total_jobs > 1 && qEl) {
@@ -441,6 +446,51 @@ const Task = {
       this.updateStatusText(`✅ 上次完成: ${status.output_path.split(/[\\/]/).pop()}`);
     } else if (status.status === 'failed') {
       this.updateStatusText('❌ ' + (status.error_message || '失败'));
+    }
+  },
+
+  async _refreshExecQueue() {
+    try {
+      const status = await App.api('/api/task/status');
+      this.renderExecQueue(status);
+    } catch (e) { /* ignore */ }
+  },
+
+  renderExecQueue(status) {
+    const el = document.getElementById('exec-queue');
+    const curEl = document.getElementById('exec-current');
+    const pendEl = document.getElementById('exec-pending');
+    const isBusy = ['parsing', 'generating', 'merging', 'paused', 'cancelling', 'validating'].includes(status.status);
+    const isDone = ['done', 'failed', 'cancelled'].includes(status.status);
+
+    if (!isBusy && !isDone) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+
+    // 当前任务
+    const name = status.output_name || (status.script_path || '').split(/[\\/]/).pop().replace(/\.md$/i, '') || '';
+    const statusMap = {
+      parsing: '🔍 解析中', generating: '🎤 生成中', merging: '🔗 合并中',
+      validating: '✅ 校验中', paused: '⏸ 已暂停', cancelling: '⏹ 停止中',
+      done: '✅ 已完成', failed: '❌ 失败', cancelled: '⏹ 已取消',
+    };
+    const label = statusMap[status.status] || status.status;
+    const jobIdx = Math.min((status.job_index || 0) + 1, status.total_jobs || 1);
+    const total = status.total_jobs || 1;
+    const batchPrefix = total > 1 ? `[${jobIdx}/${total}] ` : '';
+
+    if (isBusy || isDone) {
+      curEl.innerHTML = `<span class="exec-label">${batchPrefix}${label}</span> <span class="exec-name">${App.escapeHtml(name)}</span>`;
+    } else {
+      curEl.innerHTML = '';
+    }
+
+    // 排队任务
+    const pendings = status.pending_scripts || [];
+    if (pendings.length && isBusy) {
+      pendEl.innerHTML = `<div class="exec-pending-title">排队中 (${pendings.length})</div>` +
+        pendings.map((s, i) => `<div class="exec-pending-item">${jobIdx + i + 1}. ${App.escapeHtml(s)}</div>`).join('');
+    } else {
+      pendEl.innerHTML = '';
     }
   },
 
