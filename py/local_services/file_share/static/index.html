@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>局域网共享文件</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="head-left">
+        <h1>📁 局域网共享文件</h1>
+        <span class="sub" id="dirInfo"></span>
+      </div>
+      <div class="head-right">
+        <button class="theme-toggle" id="themeToggle" title="切换夜间模式">🌙</button>
+        <button class="btn" onclick="App.load()">⟳ 刷新</button>
+      </div>
+    </header>
+
+    <section class="upload-zone" id="dropZone">
+      <div class="upload-hint">
+        <p>拖拽文件到这里，或</p>
+        <button class="btn btn-accent" onclick="$('fileInput').click()">选择文件上传</button>
+        <input type="file" id="fileInput" multiple hidden>
+      </div>
+      <div class="progress-list" id="progressList"></div>
+    </section>
+
+    <section class="stats" id="stats"></section>
+
+    <section class="file-panel">
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th class="col-name">文件名</th>
+            <th class="col-size">大小</th>
+            <th class="col-time">修改时间</th>
+            <th class="col-ops">操作</th>
+          </tr>
+        </thead>
+        <tbody id="fileBody">
+          <tr class="empty-row"><td colspan="4">加载中…</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer class="foot" id="lanInfo"></footer>
+  </div>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

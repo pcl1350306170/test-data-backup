@@ -61,6 +61,19 @@
         "cmd": ["C:\\Users\\PCL13\\AppData\\Local\\Programs\\Ollama\\ollama.exe", "serve"],
         "wait_sec": 6
       }
+    },
+    {
+      "id": "file_share",
+      "name": "局域网共享文件",
+      "icon": "🔁",
+      "desc": "共享目录浏览器上传/下载（大文件流式直传，其他PC直接访问）",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\file_share",
+      "cmd": ["python", "server.py"],
+      "port": 8800,
+      "health_path": "/api/ping",
+      "checks": [
+        {"type": "dir", "target": "cfg:data/config.json#shared_dir", "label": "共享目录可访问"}
+      ]
     }
   ]
 }

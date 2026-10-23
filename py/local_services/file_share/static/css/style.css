@@ -1,0 +1,96 @@
+/* 局域网共享文件 */
+:root {
+  --bg: #f4f6fa; --panel: #fff; --border: #e2e6ee; --text: #24292f;
+  --muted: #6b7280; --accent: #2563eb; --green: #16a34a; --red: #dc2626;
+  --card-shadow: rgba(0,0,0,.08); --btn-bg: #fff;
+}
+[data-theme="dark"] {
+  --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #c9d1d9;
+  --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; --red: #f85149;
+  --card-shadow: rgba(0,0,0,.4); --btn-bg: #21262d;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: var(--bg); color: var(--text); padding: 20px; min-height: 100vh;
+}
+
+.container { max-width: 1100px; margin: 0 auto; }
+
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+}
+h1 { font-size: 20px; }
+.head-left { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.sub { font-size: 12px; color: var(--muted); }
+.head-right { display: flex; align-items: center; gap: 8px; }
+
+.btn {
+  border: 1px solid var(--border); background: var(--btn-bg); color: var(--text);
+  padding: 7px 14px; border-radius: 8px; font-size: 13px; cursor: pointer;
+}
+.btn:hover { border-color: var(--accent); }
+.btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-mini { padding: 4px 10px; font-size: 12px; margin-right: 4px; }
+.btn-danger:hover { border-color: var(--red); color: var(--red); }
+
+.theme-toggle {
+  background: var(--btn-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 6px 12px; font-size: 16px; cursor: pointer; line-height: 1;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+
+/* 上传区 */
+.upload-zone {
+  background: var(--panel); border: 2px dashed var(--border); border-radius: 12px;
+  padding: 20px; margin-bottom: 14px; text-align: center; transition: border-color .2s;
+}
+.upload-zone.dragging { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 6%, var(--panel)); }
+.upload-hint { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.upload-hint p { color: var(--muted); font-size: 13px; }
+
+.progress-list { margin-top: 12px; text-align: left; }
+.progress-row {
+  display: flex; align-items: center; gap: 10px; padding: 6px 8px;
+  border-top: 1px solid var(--border); font-size: 12px;
+}
+.pf-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-size { color: var(--muted); width: 70px; text-align: right; }
+.pf-bar { width: 180px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.pf-fill { height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width .15s; }
+.pf-fill.pf-fail { background: var(--red); }
+.pf-state { width: 140px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 统计 */
+.stats {
+  display: flex; gap: 20px; font-size: 13px; color: var(--muted); margin-bottom: 10px; padding: 0 4px;
+}
+.stats b { color: var(--text); }
+
+/* 文件表格 */
+.file-panel {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  overflow: hidden; box-shadow: 0 2px 8px var(--card-shadow);
+}
+.file-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.file-table th {
+  text-align: left; padding: 10px 14px; background: var(--bg);
+  color: var(--muted); font-weight: 500; border-bottom: 1px solid var(--border);
+}
+.file-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+.file-table tr:last-child td { border-bottom: none; }
+.file-table tr:hover td { background: color-mix(in srgb, var(--accent) 4%, var(--panel)); }
+.col-size, .col-time { width: 110px; white-space: nowrap; }
+.col-ops { width: 220px; white-space: nowrap; }
+.col-name { word-break: break-all; }
+.empty-row td { text-align: center; color: var(--muted); padding: 30px !important; }
+
+.foot { margin-top: 14px; font-size: 12px; color: var(--muted); text-align: center; }
+
+@media (max-width: 640px) {
+  .col-time { display: none; }
+  .pf-bar { width: 90px; }
+}
