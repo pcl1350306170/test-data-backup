@@ -22,8 +22,6 @@ from fastapi.middleware.cors import CORSMiddleware
 BASE = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE, "notes.json")
 CAT_PATH = os.path.join(BASE, "categories.json")
-CERT_FILE = os.path.join(BASE, "cert.pem")
-KEY_FILE = os.path.join(BASE, "key.pem")
 PORT = 8010
 
 DEFAULT_CATS = [
@@ -75,6 +73,10 @@ class NoteBody(BaseModel):
     created_at: str = ""    # 可选：客户端提供的录入时间（离线同步保留原时间）
     client_id: str = ""     # 可选：客户端唯一 ID（幂等去重，防止重复推送）
     category_id: str = ""   # 可选：所属分类
+
+
+class BatchNotesBody(BaseModel):
+    notes: list = []
 
 
 # ---------------------------------------------------------------- 分类
@@ -268,25 +270,62 @@ def record_copy(note_id: str):
     raise HTTPException(status_code=404, detail="记录不存在")
 
 
+@app.post("/api/notes/batch")
+def batch_import(body: BatchNotesBody):
+    """批量导入记录（按 client_id 去重，已存在的跳过）。"""
+    added = 0
+    with LOCK:
+        notes = _load_notes()
+        existing_ids = set()
+        for n in notes:
+            if n.get("client_id"):
+                existing_ids.add(n["client_id"])
+            if n.get("id"):
+                existing_ids.add(n["id"])
+        for item in body.notes:
+            content = (item.get("content") or "").strip()
+            if not content:
+                continue
+            cid = (item.get("client_id") or "").strip()
+            if cid and cid in existing_ids:
+                continue
+            created_at = (item.get("created_at") or "").strip()
+            if created_at:
+                try:
+                    datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    created_at = _now()
+            else:
+                created_at = _now()
+            note = {
+                "id": uuid.uuid4().hex[:12],
+                "content": content,
+                "created_at": created_at,
+                "updated_at": "",
+                "category_id": (item.get("category_id") or "").strip(),
+                "copy_count": item.get("copy_count", 0),
+                "last_copied_at": item.get("last_copied_at", ""),
+            }
+            if cid:
+                note["client_id"] = cid
+                existing_ids.add(cid)
+            notes.append(note)
+            added += 1
+        if added:
+            _save_notes(notes)
+    return {"ok": True, "added": added}
+
+
 if __name__ == "__main__":
-    use_ssl = os.path.exists(CERT_FILE) and os.path.exists(KEY_FILE)
-    scheme = "https" if use_ssl else "http"
     print("=" * 52)
     print("  语音速记本已启动")
-    print("  本机访问:   %s://127.0.0.1:%d" % (scheme, PORT))
+    print("  本机访问:   http://127.0.0.1:%d" % PORT)
     import socket
     try:
         host = socket.gethostbyname(socket.gethostname())
-        print("  手机访问:   %s://%s:%d  （需同一 WiFi）" % (scheme, host, PORT))
+        print("  手机访问:   http://%s:%d  （需同一 WiFi）" % (host, PORT))
     except Exception:
         pass
-    if not use_ssl:
-        print("  ℹ 未检测到证书，仅 HTTP 模式（SW 离线不可用）")
-        print("    运行 gen_cert.bat 生成证书后重启，启用 HTTPS + 离线")
     print("  按 Ctrl+C 停止服务")
     print("=" * 52)
-    kwargs = {"host": "0.0.0.0", "port": PORT, "log_level": "warning"}
-    if use_ssl:
-        kwargs["ssl_certfile"] = CERT_FILE
-        kwargs["ssl_keyfile"] = KEY_FILE
-    uvicorn.run(app, **kwargs)
+    uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="warning")

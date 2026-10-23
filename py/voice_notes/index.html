@@ -89,6 +89,27 @@ header h1 { font-size:18px; font-weight:700; }
   z-index:15; transition:background .2s ease, transform .1s ease;
 }
 #addBtn:active { background:var(--accent-active); transform:scale(0.94); }
+#syncBtn {
+  position:fixed; left:20px; bottom:calc(24px + env(safe-area-inset-bottom));
+  width:44px; height:44px; border-radius:50%;
+  font-size:20px; color:#fff; background:#059669; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 3px 10px rgba(0,0,0,0.2); z-index:15;
+}
+#syncOverlay {
+  position:fixed; inset:0; background:var(--overlay); z-index:20;
+  display:flex; align-items:flex-end; justify-content:center;
+}
+#syncArea {
+  width:100%; min-height:200px; font-size:13px; font-family:monospace; line-height:1.5;
+  border:1px solid var(--border); border-radius:12px; padding:12px; resize:vertical;
+  background:var(--input-bg); color:var(--text); outline:none;
+}
+.sync-actions { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.sync-actions button { flex:1; min-width:100px; padding:11px; font-size:14px; border:none; border-radius:10px; cursor:pointer; }
+#btnExport { background:var(--accent); color:#fff; }
+#btnImport { background:#059669; color:#fff; }
+#btnSyncClose { background:var(--btn-ghost); color:var(--btn-ghost-text); }
 #list { list-style:none; padding:8px 16px 110px; }
 .card {
   background:var(--card-bg); border-radius:12px; padding:14px; margin-bottom:12px;
@@ -186,13 +207,6 @@ header h1 { font-size:18px; font-weight:700; }
   max-width:80%; text-align:center;
 }
 #toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-#netStatus {
-  font-size:12px; padding:2px 8px; border-radius:8px; margin-right:8px;
-  background:#dcfce7; color:#15803d; font-weight:700;
-}
-#netStatus.offline { background:#fee2e2; color:#dc2626; }
-[data-theme="dark"] #netStatus { background:#064e3b; color:#6ee7b7; }
-[data-theme="dark"] #netStatus.offline { background:#7f1d1d; color:#fca5a5; }
 @media (min-width:768px) {
   #list { max-width:640px; margin:0 auto; }
   #empty { max-width:640px; margin:0 auto; }
@@ -205,7 +219,6 @@ header h1 { font-size:18px; font-weight:700; }
 <header>
   <h1>🗒 语音速记</h1>
   <div style="display:flex;align-items:center;">
-    <span id="netStatus">在线</span>
     <span id="count"></span>
     <button id="themeBtn" title="切换明暗模式">🌙</button>
   </div>
@@ -216,6 +229,7 @@ header h1 { font-size:18px; font-weight:700; }
 <div id="empty" class="hidden">还没有记录，点「＋」说话保存</div>
 
 <button id="addBtn" title="新增记录" aria-label="新增记录">＋</button>
+<button id="syncBtn" title="数据同步">📋</button>
 
 <div id="overlay" class="hidden">
   <div class="sheet">
@@ -242,6 +256,18 @@ header h1 { font-size:18px; font-weight:700; }
 </div>
 
 <div id="toast"></div>
+
+<div id="syncOverlay" class="hidden">
+  <div class="sheet">
+    <div class="sheet-title">数据同步</div>
+    <textarea id="syncArea" placeholder="点「导出」生成 JSON，或粘贴 JSON 后点「导入」"></textarea>
+    <div class="sync-actions">
+      <button id="btnExport">导出全部</button>
+      <button id="btnImport">粘贴导入</button>
+      <button id="btnSyncClose">关闭</button>
+    </div>
+  </div>
+</div>
 
 <script>
 (function () {
@@ -322,11 +348,7 @@ header h1 { font-size:18px; font-weight:700; }
   }
 
   function loadCats() {
-    fetch('/api/categories').then(function (r) {
-      if (r.status === 503) return null;
-      return r.json();
-    }).then(function (data) {
-      if (!data) return;
+    fetch('/api/categories').then(function (r) { return r.json(); }).then(function (data) {
       var next = [];
       (data.categories || []).forEach(function (c) { if (c.id) next.push({ id: c.id, name: c.name }); });
       categories = next;
@@ -533,11 +555,7 @@ header h1 { font-size:18px; font-weight:700; }
   }
 
   function load() {
-    fetch('/api/notes').then(function (r) {
-      if (r.status === 503) return null;
-      return r.json();
-    }).then(function (data) {
-      if (!data) return;
+    fetch('/api/notes').then(function (r) { return r.json(); }).then(function (data) {
       var next = data.notes || [];
       if (JSON.stringify(next) !== JSON.stringify(notes)) {
         notes = next;
@@ -801,6 +819,50 @@ header h1 { font-size:18px; font-weight:700; }
   document.getElementById('catCloseBtn').addEventListener('click', closeCatManager);
   newCatInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') addCategory(); });
 
+  /* ---------------- 数据同步（导出/导入） ---------------- */
+  var syncOverlayEl = document.getElementById('syncOverlay');
+  var syncAreaEl = document.getElementById('syncArea');
+  document.getElementById('syncBtn').addEventListener('click', function () {
+    syncOverlayEl.classList.remove('hidden'); syncAreaEl.value = '';
+  });
+  document.getElementById('btnSyncClose').addEventListener('click', function () {
+    syncOverlayEl.classList.add('hidden');
+  });
+  document.getElementById('btnExport').addEventListener('click', function () {
+    var data = { version: 1, exported_at: localNow(), categories: categories, notes: notes };
+    syncAreaEl.value = JSON.stringify(data, null, 2);
+    syncAreaEl.select();
+    try { document.execCommand('copy'); toast('已复制到剪贴板'); } catch (e) { toast('请手动 Ctrl+A → Ctrl+C'); }
+  });
+  document.getElementById('btnImport').addEventListener('click', function () {
+    var text = syncAreaEl.value.trim();
+    if (!text) { toast('请先粘贴 JSON'); return; }
+    var data;
+    try { data = JSON.parse(text); } catch (e) { alert('JSON 格式错误：' + e.message); return; }
+    if (!data.notes || !data.notes.length) { alert('没有可导入的记录'); return; }
+    var existingIds = {}; notes.forEach(function (n) { existingIds[n.id || n.client_id || ''] = 1; });
+    var toImport = [];
+    data.notes.forEach(function (n) {
+      var key = n.id || n.client_id || '';
+      if (key && existingIds[key]) return;
+      var cid = n.category_id || '';
+      var catNameVal = '';
+      (data.categories || []).forEach(function (c) { if (c.id === cid) catNameVal = c.name; });
+      var mappedId = '';
+      if (catNameVal) { for (var j = 0; j < categories.length; j++) { if (categories[j].name === catNameVal) { mappedId = categories[j].id; break; } } }
+      toImport.push({ content: n.content || '', created_at: n.created_at || '', client_id: n.id || genClientId(), category_id: mappedId });
+    });
+    if (!toImport.length) { toast('没有新记录需要导入'); syncOverlayEl.classList.add('hidden'); return; }
+    fetch('/api/notes/batch', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: toImport })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      syncOverlayEl.classList.add('hidden');
+      load();
+      toast('导入成功，新增 ' + (d.added || 0) + ' 条');
+    }).catch(function (e) { alert('导入失败：' + e.message); });
+  });
+
   loadCats();
   load();
   syncPending();
@@ -815,40 +877,6 @@ header h1 { font-size:18px; font-weight:700; }
       if (loadPending().length) { syncPending(); } else { load(); }
     }
   });
-
-  /* ---------------- 网络状态检测 ---------------- */
-  var netStatusEl = document.getElementById('netStatus');
-  var serverOnline = true;
-  function checkServer() {
-    fetch('/api/ping').then(function (r) {
-      if (r.ok) return r.json();
-      throw new Error('offline');
-    }).then(function () {
-      if (!serverOnline) { serverOnline = true; updateNetUI(); }
-    }).catch(function () {
-      if (serverOnline) { serverOnline = false; updateNetUI(); }
-    });
-  }
-  function updateNetUI() {
-    if (serverOnline) {
-      netStatusEl.textContent = '在线';
-      netStatusEl.classList.remove('offline');
-    } else {
-      netStatusEl.textContent = '离线';
-      netStatusEl.classList.add('offline');
-    }
-  }
-  checkServer();
-  setInterval(checkServer, 5000);
-
-  /* ---------------- Service Worker 注册 ---------------- */
-  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-    navigator.serviceWorker.register('/sw.js').then(function (reg) {
-      console.log('SW registered:', reg.scope);
-    }).catch(function (err) {
-      console.warn('SW registration failed:', err);
-    });
-  }
 })();
 </script>
 </body>
