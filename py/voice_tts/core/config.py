@@ -43,6 +43,7 @@ DEFAULTS = {
     "meta_album": "",
     "meta_date": "",
     "meta_comment": "",
+    "merge_start_num": "1",
 }
 
 # 预置选项（不可配置，固定列表）

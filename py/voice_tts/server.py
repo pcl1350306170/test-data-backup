@@ -281,6 +281,18 @@ async def list_media_files(kind: str = Query("audio")):
     return {"dir": d, "files": files}
 
 
+@app.get("/api/image_preview")
+async def image_preview(path: str = Query(...)):
+    """按绝对路径返回图片文件，供前端弹窗预览缩略图。"""
+    if not path or not os.path.isfile(path):
+        raise HTTPException(404, "图片不存在: %s" % path)
+    ext = os.path.splitext(path)[1].lower()
+    media_map = {".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+                 ".png": "image/png", ".gif": "image/gif",
+                 ".webp": "image/webp", ".bmp": "image/bmp"}
+    return FileResponse(path, media_type=media_map.get(ext, "application/octet-stream"))
+
+
 # ── 测试生成 ──────────────────────────────────────────
 
 @app.post("/api/test")

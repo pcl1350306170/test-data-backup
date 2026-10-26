@@ -15,5 +15,19 @@
   "tail_ms": 900,
   "prompt_audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\马老师.wav",
   "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
-  "default_prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。"
+  "default_prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
+  "bgm_dir": "D:\\FILES\\music\\仙剑3音乐",
+  "image_dir": "D:/CODE/Miscellaneous/GPT-IMG/头像/",
+  "merge_target_duration": 30,
+  "merge_format": "mp3",
+  "merge_bgm_path": "D:\\FILES\\music\\仙剑3音乐\\骆集益 - 玉满堂.mp3",
+  "merge_bgm_volume": 30,
+  "merge_cover_path": "D:/CODE/Miscellaneous/GPT-IMG/头像/359.jpg",
+  "merge_bg_image_path": "D:/CODE/Miscellaneous/GPT-IMG/头像/175.jpg",
+  "meta_title": "",
+  "meta_artist": "",
+  "meta_album": "",
+  "meta_date": "",
+  "meta_comment": "",
+  "merge_start_num": "1"
 }

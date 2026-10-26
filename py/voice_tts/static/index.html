@@ -216,29 +216,30 @@
       <div class="panel">
         <div class="panel-title">元数据 / 封面（仅 MP3 生效）</div>
         <div class="form-row">
-          <div class="form-group"><label>标题</label><input type="text" id="metaTitle"></div>
+          <div class="form-group flex-2"><label>标题</label><input type="text" id="metaTitle"></div>
+          <div class="form-group" style="max-width:100px"><label>起始序号</label><input type="text" id="mergeStartNum" value="1" placeholder="如 001"></div>
           <div class="form-group"><label>作者</label><input type="text" id="metaArtist"></div>
           <div class="form-group"><label>专辑</label><input type="text" id="metaAlbum"></div>
           <div class="form-group" style="max-width:110px"><label>日期</label><input type="text" id="metaDate" placeholder="默认今年"></div>
         </div>
         <div class="form-row">
           <div class="form-group flex-2">
-            <label>封面（图片目录）</label>
-            <select id="mergeCoverSelect"><option value="">(无)</option></select>
+            <label>封面</label>
+            <div class="img-pick-row">
+              <input type="text" id="mergeCoverPath" placeholder="图片路径" readonly>
+              <button class="btn btn-sm" onclick="Merge.openImagePicker('cover')">📂 选择图片</button>
+              <button class="btn btn-sm" onclick="Merge.clearImage('cover')">✕</button>
+            </div>
+            <div class="img-preview-wrap" id="coverPreviewWrap"></div>
           </div>
-          <div class="form-group flex-3">
-            <label>或封面自定义路径</label>
-            <input type="text" id="mergeCoverPath">
-          </div>
-        </div>
-        <div class="form-row">
           <div class="form-group flex-2">
-            <label>播放背景图（图片目录）</label>
-            <select id="mergeBgImgSelect"><option value="">(无)</option></select>
-          </div>
-          <div class="form-group flex-3">
-            <label>或背景图自定义路径</label>
-            <input type="text" id="mergeBgImagePath">
+            <label>播放背景图</label>
+            <div class="img-pick-row">
+              <input type="text" id="mergeBgImagePath" placeholder="图片路径" readonly>
+              <button class="btn btn-sm" onclick="Merge.openImagePicker('bgimg')">📂 选择图片</button>
+              <button class="btn btn-sm" onclick="Merge.clearImage('bgimg')">✕</button>
+            </div>
+            <div class="img-preview-wrap" id="bgimgPreviewWrap"></div>
           </div>
         </div>
         <div class="form-group"><label>备注</label><input type="text" id="metaComment"></div>
@@ -263,6 +264,18 @@
       <div id="mergeLogSection" class="panel" style="display:none">
         <div class="panel-title">合并日志</div>
         <div id="mergeLogBox" class="log-box"></div>
+      </div>
+
+      <!-- 图片选择弹窗 -->
+      <div id="imgPickerModal" class="modal-mask" style="display:none">
+        <div class="modal-box img-picker">
+          <div class="modal-title">选择图片</div>
+          <div id="imgPickerGrid" class="img-picker-grid"></div>
+          <div id="imgPickerEmpty" class="empty-hint" style="display:none">图片目录无文件</div>
+          <div class="modal-actions">
+            <button class="btn" onclick="Merge.closeImagePicker()">关闭</button>
+          </div>
+        </div>
       </div>
     </section>
 

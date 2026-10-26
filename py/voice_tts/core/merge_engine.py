@@ -172,11 +172,31 @@ def group_files(file_paths: list, target_minutes: int):
     return batches, total_ms, batches_ms
 
 
-def build_metadata(meta: dict, part: int, total: int) -> dict:
-    """单组元数据：多组时标题自动加 (n/N) 后缀，空值过滤。"""
+def _sanitize_filename(name: str) -> str:
+    """去除文件名中系统不允许的字符。"""
+    invalid = '<>:"/\\|?*\x00'
+    return "".join(c for c in name if c not in invalid).strip()
+
+
+def build_metadata(meta: dict, part: int, total: int, start_num: str = "1") -> dict:
+    """单组元数据：标题+序号，空值过滤。
+    start_num: 起始序号字符串，如 "1" 或 "001"（前导零决定补零宽度）
+    """
     title = (meta.get("title") or "").strip()
-    if title and total > 1:
-        title = "%s (%d/%d)" % (title, part, total)
+    # 解析起始序号
+    raw = str(start_num).strip() or "1"
+    try:
+        start = int(raw)
+        if start < 0:
+            start = 1
+            raw = "1"
+    except (ValueError, TypeError):
+        start = 1
+        raw = "1"
+    width = max(1, len(raw))
+    seq_num = start + part - 1
+    if title:
+        title = "%s%0*d" % (title, width, seq_num)
     d = {
         "title": title,
         "artist": (meta.get("artist") or "").strip(),
@@ -342,7 +362,7 @@ class MergeEngine:
             cover = (params.get("cover_path") or "").strip()
             bgimg = (params.get("bg_image_path") or "").strip()
             meta = params.get("metadata") or {}
-            date_str = date.today().strftime("%Y%m%d")
+            start_num = str(params.get("start_num") or "1").strip()
             total = self.total
 
             self._emit({"type": "started", "total": total})
@@ -368,12 +388,16 @@ class MergeEngine:
                     self._emit({"type": "group_error", "index": part, "error": str(e)})
                     continue
 
-                filename = "%s_%s_%02d.%s" % (self.source_name, date_str, part, ext)
+                # 输出文件名 = 标题+序号（与元数据标题一致）
+                md = build_metadata(meta, part, total, start_num)
+                title = (md.get("title") or "").strip()
+                base = _sanitize_filename(title) if title else ""
+                if not base:
+                    base = "%s_%02d" % (self.source_name or "合并音频", part)
+                filename = "%s.%s" % (base, ext)
                 out_path = os.path.join(out_dir, filename)
                 if os.path.exists(out_path):
-                    filename = "%s_%s_%s_%02d.%s" % (
-                        self.source_name, date_str,
-                        time.strftime("%H%M%S"), part, ext)
+                    filename = "%s_%s.%s" % (base, time.strftime("%H%M%S"), ext)
                     out_path = os.path.join(out_dir, filename)
 
                 self._log("[%d/%d] 导出 %s (%.1f秒%s)" % (
@@ -384,7 +408,7 @@ class MergeEngine:
                         temp_wav, out_path, ext,
                         bgm_path=bgm or None, bgm_volume=vol,
                         total_duration=dur,
-                        metadata=build_metadata(meta, part, total),
+                        metadata=md,
                         cover_path=cover or None, bg_image_path=bgimg or None)
                 except Exception as e:
                     self._log("[%d/%d] 导出失败: %s" % (part, total, e))

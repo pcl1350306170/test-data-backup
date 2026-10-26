@@ -16,14 +16,6 @@ var Merge = (function () {
       if (this.value) $('mergeBgmPath').value = this.value;
       saveSettings();
     });
-    $('mergeCoverSelect').addEventListener('change', function () {
-      if (this.value) $('mergeCoverPath').value = this.value;
-      saveSettings();
-    });
-    $('mergeBgImgSelect').addEventListener('change', function () {
-      if (this.value) $('mergeBgImagePath').value = this.value;
-      saveSettings();
-    });
     $('mergeBgmVolume').addEventListener('input', function () {
       $('mergeBgmVolLabel').textContent = this.value;
     });
@@ -33,6 +25,7 @@ var Merge = (function () {
     });
     $('mergeDuration').addEventListener('change', saveSettings);
     $('mergeFormat').addEventListener('change', saveSettings);
+    $('mergeStartNum').addEventListener('change', saveSettings);
     checkStatus();
   }
 
@@ -94,21 +87,9 @@ var Merge = (function () {
         if (known) sel.value = saved;
       }
     }).catch(function () { });
-
-    fetch('/api/media_files?kind=image').then(function (r) { return r.json(); }).then(function (data) {
-      [['mergeCoverSelect', 'mergeCoverPath', '(无封面)'],
-       ['mergeBgImgSelect', 'mergeBgImagePath', '(无背景图)']].forEach(function (cfg) {
-        var sel = $(cfg[0]);
-        sel.innerHTML = '<option value="">' + cfg[2] + '</option>';
-        (data.files || []).forEach(function (f) {
-          sel.innerHTML += '<option value="' + esc(f.path) + '">' + esc(f.name) + '</option>';
-        });
-        var saved = ($(cfg[1]).value || '').trim();
-        if (saved && (data.files || []).some(function (f) { return f.path === saved; })) {
-          sel.value = saved;
-        }
-      });
-    }).catch(function () { });
+    // 图片选择已改为弹窗预览模式，不再加载下拉
+    updateImagePreview('cover');
+    updateImagePreview('bgimg');
   }
 
   // ── 文件勾选 ──────────────────────────────────────
@@ -149,14 +130,15 @@ var Merge = (function () {
   // ── 参数收集 / 持久化 ─────────────────────────────
   function getMergeParams(test) {
     var bgm = ($('mergeBgmPath').value || '').trim() || $('mergeBgmSelect').value || '';
-    var cover = ($('mergeCoverPath').value || '').trim() || $('mergeCoverSelect').value || '';
-    var bgimg = ($('mergeBgImagePath').value || '').trim() || $('mergeBgImgSelect').value || '';
+    var cover = ($('mergeCoverPath').value || '').trim();
+    var bgimg = ($('mergeBgImagePath').value || '').trim();
     return {
       files: checkedNames(),
       test: !!test,
       target_duration: parseInt($('mergeDuration').value) || 20,
       format: $('mergeFormat').value,
       source_name: ($('mergeSourceName').value || '').trim(),
+      start_num: ($('mergeStartNum').value || '1').trim(),
       bgm_path: bgm,
       bgm_volume: parseInt($('mergeBgmVolume').value) || 0,
       cover_path: cover,
@@ -179,6 +161,7 @@ var Merge = (function () {
       merge_bgm_volume: parseInt($('mergeBgmVolume').value) || 0,
       merge_cover_path: ($('mergeCoverPath').value || '').trim(),
       merge_bg_image_path: ($('mergeBgImagePath').value || '').trim(),
+      merge_start_num: ($('mergeStartNum').value || '1').trim(),
       meta_title: $('metaTitle').value.trim(),
       meta_artist: $('metaArtist').value.trim(),
       meta_album: $('metaAlbum').value.trim(),
@@ -201,12 +184,85 @@ var Merge = (function () {
     $('mergeBgmVolLabel').textContent = $('mergeBgmVolume').value;
     $('mergeCoverPath').value = cfg.merge_cover_path || '';
     $('mergeBgImagePath').value = cfg.merge_bg_image_path || '';
+    $('mergeStartNum').value = cfg.merge_start_num || '1';
     $('metaTitle').value = cfg.meta_title || '';
     $('metaArtist').value = cfg.meta_artist || '';
     $('metaAlbum').value = cfg.meta_album || '';
     $('metaDate').value = cfg.meta_date || '';
     $('metaComment').value = cfg.meta_comment || '';
     loadMediaOptions();
+  }
+
+  // ── 图片弹窗预览 ─────────────────────────────────────
+  var pickerTarget = null;  // 'cover' | 'bgimg'
+
+  function openImagePicker(target) {
+    pickerTarget = target;
+    var modal = $('imgPickerModal');
+    var grid = $('imgPickerGrid');
+    var empty = $('imgPickerEmpty');
+    grid.innerHTML = '<div class="empty-hint">加载中...</div>';
+    empty.style.display = 'none';
+    modal.style.display = '';
+
+    fetch('/api/media_files?kind=image').then(function (r) { return r.json(); }).then(function (data) {
+      var files = data.files || [];
+      if (!files.length) {
+        grid.innerHTML = '';
+        empty.style.display = '';
+        return;
+      }
+      var html = '';
+      files.forEach(function (f) {
+        var src = '/api/image_preview?path=' + encodeURIComponent(f.path);
+        html += '<div class="img-pick-item" data-path="' + esc(f.path) + '" title="' + esc(f.name) + '">' +
+          '<img src="' + src + '" loading="lazy" alt="' + esc(f.name) + '">' +
+          '<span>' + esc(f.name) + '</span></div>';
+      });
+      grid.innerHTML = html;
+      grid.querySelectorAll('.img-pick-item').forEach(function (el) {
+        el.addEventListener('click', function () {
+          pickImage(this.getAttribute('data-path'));
+        });
+      });
+    }).catch(function () {
+      grid.innerHTML = '<div class="empty-hint">加载失败</div>';
+    });
+  }
+
+  function closeImagePicker() {
+    document.getElementById('imgPickerModal').style.display = 'none';
+    pickerTarget = null;
+  }
+  
+  function pickImage(path) {
+    if (!pickerTarget) return;
+    var inputId = pickerTarget === 'cover' ? 'mergeCoverPath' : 'mergeBgImagePath';
+    document.getElementById(inputId).value = path;
+    saveSettings();
+    updateImagePreview(pickerTarget);
+    closeImagePicker();
+  }
+
+  function clearImage(target) {
+    var inputId = target === 'cover' ? 'mergeCoverPath' : 'mergeBgImagePath';
+    $(inputId).value = '';
+    saveSettings();
+    updateImagePreview(target);
+  }
+
+  function updateImagePreview(target) {
+    var inputId = target === 'cover' ? 'mergeCoverPath' : 'mergeBgImagePath';
+    var wrapId = target === 'cover' ? 'coverPreviewWrap' : 'bgimgPreviewWrap';
+    var path = ($(inputId).value || '').trim();
+    var wrap = $(wrapId);
+    if (!path) {
+      wrap.innerHTML = '';
+      return;
+    }
+    var src = '/api/image_preview?path=' + encodeURIComponent(path);
+    wrap.innerHTML = '<img src="' + src + '" class="img-preview-thumb" alt="preview">' +
+      '<span class="img-preview-name">' + esc(path.split(/[\\/]/).pop()) + '</span>';
   }
 
   // ── 预览分组 ──────────────────────────────────────
@@ -377,5 +433,8 @@ var Merge = (function () {
     stop: stop,
     applyConfig: applyConfig,
     checkStatus: checkStatus,
+    openImagePicker: openImagePicker,
+    closeImagePicker: closeImagePicker,
+    clearImage: clearImage,
   };
 })();
