@@ -121,9 +121,10 @@ def sync_download():
 
 @app.post("/api/sync/upload")
 def sync_upload(body: SyncUploadBody):
-    """从 GitHub 离线版上传数据到本地服务（分类按名称去重，记录按 client_id 去重）。"""
+    """从 GitHub 离线版上传数据到本地服务（分类按名称去重，记录按 client_id 去重 + 冲突检测）。"""
     added_cats = 0
     added_notes = 0
+    updated_notes = 0
     with LOCK:
         cats = _load_categories()
         notes = _load_notes()
@@ -150,21 +151,17 @@ def sync_upload(body: SyncUploadBody):
         if added_cats:
             _save_categories(cats)
 
-        # 记录：按 client_id 去重
-        existing_ids = set()
-        for n in notes:
+        # 建立 client_id → 记录索引 的映射（用于冲突检测）
+        cid_to_idx = {}
+        for i, n in enumerate(notes):
             if n.get("client_id"):
-                existing_ids.add(n["client_id"])
-            if n.get("id"):
-                existing_ids.add(n["id"])
+                cid_to_idx[n["client_id"]] = i
 
         for item in body.notes:
             content = (item.get("content") or "").strip()
             if not content:
                 continue
             cid = (item.get("client_id") or "").strip()
-            if cid and cid in existing_ids:
-                continue
 
             # 分类映射
             old_cat_id = (item.get("category_id") or "").strip()
@@ -180,25 +177,42 @@ def sync_upload(body: SyncUploadBody):
             else:
                 created_at = _now()
 
+            client_updated = (item.get("updated_at") or "").strip()
+
+            # 冲突检测：如果 client_id 已存在，比较 updated_at
+            if cid and cid in cid_to_idx:
+                existing = notes[cid_to_idx[cid]]
+                server_updated = existing.get("updated_at", "")
+                # 仅当客户端版本更新时才覆盖
+                if client_updated and client_updated > server_updated:
+                    existing["content"] = content
+                    existing["updated_at"] = client_updated
+                    existing["category_id"] = local_cat_id
+                    existing["copy_count"] = item.get("copy_count", existing.get("copy_count", 0))
+                    existing["last_copied_at"] = item.get("last_copied_at", existing.get("last_copied_at", ""))
+                    updated_notes += 1
+                continue
+
+            # 新记录
             note = {
                 "id": uuid.uuid4().hex[:12],
                 "content": content,
                 "created_at": created_at,
-                "updated_at": (item.get("updated_at") or "").strip(),
+                "updated_at": client_updated,
                 "category_id": local_cat_id,
                 "copy_count": item.get("copy_count", 0),
                 "last_copied_at": (item.get("last_copied_at") or "").strip(),
             }
             if cid:
                 note["client_id"] = cid
-                existing_ids.add(cid)
+                cid_to_idx[cid] = len(notes)
             notes.append(note)
             added_notes += 1
 
-        if added_notes:
+        if added_notes or updated_notes:
             _save_notes(notes)
 
-    return {"ok": True, "added_notes": added_notes, "added_categories": added_cats}
+    return {"ok": True, "added_notes": added_notes, "updated_notes": updated_notes, "added_categories": added_cats}
 
 
 # ---------------------------------------------------------------- 健康检测
