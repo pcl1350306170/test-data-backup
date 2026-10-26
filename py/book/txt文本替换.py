@@ -6,6 +6,7 @@ import pymysql
 import re
 from pathlib import Path
 import chardet  # 用于检测文件编码
+import threading
 
 # 配置路径设置（与epub_replace_txt_cover.py保持一致）
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
@@ -165,15 +166,21 @@ class TxtReplacerApp:
 
         ttk.Button(btn_frame, text="加载替换规则", command=self.load_all_replacements).pack(side=tk.LEFT, padx=10)
         ttk.Button(btn_frame, text="保存配置", command=self.save_config).pack(side=tk.LEFT, padx=10)
-        ttk.Button(btn_frame, text="执行替换", command=self.execute_replacement).pack(side=tk.RIGHT, padx=10)
+        self.execute_btn = ttk.Button(btn_frame, text="执行替换", command=self.execute_replacement)
+        self.execute_btn.pack(side=tk.RIGHT, padx=10)
 
     def log(self, message):
-        """添加日志信息"""
-        self.log_text.config(state=tk.NORMAL)
-        self.log_text.insert(tk.END, message + "\n")
-        self.log_text.see(tk.END)
-        self.log_text.config(state=tk.DISABLED)
-        self.root.update_idletasks()
+        """添加日志信息（线程安全）"""
+        def _do_log():
+            self.log_text.config(state=tk.NORMAL)
+            self.log_text.insert(tk.END, message + "\n")
+            self.log_text.see(tk.END)
+            self.log_text.config(state=tk.DISABLED)
+        # 如果在子线程调用，通过 after 调度到主线程执行
+        if threading.current_thread() is threading.main_thread():
+            _do_log()
+        else:
+            self.root.after(0, _do_log)
 
     def add_files(self):
         """添加TXT文件"""
@@ -718,7 +725,7 @@ class TxtReplacerApp:
             return -1
 
     def execute_replacement(self):
-        """执行替换操作"""
+        """执行替换操作（启动后台线程，避免界面卡死）"""
         # 检查是否选择了文件
         if not self.selected_files:
             messagebox.showerror("错误", "请先添加TXT文件")
@@ -755,53 +762,68 @@ class TxtReplacerApp:
                 messagebox.showerror("错误", f"无法创建输出目录: {str(e)}")
                 return
 
-        # 执行替换
+        # 禁用执行按钮，防止重复点击
+        self.execute_btn.config(state=tk.DISABLED)
+
+        # 保存配置
+        self.save_config()
+
+        # 启动后台线程执行替换
+        worker = threading.Thread(
+            target=self._replacement_worker,
+            args=(list(self.selected_files), output_dir, overwrite_original),
+            daemon=True
+        )
+        worker.start()
+
+    def _replacement_worker(self, file_list, output_dir, overwrite_original):
+        """后台线程：逐个处理文件并实时更新日志"""
         self.log("===== 开始执行替换操作 =====")
         total_replacements = 0
         success_count = 0
+        total_files = len(file_list)
 
-        for input_path in self.selected_files:
+        for idx, input_path in enumerate(file_list, 1):
             file_name = os.path.basename(input_path)
+            self.log(f"[{idx}/{total_files}] 正在处理: {file_name}")
 
             if overwrite_original:
-                # 未选择输出目录，直接覆盖原文件
                 output_path = input_path
             else:
                 output_path = os.path.join(output_dir, file_name)
-
-                # 避免覆盖原文件
                 if os.path.abspath(input_path) == os.path.abspath(output_path):
                     name, ext = os.path.splitext(file_name)
                     output_path = os.path.join(output_dir, f"{name}_modified{ext}")
                     self.log(f"原文件路径与输出路径相同，自动重命名为: {os.path.basename(output_path)}")
 
-            # 处理文件
             count = self.process_single_file(input_path, output_path)
 
             if count >= 0:
                 success_count += 1
                 total_replacements += count
-                self.log(f"处理完成: {file_name}，替换 {count} 处")
-
-        # 保存配置
-        self.save_config()
+                self.log(f"[{idx}/{total_files}] 完成: {file_name}，替换 {count} 处")
+            else:
+                self.log(f"[{idx}/{total_files}] 失败: {file_name}")
 
         # 显示结果
         self.log(f"===== 处理完成 =====")
-        self.log(f"成功处理 {success_count}/{len(self.selected_files)} 个文件")
+        self.log(f"成功处理 {success_count}/{total_files} 个文件")
         self.log(f"总计替换 {total_replacements} 处内容")
         if overwrite_original:
             self.log("已直接替换原文件")
-            result_msg = (f"成功处理 {success_count}/{len(self.selected_files)} 个文件\n"
-                          f"总计替换 {total_replacements} 处内容\n"
-                          f"已直接替换原文件")
         else:
             self.log(f"文件已保存至: {output_dir}")
-            result_msg = (f"成功处理 {success_count}/{len(self.selected_files)} 个文件\n"
-                          f"总计替换 {total_replacements} 处内容\n"
-                          f"文件已保存至: {output_dir}")
 
-        messagebox.showinfo("完成", result_msg)
+        result_msg = (f"成功处理 {success_count}/{total_files} 个文件\n"
+                      f"总计替换 {total_replacements} 处内容")
+        if overwrite_original:
+            result_msg += "\n已直接替换原文件"
+        else:
+            result_msg += f"\n文件已保存至: {output_dir}"
+
+        # 恢复按钮状态并弹出完成提示
+        self.root.after(0, lambda: self.execute_btn.config(state=tk.NORMAL))
+        self.root.after(0, lambda: messagebox.showinfo("完成", result_msg))
 
 if __name__ == "__main__":
     # 检查依赖

@@ -42,6 +42,12 @@ except Exception:
 
 _NO_WINDOW = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
 
+
+def _sanitize_filename(name):
+    """去除文件名中系统不允许的字符"""
+    invalid = '<>:"/\\|?*\x00'
+    return "".join(c for c in name if c not in invalid).strip()
+
 # 统一的目标音频参数（所有输入都会被规范化到此参数，避免拼接时参数不一致）
 _TARGET_SAMPLE_RATE = 44100
 _TARGET_CHANNELS = 2
@@ -271,6 +277,7 @@ class AudioBatchMergerApp:
         self.meta_album = tk.StringVar()
         self.meta_date = tk.StringVar()
         self.meta_comment = tk.StringVar()
+        self.start_num = tk.StringVar(value="1")
         self.cover_path = tk.StringVar()
         self.bg_image_path = tk.StringVar()
         self._cover_photo = None
@@ -324,6 +331,11 @@ class AudioBatchMergerApp:
             row1, from_=1, to=999, textvariable=self.target_duration, width=6)
         self.spin_duration.pack(side="left", padx=5)
         self.spin_duration.bind("<FocusOut>", lambda e: self._auto_save())
+        ttk.Label(row1, text="起始序号:").pack(side="left", padx=(20, 0))
+        self.entry_start_num = ttk.Entry(row1, textvariable=self.start_num, width=6)
+        self.entry_start_num.pack(side="left", padx=5)
+        self.entry_start_num.bind("<FocusOut>", lambda e: self._auto_save())
+        self.entry_start_num.bind("<Return>", lambda e: self._auto_save())
         ttk.Label(row1, text="输出格式:").pack(side="left", padx=(20, 0))
         ttk.Radiobutton(row1, text="WAV", variable=self.output_format,
                         value="wav", command=self._auto_save).pack(side="left", padx=5)
@@ -722,8 +734,18 @@ class AudioBatchMergerApp:
         """构建元数据字典，空值字段自动过滤"""
         from datetime import date
         title = self.meta_title.get().strip()
-        if title and total_parts > 1:
-            title = f"{title} ({part_num}/{total_parts})"
+        # 解析起始序号（非法输入回退到 1）
+        try:
+            start = int(self.start_num.get().strip() or "1")
+            if start < 0:
+                start = 1
+        except (ValueError, tk.TclError):
+            start = 1
+        # 序号补零宽度 = 用户输入的起始序号字符串长度（如 "001" → 3 位宽）
+        width = max(1, len(self.start_num.get().strip() or "1"))
+        seq_num = start + part_num - 1
+        if title:
+            title = f"{title}{seq_num:0{width}d}"
         metadata = {
             "title": title,
             "artist": self.meta_artist.get().strip(),
@@ -769,8 +791,6 @@ class AudioBatchMergerApp:
         total_batches = len(batches)
         logger.info("%s共 %d 个文件，分为 %d 组", tag, len(self.wav_files), total_batches)
 
-        from datetime import date
-        date_str = date.today().strftime("%Y%m%d")
         dir_name = os.path.basename(os.path.normpath(out_dir))
         bgm_file = self.bgm_path.get().strip()
         bgm_vol = self.bgm_volume.get()
@@ -780,7 +800,12 @@ class AudioBatchMergerApp:
                 break
 
             part_num = batch_idx + 1
-            filename = f"{dir_name}_{date_str}_{part_num:02d}.{ext}"
+            metadata = self._build_metadata(part_num, total_batches)
+            title = (metadata.get("title") or "").strip()
+            base = _sanitize_filename(title) if title else dir_name
+            if not base:
+                base = dir_name or f"output_{part_num:02d}"
+            filename = f"{base}.{ext}"
             output_path = os.path.join(out_dir, filename)
             temp_wav = os.path.join(out_dir, f"_temp_concat_{part_num:02d}.wav")
 
@@ -818,7 +843,6 @@ class AudioBatchMergerApp:
 
             try:
                 total_dur = _ffprobe_duration(temp_wav)
-                metadata = self._build_metadata(part_num, total_batches)
                 _ffmpeg_finalize(
                     temp_wav, output_path, fmt,
                     bgm_path=bgm_file if bgm_file else None,
@@ -906,6 +930,7 @@ class AudioBatchMergerApp:
             "output_format": self.output_format.get(),
             "bgm_path": self.bgm_path.get(),
             "bgm_volume": self.bgm_volume.get(),
+            "start_num": self.start_num.get(),
             "meta_title": self.meta_title.get(),
             "meta_artist": self.meta_artist.get(),
             "meta_album": self.meta_album.get(),
@@ -942,6 +967,8 @@ class AudioBatchMergerApp:
                     # 文件不存在则不设置，合并时由 ffmpeg 直接读取
                 if cfg.get("bgm_volume") is not None:
                     self.bgm_volume.set(cfg["bgm_volume"])
+                if cfg.get("start_num") is not None:
+                    self.start_num.set(cfg["start_num"])
                 if cfg.get("meta_title"):
                     self.meta_title.set(cfg["meta_title"])
                 if cfg.get("meta_artist"):
@@ -963,10 +990,37 @@ class AudioBatchMergerApp:
             logger.error("加载配置失败: %s", e)
 
 
+def _build_cli_metadata(args, part_num, total_parts):
+    """CLI 模式下构建元数据（与 GUI 版 _build_metadata 对齐）"""
+    from datetime import date
+    title = (args.title or "").strip()
+    raw = str(args.start_num).strip() or "1"
+    try:
+        start = int(raw)
+        if start < 0:
+            start = 1
+            raw = "1"
+    except ValueError:
+        start = 1
+        raw = "1"
+    width = max(1, len(raw))
+    seq_num = start + part_num - 1
+    if title:
+        title = f"{title}{seq_num:0{width}d}"
+    metadata = {
+        "title": title,
+        "artist": args.artist or "",
+        "album": args.album or "",
+        "date": args.date or date.today().strftime("%Y"),
+        "comment": args.comment or "",
+        "track": f"{part_num}/{total_parts}",
+    }
+    return {k: v for k, v in metadata.items() if v}
+
+
 def main_cli():
     """命令行模式：无 GUI，按目标时长分组合并音频"""
     import argparse
-    from datetime import date
 
     parser = argparse.ArgumentParser(description="音频合并工具（CLI模式）")
     parser.add_argument("--input", required=True, help="音频目录（WAV文件）")
@@ -975,6 +1029,12 @@ def main_cli():
     parser.add_argument("--format", choices=["wav", "mp3"], default="wav", help="输出格式")
     parser.add_argument("--bgm", help="背景音乐文件路径")
     parser.add_argument("--bgm-volume", type=int, default=30, help="BGM音量 0-100（默认30）")
+    parser.add_argument("--start-num", default="1", help="标题起始序号（默认1，支持前导零如 055）")
+    parser.add_argument("--title", help="标题")
+    parser.add_argument("--artist", help="作者")
+    parser.add_argument("--album", help="专辑")
+    parser.add_argument("--date", help="日期")
+    parser.add_argument("--comment", help="备注")
     args = parser.parse_args()
 
     if not shutil.which("ffmpeg"):
@@ -1053,7 +1113,6 @@ def main_cli():
 
     print(f"[INFO] 分为 {len(batches)} 组")
     ext = args.format
-    date_str = date.today().strftime("%Y%m%d")
     dir_name = os.path.basename(os.path.normpath(args.output))
 
     for batch_idx, batch_files in enumerate(batches):
@@ -1063,7 +1122,12 @@ def main_cli():
             print(f"  - {fname}")
 
         file_paths = [os.path.join(args.input, f) for f in batch_files]
-        filename = f"{dir_name}_{date_str}_{part_num:02d}.{ext}"
+        metadata = _build_cli_metadata(args, part_num, len(batches))
+        title = (metadata.get("title") or "").strip()
+        base = _sanitize_filename(title) if title else dir_name
+        if not base:
+            base = dir_name or f"output_{part_num:02d}"
+        filename = f"{base}.{ext}"
         output_path = os.path.join(args.output, filename)
         temp_wav = os.path.join(args.output, f"_temp_concat_{part_num:02d}.wav")
 
@@ -1077,7 +1141,10 @@ def main_cli():
                 temp_wav, output_path, ext,
                 bgm_path=bgm_file,
                 bgm_volume=args.bgm_volume,
-                total_duration=total_sec)
+                total_duration=total_sec,
+                metadata=metadata,
+                cover_path=None,
+                bg_image_path=None)
             print(f"  [OK] {filename} ({total_sec:.1f}秒)")
         except Exception as e:
             print(f"  [ERROR] 第 {part_num} 组失败: {e}")
