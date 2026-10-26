@@ -79,6 +79,11 @@ class BatchNotesBody(BaseModel):
     notes: list = []
 
 
+class SyncUploadBody(BaseModel):
+    categories: list = []
+    notes: list = []
+
+
 # ---------------------------------------------------------------- 分类
 def _load_categories() -> list:
     if not os.path.exists(CAT_PATH):
@@ -102,6 +107,98 @@ def _save_categories(cats: list):
 
 class CategoryBody(BaseModel):
     name: str = ""
+
+
+# ---------------------------------------------------------------- 跨设备同步
+@app.get("/api/sync/download")
+def sync_download():
+    """返回本地服务的全部数据（供 GitHub 离线版下载使用）。"""
+    with LOCK:
+        cats = _load_categories()
+        notes = _sort_notes(_load_notes())
+    return {"categories": cats, "notes": notes}
+
+
+@app.post("/api/sync/upload")
+def sync_upload(body: SyncUploadBody):
+    """从 GitHub 离线版上传数据到本地服务（分类按名称去重，记录按 client_id 去重）。"""
+    added_cats = 0
+    added_notes = 0
+    with LOCK:
+        cats = _load_categories()
+        notes = _load_notes()
+
+        # 分类：按名称去重，建立 旧ID → 本地ID 映射
+        cat_name_to_local_id = {}
+        for c in cats:
+            cat_name_to_local_id[c["name"]] = c["id"]
+
+        old_cat_id_to_name = {}
+        for cat in body.categories:
+            old_cat_id_to_name[cat.get("id", "")] = cat.get("name", "")
+
+        for cat in body.categories:
+            name = (cat.get("name") or "").strip()
+            if not name:
+                continue
+            if name not in cat_name_to_local_id:
+                new_id = uuid.uuid4().hex[:12]
+                cats.append({"id": new_id, "name": name})
+                cat_name_to_local_id[name] = new_id
+                added_cats += 1
+
+        if added_cats:
+            _save_categories(cats)
+
+        # 记录：按 client_id 去重
+        existing_ids = set()
+        for n in notes:
+            if n.get("client_id"):
+                existing_ids.add(n["client_id"])
+            if n.get("id"):
+                existing_ids.add(n["id"])
+
+        for item in body.notes:
+            content = (item.get("content") or "").strip()
+            if not content:
+                continue
+            cid = (item.get("client_id") or "").strip()
+            if cid and cid in existing_ids:
+                continue
+
+            # 分类映射
+            old_cat_id = (item.get("category_id") or "").strip()
+            cat_name = old_cat_id_to_name.get(old_cat_id, "")
+            local_cat_id = cat_name_to_local_id.get(cat_name, "")
+
+            created_at = (item.get("created_at") or "").strip()
+            if created_at:
+                try:
+                    datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
+                except ValueError:
+                    created_at = _now()
+            else:
+                created_at = _now()
+
+            note = {
+                "id": uuid.uuid4().hex[:12],
+                "content": content,
+                "created_at": created_at,
+                "updated_at": (item.get("updated_at") or "").strip(),
+                "category_id": local_cat_id,
+                "copy_count": item.get("copy_count", 0),
+                "last_copied_at": (item.get("last_copied_at") or "").strip(),
+            }
+            if cid:
+                note["client_id"] = cid
+                existing_ids.add(cid)
+            notes.append(note)
+            added_notes += 1
+
+        if added_notes:
+            _save_notes(notes)
+
+    return {"ok": True, "added_notes": added_notes, "added_categories": added_cats}
 
 
 # ---------------------------------------------------------------- 健康检测
