@@ -92,6 +92,18 @@ var Task = (function () {
         }
         break;
 
+      case 'queued':
+        App.toast('任务已加入队列，当前队列共 ' + event.queue_size + ' 个任务');
+        appendLog('[队列] 任务 ' + event.task_name + ' 已加入等待队列');
+        loadQueue();
+        break;
+
+      case 'auto_start':
+        appendLog('[自动] 开始执行队列任务: ' + event.task_name);
+        setUIRunning();
+        loadQueue();
+        break;
+
       case 'progress':
         updateProgress(event.current, event.total, event.percent);
         if (event.skipped) appendLog('[' + event.current + '/' + event.total + '] 已完成，跳过');
@@ -111,11 +123,8 @@ var Task = (function () {
         break;
 
       case 'complete':
-        setUIIdle();
         updateProgress(event.total, event.total, 100);
         App.toast('生成完成！共 ' + event.files.length + ' 个文件', 3000);
-        disconnectSSE();
-        currentTaskId = null;
         App.loadTaskList();
         setTimeout(function () {
           document.querySelector('[data-tab="results"]').click();
@@ -123,17 +132,13 @@ var Task = (function () {
         break;
 
       case 'cancelled':
-        setUIIdle();
         App.toast('任务已停止，成品与中间文件已清理');
-        disconnectSSE();
         App.loadTaskList();
         App.loadAudioList();
         break;
 
       case 'error':
-        setUIIdle();
         App.toast('生成失败: ' + event.message, 4000);
-        disconnectSSE();
         App.loadTaskList();
         break;
 
@@ -176,9 +181,16 @@ var Task = (function () {
       });
     }).then(function (data) {
       currentTaskId = data.task_id;
-      setUIRunning();
-      updateProgress(0, data.total, 0);
-      App.toast('任务已启动，共 ' + data.total + ' 段');
+      if (data.queued) {
+        App.toast('任务已加入队列，等待执行');
+        $('btnStart').disabled = false;
+        $('btnTest').disabled = false;
+        loadQueue();
+      } else {
+        setUIRunning();
+        updateProgress(0, data.total, 0);
+        App.toast('任务已启动，共 ' + data.total + ' 段');
+      }
       App.loadTaskList();
       // 清空任务名输入，避免下一次复用
       var tni = $('taskNameInput'); if (tni) tni.value = '';
@@ -283,6 +295,31 @@ var Task = (function () {
     }).catch(function () { });
   }
 
+  // ── 队列显示 ──────────────────────────────────────
+  function loadQueue() {
+    fetch('/api/task/queue').then(function (r) { return r.json(); }).then(function (data) {
+      var queue = data.queue || [];
+      var el = $('queueList');
+      if (!el) return;
+      if (!queue.length) {
+        el.innerHTML = '<div class="empty-hint">队列为空</div>';
+        return;
+      }
+      var html = '<ul class="queue-items">';
+      queue.forEach(function (t, i) {
+        html += '<li>' + (i + 1) + '. ' + esc(t.name) + ' (' + t.total + '段)</li>';
+      });
+      html += '</ul>';
+      el.innerHTML = html;
+    }).catch(function () { });
+  }
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
   // ── 公开接口 ──────────────────────────────────────
   return {
     start: start,
@@ -293,5 +330,6 @@ var Task = (function () {
     checkStatus: checkStatus,
     onResumedFromList: onResumedFromList,
     switchToCurrent: switchToCurrent,
+    loadQueue: loadQueue,
   };
 })();

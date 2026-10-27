@@ -351,8 +351,11 @@ class ClipboardCollectorGUI:
         file_path = save_dir / f"{safe_filename}.txt"
         
         try:
-            # 以 UTF-8 编码保存纯净内容
-            with open(file_path, 'w', encoding='utf-8') as f:
+            # 以 UTF-8 编码追加内容（文件不存在则自动创建）
+            with open(file_path, 'a', encoding='utf-8') as f:
+                # 如果文件已有内容，先写入分隔符
+                if file_path.exists() and file_path.stat().st_size > 0:
+                    f.write("\n\n" + "=" * 60 + "\n\n")
                 f.write(clean_content)
             
             self.update_status(f"✅ 文件已保存: {file_path.name}")

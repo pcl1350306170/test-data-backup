@@ -101,15 +101,20 @@ async def start_task(data: dict):
     text = data.get("text", "")
     task_name = data.get("task_name", "")
     params = {k: v for k, v in data.items() if k not in ("text", "task_name")}
-    ok, task_id, err = engine.start(text, params, task_name)
+    ok, task_id, err, queued = engine.start(text, params, task_name)
     if not ok:
         raise HTTPException(409, err)
-    return {"ok": True, "task_id": task_id, "total": engine.total}
+    return {"ok": True, "task_id": task_id, "total": engine.total, "queued": queued}
 
 
 @app.get("/api/task/status")
 async def task_status():
     return engine.get_status()
+
+
+@app.get("/api/task/queue")
+async def task_queue():
+    return {"queue": engine.get_queue()}
 
 
 @app.post("/api/task/stop")
@@ -223,8 +228,14 @@ async def merge_start(data: dict):
         raise HTTPException(409, "语音生成任务正在运行，请先停止后再合并")
     names = data.get("files") or []
     test = bool(data.get("test"))
-    ok, err = merge_engine.start(names, data, test=test,
-                                 source_name=data.get("source_name", ""))
+    confirm = bool(data.get("confirm"))
+    ok, err, need_confirm = merge_engine.start(
+        names, data, test=test,
+        source_name=data.get("source_name", ""),
+        confirm=confirm)
+    if need_confirm:
+        return {"ok": False, "need_confirm": True,
+                "message": "输出目录已存在，是否继续使用？"}
     if not ok:
         raise HTTPException(409, err)
     return {"ok": True, "total": merge_engine.total}

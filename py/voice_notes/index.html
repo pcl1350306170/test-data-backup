@@ -130,6 +130,13 @@ header h1 { font-size:18px; font-weight:700; }
   font-size:15px; line-height:1.7; white-space:pre-wrap; word-break:break-word;
   cursor:pointer; border-radius:8px;
 }
+.card .content-truncated {
+  display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
+}
+.expand-btn {
+  font-size:13px; color:var(--edit); background:none; border:none; cursor:pointer;
+  padding:6px 0; margin-top:4px;
+}
 .card .content:active { opacity:.7; }
 .card .ops { display:flex; gap:14px; margin-top:10px; }
 .card .ops button { border:none; background:none; font-size:13px; cursor:pointer; padding:6px 2px; }
@@ -325,6 +332,32 @@ header h1 { font-size:18px; font-weight:700; }
   function catName(id) {
     for (var i = 0; i < categories.length; i++) if (categories[i].id === id) return categories[i].name;
     return '';
+  }
+  // --- Markdown 过滤（仅显示时过滤，不修改原始数据） ---
+  function stripMarkdown(text) {
+    if (!text) return '';
+    var s = text;
+    // 图片：![alt](url) → 删除
+    s = s.replace(/!\[([^\]]*)\]\([^)]+\)/g, '');
+    // 链接：[text](url) → 保留文字
+    s = s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+    // 标题：# 文本 → 文本
+    s = s.replace(/^#{1,6}\s+/gm, '');
+    // 粗体/斜体：**text**、*text*、__text__、_text_
+    s = s.replace(/\*\*(.+?)\*\*/g, '$1');
+    s = s.replace(/__(.+?)__/g, '$1');
+    s = s.replace(/\*(.+?)\*/g, '$1');
+    s = s.replace(/_(.+?)_/g, '$1');
+    // 代码：`code` → code
+    s = s.replace(/`([^`]+)`/g, '$1');
+    // 列表符号：- 、* 、1. 
+    s = s.replace(/^[\s]*[-*+]\s+/gm, '');
+    s = s.replace(/^[\s]*\d+\.\s+/gm, '');
+    // 引用：> 
+    s = s.replace(/^>\s?/gm, '');
+    // 分隔线：---、***
+    s = s.replace(/^[-*_]{3,}$/gm, '');
+    return s.trim();
   }
   function catColor(id) {
     var h = 0;
@@ -522,11 +555,34 @@ header h1 { font-size:18px; font-weight:700; }
       li.appendChild(time);
 
       var content = document.createElement('div');
-      content.className = 'content';
+      content.className = 'content content-truncated';
       content.title = '点击复制';
-      content.textContent = n.content;
+      content.textContent = stripMarkdown(n.content);
       content.addEventListener('click', function () { copyAndTrack(n); });
       li.appendChild(content);
+
+      // 展开/收起按钮
+      var expandBtn = document.createElement('button');
+      expandBtn.className = 'expand-btn';
+      expandBtn.textContent = '展开全文';
+      expandBtn.style.display = 'none';
+      expandBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (content.classList.contains('content-truncated')) {
+          content.classList.remove('content-truncated');
+          expandBtn.textContent = '收起';
+        } else {
+          content.classList.add('content-truncated');
+          expandBtn.textContent = '展开全文';
+        }
+      });
+      li.appendChild(expandBtn);
+      // 渲染后检测是否需要展开按钮
+      setTimeout(function () {
+        if (content.scrollHeight > content.clientHeight + 2) {
+          expandBtn.style.display = 'block';
+        }
+      }, 0);
 
       var ops = document.createElement('div');
       ops.className = 'ops';
@@ -840,27 +896,51 @@ header h1 { font-size:18px; font-weight:700; }
     var data;
     try { data = JSON.parse(text); } catch (e) { alert('JSON 格式错误：' + e.message); return; }
     if (!data.notes || !data.notes.length) { alert('没有可导入的记录'); return; }
-    var existingIds = {}; notes.forEach(function (n) { existingIds[n.id || n.client_id || ''] = 1; });
-    var toImport = [];
-    data.notes.forEach(function (n) {
-      var key = n.id || n.client_id || '';
-      if (key && existingIds[key]) return;
-      var cid = n.category_id || '';
-      var catNameVal = '';
-      (data.categories || []).forEach(function (c) { if (c.id === cid) catNameVal = c.name; });
-      var mappedId = '';
-      if (catNameVal) { for (var j = 0; j < categories.length; j++) { if (categories[j].name === catNameVal) { mappedId = categories[j].id; break; } } }
-      toImport.push({ content: n.content || '', created_at: n.created_at || '', client_id: n.id || genClientId(), category_id: mappedId });
+
+    // 先合并分类（按名称去重，不存在的通过 API 创建）
+    var catNameToId = {};
+    categories.forEach(function (c) { catNameToId[c.name] = c.id; });
+    var oldToNewCatId = {};
+    var catPromises = [];
+    (data.categories || []).forEach(function (sc) {
+      var name = (sc.name || '').trim();
+      if (!name) return;
+      if (catNameToId[name]) {
+        oldToNewCatId[sc.id] = catNameToId[name];
+      } else {
+        // 创建新分类
+        catPromises.push(
+          fetch('/api/categories', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name })
+          }).then(function (r) { return r.json(); }).then(function (c) {
+            categories.push(c);
+            catNameToId[name] = c.id;
+            oldToNewCatId[sc.id] = c.id;
+          }).catch(function () {})
+        );
+      }
     });
-    if (!toImport.length) { toast('没有新记录需要导入'); syncOverlayEl.classList.add('hidden'); return; }
-    fetch('/api/notes/batch', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes: toImport })
-    }).then(function (r) { return r.json(); }).then(function (d) {
-      syncOverlayEl.classList.add('hidden');
-      load();
-      toast('导入成功，新增 ' + (d.added || 0) + ' 条');
-    }).catch(function (e) { alert('导入失败：' + e.message); });
+
+    Promise.all(catPromises).then(function () {
+      var existingIds = {}; notes.forEach(function (n) { existingIds[n.client_id || n.id || ''] = 1; });
+      var toImport = [];
+      data.notes.forEach(function (n) {
+        var key = n.client_id || n.id || '';
+        if (key && existingIds[key]) return;
+        var localCatId = oldToNewCatId[n.category_id || ''] || '';
+        toImport.push({ content: n.content || '', created_at: n.created_at || '', client_id: n.client_id || n.id || genClientId(), category_id: localCatId });
+      });
+      if (!toImport.length) { toast('没有新记录需要导入'); syncOverlayEl.classList.add('hidden'); return; }
+      fetch('/api/notes/batch', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes: toImport })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        syncOverlayEl.classList.add('hidden');
+        loadCats(); load();
+        toast('导入成功：新增 ' + (d.added || 0) + ' 条记录');
+      }).catch(function (e) { alert('导入失败：' + e.message); });
+    });
   });
 
   loadCats();

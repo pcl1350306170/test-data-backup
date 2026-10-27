@@ -32,6 +32,7 @@ public/version.md
 .env.prod.copy
 vue.config.js
 完工报告.md
+temp_clipboard.txt
 
 # Script config files
 **/json/config_*.json

@@ -140,6 +140,12 @@
         <div class="panel-title">生成日志</div>
         <div id="logBox" class="log-box"></div>
       </div>
+
+      <!-- 任务队列 -->
+      <div class="panel">
+        <div class="panel-title">任务队列</div>
+        <div id="queueList"></div>
+      </div>
     </section>
 
     <!-- ═══ 任务列表页 ═══ -->
@@ -186,10 +192,16 @@
           </div>
           <div class="form-group flex-2">
             <label>来源名（用于输出文件名）</label>
-            <input type="text" id="mergeSourceName" placeholder="默认：任务名或“合并音频”">
+            <input type="text" id="mergeSourceName" placeholder="默认：任务名或"合并音频"">
           </div>
           <div class="form-group" style="align-self:flex-end">
             <button class="btn" onclick="Merge.preview()">🔍 预览分组</button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>输出根目录（将在此下创建标题子目录）</label>
+            <input type="text" id="mergeOutputDir" placeholder="D:\FILES\music\AI音频\MP3">
           </div>
         </div>
         <div id="mergePreview" class="merge-preview" style="display:none"></div>

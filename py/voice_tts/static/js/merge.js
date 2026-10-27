@@ -139,6 +139,7 @@ var Merge = (function () {
       format: $('mergeFormat').value,
       source_name: ($('mergeSourceName').value || '').trim(),
       start_num: ($('mergeStartNum').value || '1').trim(),
+      output_dir: ($('mergeOutputDir').value || '').trim(),
       bgm_path: bgm,
       bgm_volume: parseInt($('mergeBgmVolume').value) || 0,
       cover_path: cover,
@@ -162,6 +163,7 @@ var Merge = (function () {
       merge_cover_path: ($('mergeCoverPath').value || '').trim(),
       merge_bg_image_path: ($('mergeBgImagePath').value || '').trim(),
       merge_start_num: ($('mergeStartNum').value || '1').trim(),
+      merge_output_dir: ($('mergeOutputDir').value || '').trim(),
       meta_title: $('metaTitle').value.trim(),
       meta_artist: $('metaArtist').value.trim(),
       meta_album: $('metaAlbum').value.trim(),
@@ -185,6 +187,7 @@ var Merge = (function () {
     $('mergeCoverPath').value = cfg.merge_cover_path || '';
     $('mergeBgImagePath').value = cfg.merge_bg_image_path || '';
     $('mergeStartNum').value = cfg.merge_start_num || '1';
+    $('mergeOutputDir').value = cfg.merge_output_dir || '';
     $('metaTitle').value = cfg.meta_title || '';
     $('metaArtist').value = cfg.meta_artist || '';
     $('metaAlbum').value = cfg.meta_album || '';
@@ -294,9 +297,11 @@ var Merge = (function () {
   }
 
   // ── 开始 / 停止 ─────────────────────────────────────
-  function start(test) {
+  function start(test, isConfirm) {
     var params = getMergeParams(test);
     if (!params.files.length) { App.toast('请先勾选要合并的文件'); return; }
+    if (!params.metadata.title) { App.toast('必须输入标题'); return; }
+    if (isConfirm) params.confirm = true;
 
     saveSettings();
     connectSSE();
@@ -315,6 +320,14 @@ var Merge = (function () {
         return d;
       });
     }).then(function (d) {
+      if (d.need_confirm) {
+        setRunning(false);
+        disconnectSSE();
+        if (window.confirm(d.message || '输出目录已存在，是否继续使用？')) {
+          start(test, true);
+        }
+        return;
+      }
       App.toast((test ? '测试合并' : '合并') + '已启动，共 ' + d.total + ' 组');
     }).catch(function (e) {
       App.toast(e.message, 3000);

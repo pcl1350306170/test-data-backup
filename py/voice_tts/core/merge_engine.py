@@ -79,11 +79,26 @@ def ffmpeg_finalize(input_wav, output_path, fmt="wav", bgm_path=None,
     """BGM 叠加 + 元数据/封面嵌入 + 格式转换，ffmpeg 一次完成。"""
     has_bgm = bool(bgm_path) and os.path.isfile(bgm_path) and bgm_volume > 0
 
+    # 第一步：收集所有输入文件
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-nostdin", "-i", input_wav]
     next_input = 1
-    filter_parts = []
     if has_bgm:
         cmd += ["-i", bgm_path]
+        next_input = 2
+
+    # 图片嵌入（仅 MP3）- 先添加所有图片输入
+    images = []
+    if fmt == "mp3":
+        if cover_path and os.path.isfile(cover_path):
+            images.append((cover_path, "Album cover", "Cover (front)"))
+        if bg_image_path and os.path.isfile(bg_image_path):
+            images.append((bg_image_path, "Background", "Other"))
+        for img_path, _t, _c in images:
+            cmd += ["-i", img_path]
+
+    # 第二步：添加滤镜和映射
+    filter_parts = []
+    if has_bgm:
         gain_db = -30.0 + (bgm_volume / 100.0) * 30.0
         fade_start = max(0.0, total_duration - 2.0)
         filter_parts.append(
@@ -93,29 +108,20 @@ def ffmpeg_finalize(input_wav, output_path, fmt="wav", bgm_path=None,
                 gain_db, total_duration, fade_start, _TARGET_SAMPLE_RATE))
         filter_parts.append(
             "[0:a][bgm]amix=inputs=2:duration=first:normalize=0[out]")
-        next_input = 2
 
     if filter_parts:
         cmd += ["-filter_complex", ";".join(filter_parts), "-map", "[out]"]
     else:
         cmd += ["-map", "0:a"]
 
-    # 图片嵌入（仅 MP3）
-    images = []
-    if fmt == "mp3":
-        if cover_path and os.path.isfile(cover_path):
-            images.append((cover_path, "Album cover", "Cover (front)"))
-        if bg_image_path and os.path.isfile(bg_image_path):
-            images.append((bg_image_path, "Background", "Other"))
-        for img_path, _t, _c in images:
-            cmd += ["-i", img_path]
-        if images:
-            for idx in range(len(images)):
-                cmd += ["-map", "%d:0" % (next_input + idx)]
-            cmd += ["-c:v", "mjpeg", "-id3v2_version", "3"]
-            for idx, (_p, title, comment) in enumerate(images):
-                cmd += ["-metadata:s:v:%d" % idx, "title=%s" % title,
-                        "-metadata:s:v:%d" % idx, "comment=%s" % comment]
+    # 图片映射（在所有 -i 之后）
+    if images:
+        for idx in range(len(images)):
+            cmd += ["-map", "%d:0" % (next_input + idx)]
+        cmd += ["-c:v", "mjpeg", "-id3v2_version", "3"]
+        for idx, (_p, title, comment) in enumerate(images):
+            cmd += ["-metadata:s:v:%d" % idx, "title=%s" % title,
+                    "-metadata:s:v:%d" % idx, "comment=%s" % comment]
 
     if fmt == "mp3":
         cmd += ["-acodec", "libmp3lame", "-q:a", "2"]
@@ -285,29 +291,55 @@ class MergeEngine:
     # ── 任务控制 ──────────────────────────────────────
 
     def start(self, names: list, params: dict, test: bool = False,
-              source_name: str = "") -> tuple:
-        """返回 (ok, error_msg)。"""
+              source_name: str = "", confirm: bool = False) -> tuple:
+        """返回 (ok, error_msg, need_confirm)。"""
         if self.busy():
-            return False, "已有合并任务正在运行，请等待完成或停止"
+            return False, "已有合并任务正在运行，请等待完成或停止", False
         if not shutil.which("ffmpeg"):
-            return False, "缺少 ffmpeg，请确保已安装并添加到环境变量"
+            return False, "缺少 ffmpeg，请确保已安装并添加到环境变量", False
+
+        # 检查标题
+        meta = params.get("metadata") or {}
+        title = (meta.get("title") or "").strip()
+        if not title:
+            return False, "必须输入标题", False
 
         cfg = load_config()
-        out_dir = cfg.get("output_dir", "")
+        tts_out_dir = cfg.get("output_dir", "")
         paths = []
         for n in names or []:
-            p = os.path.join(out_dir, os.path.basename(n))
+            p = os.path.join(tts_out_dir, os.path.basename(n))
             if os.path.isfile(p):
                 paths.append(p)
         if not paths:
-            return False, "没有可合并的音频文件"
+            return False, "没有可合并的音频文件", False
 
         target_minutes = int(params.get("target_duration") or 20)
         batches, _, _ = group_files(paths, target_minutes)
         if not batches:
-            return False, "音频时长解析失败，无法分组"
+            return False, "音频时长解析失败，无法分组", False
         if test:
             batches = [batches[0]]
+
+        # 确定输出目录：merge_output_dir/标题
+        merge_out_base = (params.get("output_dir") or "").strip()
+        if not merge_out_base:
+            merge_out_base = cfg.get("merge_output_dir", "")
+        if not merge_out_base:
+            return False, "未配置合并输出目录", False
+
+        safe_title = _sanitize_filename(title)
+        final_out_dir = os.path.join(merge_out_base, safe_title)
+
+        # 目录已存在且未确认，返回需要确认
+        if os.path.isdir(final_out_dir) and not confirm:
+            return False, "", True  # need_confirm=True
+
+        # 创建目录
+        try:
+            os.makedirs(final_out_dir, exist_ok=True)
+        except Exception as e:
+            return False, "创建输出目录失败: %s" % e, False
 
         self.status = "running"
         self.total = len(batches)
@@ -320,9 +352,9 @@ class MergeEngine:
         self._stop_event.clear()
 
         self._thread = threading.Thread(
-            target=self._run, args=(batches, out_dir, params), daemon=True)
+            target=self._run, args=(batches, final_out_dir, params), daemon=True)
         self._thread.start()
-        return True, ""
+        return True, "", False
 
     def stop(self) -> bool:
         if not self.busy():

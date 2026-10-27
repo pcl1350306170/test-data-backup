@@ -22,7 +22,7 @@ from .config import load as load_config
 
 
 class TaskEngine:
-    """单活动任务引擎（其他任务保留在磁盘，可后续恢复）。"""
+    """任务队列引擎：支持追加任务，按顺序依次执行。"""
 
     def __init__(self):
         self.status = "idle"  # idle|running|paused|stopping|done|error|cancelled|interrupted
@@ -45,6 +45,7 @@ class TaskEngine:
         self._thread: Optional[threading.Thread] = None
         self._loop: Optional[asyncio.AbstractEventLoop] = None
         self._subscribers: set = set()
+        self._queue: list = []  # 待执行的任务队列
 
     # ── SSE 订阅管理 ──────────────────────────────────
 
@@ -75,13 +76,10 @@ class TaskEngine:
         return self.status in ("running", "paused", "stopping")
 
     def start(self, text: str, params: dict, task_name: str = "") -> tuple:
-        """启动新任务。返回 (ok, task_id, error_msg)。"""
-        if self._busy():
-            return False, None, "已有任务正在运行，请先暂停/停止当前任务"
-
+        """启动新任务或加入队列。返回 (ok, task_id, error_msg, queued)。"""
         text = (text or "").strip()
         if not text:
-            return False, None, "文本不能为空"
+            return False, None, "文本不能为空", False
 
         cfg = load_config()
         for key in ("spk", "style", "speed", "format", "seg_len",
@@ -91,11 +89,11 @@ class TaskEngine:
 
         ok, err = self._validate_env(cfg)
         if not ok:
-            return False, None, err
+            return False, None, err, False
 
         segments = tts_engine.split_text(text, cfg.get("seg_len", 500))
         if not segments:
-            return False, None, "文本切段后为空"
+            return False, None, "文本切段后为空", False
 
         task_id = uuid.uuid4().hex[:12]
         ts = time.strftime("%Y%m%d_%H%M%S")
@@ -116,7 +114,7 @@ class TaskEngine:
                 "fade_ms", "tail_ms", "prompt_audio", "prompt_text", "prefix",
                 "model_dir", "repo_dir", "conda_python", "worker_script", "output_dir")},
             "base_prefix": base,
-            "status": "running",
+            "status": "pending" if self._busy() else "running",
             "total": len(segments),
             "completed_segments": [],
             "output_files": [],
@@ -125,10 +123,18 @@ class TaskEngine:
         }
         task_store.upsert(task)
 
+        # 如果当前有任务在运行，加入队列
+        if self._busy():
+            self._queue.append(task)
+            self._emit({"type": "queued", "task_id": task_id, "task_name": task_name,
+                        "queue_size": len(self._queue)})
+            return True, task_id, "", True
+
+        # 否则立即执行
         self._bind_running(task, segments, cfg, base)
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
-        return True, task_id, ""
+        return True, task_id, "", False
 
     def resume_task(self, task_id: str) -> tuple:
         """从磁盘任务恢复执行（跳过已完成段）。返回 (ok, error_msg)。"""
@@ -206,7 +212,14 @@ class TaskEngine:
             "files": self.files,
             "error": self.error,
             "created_at": self.created_at,
+            "queue_size": len(self._queue),
         }
+
+    def get_queue(self) -> list:
+        """返回队列中的待执行任务列表。"""
+        return [{"id": t["id"], "name": t.get("name", ""),
+                 "total": t.get("total", 0), "text": t.get("text", "")[:50]}
+                for t in self._queue]
 
     # ── 内部辅助 ──────────────────────────────────────
 
@@ -421,6 +434,8 @@ class TaskEngine:
                 self._log(f"已清理中间文件目录 _temp/{self.task_id}")
             self._log(f"全部完成，共生成 {len(self.files)} 个文件")
             self._emit({"type": "complete", "files": self.files, "total": self.total})
+            # 启动队列中的下一个任务
+            self._start_next()
 
         except Exception as e:
             self.status = "error"
@@ -429,6 +444,8 @@ class TaskEngine:
             self._persist_snapshot(status="error", error=str(e))
             self._emit({"type": "error", "message": str(e)})
             traceback.print_exc()
+            # 出错也启动下一个
+            self._start_next()
 
     def _finalize_cancelled(self, done_idx: int):
         self.status = "cancelled"
@@ -443,6 +460,28 @@ class TaskEngine:
         self.completed_segments = set()
         self._persist_snapshot(status="cancelled")
         self._emit({"type": "cancelled"})
+        # 取消后也启动下一个
+        self._start_next()
+
+    def _start_next(self):
+        """从队列中取出下一个任务执行。"""
+        if not self._queue:
+            self.status = "idle"
+            return
+        next_task = self._queue.pop(0)
+        cfg = load_config()
+        for k, v in (next_task.get("params") or {}).items():
+            if v is not None:
+                cfg[k] = v
+        segments = next_task.get("segments") or []
+        base = next_task.get("base_prefix") or self._build_base(cfg, time.strftime("%Y%m%d_%H%M%S"))
+        next_task["status"] = "running"
+        task_store.upsert(next_task)
+        self._bind_running(next_task, segments, cfg, base)
+        self._log(f"自动启动队列任务: {self.task_name} ({self.task_id})")
+        self._emit({"type": "auto_start", "task_id": self.task_id, "task_name": self.task_name})
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
 
     # ── 测试生成（同步，不入任务列表） ────────────────
 

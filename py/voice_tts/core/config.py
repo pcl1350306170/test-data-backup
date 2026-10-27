@@ -44,6 +44,7 @@ DEFAULTS = {
     "meta_date": "",
     "meta_comment": "",
     "merge_start_num": "1",
+    "merge_output_dir": r"D:\FILES\music\AI音频\MP3",
 }
 
 # 预置选项（不可配置，固定列表）

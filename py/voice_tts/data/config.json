@@ -21,13 +21,14 @@
   "merge_target_duration": 30,
   "merge_format": "mp3",
   "merge_bgm_path": "D:\\FILES\\music\\仙剑3音乐\\骆集益 - 玉满堂.mp3",
-  "merge_bgm_volume": 30,
+  "merge_bgm_volume": 21,
   "merge_cover_path": "D:/CODE/Miscellaneous/GPT-IMG/头像/359.jpg",
   "merge_bg_image_path": "D:/CODE/Miscellaneous/GPT-IMG/头像/175.jpg",
-  "meta_title": "",
-  "meta_artist": "",
+  "meta_title": "母子吟",
+  "meta_artist": "君霄",
   "meta_album": "",
   "meta_date": "",
   "meta_comment": "",
-  "merge_start_num": "1"
+  "merge_start_num": "01",
+  "merge_output_dir": "D:\\FILES\\music\\AI音频\\MP3"
 }
