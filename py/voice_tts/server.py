@@ -198,6 +198,16 @@ async def resume_task_by_id(task_id: str):
     return {"ok": True, "task_id": task_id, "total": engine.total}
 
 
+@app.post("/api/tasks/{task_id}/clean_temp")
+async def clean_task_temp(task_id: str):
+    """清理指定任务的中间文件（不删除成品）。"""
+    t = task_store.get(task_id)
+    if not t:
+        raise HTTPException(404, "任务不存在")
+    removed = TaskEngine.cleanup_task_files(t, clean_temp=True, clean_output=False)
+    return {"ok": True, "removed": removed}
+
+
 @app.delete("/api/tasks/{task_id}")
 async def delete_task(task_id: str,
                      clean_temp: bool = Query(False),

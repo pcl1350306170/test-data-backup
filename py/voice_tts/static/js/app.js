@@ -344,6 +344,7 @@ var App = (function () {
           html += '<button class="btn" onclick="App.viewTaskOutput(\'' + escHtml(t.id) + '\')">查看成品</button>';
           html += '<button class="btn" onclick="App.gotoMergeWithTask(\'' + escHtml(t.id) + '\')">🔗 合并成品</button>';
         }
+        html += '<button class="btn" onclick="App.cleanTaskTemp(\'' + escHtml(t.id) + '\')">🧹 清理中间文件</button>';
         html += '<button class="btn btn-danger" onclick="App.openDeleteModal(\'' + escHtml(t.id) + '\', \'' + escHtml(t.name || '(未命名)') + '\', ' + t.output_count + ')">🗑 删除</button>';
         html += '</div></div>';
       });
@@ -415,6 +416,24 @@ var App = (function () {
     }).catch(function (e) { toast(e.message, 3000); });
   }
 
+  function cleanTaskTemp(taskId) {
+    if (!confirm('确定清理该任务的中间文件吗？（成品文件不受影响）')) return;
+    fetch('/api/tasks/' + encodeURIComponent(taskId) + '/clean_temp', { method: 'POST' })
+      .then(function (r) {
+        return r.json().then(function (d) {
+          if (!r.ok) throw new Error(d.detail || '清理失败');
+          return d;
+        });
+      }).then(function (d) {
+        var msg = '中间文件已清理';
+        if (d.removed && d.removed.temp) {
+          msg += '（' + d.removed.temp + ' 个目录）';
+        }
+        toast(msg);
+        loadTaskList();
+      }).catch(function (e) { toast(e.message, 3000); });
+  }
+
   // ── 初始化 ──────────────────────────────────────
   function init() {
     initTheme();
@@ -450,5 +469,6 @@ var App = (function () {
     openDeleteModal: openDeleteModal,
     closeModal: closeModal,
     confirmDeleteTask: confirmDeleteTask,
+    cleanTaskTemp: cleanTaskTemp,
   };
 })();

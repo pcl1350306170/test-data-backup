@@ -59,8 +59,10 @@ def split_text(text: str, max_chars: int = 500) -> list:
 # ============================================================
 # Worker 调用
 # ============================================================
-def call_worker(text: str, out_wav: str, cfg: dict) -> bool:
-    """通过 subprocess 调用 CosyVoice worker 生成 wav。成功返回 True，失败抛异常。"""
+def call_worker(text: str, out_wav: str, cfg: dict, stop_event=None) -> bool:
+    """通过 subprocess 调用 CosyVoice worker 生成 wav。成功返回 True，失败抛异常。
+    stop_event: 可选的 threading.Event，用于中断生成过程。
+    """
     worker_script = cfg.get("worker_script", "")
     model_dir = cfg.get("model_dir", "")
     repo_dir = cfg.get("repo_dir", "")
@@ -98,17 +100,27 @@ def call_worker(text: str, out_wav: str, cfg: dict) -> bool:
         cmd += ["--prompt_audio", prompt_audio, "--prompt_text", prompt_text]
 
     try:
-        proc = subprocess.run(cmd, capture_output=True, text=True,
-                              encoding="utf-8", errors="replace",
-                              timeout=900, env=env, creationflags=_NO_WINDOW)
-    except subprocess.TimeoutExpired:
-        raise RuntimeError("CosyVoice 生成超时（>15分钟）")
+        # 使用 Popen 以支持中断
+        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                text=True, encoding="utf-8", errors="replace",
+                                env=env, creationflags=_NO_WINDOW)
+        # 轮询等待，检查 stop_event
+        while proc.poll() is None:
+            if stop_event and stop_event.is_set():
+                proc.kill()
+                raise RuntimeError("任务已中断")
+            try:
+                proc.wait(timeout=1)
+            except subprocess.TimeoutExpired:
+                continue
+        # 检查返回码
+        if proc.returncode != 0:
+            stdout, stderr = proc.communicate()
+            err = (stderr or "").strip() or (stdout or "").strip()
+            raise RuntimeError(f"CosyVoice 生成失败: {err[-1500:]}")
     except FileNotFoundError:
         raise RuntimeError(f"找不到 Python 解释器: {conda_py}")
 
-    if proc.returncode != 0:
-        err = (proc.stderr or "").strip() or (proc.stdout or "").strip()
-        raise RuntimeError(f"CosyVoice 生成失败: {err[-1500:]}")
     if not os.path.isfile(out_wav):
         raise RuntimeError("Worker 未产出文件")
     return True

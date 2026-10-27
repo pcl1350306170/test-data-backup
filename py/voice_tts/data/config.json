@@ -13,7 +13,7 @@
   "fade": true,
   "fade_ms": 0,
   "tail_ms": 900,
-  "prompt_audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\马老师.wav",
+  "prompt_audio": "D:\\CODE\\Python\\test-data-backup\\AI Work Space\\TTS\\迎迎.mp3",
   "prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
   "default_prompt_text": "清晨的风轻轻吹过山头，世间万物慢慢苏醒过来。接下来，我们就来看一看这里发生的有趣故事。",
   "bgm_dir": "D:\\FILES\\music\\仙剑3音乐",

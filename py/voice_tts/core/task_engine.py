@@ -185,6 +185,8 @@ class TaskEngine:
     def pause(self) -> bool:
         if self.status != "running":
             return False
+        # 立即中断当前生成
+        self._stop_event.set()
         self._pause_event.set()
         self.status = "paused"
         self._persist_status("paused")
@@ -194,10 +196,15 @@ class TaskEngine:
     def resume(self) -> bool:
         if self.status != "paused":
             return False
+        # 清除停止和暂停标志，允许继续执行
+        self._stop_event.clear()
         self._pause_event.clear()
         self.status = "running"
         self._persist_status("running")
         self._emit({"type": "resumed"})
+        # 重启线程继续执行
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
         return True
 
     def get_status(self) -> dict:
@@ -353,14 +360,28 @@ class TaskEngine:
             for idx, seg_text in enumerate(segments, start=1):
                 # 停止
                 if self._stop_event.is_set():
-                    self._finalize_cancelled(idx - 1)
-                    return
-                # 暂停
+                    # 检查是暂停还是停止
+                    if self._pause_event.is_set() and self.status == "paused":
+                        # 暂停：保存状态但不删除文件
+                        self._log(f"已在第 {idx - 1}/{self.total} 段后暂停")
+                        self._persist_snapshot(status="paused")
+                        self._emit({"type": "paused"})
+                        return
+                    else:
+                        # 停止：删除文件
+                        self._finalize_cancelled(idx - 1)
+                        return
+                # 暂停（旧逻辑，保留以兼容）
                 while self._pause_event.is_set() and not self._stop_event.is_set():
                     time.sleep(0.3)
                 if self._stop_event.is_set():
-                    self._finalize_cancelled(idx - 1)
-                    return
+                    if self._pause_event.is_set() and self.status == "paused":
+                        self._log(f"已在第 {idx - 1}/{self.total} 段后暂停")
+                        self._persist_snapshot(status="paused")
+                        return
+                    else:
+                        self._finalize_cancelled(idx - 1)
+                        return
 
                 # 已完成则跳过（断点续跑）
                 if idx in self.completed_segments:
@@ -380,8 +401,18 @@ class TaskEngine:
                 # 1) worker 输出（若原始 wav 已存在则复用，节省时间）
                 if not os.path.isfile(raw_wav):
                     try:
-                        tts_engine.call_worker(seg_text, raw_wav, cfg)
+                        tts_engine.call_worker(seg_text, raw_wav, cfg, stop_event=self._stop_event)
                     except Exception as e:
+                        # 检查是否是因为暂停或停止导致的失败
+                        if self._pause_event.is_set() and self.status == "paused":
+                            # 暂停：保存状态
+                            self._log(f"[{idx}/{self.total}] 已暂停")
+                            self._persist_snapshot(status="paused")
+                            return
+                        elif self._stop_event.is_set():
+                            # 停止：删除文件
+                            self._finalize_cancelled(idx - 1)
+                            return
                         self._log(f"[{idx}/{self.total}] 失败: {e}")
                         self._emit({"type": "segment_error", "index": idx, "error": str(e)})
                         continue
