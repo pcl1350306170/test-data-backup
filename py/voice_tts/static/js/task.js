@@ -17,8 +17,9 @@ var Task = (function () {
   }
 
   function setUIRunning() {
-    $('btnStart').disabled = true;
-    $('btnTest').disabled = true;
+    // 保持按钮可用，允许随时追加任务
+    $('btnStart').disabled = false;
+    $('btnTest').disabled = false;
     App.show('btnStop');
     App.show('btnPause');
     App.hide('btnResume');
@@ -165,8 +166,6 @@ var Task = (function () {
     App.show('logSection');
     App.show('progressSection');
     updateProgress(0, 0, 0);
-    $('btnStart').disabled = true;
-    $('btnTest').disabled = true;
 
     connectSSE();
 
@@ -183,8 +182,6 @@ var Task = (function () {
       currentTaskId = data.task_id;
       if (data.queued) {
         App.toast('任务已加入队列，等待执行');
-        $('btnStart').disabled = false;
-        $('btnTest').disabled = false;
         loadQueue();
       } else {
         setUIRunning();
