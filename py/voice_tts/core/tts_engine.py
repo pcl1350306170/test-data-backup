@@ -101,8 +101,8 @@ def call_worker(text: str, out_wav: str, cfg: dict, stop_event=None) -> bool:
 
     try:
         # 使用 Popen 以支持中断
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                text=True, encoding="utf-8", errors="replace",
+        # 注意：不能用 subprocess.PIPE，否则管道缓冲区满后会导致死锁
+        proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                                 env=env, creationflags=_NO_WINDOW)
         # 轮询等待，检查 stop_event
         while proc.poll() is None:
@@ -115,9 +115,7 @@ def call_worker(text: str, out_wav: str, cfg: dict, stop_event=None) -> bool:
                 continue
         # 检查返回码
         if proc.returncode != 0:
-            stdout, stderr = proc.communicate()
-            err = (stderr or "").strip() or (stdout or "").strip()
-            raise RuntimeError(f"CosyVoice 生成失败: {err[-1500:]}")
+            raise RuntimeError(f"CosyVoice 生成失败，退出码: {proc.returncode}")
     except FileNotFoundError:
         raise RuntimeError(f"找不到 Python 解释器: {conda_py}")
 
