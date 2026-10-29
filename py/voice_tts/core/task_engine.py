@@ -202,6 +202,9 @@ class TaskEngine:
         self.status = "running"
         self._persist_status("running")
         self._emit({"type": "resumed"})
+        # 等待旧线程完全退出（最多2秒）
+        if self._thread and self._thread.is_alive():
+            self._thread.join(timeout=2)
         # 重启线程继续执行
         self._thread = threading.Thread(target=self._run, daemon=True)
         self._thread.start()
@@ -358,9 +361,8 @@ class TaskEngine:
                 self._log(f"开始生成：共 {self.total} 段，格式={fmt.upper()}")
 
             for idx, seg_text in enumerate(segments, start=1):
-                # 停止
+                # 检查停止或暂停（立即中断）
                 if self._stop_event.is_set():
-                    # 检查是暂停还是停止
                     if self._pause_event.is_set() and self.status == "paused":
                         # 暂停：保存状态但不删除文件
                         self._log(f"已在第 {idx - 1}/{self.total} 段后暂停")
@@ -369,17 +371,6 @@ class TaskEngine:
                         return
                     else:
                         # 停止：删除文件
-                        self._finalize_cancelled(idx - 1)
-                        return
-                # 暂停（旧逻辑，保留以兼容）
-                while self._pause_event.is_set() and not self._stop_event.is_set():
-                    time.sleep(0.3)
-                if self._stop_event.is_set():
-                    if self._pause_event.is_set() and self.status == "paused":
-                        self._log(f"已在第 {idx - 1}/{self.total} 段后暂停")
-                        self._persist_snapshot(status="paused")
-                        return
-                    else:
                         self._finalize_cancelled(idx - 1)
                         return
 
@@ -499,6 +490,9 @@ class TaskEngine:
         if not self._queue:
             self.status = "idle"
             return
+        # 等待旧线程完全退出（最多2秒）
+        if self._thread and self._thread.is_alive():
+            self._thread.join(timeout=2)
         next_task = self._queue.pop(0)
         cfg = load_config()
         for k, v in (next_task.get("params") or {}).items():

@@ -1490,6 +1490,605 @@
         });
     }
 
+    // ==============================
+    // 题库快速添加弹窗
+    // ==============================
+    function showQuestionLibraryDialog() {
+        const existing = document.getElementById('ward-dialog-overlay');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'ward-dialog-overlay';
+        const dialog = document.createElement('div');
+        dialog.className = 'ward-dialog ward-device-dialog';
+
+        // 题目类型映射
+        const questionTypes = [
+            { label: '单选题', value: 0 },
+            { label: '多选题', value: 1 },
+            { label: '简答题', value: 2 },
+            { label: '单选评分题', value: 3 },
+            { label: '多选评分题', value: 4 },
+            { label: '段落说明', value: 5 }
+        ];
+
+        dialog.innerHTML = `
+            <div class="ward-dialog-header">
+                <span>📝 题库快速添加</span>
+                <span class="ward-dialog-close">&times;</span>
+            </div>
+            <div class="ward-dialog-body">
+                <div class="ward-form-group">
+                    <label>题目类型</label>
+                    <select name="questionType">
+                        <option value="random">随机混合</option>
+                        <option value="0">单选题</option>
+                        <option value="1">多选题</option>
+                        <option value="2">简答题</option>
+                        <option value="3">单选评分题</option>
+                        <option value="4">多选评分题</option>
+                        <option value="5">段落说明</option>
+                    </select>
+                </div>
+                <div class="ward-form-group">
+                    <label>生成数量</label>
+                    <input type="number" name="count" value="10" min="1" max="100">
+                </div>
+                <div class="ward-form-group">
+                    <label>标题前缀（可选）</label>
+                    <input type="text" name="titlePrefix" value="" placeholder="如：快速测试-">
+                    <p class="ward-hint">添加后标题格式为：前缀+原题目标题</p>
+                </div>
+                <div class="ward-form-group">
+                    <label>是否必选</label>
+                    <select name="required">
+                        <option value="0">选填题</option>
+                        <option value="1">必填题</option>
+                    </select>
+                </div>
+                <div class="ward-form-group">
+                    <label>题目预览（生成后预览）</label>
+                    <div class="ward-preview-list" style="max-height:250px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;padding:8px;font-size:13px;min-height:60px">
+                        <span style="color:#999">请点击"生成预览"查看</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-bottom:10px">
+                    <button type="button" class="ward-generate-preview-btn" style="flex:1;padding:8px;cursor:pointer;background:#909399;color:white;border:none;border-radius:4px">🔄 生成预览</button>
+                </div>
+                <button class="ward-submit-btn" type="button">💾 保存</button>
+                <div class="ward-result" style="display:none"></div>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        dialog.addEventListener('click', (e) => e.stopPropagation());
+        overlay.addEventListener('click', () => overlay.remove());
+        dialog.querySelector('.ward-dialog-close').addEventListener('click', () => overlay.remove());
+
+        // 存储生成的题目数据
+        let generatedQuestions = [];
+
+        // 从题库中随机获取题目
+        function getRandomQuestions(type, count) {
+            const questions = [];
+            const typeMap = {
+                '0': 'singleChoice',
+                '1': 'multipleChoice',
+                '2': 'shortAnswer',
+                '3': 'singleRating',
+                '4': 'multipleRating',
+                '5': 'paragraph'
+            };
+
+            if (type === 'random') {
+                // 随机混合：从所有类型中随机选取
+                const allTypes = Object.keys(typeMap);
+                for (let i = 0; i < count; i++) {
+                    const randomType = allTypes[Math.floor(Math.random() * allTypes.length)];
+                    const bankKey = typeMap[randomType];
+                    const bank = QuestionBank[bankKey];
+                    if (bank && bank.length > 0) {
+                        const randomItem = bank[Math.floor(Math.random() * bank.length)];
+                        questions.push({
+                            questionType: parseInt(randomType),
+                            ...randomItem
+                        });
+                    }
+                }
+            } else {
+                // 指定类型
+                const bankKey = typeMap[type];
+                const bank = QuestionBank[bankKey];
+                if (!bank || bank.length === 0) return questions;
+
+                // 不重复随机选取
+                const shuffled = [...bank].sort(() => Math.random() - 0.5);
+                const selectedCount = Math.min(count, shuffled.length);
+                for (let i = 0; i < selectedCount; i++) {
+                    questions.push({
+                        questionType: parseInt(type),
+                        ...shuffled[i]
+                    });
+                }
+
+                // 如果需要的数量大于题库数量，允许重复
+                if (count > shuffled.length) {
+                    for (let i = selectedCount; i < count; i++) {
+                        const randomItem = bank[Math.floor(Math.random() * bank.length)];
+                        questions.push({
+                            questionType: parseInt(type),
+                            ...randomItem
+                        });
+                    }
+                }
+            }
+            return questions;
+        }
+
+        // 生成预览
+        function generatePreview() {
+            const type = dialog.querySelector('select[name="questionType"]').value;
+            const count = parseInt(dialog.querySelector('input[name="count"]').value) || 10;
+            const prefix = dialog.querySelector('input[name="titlePrefix"]').value.trim();
+
+            generatedQuestions = getRandomQuestions(type, count);
+
+            const previewEl = dialog.querySelector('.ward-preview-list');
+            if (generatedQuestions.length === 0) {
+                previewEl.innerHTML = '<span style="color:red">❌ 未找到对应类型的题目数据</span>';
+                return;
+            }
+
+            const typeLabels = ['单选题', '多选题', '简答题', '单选评分题', '多选评分题', '段落说明'];
+            previewEl.innerHTML = generatedQuestions.map((q, i) => {
+                let optionsHtml = '';
+                if (q.options && q.options.length > 0) {
+                    optionsHtml = '<div style="margin-left:16px;color:#666;font-size:12px">' +
+                        q.options.map((opt, j) => {
+                            const letter = String.fromCharCode(65 + j);
+                            const scoreStr = (q.questionType === 3 || q.questionType === 4) ? ` [${opt.score || 0}分]` : '';
+                            return `${letter}. ${opt.content}${scoreStr}`;
+                        }).join('<br>') +
+                        '</div>';
+                }
+                return `<div style="padding:4px 0;border-bottom:1px solid #f0f0f0">
+                    <span style="color:#999">${i + 1}.</span>
+                    <span style="background:#e6f7ff;padding:1px 6px;border-radius:3px;font-size:11px;margin-right:4px">${typeLabels[q.questionType]}</span>
+                    ${prefix}<strong>${q.title}</strong>
+                    ${optionsHtml}
+                </div>`;
+            }).join('');
+
+            showToast(`✅ 已生成 ${generatedQuestions.length} 道题目`);
+        }
+
+        // 绑定预览按钮
+        dialog.querySelector('.ward-generate-preview-btn').addEventListener('click', generatePreview);
+
+        // 保存
+        dialog.querySelector('.ward-submit-btn').addEventListener('click', async () => {
+            // 如果没有生成过，先生成
+            if (generatedQuestions.length === 0) {
+                generatePreview();
+                if (generatedQuestions.length === 0) return;
+            }
+
+            const prefix = dialog.querySelector('input[name="titlePrefix"]').value.trim();
+            const required = parseInt(dialog.querySelector('select[name="required"]').value);
+
+            const btn = dialog.querySelector('.ward-submit-btn');
+            const resultDiv = dialog.querySelector('.ward-result');
+            btn.disabled = true;
+            btn.textContent = '⏳ 保存中...';
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '';
+            resultDiv.className = 'ward-result ward-result-info';
+
+            let successCount = 0;
+            const total = generatedQuestions.length;
+
+            for (let i = 0; i < total; i++) {
+                const q = generatedQuestions[i];
+                const questionData = {
+                    title: prefix + q.title,
+                    required: required,
+                    questionType: q.questionType
+                };
+
+                // 非简答题和段落说明需要添加选项
+                if (q.questionType !== 2 && q.questionType !== 5 && q.options) {
+                    questionData.optionsDoList = q.options.map((opt, idx) => ({
+                        sortIndex: String.fromCharCode(65 + idx),
+                        content: opt.content,
+                        score: (q.questionType === 3 || q.questionType === 4) ? (opt.score || 0) : 0
+                    }));
+                } else {
+                    questionData.optionsDoList = [];
+                }
+
+                try {
+                    const res = await callPageApi('/qsms/web-qs/questionLibrary', questionData);
+                    const item = document.createElement('div');
+                    item.className = 'ward-result-item ward-result-success';
+                    item.textContent = `✅ ${i + 1}. ${questionData.title} - ${res.desc || '操作成功'}`;
+                    resultDiv.appendChild(item);
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                    successCount++;
+                } catch (e) {
+                    const item = document.createElement('div');
+                    item.className = 'ward-result-item ward-result-error';
+                    item.textContent = `❌ ${i + 1}. ${questionData.title} - ${e.message}`;
+                    resultDiv.appendChild(item);
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                }
+                if (i < total - 1) await new Promise(r => setTimeout(r, 200));
+            }
+
+            const summary = document.createElement('div');
+            summary.style.marginTop = '8px';
+            summary.style.fontWeight = 'bold';
+            summary.textContent = `完成！成功: ${successCount}, 失败: ${total - successCount}`;
+            resultDiv.appendChild(summary);
+
+            btn.disabled = false;
+            btn.textContent = '💾 保存';
+            showToast(`✅ 题库添加完成: 成功${successCount}, 失败${total - successCount}`);
+        });
+    }
+
+    // ==============================
+    // 问卷快速添加弹窗
+    // ==============================
+    function showQuestionnaireDialog() {
+        const existing = document.getElementById('ward-dialog-overlay');
+        if (existing) existing.remove();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'ward-dialog-overlay';
+        const dialog = document.createElement('div');
+        dialog.className = 'ward-dialog ward-device-dialog';
+
+        dialog.innerHTML = `
+            <div class="ward-dialog-header">
+                <span>📋 问卷快速添加</span>
+                <span class="ward-dialog-close">&times;</span>
+            </div>
+            <div class="ward-dialog-body">
+                <div class="ward-form-row">
+                    <div class="ward-form-group">
+                        <label>问卷数量</label>
+                        <input type="number" name="questionnaireCount" value="1" min="1" max="50">
+                    </div>
+                    <div class="ward-form-group">
+                        <label>每套题目数</label>
+                        <input type="number" name="questionCount" value="10" min="1" max="50">
+                    </div>
+                </div>
+                <div class="ward-form-group">
+                    <label>标题前缀（可选）</label>
+                    <input type="text" name="titlePrefix" value="" placeholder="如：快速测试-">
+                    <p class="ward-hint">添加后标题格式为：前缀+随机标题（总长不超过32字符）</p>
+                </div>
+                <div class="ward-form-group">
+                    <label>护理单元</label>
+                    <select name="nurseUnitMode">
+                        <option value="auto">自动获取（当前选中病区）</option>
+                        <option value="select">从下拉框选择</option>
+                        <option value="all">全院问卷（护理单元=0）</option>
+                    </select>
+                </div>
+                <div class="ward-form-group" id="nurseUnitSelectGroup" style="display:none">
+                    <label>选择护理单元</label>
+                    <select name="nurseUnitId">
+                        <option value="">⏳ 正在加载科室...</option>
+                    </select>
+                </div>
+                <div class="ward-form-group">
+                    <label>手机答题</label>
+                    <select name="answerOnPhone">
+                        <option value="0" selected>关闭</option>
+                        <option value="1">开启</option>
+                    </select>
+                </div>
+                <div class="ward-form-group">
+                    <label>问卷预览（生成后预览）</label>
+                    <div class="ward-preview-list" style="max-height:280px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;padding:8px;font-size:13px;min-height:80px">
+                        <span style="color:#999">请点击"生成预览"查看</span>
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-bottom:10px">
+                    <button type="button" class="ward-generate-preview-btn" style="flex:1;padding:8px;cursor:pointer;background:#909399;color:white;border:none;border-radius:4px">🔄 生成预览</button>
+                </div>
+                <button class="ward-submit-btn" type="button">💾 保存</button>
+                <div class="ward-result" style="display:none"></div>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        dialog.addEventListener('click', (e) => e.stopPropagation());
+        overlay.addEventListener('click', () => overlay.remove());
+        dialog.querySelector('.ward-dialog-close').addEventListener('click', () => overlay.remove());
+
+        // 护理单元选择模式切换
+        const nurseUnitMode = dialog.querySelector('select[name="nurseUnitMode"]');
+        const nurseUnitSelectGroup = dialog.querySelector('#nurseUnitSelectGroup');
+        nurseUnitMode.addEventListener('change', () => {
+            if (nurseUnitMode.value === 'select') {
+                nurseUnitSelectGroup.style.display = 'block';
+                loadNurseUnits();
+            } else {
+                nurseUnitSelectGroup.style.display = 'none';
+            }
+        });
+
+        // 加载科室列表
+        async function loadNurseUnits() {
+            const select = dialog.querySelector('select[name="nurseUnitId"]');
+            try {
+                const res = await callPageApiGet('/ifms/web-org/depts');
+                const depts = flattenDepts((res.data && res.data.list) || []);
+                if (!depts.length) {
+                    select.innerHTML = '<option value="">（无科室数据）</option>';
+                    return;
+                }
+                // 尝试获取当前选中的科室
+                let currentDeptId = '';
+                try {
+                    const selectDeptInfo = window.localStorage.getItem('selectDeptInfo');
+                    if (selectDeptInfo) {
+                        const deptInfo = JSON.parse(selectDeptInfo);
+                        currentDeptId = deptInfo.deptId || '';
+                    }
+                } catch (e) { }
+
+                select.innerHTML = depts.map(d =>
+                    `<option value="${d.deptId}" data-name="${d.deptName}"${d.deptId === currentDeptId ? ' selected' : ''}>${' '.repeat(d.depth)}${d.deptName}</option>`
+                ).join('');
+            } catch (e) {
+                select.innerHTML = `<option value="">❌ 加载失败：${e.message}</option>`;
+            }
+        }
+
+        // 扁平化科室树
+        const flattenDepts = (list, depth = 0, out = []) => {
+            for (const d of (list || [])) {
+                out.push({ deptId: d.deptId, deptName: d.deptName, depth });
+                if (d.children && d.children.length) flattenDepts(d.children, depth + 1, out);
+            }
+            return out;
+        };
+
+        // 存储生成的问卷数据
+        let generatedQuestionnaires = [];
+
+        // 生成随机题目列表
+        function generateRandomQuestions(count) {
+            const questions = [];
+            const allTypes = ['singleChoice', 'multipleChoice', 'shortAnswer', 'singleRating', 'multipleRating', 'paragraph'];
+            const typeValueMap = {
+                'singleChoice': 0,
+                'multipleChoice': 1,
+                'shortAnswer': 2,
+                'singleRating': 3,
+                'multipleRating': 4,
+                'paragraph': 5
+            };
+
+            for (let i = 0; i < count; i++) {
+                // 随机选择题目类型
+                const randomTypeKey = allTypes[Math.floor(Math.random() * allTypes.length)];
+                const bank = QuestionBank[randomTypeKey];
+                if (bank && bank.length > 0) {
+                    const randomItem = bank[Math.floor(Math.random() * bank.length)];
+                    const questionType = typeValueMap[randomTypeKey];
+
+                    const question = {
+                        title: randomItem.title,
+                        required: Math.random() > 0.3 ? 1 : 0, // 70%概率为必填
+                        questionType: questionType,
+                        sort: i + 1,
+                        logicId: generateRandomId(),
+                        optionsDoList: []
+                    };
+
+                    // 非简答题和段落说明需要添加选项
+                    if (questionType !== 2 && questionType !== 5 && randomItem.options) {
+                        question.optionsDoList = randomItem.options.map((opt, idx) => ({
+                            sortIndex: String.fromCharCode(65 + idx),
+                            content: opt.content,
+                            score: (questionType === 3 || questionType === 4) ? (opt.score || 0) : 0
+                        }));
+                    }
+
+                    questions.push(question);
+                }
+            }
+            return questions;
+        }
+
+        // 生成随机ID
+        function generateRandomId() {
+            let str = Math.random().toString(36).substr(3);
+            str += Date.now().toString(16).substr(4);
+            return str;
+        }
+
+        // 生成问卷
+        function generateQuestionnaires() {
+            const qnCount = parseInt(dialog.querySelector('input[name="questionnaireCount"]').value) || 1;
+            const qCount = parseInt(dialog.querySelector('input[name="questionCount"]').value) || 10;
+            const prefix = dialog.querySelector('input[name="titlePrefix"]').value.trim();
+            const answerOnPhone = parseInt(dialog.querySelector('select[name="answerOnPhone"]').value);
+
+            generatedQuestionnaires = [];
+
+            for (let i = 0; i < qnCount; i++) {
+                // 随机选择标题
+                const randomTitle = QuestionBank.questionnaireTitles[Math.floor(Math.random() * QuestionBank.questionnaireTitles.length)];
+                let fullTitle = prefix + randomTitle;
+                // 截断到32字符
+                if (fullTitle.length > 32) {
+                    fullTitle = fullTitle.substring(0, 32);
+                }
+
+                // 随机选择说明
+                const randomRemark = QuestionBank.questionnaireRemarks[Math.floor(Math.random() * QuestionBank.questionnaireRemarks.length)];
+
+                // 生成题目
+                const questions = generateRandomQuestions(qCount);
+
+                generatedQuestionnaires.push({
+                    title: fullTitle,
+                    remark: randomRemark,
+                    answerOnPhone: answerOnPhone,
+                    questionsDoList: questions
+                });
+            }
+
+            return generatedQuestionnaires;
+        }
+
+        // 生成预览
+        function generatePreview() {
+            const questionnaires = generateQuestionnaires();
+            const previewEl = dialog.querySelector('.ward-preview-list');
+
+            if (questionnaires.length === 0) {
+                previewEl.innerHTML = '<span style="color:red">❌ 生成失败</span>';
+                return;
+            }
+
+            const typeLabels = ['单选题', '多选题', '简答题', '单选评分题', '多选评分题', '段落说明'];
+
+            previewEl.innerHTML = questionnaires.map((qn, qnIdx) => {
+                const questionsHtml = qn.questionsDoList.map((q, qIdx) => {
+                    let optionsHtml = '';
+                    if (q.optionsDoList && q.optionsDoList.length > 0) {
+                        optionsHtml = '<div style="margin-left:16px;color:#666;font-size:11px">' +
+                            q.optionsDoList.map(opt => `${opt.sortIndex}. ${opt.content}${q.questionType === 3 || q.questionType === 4 ? ` [${opt.score}分]` : ''}`).join(' | ') +
+                            '</div>';
+                    }
+                    return `<div style="padding:2px 0;margin-left:8px">
+                        <span style="color:#999">${q.sort}.</span>
+                        <span style="background:#f0f9eb;padding:1px 4px;border-radius:2px;font-size:10px;margin-right:4px">${typeLabels[q.questionType]}</span>
+                        <span style="font-size:12px">${q.title}</span>
+                        ${optionsHtml}
+                    </div>`;
+                }).join('');
+
+                return `<div style="padding:8px;margin-bottom:8px;border:1px solid #e4e7ed;border-radius:4px;background:#fafafa">
+                    <div style="font-weight:bold;color:#409eff;margin-bottom:4px">📋 ${qnIdx + 1}. ${qn.title}</div>
+                    <div style="font-size:11px;color:#999;margin-bottom:4px">说明: ${qn.remark.substring(0, 50)}...</div>
+                    <div style="font-size:11px;color:#666;margin-bottom:4px">手机答题: ${qn.answerOnPhone === 1 ? '✅ 开启' : '❌ 关闭'} | 题目数: ${qn.questionsDoList.length}</div>
+                    ${questionsHtml}
+                </div>`;
+            }).join('');
+
+            showToast(`✅ 已生成 ${questionnaires.length} 套问卷`);
+        }
+
+        // 绑定预览按钮
+        dialog.querySelector('.ward-generate-preview-btn').addEventListener('click', generatePreview);
+
+        // 获取护理单元信息
+        function getNurseUnitInfo() {
+            const mode = dialog.querySelector('select[name="nurseUnitMode"]').value;
+
+            if (mode === 'all') {
+                return { nurseUnitId: '0', nurseUnitName: '0' };
+            }
+
+            if (mode === 'select') {
+                const select = dialog.querySelector('select[name="nurseUnitId"]');
+                const selectedOption = select.options[select.selectedIndex];
+                return {
+                    nurseUnitId: select.value,
+                    nurseUnitName: selectedOption ? selectedOption.dataset.name : ''
+                };
+            }
+
+            // auto模式：从localStorage获取
+            try {
+                const selectDeptInfo = window.localStorage.getItem('selectDeptInfo');
+                if (selectDeptInfo) {
+                    const deptInfo = JSON.parse(selectDeptInfo);
+                    return {
+                        nurseUnitId: deptInfo.deptId || '0',
+                        nurseUnitName: deptInfo.deptName || ''
+                    };
+                }
+            } catch (e) { }
+
+            return { nurseUnitId: '0', nurseUnitName: '0' };
+        }
+
+        // 保存
+        dialog.querySelector('.ward-submit-btn').addEventListener('click', async () => {
+            // 如果没有生成过，先生成
+            if (generatedQuestionnaires.length === 0) {
+                generatePreview();
+                if (generatedQuestionnaires.length === 0) return;
+            }
+
+            const nurseUnitInfo = getNurseUnitInfo();
+
+            const btn = dialog.querySelector('.ward-submit-btn');
+            const resultDiv = dialog.querySelector('.ward-result');
+            btn.disabled = true;
+            btn.textContent = '⏳ 保存中...';
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '';
+            resultDiv.className = 'ward-result ward-result-info';
+
+            let successCount = 0;
+            const total = generatedQuestionnaires.length;
+
+            for (let i = 0; i < total; i++) {
+                const qn = generatedQuestionnaires[i];
+                const questionnaireData = {
+                    title: qn.title,
+                    remark: qn.remark,
+                    answerOnPhone: qn.answerOnPhone,
+                    nurseUnitId: nurseUnitInfo.nurseUnitId,
+                    nurseUnitName: nurseUnitInfo.nurseUnitName,
+                    roomModel: '0',
+                    questionsDoList: qn.questionsDoList
+                };
+
+                try {
+                    const res = await callPageApi('/qsms/web-qs/papers', questionnaireData);
+                    const item = document.createElement('div');
+                    item.className = 'ward-result-item ward-result-success';
+                    item.textContent = `✅ ${i + 1}. ${qn.title} (${qn.questionsDoList.length}题) - ${res.desc || '操作成功'}`;
+                    resultDiv.appendChild(item);
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                    successCount++;
+                } catch (e) {
+                    const item = document.createElement('div');
+                    item.className = 'ward-result-item ward-result-error';
+                    item.textContent = `❌ ${i + 1}. ${qn.title} - ${e.message}`;
+                    resultDiv.appendChild(item);
+                    resultDiv.scrollTop = resultDiv.scrollHeight;
+                }
+                if (i < total - 1) await new Promise(r => setTimeout(r, 300));
+            }
+
+            const summary = document.createElement('div');
+            summary.style.marginTop = '8px';
+            summary.style.fontWeight = 'bold';
+            summary.textContent = `完成！成功: ${successCount}, 失败: ${total - successCount}`;
+            resultDiv.appendChild(summary);
+
+            btn.disabled = false;
+            btn.textContent = '💾 保存';
+            showToast(`✅ 问卷添加完成: 成功${successCount}, 失败${total - successCount}`);
+        });
+    }
+
     // ===== 异步初始化 =====
     async function init() {
         const config = await ConfigManager.getConfig();
@@ -1570,6 +2169,8 @@
             { text: '📦 批量创建设备', action: () => showDeviceDialog(apiBaseUrl) },
             { text: '📋 宣教分类添加', action: () => showArticleCategoryDialog() },
             { text: '📝 宣教添加', action: () => showArticleDialog() },
+            { text: '📚 题库快速添加', action: () => showQuestionLibraryDialog() },
+            { text: '📋 问卷快速添加', action: () => showQuestionnaireDialog() },
             { text: '👤 添加用户', action: () => showOperationDialog('insertUser', '添加用户', apiBaseUrl) },
         ];
 

@@ -12,7 +12,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["storage.js", "content.js"],
+      "js": ["storage.js", "questionBank.js", "content.js"],
       "css": ["button.css"]
     }
   ],
