@@ -3,6 +3,12 @@ var Merge = (function () {
   var eventSource = null;
   var filesCache = [];      // /api/audio/list 结果
   var running = false;
+  var lastOutDir = '';      // 本次/上次合并的实际输出目录
+  var lastAutoSource = '';  // 上次选任务时自动填入的来源名（用于判断用户是否手改过）
+  var lastAutoTitle = '';   // 上次选任务时自动填入的标题
+  var selectedTaskNames = [];  // 选任务时该任务的全部成品名（用于完整性校验）
+  var selectedTaskLabel = '';  // 当前选中任务的名字
+  var pendingSel = null;       // 文件列表未加载完时暂存的任务选择
 
   function $(id) { return document.getElementById(id); }
 
@@ -11,6 +17,10 @@ var Merge = (function () {
     $('mergeTaskSelect').addEventListener('change', function () {
       if (this.value) selectTaskFiles(this.value);
       else updateCount();
+    });
+    $('mergeSourceName').addEventListener('change', function () {
+      lastAutoSource = this.value.trim();   // 手动改过，以用户值为准
+      saveSettings();
     });
     $('mergeBgmSelect').addEventListener('change', function () {
       if (this.value) $('mergeBgmPath').value = this.value;
@@ -21,7 +31,10 @@ var Merge = (function () {
     });
     ['mergeBgmPath', 'mergeCoverPath', 'mergeBgImagePath',
      'metaTitle', 'metaArtist', 'metaAlbum', 'metaDate', 'metaComment'].forEach(function (id) {
-      $(id).addEventListener('change', saveSettings);
+      $(id).addEventListener('change', function () {
+        if (id === 'metaTitle') lastAutoTitle = this.value.trim();
+        saveSettings();
+      });
     });
     $('mergeDuration').addEventListener('change', saveSettings);
     $('mergeFormat').addEventListener('change', saveSettings);
@@ -37,7 +50,9 @@ var Merge = (function () {
   }
 
   function loadFileList() {
-    fetch('/api/audio/list').then(function (r) { return r.json(); }).then(function (data) {
+    // limit=0：拉取完整列表。成品目录文件数超过默认上限时，
+    // 任务的成品会被截断，导致选任务后只勾中一部分。
+    fetch('/api/audio/list?limit=0').then(function (r) { return r.json(); }).then(function (data) {
       filesCache = data.files || [];
       var checked = checkedNames();
       var el = $('mergeFileList');
@@ -50,11 +65,19 @@ var Merge = (function () {
       filesCache.forEach(function (f) {
         var sizeStr = f.size > 1048576 ? (f.size / 1048576).toFixed(1) + 'MB' : (f.size / 1024).toFixed(0) + 'KB';
         var c = checked.indexOf(f.name) >= 0 ? ' checked' : '';
-        html += '<label class="fc-item"><input type="checkbox" value="' + esc(f.name) + '"' + c + ' onchange="Merge.updateCount()">' +
-          '<span class="fc-name" title="' + esc(f.name) + '">' + esc(f.name) + '</span>' +
+        var base = f.base || f.name;
+        var dirTag = f.dir ? '<span class="fc-dir">' + esc(f.dir) + '</span>' : '';
+        html += '<label class="fc-item"><input type="checkbox" value="' + esc(f.name) + '"' + c + ' onchange="Merge.onFileCheckChange()">' +
+          '<span class="fc-name" title="' + esc(f.name) + '">' + esc(base) + dirTag + '</span>' +
           '<span class="fc-meta">' + sizeStr + '</span></label>';
       });
       el.innerHTML = html;
+      // 列表是异步加载的：若加载完成前已选了任务，渲染后要补上勾选
+      if (pendingSel) {
+        var p = pendingSel;
+        pendingSel = null;
+        applyTaskSelection(p.names, p.label);
+      }
       updateCount();
     }).catch(function () { });
   }
@@ -104,10 +127,40 @@ var Merge = (function () {
     $('mergeFileList').querySelectorAll('input[type=checkbox]').forEach(function (b) {
       b.checked = !!on;
     });
+    invalidateTaskSelection();
+    updateCount();
+  }
+
+  /** 单个勾选变化（列表 inline onchange 入口） */
+  function onFileCheckChange() {
+    invalidateTaskSelection();
     updateCount();
   }
   function updateCount() {
-    $('mergeFileCount').textContent = '已选 ' + checkedBoxes().length + ' 个文件';
+    var n = checkedBoxes().length;
+    var txt = '已选 ' + n + ' 个文件';
+    if (selectedTaskNames.length && n !== selectedTaskNames.length) {
+      txt += '（任务「' + selectedTaskLabel + '」共 ' + selectedTaskNames.length +
+        ' 个成品，未全部选中！）';
+    }
+    $('mergeFileCount').textContent = txt;
+  }
+
+  /** 手动改过勾选后，就不再拿任务完整性去校验 */
+  function invalidateTaskSelection() {
+    selectedTaskNames = [];
+    selectedTaskLabel = '';
+  }
+
+  /**
+   * 校验已勾选文件是否覆盖当前任务的全部成品。
+   * 返回缺失文件名数组（空 = 完整）。防止列表被截断/文件丢失时默默合并不完整内容。
+   */
+  function missingTaskFiles() {
+    if (!selectedTaskNames.length) return [];
+    var picked = {};
+    checkedNames().forEach(function (n) { picked[n] = 1; });
+    return selectedTaskNames.filter(function (n) { return !picked[n]; });
   }
 
   function selectTaskFiles(taskId) {
@@ -116,15 +169,69 @@ var Merge = (function () {
       return r.json();
     }).then(function (t) {
       var names = t.output_files || [];
-      $('mergeFileList').querySelectorAll('input[type=checkbox]').forEach(function (b) {
-        b.checked = names.indexOf(b.value) >= 0;
-      });
-      updateCount();
-      if (!$('mergeSourceName').value.trim()) {
-        $('mergeSourceName').value = t.name || '';
+      if (!filesCache.length) {
+        // 文件列表还没加载完（直接选了任务），先暂存，渲染后再勾选
+        pendingSel = { names: names, label: t.name || t.id };
+        selectedTaskNames = names.slice();
+        selectedTaskLabel = pendingSel.label;
+        syncTaskName(t.name || '');
+        updateCount();
+        App.toast('已选择任务「' + selectedTaskLabel + '」，等待文件列表加载后自动勾选 ' +
+          names.length + ' 个成品');
+        return;
       }
-      App.toast('已勾选任务「' + (t.name || t.id) + '」的 ' + names.length + ' 个成品');
+      applyTaskSelection(names, t.name || t.id);
+      syncTaskName(t.name || '');
     }).catch(function (e) { App.toast(e.message); });
+  }
+
+  /** 把任务的成品全部勾上，其余取消，并报告找不到的文件 */
+  function applyTaskSelection(names, label) {
+    var boxes = Array.prototype.slice.call(
+      $('mergeFileList').querySelectorAll('input[type=checkbox]'));
+    var inList = {};
+    boxes.forEach(function (b) { inList[b.value] = b; });
+    var missing = [];
+    names.forEach(function (n) {
+      if (inList[n]) inList[n].checked = true;
+      else missing.push(n);
+    });
+    boxes.forEach(function (b) {
+      if (names.indexOf(b.value) < 0) b.checked = false;
+    });
+    selectedTaskNames = names.slice();
+    selectedTaskLabel = label;
+    updateCount();
+    if (missing.length) {
+      App.toast('任务「' + label + '」有 ' + missing.length + '/' + names.length +
+        ' 个成品在列表中找不到（已被删除或未加载），已选中 ' +
+        (names.length - missing.length) + ' 个', 8000);
+    } else {
+      App.toast('已勾选任务「' + label + '」的 ' + names.length + ' 个成品');
+    }
+  }
+
+  /**
+   * 切换任务时同步「来源名」与「标题」。
+   * 规则：为空、或仍是上次选任务自动填入的值 → 跟新任务名走；
+   * 用户手改过则不覆盖（避免丢失自定义命名）。
+   */
+  function syncTaskName(name) {
+    name = (name || '').trim();
+    if (!name) return;
+    var srcEl = $('mergeSourceName');
+    var cur = srcEl.value.trim();
+    if (!cur || cur === lastAutoSource) {
+      srcEl.value = name;
+      lastAutoSource = name;
+    }
+    var tEl = $('metaTitle');
+    var curT = tEl.value.trim();
+    if (!curT || curT === lastAutoTitle || curT === lastAutoSource) {
+      tEl.value = name;
+      lastAutoTitle = name;
+    }
+    saveSettings();
   }
 
   // ── 参数收集 / 持久化 ─────────────────────────────
@@ -188,7 +295,10 @@ var Merge = (function () {
     $('mergeBgImagePath').value = cfg.merge_bg_image_path || '';
     $('mergeStartNum').value = cfg.merge_start_num || '1';
     $('mergeOutputDir').value = cfg.merge_output_dir || '';
+    // 刷新后来源名从配置重置（来源名不做持久化），重新认得“上次自动填入的值”
+    lastAutoSource = ($('mergeSourceName').value || '').trim();
     $('metaTitle').value = cfg.meta_title || '';
+    lastAutoTitle = cfg.meta_title || '';
     $('metaArtist').value = cfg.meta_artist || '';
     $('metaAlbum').value = cfg.meta_album || '';
     $('metaDate').value = cfg.meta_date || '';
@@ -272,6 +382,12 @@ var Merge = (function () {
   function preview() {
     var files = checkedNames();
     if (!files.length) { App.toast('请先勾选要合并的文件'); return; }
+    var miss = missingTaskFiles();
+    if (miss.length) {
+      App.toast('当前任务还有 ' + miss.length + ' 个成品未选中（如 ' + miss[0] +
+        '），合并内容会不完整，请先刷新列表或重新选择任务', 8000);
+      return;
+    }
     fetch('/api/merge/preview', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ files: files, target_duration: parseInt($('mergeDuration').value) || 20 })
@@ -301,6 +417,12 @@ var Merge = (function () {
     var params = getMergeParams(test);
     if (!params.files.length) { App.toast('请先勾选要合并的文件'); return; }
     if (!params.metadata.title) { App.toast('必须输入标题'); return; }
+    var miss = missingTaskFiles();
+    if (miss.length && !isConfirm) {
+      App.toast('当前任务还有 ' + miss.length + ' 个成品未选中（如 ' + miss[0] +
+        '），合并内容会不完整。可点“刷新列表”后重新选择任务', 8000);
+      return;
+    }
     if (isConfirm) params.confirm = true;
 
     saveSettings();
@@ -367,6 +489,7 @@ var Merge = (function () {
       case 'started':
         setRunning(true);
         updateProgress(0, event.total, 0);
+        if (event.out_dir) { lastOutDir = event.out_dir; }
         break;
       case 'progress':
         updateProgress(event.current, event.total, event.percent);
@@ -380,9 +503,10 @@ var Merge = (function () {
       case 'complete':
         setRunning(false);
         updateProgress(event.total, event.total, 100);
-        App.toast('合并完成！共输出 ' + event.files.length + ' 个文件', 3000);
+        if (event.out_dir) { lastOutDir = event.out_dir; }
+        showResultBar(lastOutDir, (event.files || []).length);
+        App.toast('合并完成！共输出 ' + event.files.length + ' 个文件到 ' + (lastOutDir || '输出目录'), 6000);
         disconnectSSE();
-        App.loadAudioList();
         break;
       case 'cancelled':
         setRunning(false);
@@ -397,6 +521,42 @@ var Merge = (function () {
       case 'heartbeat':
         break;
     }
+  }
+
+  // ── 输出目录展示与打开 ──────────────────
+  function showResultBar(dir, count) {
+    var bar = $('mergeResultBar');
+    if (!bar) return;
+    if (!dir) { App.hide('mergeResultBar'); return; }
+    $('mergeResultDir').textContent = dir;
+    $('mergeResultDir').title = dir;
+    $('mergeResultCount').textContent = count > 0 ? ('共 ' + count + ' 个文件') : '';
+    App.show('mergeResultBar');
+  }
+
+  function openDir(path) {
+    if (!path) { App.toast('目录为空'); return; }
+    fetch('/api/system/open_dir', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: path })
+    }).then(function (r) {
+      return r.json().then(function (d) {
+        if (!r.ok) throw new Error(d.detail || '打开失败');
+        return d;
+      });
+    }).catch(function (e) { App.toast(e.message, 3000); });
+  }
+
+  function openResultDir() { openDir(lastOutDir); }
+
+  function openRootDir() {
+    var dir = ($('mergeOutputDir').value || '').trim();
+    if (dir) { openDir(dir); return; }
+    // 输入框为空时用配置里的默认根目录
+    fetch('/api/merge/output_dir').then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.root_dir) { openDir(d.root_dir); }
+      else { App.toast('未配置输出根目录'); }
+    }).catch(function () { App.toast('打开失败'); });
   }
 
   function updateProgress(current, total, percent) {
@@ -414,6 +574,7 @@ var Merge = (function () {
   // ── 页面刷新恢复 ────────────────────────────────────
   function checkStatus() {
     fetch('/api/merge/status').then(function (r) { return r.json(); }).then(function (d) {
+      if (d.out_dir) { lastOutDir = d.out_dir; }
       if (d.status === 'running' || d.status === 'stopping') {
         App.show('mergeProgressSection');
         App.show('mergeLogSection');
@@ -424,6 +585,7 @@ var Merge = (function () {
       } else if (d.status === 'done') {
         App.show('mergeLogSection');
         $('mergeLogBox').textContent = (d.logs || []).join('\n');
+        showResultBar(d.out_dir, (d.files || []).length);
         setRunning(false);
       }
     }).catch(function () { });
@@ -440,6 +602,7 @@ var Merge = (function () {
     refresh: refresh,
     selectAll: selectAll,
     updateCount: updateCount,
+    onFileCheckChange: onFileCheckChange,
     selectTaskFiles: selectTaskFiles,
     preview: preview,
     start: start,
@@ -449,5 +612,8 @@ var Merge = (function () {
     openImagePicker: openImagePicker,
     closeImagePicker: closeImagePicker,
     clearImage: clearImage,
+    openRootDir: openRootDir,
+    openResultDir: openResultDir,
+    openDir: openDir,
   };
 })();

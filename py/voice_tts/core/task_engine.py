@@ -4,12 +4,14 @@
 设计要点：
 - 同一时刻只运行一个活动任务；其他任务保留在 tasks.json 中待恢复
 - worker 输出到 `output/_temp/{task_id}/{idx}.wav`（原始）
-- 后处理（语速/淡出/格式）后 copy 到 `output/{base}-{idx:03d}.{ext}`（成品）
+- 后处理（语速/淡出/格式）后 copy 到 `output/{任务名_id}/{base}-{idx:03d}.{ext}`（成品，按任务分子目录）
+- output_files 存相对 output_dir 的路径（如 `母子吟_66ae8bef/xxx-001.wav`）
 - 每完成一段就 upsert 到 tasks.json，重启后可跳过已完成段
 - 通过 loop.call_soon_threadsafe(q.put_nowait, event) 投递事件到 SSE
 """
 import asyncio
 import os
+import re
 import shutil
 import threading
 import time
@@ -19,6 +21,62 @@ from typing import Optional
 
 from . import task_store, tts_engine
 from .config import load as load_config
+
+AUDIO_EXTS = (".wav", ".mp3", ".flac", ".ogg", ".m4a")
+
+
+# ── 成品子目录（目录名 = 任务名）──────────────────────
+
+def _safe_dir_name(name: str) -> str:
+    """任务名 → 合法目录名。"""
+    s = tts_engine.safe_name((name or "").strip())
+    s = re.sub(r"\s+", " ", s).strip(" .")   # Windows 目录名不能以空格/点结尾
+    return s[:60]
+
+
+def task_output_subdir(task: dict) -> str:
+    """任务成品子目录名：`任务名_id前6位`（重名任务也不会互相覆盖）。
+    已记录在任务里的 out_subdir 优先，保证改名/重启后目录稳定不变。
+    """
+    exist = (task.get("out_subdir") or "").strip()
+    if exist:
+        return exist.replace("\\", "/").strip("/")
+    tid = (task.get("id") or "")[:6]
+    base = _safe_dir_name(task.get("name") or "") or "未命名任务"
+    return "%s_%s" % (base, tid) if tid else base
+
+
+def task_output_dir(task: dict, cfg: dict = None) -> str:
+    """任务成品目录绝对路径 = output_dir/任务子目录。"""
+    cfg = cfg or load_config()
+    return os.path.join(cfg.get("output_dir", ""), task_output_subdir(task))
+
+
+def resolve_output_path(root: str, name: str) -> str:
+    """把 output_files / 前端传来的名字解析成绝对路径。
+    兼容三种形式：相对路径（新）、纯文件名（旧数据）、绝对路径。
+    并做越权校验，避免 ../ 逃出 output_dir。
+    """
+    root = os.path.abspath(root or "")
+    s = (name or "").strip().replace("\\", "/")
+    if not s:
+        return ""
+    if os.path.isabs(s):
+        cand = os.path.abspath(s)
+    else:
+        cand = os.path.normpath(os.path.join(root, s))
+    if cand != root and not cand.startswith(root + os.sep):
+        return ""
+    return cand
+
+
+def to_rel_name(root: str, path: str) -> str:
+    """绝对路径 → 相对 output_dir 的路径（统一用 / 分隔）。"""
+    root = os.path.abspath(root or "")
+    p = os.path.abspath(path)
+    if p.startswith(root + os.sep):
+        return p[len(root) + 1:].replace("\\", "/")
+    return os.path.basename(p)
 
 
 class TaskEngine:
@@ -36,6 +94,7 @@ class TaskEngine:
         self.text = ""
         self.segments: list = []
         self.base_prefix = ""
+        self.out_subdir = ""       # 本任务成品子目录名（相对 output_dir）
         self.completed_segments: set = set()  # 已完成的段号集合
         self.cfg: dict = {}
         self.created_at = ""
@@ -114,6 +173,7 @@ class TaskEngine:
                 "fade_ms", "tail_ms", "prompt_audio", "prompt_text", "prefix",
                 "model_dir", "repo_dir", "conda_python", "worker_script", "output_dir")},
             "base_prefix": base,
+            "out_subdir": task_output_subdir({"id": task_id, "name": task_name}),
             "status": "pending" if self._busy() else "running",
             "total": len(segments),
             "completed_segments": [],
@@ -149,6 +209,9 @@ class TaskEngine:
         if task.get("status") in ("running", "paused", "stopping"):
             return False, "任务当前正在活动，请使用暂停/继续按钮"
 
+        # 手动启动的任务不能再从队列重复启动
+        self._queue = [t for t in self._queue if t.get("id") != task_id]
+
         cfg = load_config()
         # 用保存的 params 覆盖运行环境参数（保证一致性）
         for k, v in (task.get("params") or {}).items():
@@ -167,6 +230,7 @@ class TaskEngine:
         done = set(task.get("completed_segments") or [])
         task["status"] = "running"
         task["base_prefix"] = base
+        task["out_subdir"] = task_output_subdir(task)
         task_store.upsert(task)
 
         self._bind_running(task, segments, cfg, base, initial_completed=done)
@@ -231,6 +295,26 @@ class TaskEngine:
                  "total": t.get("total", 0), "text": t.get("text", "")[:50]}
                 for t in self._queue]
 
+    def queue_empty(self) -> bool:
+        """队列是否已空（SSE 据此判断是否保持连接）。"""
+        return not self._queue
+
+    def restore_queue(self) -> int:
+        """服务启动时调用：把磁盘上 status=pending 的任务按创建顺序恢复进内存队列。
+
+        只恢复队列不自动开跑（避免重启后意外占用 CPU 开始生成）。
+        """
+        tasks = task_store.load_all()  # 最新在前
+        pending = [t for t in tasks if t.get("status") == "pending"]
+        pending.reverse()             # 转为最早在前，保持追加顺序
+        known = {t.get("id") for t in self._queue}
+        n = 0
+        for t in pending:
+            if t.get("id") not in known and (t.get("segments") or []):
+                self._queue.append(t)
+                n += 1
+        return n
+
     # ── 内部辅助 ──────────────────────────────────────
 
     def _validate_env(self, cfg: dict) -> tuple:
@@ -261,6 +345,7 @@ class TaskEngine:
         self.segments = segments
         self.cfg = cfg
         self.base_prefix = base
+        self.out_subdir = task_output_subdir(task)
         self.status = "running"
         self.total = len(segments)
         self.completed_segments = set(initial_completed or task.get("completed_segments") or [])
@@ -286,6 +371,7 @@ class TaskEngine:
                 "fade_ms", "tail_ms", "prompt_audio", "prompt_text", "prefix",
                 "model_dir", "repo_dir", "conda_python", "worker_script", "output_dir")},
             "base_prefix": self.base_prefix,
+            "out_subdir": self.out_subdir or task_output_subdir(task),
             "status": status or self.status,
             "total": self.total,
             "completed_segments": sorted(self.completed_segments),
@@ -300,6 +386,23 @@ class TaskEngine:
         if task:
             task["status"] = status
             task_store.upsert(task)
+
+    def _final_dir(self) -> str:
+        """本任务成品目录（output_dir/任务子目录），并确保存在。"""
+        d = os.path.join(self.cfg.get("output_dir", ""), self.out_subdir or "")
+        os.makedirs(d, exist_ok=True)
+        return d
+
+    def _remove_empty_final_dir(self):
+        """成品已全部删除后，清理空的任务子目录。"""
+        if not self.out_subdir:
+            return
+        d = os.path.join(self.cfg.get("output_dir", ""), self.out_subdir)
+        try:
+            if os.path.isdir(d) and not os.listdir(d):
+                os.rmdir(d)
+        except Exception:
+            pass
 
     def _segment_final_name(self, idx: int, ext: str) -> str:
         if self.total == 1:
@@ -327,8 +430,8 @@ class TaskEngine:
         output_dir = self.cfg.get("output_dir", "")
         n = 0
         for name in self.files:
-            fp = os.path.join(output_dir, os.path.basename(name))
-            if os.path.isfile(fp):
+            fp = resolve_output_path(output_dir, name)
+            if fp and os.path.isfile(fp):
                 try:
                     os.remove(fp)
                     n += 1
@@ -352,9 +455,11 @@ class TaskEngine:
             fmt = (cfg.get("format") or "wav").lower()
             output_dir = cfg.get("output_dir", "")
             os.makedirs(output_dir, exist_ok=True)
+            final_dir = self._final_dir()   # 成品写入任务子目录，不再混在根目录
 
             self._emit({"type": "started", "total": self.total,
-                        "resumed": len(self.completed_segments)})
+                        "resumed": len(self.completed_segments), "out_dir": final_dir})
+            self._log(f"成品目录：{final_dir}")
             if self.completed_segments:
                 self._log(f"继续任务：共 {self.total} 段，已完成 {len(self.completed_segments)} 段")
             else:
@@ -382,7 +487,7 @@ class TaskEngine:
                     continue
 
                 final_name = self._segment_final_name(idx, fmt if fmt == "mp3" else "wav")
-                final_path = os.path.join(output_dir, final_name)
+                final_path = os.path.join(final_dir, final_name)
                 raw_wav = self._segment_temp_path(idx)
 
                 self._log(f"[{idx}/{self.total}] 生成中...")
@@ -419,25 +524,27 @@ class TaskEngine:
                     tts_engine.apply_fade_out(raw_wav, fade_ms, tail_ms)
 
                 # 3) 落到成品目录（wav 用 move，mp3 转换后 wav 留在 _temp）
-                produced_name = final_name
+                produced_path = final_path
                 try:
                     if fmt == "mp3":
-                        mp3_final = os.path.join(output_dir, self._segment_final_name(idx, "mp3"))
+                        mp3_final = os.path.join(final_dir, self._segment_final_name(idx, "mp3"))
                         if tts_engine.wav_to_mp3(raw_wav, mp3_final):
-                            produced_name = os.path.basename(mp3_final)
+                            produced_path = mp3_final
                         else:
-                            wav_final = os.path.join(output_dir, self._segment_final_name(idx, "wav"))
+                            wav_final = os.path.join(final_dir, self._segment_final_name(idx, "wav"))
                             shutil.copyfile(raw_wav, wav_final)
-                            produced_name = os.path.basename(wav_final)
+                            produced_path = wav_final
                             self._log(f"[{idx}/{self.total}] MP3 失败，保留 WAV")
                     else:
                         shutil.copyfile(raw_wav, final_path)
-                        produced_name = os.path.basename(final_path)
+                        produced_path = final_path
                 except Exception as e:
                     self._log(f"[{idx}/{self.total}] 输出失败: {e}")
                     self._emit({"type": "segment_error", "index": idx, "error": str(e)})
                     continue
 
+                # output_files 存相对 output_dir 的路径（含任务子目录）
+                produced_name = to_rel_name(output_dir, produced_path)
                 self.completed_segments.add(idx)
                 self.completed = idx
                 if produced_name not in self.files:
@@ -455,16 +562,21 @@ class TaskEngine:
             if self._cleanup_temp_dir():
                 self._log(f"已清理中间文件目录 _temp/{self.task_id}")
             self._log(f"全部完成，共生成 {len(self.files)} 个文件")
-            self._emit({"type": "complete", "files": self.files, "total": self.total})
+            self._emit({"type": "complete", "files": self.files, "total": self.total,
+                        "queue_size": len(self._queue)})
             # 启动队列中的下一个任务
             self._start_next()
 
         except Exception as e:
+            # 任务已被用户暂停/停止时，不再覆盖状态、不再触发下一个任务
+            if self.status in ("paused", "cancelled", "stopping"):
+                traceback.print_exc()
+                return
             self.status = "error"
             self.error = str(e)
             self._log(f"异常: {e}")
             self._persist_snapshot(status="error", error=str(e))
-            self._emit({"type": "error", "message": str(e)})
+            self._emit({"type": "error", "message": str(e), "queue_size": len(self._queue)})
             traceback.print_exc()
             # 出错也启动下一个
             self._start_next()
@@ -478,10 +590,11 @@ class TaskEngine:
             self._log(f"已删除 {removed} 个成品文件")
         if self._cleanup_temp_dir():
             self._log(f"已清理中间文件目录 _temp/{self.task_id}")
+        self._remove_empty_final_dir()
         self.files = []
         self.completed_segments = set()
         self._persist_snapshot(status="cancelled")
-        self._emit({"type": "cancelled"})
+        self._emit({"type": "cancelled", "queue_size": len(self._queue)})
         # 取消后也启动下一个
         self._start_next()
 
@@ -489,24 +602,38 @@ class TaskEngine:
         """从队列中取出下一个任务执行。"""
         if not self._queue:
             self.status = "idle"
+            self._emit({"type": "queue_done", "queue_size": 0})
             return
-        # 等待旧线程完全退出（最多2秒）
-        if self._thread and self._thread.is_alive():
+        # 等待旧线程退出（绝不能 join 当前线程自身，否则 RuntimeError 导致队列停摆）
+        cur = threading.current_thread()
+        if self._thread and self._thread is not cur and self._thread.is_alive():
             self._thread.join(timeout=2)
         next_task = self._queue.pop(0)
-        cfg = load_config()
-        for k, v in (next_task.get("params") or {}).items():
-            if v is not None:
-                cfg[k] = v
-        segments = next_task.get("segments") or []
-        base = next_task.get("base_prefix") or self._build_base(cfg, time.strftime("%Y%m%d_%H%M%S"))
-        next_task["status"] = "running"
-        task_store.upsert(next_task)
-        self._bind_running(next_task, segments, cfg, base)
-        self._log(f"自动启动队列任务: {self.task_name} ({self.task_id})")
-        self._emit({"type": "auto_start", "task_id": self.task_id, "task_name": self.task_name})
-        self._thread = threading.Thread(target=self._run, daemon=True)
-        self._thread.start()
+        try:
+            cfg = load_config()
+            for k, v in (next_task.get("params") or {}).items():
+                if v is not None:
+                    cfg[k] = v
+            segments = next_task.get("segments") or []
+            base = next_task.get("base_prefix") or self._build_base(cfg, time.strftime("%Y%m%d_%H%M%S"))
+            next_task["status"] = "running"
+            task_store.upsert(next_task)
+            self._bind_running(next_task, segments, cfg, base)
+            self._log(f"自动启动队列任务: {self.task_name} ({self.task_id})")
+            self._emit({"type": "auto_start", "task_id": self.task_id, "task_name": self.task_name,
+                        "total": self.total})
+            self._thread = threading.Thread(target=self._run, daemon=True)
+            self._thread.start()
+        except Exception as e:
+            # 兜底：启动下一个失败时标记该任务出错并继续处理队列，避免队列卡死
+            self._log(f"启动队列任务失败: {e}")
+            next_task["status"] = "error"
+            next_task["error"] = str(e)
+            task_store.upsert(next_task)
+            self._emit({"type": "error", "task_id": next_task.get("id"),
+                        "message": "队列任务启动失败: %s" % e,
+                        "queue_size": len(self._queue)})
+            self._start_next()
 
     # ── 测试生成（同步，不入任务列表） ────────────────
 
@@ -573,11 +700,88 @@ class TaskEngine:
                     pass
         if clean_output:
             for name in task.get("output_files") or []:
-                fp = os.path.join(output_dir, os.path.basename(name))
-                if os.path.isfile(fp):
+                fp = resolve_output_path(output_dir, name)
+                if fp and os.path.isfile(fp):
                     try:
                         os.remove(fp)
                         removed["output"] += 1
                     except Exception:
                         pass
+            # 成品删完后清理空的任务子目录
+            sub = task_output_subdir(task)
+            sub_dir = os.path.join(output_dir, sub)
+            try:
+                if os.path.isdir(sub_dir) and not os.listdir(sub_dir):
+                    os.rmdir(sub_dir)
+            except Exception:
+                pass
         return removed
+
+
+# ── 历史成品迁移：把根目录混在一起的旧文件归位到任务子目录 ──────────
+
+def migrate_outputs_to_subdirs() -> dict:
+    """服务启动时调用：把旧版本散落在 output_dir 根目录的成品，
+    按各自任务移入 `output_dir/任务名_id/` 子目录，并把 output_files 更新为相对路径。
+
+    幂等：已经是相对路径（含 /）或已在子目录中的记录不会重复处理。
+    返回 {"tasks": 改动任务数, "moved": 移动文件数, "missing": 找不到的文件数}。
+    """
+    result = {"tasks": 0, "moved": 0, "missing": 0}
+    try:
+        cfg = load_config()
+    except Exception:
+        return result
+    output_dir = cfg.get("output_dir", "")
+    if not output_dir or not os.path.isdir(output_dir):
+        return result
+    try:
+        tasks = task_store.load_all()
+    except Exception:
+        return result
+
+    for task in tasks or []:
+        files = task.get("output_files") or []
+        if not files:
+            continue
+        sub = task_output_subdir(task)
+        sub_dir = os.path.join(output_dir, sub)
+        new_files = []
+        changed = False
+        for name in files:
+            # 已是相对路径（含子目录）则原样保留
+            if "/" in name.replace("\\", "/"):
+                new_files.append(name)
+                continue
+            src = os.path.join(output_dir, os.path.basename(name))
+            if not os.path.isfile(src):
+                # 根目录找不到：可能已在子目录里
+                alt = os.path.join(sub_dir, os.path.basename(name))
+                if os.path.isfile(alt):
+                    new_files.append(to_rel_name(output_dir, alt))
+                    changed = True
+                else:
+                    new_files.append(name)
+                    result["missing"] += 1
+                continue
+            try:
+                os.makedirs(sub_dir, exist_ok=True)
+                dst = os.path.join(sub_dir, os.path.basename(name))
+                if os.path.abspath(src) != os.path.abspath(dst):
+                    shutil.move(src, dst)
+                    result["moved"] += 1
+                new_files.append(to_rel_name(output_dir, dst))
+                changed = True
+            except Exception:
+                new_files.append(name)
+        if task.get("out_subdir") != sub:
+            task["out_subdir"] = sub
+            changed = True
+        if changed:
+            task["output_files"] = new_files
+            try:
+                task_store.upsert(task)
+                result["tasks"] += 1
+            except Exception:
+                pass
+    return result

@@ -211,13 +211,16 @@ var App = (function () {
       var html = '';
       files.forEach(function (f) {
         var sizeStr = f.size > 1048576 ? (f.size / 1048576).toFixed(1) + 'MB' : (f.size / 1024).toFixed(0) + 'KB';
+        var base = f.base || f.name;
+        var dirTag = f.dir ? '<span class="fdir">' + escHtml(f.dir) + '</span>' : '';
+        var id = escHtml(f.name);   // name = 相对路径（含任务子目录），作为唯一标识
         html += '<div class="audio-item">';
-        html += '<span class="fname" title="' + f.name + '">' + f.name + '</span>';
+        html += '<span class="fname" title="' + id + '">' + escHtml(base) + dirTag + '</span>';
         html += '<span class="fmeta">' + sizeStr + ' · ' + f.modified + '</span>';
         html += '<span class="ops">';
-        html += '<button onclick="App.playAudio(\'' + escHtml(f.name) + '\')">▶ 播放</button>';
+        html += '<button onclick="App.playAudio(\'' + id + '\')">▶ 播放</button>';
         html += '<a href="/api/audio/download?file=' + encodeURIComponent(f.name) + '">⬇ 下载</a>';
-        html += '<button class="btn-del" onclick="App.deleteAudio(\'' + escHtml(f.name) + '\')">✕</button>';
+        html += '<button class="btn-del" onclick="App.deleteAudio(\'' + id + '\')">✕</button>';
         html += '</span></div>';
       });
       listEl.innerHTML = html;
@@ -300,6 +303,7 @@ var App = (function () {
       var STATUS_LABELS = {
         idle: '空闲', running: '执行中', paused: '已暂停', stopping: '正在停止…',
         cancelled: '已停止', done: '已完成', error: '失败', interrupted: '待恢复',
+        pending: '排队中',
       };
       var unfinished = tasks.filter(function (t) { return t.status !== 'done'; }).length;
       var badge = $('taskBadge');
@@ -316,7 +320,7 @@ var App = (function () {
         var pct = t.total > 0 ? Math.round(t.completed / t.total * 100) : 0;
         var isActive = (t.id === data.active_task_id);
         var resumable = !isActive && (t.status === 'interrupted' || t.status === 'paused'
-          || t.status === 'error');
+          || t.status === 'error' || t.status === 'pending');
         html += '<div class="task-card status-' + t.status + '">';
         html += '<div class="task-head">';
         html += '<div class="task-title" title="' + escHtml(t.name || '') + '">' + escHtml(t.name || '(未命名)') + '</div>';
@@ -338,7 +342,8 @@ var App = (function () {
         if (isActive && (t.status === 'running' || t.status === 'paused' || t.status === 'stopping')) {
           html += '<button class="btn" onclick="Task.switchToCurrent()">查看当前进度</button>';
         } else if (resumable) {
-          html += '<button class="btn btn-primary" onclick="App.resumeTask(\'' + escHtml(t.id) + '\')">▶ 继续任务</button>';
+          var btnLabel = t.status === 'pending' ? '▶ 开始任务' : '▶ 继续任务';
+          html += '<button class="btn btn-primary" onclick="App.resumeTask(\'' + escHtml(t.id) + '\')">' + btnLabel + '</button>';
         }
         if (t.output_count > 0) {
           html += '<button class="btn" onclick="App.viewTaskOutput(\'' + escHtml(t.id) + '\')">查看成品</button>';
@@ -360,9 +365,10 @@ var App = (function () {
           return d;
         });
       }).then(function (d) {
-        toast('任务已恢复，共 ' + d.total + ' 段');
+        toast('任务已开始，共 ' + d.total + ' 段');
         document.querySelector('[data-tab="synthesize"]').click();
         Task.onResumedFromList();
+        Task.loadQueue();
       }).catch(function (e) { toast(e.message, 3000); });
   }
 

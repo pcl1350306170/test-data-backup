@@ -20,7 +20,7 @@ from fastapi.staticfiles import StaticFiles
 
 from core import config, task_store, tts_engine
 from core.merge_engine import MergeEngine, scan_media_dir
-from core.task_engine import TaskEngine
+from core.task_engine import TaskEngine, resolve_output_path, migrate_outputs_to_subdirs
 
 # ── 初始化 ──────────────────────────────────────────────
 
@@ -45,6 +45,17 @@ async def on_startup():
     if changed:
         print("[startup] 标记 %d 个任务为 interrupted: %s" % (
             len(changed), ", ".join(t.get("name", t.get("id", "?")) for t in changed)))
+    try:
+        mig = migrate_outputs_to_subdirs()
+        if mig.get("moved") or mig.get("tasks"):
+            print("[startup] 成品归位：%d 个任务、移动 %d 个文件到任务子目录%s" % (
+                mig.get("tasks", 0), mig.get("moved", 0),
+                ("，%d 个文件缺失" % mig["missing"]) if mig.get("missing") else ""))
+    except Exception as e:
+        print("[startup] 成品归位失败（已跳过）: %s" % e)
+    n = engine.restore_queue()
+    if n:
+        print("[startup] 恢复 %d 个排队任务到队列（需手动开始或等当前任务完成后自动执行）" % n)
 
 
 def _get_cfg():
@@ -143,7 +154,10 @@ async def task_progress():
                 try:
                     event = await asyncio.wait_for(queue.get(), timeout=30)
                     yield "data: %s\n\n" % json.dumps(event, ensure_ascii=False)
-                    if event.get("type") in ("complete", "error", "cancelled"):
+                    # 队列还有后续任务时不断开，让前端能继续收到 auto_start
+                    if event.get("type") == "queue_done":
+                        break
+                    if event.get("type") in ("complete", "error", "cancelled") and engine.queue_empty():
                         break
                 except asyncio.TimeoutError:
                     yield "data: %s\n\n" % json.dumps({"type": "heartbeat"})
@@ -261,6 +275,31 @@ async def merge_status():
     return merge_engine.get_status()
 
 
+@app.get("/api/merge/output_dir")
+async def merge_output_dir():
+    """返回合并输出的实际目录（根目录/标题）及已输出文件。"""
+    return merge_engine.get_output_dir()
+
+
+@app.post("/api/system/open_dir")
+async def open_dir(data: dict):
+    """在文件管理器中打开目录（仅允许已存在的目录）。"""
+    path = (data.get("path") or "").strip()
+    if not path:
+        raise HTTPException(400, "路径为空")
+    if not os.path.isdir(path):
+        raise HTTPException(404, "目录不存在: %s" % path)
+    try:
+        if os.name == "nt":
+            os.startfile(path)  # noqa
+        else:
+            import subprocess
+            subprocess.Popen(["xdg-open", path])
+    except Exception as e:
+        raise HTTPException(500, "打开目录失败: %s" % e)
+    return {"ok": True, "path": path}
+
+
 @app.get("/api/merge/progress")
 async def merge_progress():
     """SSE 端点：实时推送合并进度。"""
@@ -327,30 +366,45 @@ async def test_generate(data: dict):
 # ── 音频文件 API ──────────────────────────────────────
 
 @app.get("/api/audio/list")
-async def list_audio():
+async def list_audio(limit: int = 200):
     cfg = _get_cfg()
     output_dir = cfg.get("output_dir", "")
     files = []
     if os.path.isdir(output_dir):
-        for f in sorted(os.listdir(output_dir), reverse=True):
-            ext = os.path.splitext(f)[1].lower()
-            if ext in (".wav", ".mp3", ".flac", ".ogg", ".m4a"):
-                fp = os.path.join(output_dir, f)
-                stat = os.stat(fp)
+        for root, dirs, fnames in os.walk(output_dir):
+            dirs[:] = [d for d in dirs if d != "_temp"]   # 跳过中间产物
+            for f in fnames:
+                ext = os.path.splitext(f)[1].lower()
+                if ext not in (".wav", ".mp3", ".flac", ".ogg", ".m4a"):
+                    continue
+                fp = os.path.join(root, f)
+                try:
+                    stat = os.stat(fp)
+                except OSError:
+                    continue
+                rel = os.path.relpath(fp, output_dir).replace("\\", "/")
+                rel_dir = os.path.relpath(root, output_dir).replace("\\", "/")
                 files.append({
-                    "name": f,
+                    "name": rel,          # 相对路径（含任务子目录），唯一标识
+                    "base": f,            # 纯文件名，用于展示
+                    "dir": "" if rel_dir == "." else rel_dir,
                     "size": stat.st_size,
                     "modified": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stat.st_mtime)),
                 })
-    return {"files": files[:200]}
+        files.sort(key=lambda x: x["name"], reverse=True)
+    total = len(files)
+    # limit<=0 表示不限制（合并页需要完整列表，否则任务成品会被截断而漏选）
+    if limit and limit > 0:
+        files = files[:limit]
+    return {"files": files, "total": total, "limit": limit}
 
 
 @app.get("/api/audio/play")
 async def play_audio(file: str = Query(...)):
     cfg = _get_cfg()
     output_dir = cfg.get("output_dir", "")
-    fp = os.path.join(output_dir, os.path.basename(file))
-    if not os.path.isfile(fp):
+    fp = resolve_output_path(output_dir, file)
+    if not fp or not os.path.isfile(fp):
         raise HTTPException(404, "音频文件不存在")
     ext = os.path.splitext(fp)[1].lower()
     media_map = {".wav": "audio/wav", ".mp3": "audio/mpeg",
@@ -363,8 +417,8 @@ async def play_audio(file: str = Query(...)):
 async def download_audio(file: str = Query(...)):
     cfg = _get_cfg()
     output_dir = cfg.get("output_dir", "")
-    fp = os.path.join(output_dir, os.path.basename(file))
-    if not os.path.isfile(fp):
+    fp = resolve_output_path(output_dir, file)
+    if not fp or not os.path.isfile(fp):
         raise HTTPException(404, "音频文件不存在")
     return FileResponse(fp, filename=os.path.basename(fp),
                         headers={"Content-Disposition": "attachment"})
@@ -377,8 +431,8 @@ async def delete_audio(data: dict):
         raise HTTPException(400, "文件名不能为空")
     cfg = _get_cfg()
     output_dir = cfg.get("output_dir", "")
-    fp = os.path.join(output_dir, os.path.basename(filename))
-    if not os.path.isfile(fp):
+    fp = resolve_output_path(output_dir, filename)
+    if not fp or not os.path.isfile(fp):
         raise HTTPException(404, "文件不存在")
     os.remove(fp)
     return {"ok": True}
@@ -407,5 +461,7 @@ if __name__ == "__main__":
         pass
     print("  按 Ctrl+C 停止服务")
     print("=" * 56)
-    open_browser(PORT)
+    # 仅在非 Hub 托管模式下自动打开浏览器（避免远程启动时弹本地浏览器）
+    if not os.environ.get("HUB_MANAGED"):
+        open_browser(PORT)
     uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="info")

@@ -86,6 +86,8 @@ var Task = (function () {
   function handleEvent(event) {
     switch (event.type) {
       case 'started':
+        if (event.task_id) currentTaskId = event.task_id;
+        clearLog();
         setUIRunning();
         updateProgress(0, event.total, 0);
         if (event.resumed && event.resumed > 0) {
@@ -100,9 +102,18 @@ var Task = (function () {
         break;
 
       case 'auto_start':
+        currentTaskId = event.task_id || currentTaskId;
+        currentTaskName = event.task_name || '';
         appendLog('[自动] 开始执行队列任务: ' + event.task_name);
         setUIRunning();
+        updateProgress(0, event.total || 0, 0);
         loadQueue();
+        App.loadTaskList();
+        break;
+
+      case 'queue_done':
+        loadQueue();
+        App.loadTaskList();
         break;
 
       case 'progress':
@@ -125,22 +136,32 @@ var Task = (function () {
 
       case 'complete':
         updateProgress(event.total, event.total, 100);
-        App.toast('生成完成！共 ' + event.files.length + ' 个文件', 3000);
         App.loadTaskList();
-        setTimeout(function () {
-          document.querySelector('[data-tab="results"]').click();
-        }, 500);
+        if (event.queue_size > 0) {
+          // 队列还有后续任务，不跳转结果页，等 auto_start 接管
+          App.toast('本任务完成，队列还剩 ' + event.queue_size + ' 个任务待执行', 3000);
+          loadQueue();
+        } else {
+          App.toast('生成完成！共 ' + event.files.length + ' 个文件', 3000);
+          setTimeout(function () {
+            document.querySelector('[data-tab="results"]').click();
+          }, 500);
+        }
         break;
 
       case 'cancelled':
-        App.toast('任务已停止，成品与中间文件已清理');
+        App.toast(event.queue_size > 0
+          ? '任务已停止，继续执行队列中剩余 ' + event.queue_size + ' 个任务'
+          : '任务已停止，成品与中间文件已清理');
         App.loadTaskList();
         App.loadAudioList();
+        loadQueue();
         break;
 
       case 'error':
         App.toast('生成失败: ' + event.message, 4000);
         App.loadTaskList();
+        if (event.queue_size >= 0) loadQueue();
         break;
 
       case 'segment_error':

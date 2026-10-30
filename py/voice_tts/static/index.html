@@ -204,6 +204,9 @@
             <label>输出根目录（将在此下创建标题子目录）</label>
             <input type="text" id="mergeOutputDir" placeholder="D:\FILES\music\AI音频\MP3">
           </div>
+          <div class="form-group" style="align-self:flex-end">
+            <button class="btn" onclick="Merge.openRootDir()">📂 打开根目录</button>
+          </div>
         </div>
         <div id="mergePreview" class="merge-preview" style="display:none"></div>
       </div>
@@ -272,6 +275,13 @@
           <span id="mergeProgressText">0/0</span>
           <span id="mergeProgressPercent">0%</span>
         </div>
+      </div>
+
+      <div id="mergeResultBar" class="merge-result-bar" style="display:none">
+        <span class="mrb-label">✅ 输出目录：</span>
+        <span id="mergeResultDir" class="mrb-path"></span>
+        <span id="mergeResultCount" class="mrb-count"></span>
+        <button class="btn btn-sm" onclick="Merge.openResultDir()">📂 打开目录</button>
       </div>
 
       <div id="mergeLogSection" class="panel" style="display:none">

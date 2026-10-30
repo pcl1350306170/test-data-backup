@@ -21,6 +21,7 @@ from typing import Optional
 
 from . import tts_engine
 from .config import load as load_config
+from .task_engine import resolve_output_path
 
 _NO_WINDOW = subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
 _TARGET_SAMPLE_RATE = 44100
@@ -241,6 +242,8 @@ class MergeEngine:
         self.error = ""
         self.source_name = ""
         self.started_at = ""
+        self.out_dir = ""          # 本次合并的实际输出目录（根目录/标题）
+        self.title = ""
 
         self._stop_event = threading.Event()
         self._thread: Optional[threading.Thread] = None
@@ -277,8 +280,8 @@ class MergeEngine:
     def preview(self, names: list, target_minutes: int) -> dict:
         cfg = load_config()
         out_dir = cfg.get("output_dir", "")
-        paths = [os.path.join(out_dir, os.path.basename(n)) for n in names or []]
-        paths = [p for p in paths if os.path.isfile(p)]
+        paths = [resolve_output_path(out_dir, n) for n in names or []]
+        paths = [p for p in paths if p and os.path.isfile(p)]
         batches, total_ms, batches_ms = group_files(paths, target_minutes)
         groups = [{
             "files": [os.path.basename(p) for p in b],
@@ -308,8 +311,8 @@ class MergeEngine:
         tts_out_dir = cfg.get("output_dir", "")
         paths = []
         for n in names or []:
-            p = os.path.join(tts_out_dir, os.path.basename(n))
-            if os.path.isfile(p):
+            p = resolve_output_path(tts_out_dir, n)
+            if p and os.path.isfile(p):
                 paths.append(p)
         if not paths:
             return False, "没有可合并的音频文件", False
@@ -347,6 +350,8 @@ class MergeEngine:
         self.logs = []
         self.files = []
         self.error = ""
+        self.out_dir = final_out_dir
+        self.title = safe_title
         self.source_name = tts_engine.safe_name(source_name) or "合并音频"
         self.started_at = time.strftime("%Y-%m-%d %H:%M:%S")
         self._stop_event.clear()
@@ -374,6 +379,19 @@ class MergeEngine:
             "error": self.error,
             "source_name": self.source_name,
             "started_at": self.started_at,
+            "out_dir": self.out_dir,
+        }
+
+    def get_output_dir(self) -> dict:
+        """返回合并输出的实际目录信息（供前端展示/一键打开）。"""
+        cfg = load_config()
+        root = (cfg.get("merge_output_dir") or "").strip()
+        return {
+            "out_dir": self.out_dir,
+            "root_dir": root,
+            "exists": bool(self.out_dir) and os.path.isdir(self.out_dir),
+            "files": list(self.files),
+            "status": self.status,
         }
 
     # ── 工作线程 ──────────────────────────────────────
@@ -397,8 +415,9 @@ class MergeEngine:
             start_num = str(params.get("start_num") or "1").strip()
             total = self.total
 
-            self._emit({"type": "started", "total": total})
+            self._emit({"type": "started", "total": total, "out_dir": out_dir})
             self._log("开始合并：%d 组，格式=%s，来源=%s" % (total, ext.upper(), self.source_name))
+            self._log("输出目录：%s" % out_dir)
 
             for i, batch in enumerate(batches):
                 if self._stop_event.is_set():
@@ -459,7 +478,9 @@ class MergeEngine:
             else:
                 self.status = "done"
                 self._log("合并完成，共输出 %d 个文件" % len(self.files))
-                self._emit({"type": "complete", "files": self.files, "total": total})
+                self._log("输出目录：%s" % out_dir)
+                self._emit({"type": "complete", "files": self.files, "total": total,
+                            "out_dir": out_dir})
 
         except Exception as e:
             self.status = "error"

@@ -329,7 +329,7 @@ async def start_service(sid: str, force: bool = False):
     os.makedirs(LOGS_DIR, exist_ok=True)
     _rotate_logs(sid)
 
-    env = dict(os.environ, PYTHONIOENCODING="utf-8")
+    env = dict(os.environ, PYTHONIOENCODING="utf-8", HUB_MANAGED="1")
     cmd = svc["cmd"]
     resolved = [cmd[0]] if os.path.isabs(cmd[0]) else [_which_or_fail(cmd[0])]
     cmd = resolved + cmd[1:]

@@ -478,5 +478,8 @@ def open_browser(port):
 if __name__ == "__main__":
     import uvicorn
     PORT = 8642
-    open_browser(PORT)
+    
+    # 仅在非 Hub 托管模式下自动打开浏览器（避免远程启动时弹本地浏览器）
+    if not os.environ.get("HUB_MANAGED"):
+        open_browser(PORT)
     uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="info")
