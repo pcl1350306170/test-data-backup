@@ -10,6 +10,7 @@
 import asyncio
 import math
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -185,6 +186,29 @@ def _sanitize_filename(name: str) -> str:
     return "".join(c for c in name if c not in invalid).strip()
 
 
+_SEG_TAIL_RE = re.compile(r"^(.*)-(\d{1,9})$")
+
+
+def segment_order_key(path: str):
+    """成品文件的拼接排序键：先按来源基名分组，组内按段号数值升序。
+
+    成品名格式固定为 `{基名}-{段号:03d}.{ext}`（如 马老师_20261027_151502-018.wav）。
+    前端/接口的列表是按相对路径倒序排的（最新的在最前），直接拿勾选顺序去合并会变成
+    段号从大到小，因此这里统一还原成段号升序；同一批文件基名相同，分组不影响顺序。
+    无段号后缀的文件归到同基名组的最后（不会插到 001 前面）。
+    """
+    stem = os.path.splitext(os.path.basename(path))[0]
+    m = _SEG_TAIL_RE.match(stem)
+    if m:
+        return (m.group(1), 0, "", int(m.group(2)))
+    return (stem, 1, stem, 0)
+
+
+def order_paths_for_merge(paths: list) -> list:
+    """按拼接顺序重排（稳定排序，同键保持原有相对顺序）。"""
+    return sorted(paths, key=segment_order_key)
+
+
 def build_metadata(meta: dict, part: int, total: int, start_num: str = "1") -> dict:
     """单组元数据：标题+序号，空值过滤。
     start_num: 起始序号字符串，如 "1" 或 "001"（前导零决定补零宽度）
@@ -282,6 +306,8 @@ class MergeEngine:
         out_dir = cfg.get("output_dir", "")
         paths = [resolve_output_path(out_dir, n) for n in names or []]
         paths = [p for p in paths if p and os.path.isfile(p)]
+        # 合并顺序固定按段号升序，不依赖前端勾选顺序
+        paths = order_paths_for_merge(paths)
         batches, total_ms, batches_ms = group_files(paths, target_minutes)
         groups = [{
             "files": [os.path.basename(p) for p in b],
@@ -316,6 +342,8 @@ class MergeEngine:
                 paths.append(p)
         if not paths:
             return False, "没有可合并的音频文件", False
+        # 拼接顺序：按段号升序（前端列表是倒序渲染的，直接合并会变成从最后一段开始）
+        paths = order_paths_for_merge(paths)
 
         target_minutes = int(params.get("target_duration") or 20)
         batches, _, _ = group_files(paths, target_minutes)
@@ -428,7 +456,9 @@ class MergeEngine:
                     return
 
                 part = i + 1
-                self._log("[%d/%d] 拼接 %d 个文件..." % (part, total, len(batch)))
+                self._log("[%d/%d] 拼接 %d 个文件：%s → %s" % (
+                    part, total, len(batch),
+                    os.path.basename(batch[0]), os.path.basename(batch[-1])))
                 self._emit({"type": "progress", "current": part, "total": total,
                             "percent": round((part - 1) / total * 100, 1)})
                 try:

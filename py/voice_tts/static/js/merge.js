@@ -123,6 +123,27 @@ var Merge = (function () {
   function checkedNames() {
     return checkedBoxes().map(function (b) { return b.value; });
   }
+
+  /**
+   * 本次合并的文件顺序。
+   * 列表是按相对路径倒序渲染的（最新在最前），直接按勾选顺序合并会把成品倒着拼；
+   * 选了任务时以任务记录 output_files 的段号顺序为准，手动挑选才用列表顺序。
+   */
+  function mergeOrderNames() {
+    if (selectedTaskNames.length) {
+      var picked = {};
+      checkedNames().forEach(function (n) { picked[n] = 1; });
+      var ordered = selectedTaskNames.filter(function (n) { return picked[n]; });
+      // 任务记录之外多勾的文件接在后面，不丢东西
+      if (ordered.length !== Object.keys(picked).length) {
+        checkedNames().forEach(function (n) {
+          if (selectedTaskNames.indexOf(n) < 0) ordered.push(n);
+        });
+      }
+      return ordered;
+    }
+    return checkedNames();
+  }
   function selectAll(on) {
     $('mergeFileList').querySelectorAll('input[type=checkbox]').forEach(function (b) {
       b.checked = !!on;
@@ -240,7 +261,7 @@ var Merge = (function () {
     var cover = ($('mergeCoverPath').value || '').trim();
     var bgimg = ($('mergeBgImagePath').value || '').trim();
     return {
-      files: checkedNames(),
+      files: mergeOrderNames(),
       test: !!test,
       target_duration: parseInt($('mergeDuration').value) || 20,
       format: $('mergeFormat').value,
@@ -380,7 +401,7 @@ var Merge = (function () {
 
   // ── 预览分组 ──────────────────────────────────────
   function preview() {
-    var files = checkedNames();
+    var files = mergeOrderNames();
     if (!files.length) { App.toast('请先勾选要合并的文件'); return; }
     var miss = missingTaskFiles();
     if (miss.length) {
