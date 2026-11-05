@@ -1,27 +1,33 @@
 # batch_zipper_enhanced.py
+# 批量打包压缩工具：单人单任务使用，支持暂停/断点续压、按数量或大小分批、每个子目录独立打包
 
-import os
-import subprocess
 import json
-import platform
-from pathlib import Path
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox, scrolledtext
 import logging
-from datetime import datetime
+import os
+import platform
+import queue
+import re
+import shutil
+import subprocess
 import threading
 import time
+from datetime import datetime
+from pathlib import Path
+from types import SimpleNamespace
+import tkinter as tk
+from tkinter import ttk, filedialog, messagebox, scrolledtext
 
 # ================== 配置与常量 ==================
 SCRIPT_DIR = Path(os.path.abspath(os.path.dirname(__file__)))
 SCRIPT_NAME = "batch_zipper"
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / f"config_{SCRIPT_NAME}.json"
-STATE_FILE = CONFIG_DIR / f"state_{SCRIPT_NAME}.json"  # 断点续压状态文件
-CONFIG_DIR.mkdir(exist_ok=True, parents=True)
 LOG_DIR = CONFIG_DIR / "logs"
-LOG_DIR.mkdir(exist_ok=True, parents=True)
 PROCESS_LOG_FILE = LOG_DIR / f"log_{SCRIPT_NAME}.log"
+TMP_FILELIST_PATTERN = "tmp_filelist_*.txt"  # 传给 7z 的临时文件清单
+
+CONFIG_DIR.mkdir(exist_ok=True, parents=True)
+LOG_DIR.mkdir(exist_ok=True, parents=True)
 
 logging.basicConfig(
     filename=PROCESS_LOG_FILE,
@@ -40,17 +46,30 @@ DEFAULT_CONFIG = {
     "archive_prefix": "HH_Collection",
     "seven_zip_path": "7z",
     "enable_size_limit": True,
-    "max_archive_size_mb": 3072  # 默认3GB
+    "max_archive_size_mb": 3072,  # 默认3GB
+    "one_archive_per_subdir": False,  # 每个一级子目录打包为独立压缩包
+    "encrypt_header": False  # 加密文件名（仅 7z 格式支持）
 }
+
+MAX_LOG_LINES = 3000  # 界面日志保留行数，避免长时间运行内存膨胀
+UI_POLL_MS = 120  # 主线程拉取 UI 队列的间隔
+
+# 本脚本以 .pyw（pythonw.exe）运行，本身没有控制台；一旦派生 7z.exe 这类控制台程序，
+# Windows 会为其新建一个黑窗口（即使输重定向到 DEVNULL 也照样弹），因此禁止分配控制台
+NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0) if platform.system() == "Windows" else 0
+
+RESULT_DONE = "done"
+RESULT_ABORTED = "aborted"
+
 
 class BatchZipperApp:
     def __init__(self, root):
         self.root = root
         self.root.title("批量打包压缩工具（支持暂停 & 断点续压）")
-        self.root.geometry("950x700")
-        self.root.minsize(850, 650)
+        self.root.geometry("950x720")
+        self.root.minsize(850, 660)
 
-        # 控制变量
+        # 控制变量（名称与配置文件 key 一一对应）
         self.source_dir = tk.StringVar()
         self.output_dir = tk.StringVar()
         self.archive_format = tk.StringVar(value="zip")
@@ -61,25 +80,62 @@ class BatchZipperApp:
         self.seven_zip_path = tk.StringVar(value="7z")
         self.enable_size_limit = tk.BooleanVar(value=True)
         self.max_archive_size_mb = tk.IntVar(value=3072)
+        self.one_archive_per_subdir = tk.BooleanVar(value=False)
+        self.encrypt_header = tk.BooleanVar(value=False)
 
-        # 运行控制
+        # 运行控制：同一时刻只允许一个打包任务
         self.is_running = False
-        self.pause_event = threading.Event()  # 用于暂停/继续
-        self.pause_event.set()  # 初始为运行状态
-        self.current_batch = 0
-        self.total_batches = 0
+        self.pause_event = threading.Event()
+        self.pause_event.set()  # 初始为运行（未暂停）状态
 
+        # 工作线程只写队列，所有控件操作都在主线程完成
+        self._ui_queue = queue.Queue()
+
+        self._cleanup_stale_tmp_files()
         self._create_widgets()
         self._load_config()
+        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
+        self.root.after(UI_POLL_MS, self._poll_ui_queue)
 
-    def _check_7z(self):
+    # ==================== 主线程 UI ====================
+
+    def _poll_ui_queue(self):
+        """主线程定时消费队列，保证控件操作只发生在主线程"""
         try:
-            subprocess.run([self.seven_zip_path.get(), "h"],
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=5)
-            self._log("✅ 7-Zip 可用")
-        except Exception as e:
-            self._log(f"⚠️ 7-Zip 检测失败: {e}", logging.WARNING)
-            messagebox.showwarning("警告", "未检测到 7-Zip，请检查路径设置")
+            while True:
+                msg = self._ui_queue.get_nowait()
+                kind = msg[0]
+                if kind == "log":
+                    self._append_log(msg[1])
+                elif kind == "progress":
+                    self.progress_label.config(text=msg[1])
+                elif kind == "toast":
+                    self._show_toast(*msg[1])
+                elif kind == "ui_state":
+                    self._update_ui_state()
+        except queue.Empty:
+            pass
+        self.root.after(UI_POLL_MS, self._poll_ui_queue)
+
+    def _append_log(self, line):
+        self.log_text.config(state=tk.NORMAL)
+        self.log_text.insert(tk.END, line + "\n")
+        last = int(self.log_text.index("end-1c").split(".")[0])
+        if last > MAX_LOG_LINES:
+            self.log_text.delete("1.0", f"{last - MAX_LOG_LINES}.0")
+        self.log_text.see(tk.END)
+        self.log_text.config(state=tk.DISABLED)
+
+    def _log(self, msg, level=logging.INFO):
+        """任意线程可调用的日志：落盘 + 投递到界面队列"""
+        logging.log(level, msg)
+        self._ui_queue.put(("log", f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {msg}"))
+
+    def _set_progress(self, text):
+        self._ui_queue.put(("progress", text))
+
+    def _toast(self, title, message, level="info"):
+        self._ui_queue.put(("toast", (title, message, level)))
 
     def _show_toast(self, title, message, level="info", duration_ms=60000):
         """屏幕右下角弹出消息提醒，duration_ms 后自动消失（默认1分钟）"""
@@ -114,33 +170,50 @@ class BatchZipperApp:
         w, h = toast.winfo_width(), toast.winfo_height()
         sx = toast.winfo_screenwidth()
         sy = toast.winfo_screenheight()
-        x = sx - w - 20
-        y = sy - h - 60
-        toast.geometry(f"+{x}+{y}")
+        toast.geometry(f"+{sx - w - 20}+{sy - h - 60}")
         toast.deiconify()
 
         toast.after(duration_ms, toast.destroy)
 
-    def _select_source_dir(self):
-        d = filedialog.askdirectory(title="选择源文件夹")
-        if d: self.source_dir.set(d)
+    def _update_ui_state(self):
+        """任务运行中锁定全部参数，避免中途改参数造成歧义"""
+        running_state = tk.DISABLED if self.is_running else tk.NORMAL
+        for w in [self.source_btn, self.output_btn, self.browse_7z_btn, self.save_btn, self.start_btn]:
+            w.config(state=running_state)
+        for w in self._param_widgets:
+            w.config(state=running_state)
+        self.pause_btn.config(state=tk.NORMAL if self.is_running else tk.DISABLED)
+        if not self.is_running:
+            self.pause_btn.config(text="暂停")
+            self._sync_widget_states()  # 再按当前模式恢复各控件可用性
 
-    def _select_output_dir(self):
-        d = filedialog.askdirectory(title="选择输出目录")
-        if d: self.output_dir.set(d)
+    def _sync_widget_states(self):
+        """按“子目录独立打包 / 限制大小 / 按文件数”三种模式联动控件可用性"""
+        subdir_mode = self.one_archive_per_subdir.get()
+        if self.is_running:
+            return
 
-    def _toggle_size_limit(self):
-        """切换大小限制启用状态，联动控制文件数输入框"""
-        if self.enable_size_limit.get():
+        if subdir_mode:
+            # 此模式下每包文件数、大小限制、压缩包前缀都不再生效
             self.files_spinbox.config(state=tk.DISABLED)
-            self.size_limit_spinbox.config(state=tk.NORMAL)
-        else:
-            self.files_spinbox.config(state=tk.NORMAL)
             self.size_limit_spinbox.config(state=tk.DISABLED)
+            self.size_limit_check.config(state=tk.DISABLED)
+            self.prefix_entry.config(state=tk.DISABLED)
+        else:
+            self.size_limit_check.config(state=tk.NORMAL)
+            self.prefix_entry.config(state=tk.NORMAL)
+            if self.enable_size_limit.get():
+                self.files_spinbox.config(state=tk.DISABLED)
+                self.size_limit_spinbox.config(state=tk.NORMAL)
+            else:
+                self.files_spinbox.config(state=tk.NORMAL)
+                self.size_limit_spinbox.config(state=tk.DISABLED)
 
-    def _select_7z_path(self):
-        f = filedialog.askopenfilename(title="选择 7z.exe", filetypes=[("7z.exe", "7z.exe")])
-        if f: self.seven_zip_path.set(f)
+        # 文件名加密只有 7z 格式支持（zip 只能加密内容），且必须启用密码
+        if self.archive_format.get() == "7z" and self.enable_password.get():
+            self.header_check.config(state=tk.NORMAL)
+        else:
+            self.header_check.config(state=tk.DISABLED)
 
     def _toggle_pause(self):
         if self.pause_event.is_set():
@@ -152,222 +225,388 @@ class BatchZipperApp:
             self.pause_btn.config(text="暂停")
             self._log("▶ 继续打包...")
 
-    def _run_packaging(self):
-        if not self.source_dir.get() or not Path(self.source_dir.get()).exists():
-            messagebox.showerror("错误", "源目录无效")
+    def _on_close(self):
+        if self.is_running and not messagebox.askokcancel("退出", "打包任务正在进行，确定要退出吗？"):
             return
+        self.is_running = False
+        self.pause_event.set()  # 唤醒可能处于暂停等待中的工作线程
+        self.root.destroy()
+
+    # ==================== 目录选择 ====================
+
+    def _select_source_dir(self):
+        d = filedialog.askdirectory(title="选择源文件夹")
+        if d: self.source_dir.set(d)
+
+    def _select_output_dir(self):
+        d = filedialog.askdirectory(title="选择输出目录")
+        if d: self.output_dir.set(d)
+
+    def _select_7z_path(self):
+        f = filedialog.askopenfilename(title="选择 7z.exe", filetypes=[("7z.exe", "7z.exe")])
+        if f: self.seven_zip_path.set(f)
+
+    # ==================== 任务启动校验 ====================
+
+    def _resolve_7z(self):
+        """返回可用的 7z 可执行文件路径，找不到返回 None"""
+        configured = self.seven_zip_path.get().strip()
+        if not configured:
+            return None
+        candidate = Path(configured)
+        if candidate.is_file():
+            return str(candidate)
+        return shutil.which(configured)
+
+    def _get_positive_int(self, var, label):
+        """读取 Spinbox 数值，非法输入返回 None"""
+        try:
+            value = var.get()
+        except tk.TclError:
+            messagebox.showerror("错误", f"“{label}”必须是数字")
+            return None
+        if value <= 0:
+            messagebox.showerror("错误", f"“{label}”必须大于 0")
+            return None
+        return value
+
+    def _validate_inputs(self):
+        """主线程完成全部校验并快照配置，返回 (源目录, 输出目录, 配置快照)"""
+        source = Path(self.source_dir.get())
+        if not self.source_dir.get() or not source.is_dir():
+            messagebox.showerror("错误", "源目录无效")
+            return None
+
         if not self.output_dir.get():
             messagebox.showerror("错误", "请设置输出目录")
-            return
+            return None
+        output = Path(self.output_dir.get())
+        try:
+            src_res, out_res = source.resolve(), output.resolve()
+        except OSError as e:
+            messagebox.showerror("错误", f"路径解析失败: {e}")
+            return None
+        if out_res == src_res or src_res in out_res.parents:
+            # 输出目录在源目录内部会把压缩包再次打包进去
+            messagebox.showerror("错误", "输出目录不能是源目录本身或其子目录")
+            return None
+
         if self.enable_password.get() and not self.password.get():
             messagebox.showerror("错误", "密码不能为空")
+            return None
+
+        seven_zip = self._resolve_7z()
+        if seven_zip is None:
+            messagebox.showerror("错误", f"未找到 7-Zip：{self.seven_zip_path.get()}\n请检查“7z路径”设置")
+            return None
+
+        subdir_mode = self.one_archive_per_subdir.get()
+        size_limited = self.enable_size_limit.get()
+        files_per_archive = max_mb = None
+        if not subdir_mode:
+            if not size_limited:
+                files_per_archive = self._get_positive_int(self.files_per_archive, "每包文件数")
+                if files_per_archive is None:
+                    return None
+            else:
+                max_mb = self._get_positive_int(self.max_archive_size_mb, "限制压缩包大小")
+                if max_mb is None:
+                    return None
+
+        cfg = SimpleNamespace(
+            ext=self.archive_format.get(),
+            subdir_mode=subdir_mode,
+            size_limited=size_limited,
+            files_per_archive=files_per_archive,
+            max_archive_size_mb=max_mb,
+            prefix=self.archive_prefix.get().strip() or "batch",
+            seven_zip=seven_zip,
+            enable_password=self.enable_password.get(),
+            password=self.password.get(),
+            encrypt_header=self.encrypt_header.get()
+        )
+        return source, output, cfg
+
+    def _run_packaging(self):
+        if self.is_running:
+            messagebox.showinfo("提示", "已有打包任务在进行")
+            return
+        checked = self._validate_inputs()
+        if not checked:
             return
 
         self.is_running = True
+        self.pause_event.set()
         self._update_ui_state()
-        threading.Thread(target=self._do_packaging, daemon=True).start()
+        threading.Thread(target=self._do_packaging, args=checked, daemon=True).start()
 
-    def _do_packaging(self):
+    # ==================== 打包主流程（工作线程，只读 cfg 快照，不触碰 tk 对象） ====================
+
+    def _do_packaging(self, source, output, cfg):
         try:
-            source = Path(self.source_dir.get())
-            output = Path(self.output_dir.get())
             output.mkdir(parents=True, exist_ok=True)
 
-            # 获取所有文件（保留结构）
-            all_files = []
-            for fp in source.rglob("*"):
-                if fp.is_file():
-                    rel = fp.relative_to(source)
-                    file_size = fp.stat().st_size
-                    all_files.append((fp, rel, file_size))
-            if not all_files:
-                self._log("❌ 源目录无文件", logging.WARNING)
-                return
+            if cfg.enable_password and cfg.ext == "zip" and cfg.encrypt_header:
+                self._log("ℹ️ zip 格式不支持加密文件名，仅加密文件内容（需加密文件名请选 7z）", logging.WARNING)
 
-            prefix = self.archive_prefix.get().strip() or "batch"
-            ext = self.archive_format.get()
-
-            if self.enable_size_limit.get():
-                self._do_packaging_by_size(source, output, all_files, prefix, ext)
+            if cfg.subdir_mode:
+                status, success, skipped, empty, failed = self._pack_by_subdir(source, output, cfg)
             else:
-                self._do_packaging_by_count(source, output, all_files, prefix, ext)
+                all_files = self._scan_files(source)
+                if all_files is None:
+                    return
+                if not all_files:
+                    self._log("❌ 源目录无文件", logging.WARNING)
+                    return
+                status, success, skipped, empty, failed = self._pack_by_batches(source, output, all_files, cfg)
 
-            self._log("🎉 打包全部完成！")
-            self.root.after(0, lambda: self._show_toast("打包完成", "所有文件已成功打包！", "success"))
+            detail = f"成功 {success}，跳过 {skipped}，空目录 {empty}，失败 {failed}"
+            if status == RESULT_ABORTED:
+                self._log("⏹ 任务已中止，已生成的压缩包保留，可再次“开始打包”续压", logging.WARNING)
+                self._toast("任务已中止", detail, "info")
+            else:
+                self._log("🎉 打包全部完成！")
+                self._toast("打包完成", detail, "error" if failed else "success")
 
         except Exception as e:
             self._log(f"💥 打包异常: {e}", logging.ERROR)
-            self.root.after(0, lambda: self._show_toast("打包失败", str(e), "error"))
+            self._toast("打包失败", str(e), "error")
         finally:
             self.is_running = False
-            self.root.after(0, self._update_ui_state)
+            self._set_progress("")
+            self._ui_queue.put(("ui_state",))
 
-    def _do_packaging_by_count(self, source, output, all_files, prefix, ext):
-        """按文件数量分批打包（原有逻辑）"""
-        batch_size = self.files_per_archive.get()
-        total = len(all_files)
-        total_batches = (total + batch_size - 1) // batch_size
-        self.total_batches = total_batches
+    def _scan_files(self, source):
+        """递归收集源目录文件，返回 (绝对路径, 相对路径, 大小)；排序保证分批结果可复现"""
+        all_files = []
+        try:
+            for fp in source.rglob("*"):
+                try:
+                    if fp.is_file():
+                        all_files.append((fp, fp.relative_to(source), fp.stat().st_size))
+                except OSError as e:
+                    self._log(f"⚠️ 跳过无法读取的文件: {fp} - {e}", logging.WARNING)
+        except OSError as e:
+            self._log(f"❌ 扫描源目录失败: {e}", logging.ERROR)
+            return None
+        all_files.sort(key=lambda item: str(item[1]).casefold())
+        return all_files
 
-        # === 断点续压：检查已有压缩包 ===
-        completed_batches = set()
-        for i in range(1, total_batches + 1):
-            name = f"{prefix}_batch_{i:03d}.{ext}"
-            if (output / name).exists():
-                completed_batches.add(i)
-        start_batch = min(completed_batches) if completed_batches else 1
-        if completed_batches:
-            start_batch = max(completed_batches) + 1
-            if start_batch > total_batches:
-                self._log("✅ 所有批次已完成，无需继续")
-                return
-            self._log(f"🔁 检测到 {len(completed_batches)} 个已完成压缩包，从第 {start_batch} 批开始")
-
-        # === 主循环 ===
-        for i in range(start_batch, total_batches + 1):
-            self.current_batch = i
-            self.root.after(0, lambda i=i: self.progress_label.config(text=f"正在处理第 {i}/{total_batches} 批..."))
-
-            while not self.pause_event.is_set():
-                time.sleep(0.5)
-                if not self.is_running:
-                    return
-
-            start_idx = (i - 1) * batch_size
-            end_idx = min(start_idx + batch_size, total)
-            batch_files = all_files[start_idx:end_idx]
-
-            archive_name = f"{prefix}_batch_{i:03d}.{ext}"
-            archive_path = output / archive_name
-
-            self._log(f"📦 创建: {archive_name} ({len(batch_files)} 文件)")
-
-            list_file = CONFIG_DIR / f"tmp_filelist_{i}.txt"
-            try:
-                with open(list_file, 'w', encoding='utf-8') as f:
-                    for _, rel, _ in batch_files:
-                        f.write(str(rel).replace('/', '\\') + '\n')
-
-                cmd = [
-                    self.seven_zip_path.get(),
-                    "a", "-t" + ext, "-mx=1", "-mmt=on",
-                    f"-w{output}",
-                ]
-                if self.enable_password.get():
-                    cmd.append(f"-p{self.password.get()}")
-                cmd += [str(archive_path), f"@{list_file}"]
-
-                proc = subprocess.Popen(
-                    cmd,
-                    cwd=str(source),
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    encoding='utf-8'
-                )
-
-                while proc.poll() is None:
-                    time.sleep(0.1)
-                if proc.returncode != 0:
-                    self._log(f"❌ 压缩失败: {archive_name}", logging.ERROR)
-                else:
-                    self._log(f"✅ 成功: {archive_name}")
-
-            finally:
-                if list_file.exists():
-                    list_file.unlink(missing_ok=True)
-
-    def _do_packaging_by_size(self, source, output, all_files, prefix, ext):
-        """按压缩包大小限制分批打包"""
-        max_bytes = self.max_archive_size_mb.get() * 1024 * 1024
-        total_files = len(all_files)
-
-        # 按大小切分批次
-        batches = []  # list of (start_idx, end_idx)
-        current_size = 0
-        batch_start = 0
-        for idx, (fp, rel, fsize) in enumerate(all_files):
-            if current_size + fsize > max_bytes and idx > batch_start:
-                batches.append((batch_start, idx))
-                current_size = fsize
-                batch_start = idx
-            else:
+    def _make_batches(self, all_files, cfg):
+        """按快照配置把文件切分为批次，返回 (批次数组, 规则说明)"""
+        if cfg.size_limited:
+            max_bytes = cfg.max_archive_size_mb * 1024 * 1024
+            batches, current, current_size = [], [], 0
+            for item in all_files:
+                fsize = item[2]
+                if current and current_size + fsize > max_bytes:
+                    batches.append(current)
+                    current, current_size = [], 0
+                current.append(item)
                 current_size += fsize
-        # 最后一批
-        if batch_start < total_files:
-            batches.append((batch_start, total_files))
+            if current:
+                batches.append(current)
+            return batches, f"按大小限制分为 {len(batches)} 批（每批上限 {cfg.max_archive_size_mb}MB）"
 
-        total_batches = len(batches)
-        self.total_batches = total_batches
-        self._log(f"📊 按大小限制分为 {total_batches} 批（每批上限 {self.max_archive_size_mb.get()}MB）")
+        batches = [all_files[i:i + cfg.files_per_archive] for i in range(0, len(all_files), cfg.files_per_archive)]
+        return batches, f"按每包 {cfg.files_per_archive} 个文件分为 {len(batches)} 批"
 
-        # === 断点续压：检查已有压缩包 ===
-        completed_batches = set()
-        for i in range(1, total_batches + 1):
-            name = f"{prefix}_batch_{i:03d}.{ext}"
-            if (output / name).exists():
-                completed_batches.add(i)
-        start_batch = min(completed_batches) if completed_batches else 1
-        if completed_batches:
-            start_batch = max(completed_batches) + 1
-            if start_batch > total_batches:
-                self._log("✅ 所有批次已完成，无需继续")
-                return
-            self._log(f"🔁 检测到 {len(completed_batches)} 个已完成压缩包，从第 {start_batch} 批开始")
+    def _pack_by_batches(self, source, output, all_files, cfg):
+        """按数量或大小分批打包；已存在的批次跳过（续压）"""
+        batches, rule = self._make_batches(all_files, cfg)
+        total = len(batches)
+        self._log(f"📊 共 {len(all_files)} 个文件，{rule}")
 
-        # === 主循环 ===
-        for i in range(start_batch, total_batches + 1):
-            self.current_batch = i
-            self.root.after(0, lambda i=i: self.progress_label.config(text=f"正在处理第 {i}/{total_batches} 批..."))
+        def items():
+            for i, batch in enumerate(batches, 1):
+                def prepare(batch=batch):
+                    return [rel for _, rel, _ in batch], sum(f for _, _, f in batch)
+                yield i, output / f"{cfg.prefix}_batch_{i:03d}.{cfg.ext}", f"第 {i}/{total} 批", prepare
 
-            while not self.pause_event.is_set():
-                time.sleep(0.5)
+        return self._pack_loop(source, output, cfg, total, items())
+
+    def _pack_by_subdir(self, source, output, cfg):
+        """每个一级子目录打包为一个独立压缩包（忽略文件数量/压缩包大小限制）"""
+        try:
+            entries = list(source.iterdir())
+        except OSError as e:
+            self._log(f"❌ 读取源目录失败: {e}", logging.ERROR)
+            return RESULT_DONE, 0, 0, 0, 0
+        subdirs = sorted((p for p in entries if p.is_dir()), key=lambda p: p.name.casefold())
+        if not subdirs:
+            self._log("❌ 源目录下没有子目录（此模式仅处理一级子目录）", logging.WARNING)
+            return RESULT_DONE, 0, 0, 0, 0
+
+        loose = sum(1 for p in entries if p.is_file())
+        if loose:
+            self._log(f"⚠️ 源目录根下有 {loose} 个散文件不会被打包（此模式仅处理一级子目录）", logging.WARNING)
+
+        # 平铺输出：子目录名即包名，重名时追加序号避免互相覆盖
+        used_names, plans = set(), []
+        for sd in subdirs:
+            stem = self._safe_archive_stem(sd.name)
+            archive_name = f"{stem}.{cfg.ext}"
+            seq = 1
+            while archive_name.casefold() in used_names:
+                archive_name = f"{stem}_{seq}.{cfg.ext}"
+                seq += 1
+            used_names.add(archive_name.casefold())
+            plans.append((sd, output / archive_name))
+
+        total = len(plans)
+        self._log(f"📊 子目录独立打包模式：共 {total} 个一级子目录（已忽略数量/大小限制）")
+
+        def items():
+            # 只有确认需要打包时才扫描子目录，避免为已存在的压缩包白扫一遍
+            for idx, (sd, archive_path) in enumerate(plans, 1):
+                def prepare(sd=sd, idx=idx, total=total):
+                    files, size_bytes = self._collect_subdir_files(sd, idx, total)
+                    return [fp.relative_to(source) for fp in files], size_bytes
+                yield idx, archive_path, f"第 {idx}/{total} 个子目录: {sd.name}", prepare
+
+        return self._pack_loop(source, output, cfg, total, items())
+
+    def _collect_subdir_files(self, sd, idx, total):
+        files, size_bytes = [], 0
+        try:
+            for fp in sd.rglob("*"):
+                try:
+                    if fp.is_file():
+                        files.append(fp)
+                        size_bytes += fp.stat().st_size
+                except OSError:
+                    pass
+        except OSError as e:
+            self._log(f"⚠️ [{idx}/{total}] 扫描子目录异常（已扫描部分继续打包）: {sd.name} - {e}", logging.WARNING)
+        if not files:
+            self._log(f"🈳 [{idx}/{total}] 子目录内没有文件，不生成压缩包: {sd.name}", logging.WARNING)
+        return files, size_bytes
+
+    def _pack_loop(self, source, output, cfg, total, items):
+        """三种模式共用的主循环：续压跳过 -> 暂停检查 -> 生成清单 -> 压缩 -> 计数汇总
+
+        items 逐项产出 (序号, 压缩包路径, 进度描述, 文件清单生成函数)
+        返回 (状态, 成功数, 已存在跳过数, 空目录数, 失败数)
+        """
+        success = skipped = empty = failed = 0
+        for idx, archive_path, desc, prepare in items:
+            archive_name = archive_path.name
+            if archive_path.exists():
+                skipped += 1
+                self._log(f"⏭ [{idx}/{total}] 已存在，跳过: {archive_name}")
+                continue
+
+            if self._wait_if_paused():
+                self._log_summary(success, skipped, empty, failed, total)
+                return RESULT_ABORTED, success, skipped, empty, failed
+
+            rel_paths, size_bytes = prepare()
+            if not rel_paths:
+                empty += 1
+                continue
+
+            self._set_progress(f"正在打包 {desc}")
+            self._log(f"📦 [{idx}/{total}] 创建: {archive_name} "
+                      f"({len(rel_paths)} 文件, 原始大小 {size_bytes / (1024 * 1024):.1f}MB)")
+            ok, err = self._compress(source, output, archive_path, rel_paths, cfg, idx)
+            # 压缩过程中被中止：子进程已 kill、半成品已清理，不计入成功/失败批次
+            if not self.is_running:
+                self._log(f"⏹ [{idx}/{total}] 任务已中断，残包已清理: {archive_name}", logging.WARNING)
+                self._log_summary(success, skipped, empty, failed, total)
+                return RESULT_ABORTED, success, skipped, empty, failed
+            if ok:
+                success += 1
+                self._log(f"✅ [{idx}/{total}] 成功: {archive_name}")
+            else:
+                failed += 1
+                self._log(f"❌ [{idx}/{total}] 压缩失败: {archive_name} - {err}", logging.ERROR)
+
+        self._log_summary(success, skipped, empty, failed, total)
+        return RESULT_DONE, success, skipped, empty, failed
+
+    def _log_summary(self, success, skipped, empty, failed, total):
+        self._log(f"📋 汇总：成功 {success}，已存在跳过 {skipped}，空目录 {empty}，失败 {failed}（计划 {total}）")
+
+    def _wait_if_paused(self):
+        """暂停时阻塞等待；返回 True 表示任务需要中止"""
+        while not self.pause_event.is_set():
+            if not self.is_running:
+                return True
+            time.sleep(0.5)
+        return not self.is_running
+
+    def _compress(self, source, output, archive_path, rel_paths, cfg, tag):
+        """写文件清单并调用 7-Zip 生成一个压缩包，返回 (是否成功, 错误信息)"""
+        if not rel_paths:
+            return False, "没有待打包的文件"
+        list_file = CONFIG_DIR / f"tmp_filelist_{os.getpid()}_{tag}.txt"
+        try:
+            with open(list_file, 'w', encoding='utf-8') as f:
+                for rel in rel_paths:
+                    f.write(str(rel).replace('/', '\\') + '\n')
+
+            cmd = [
+                cfg.seven_zip,
+                "a", "-t" + cfg.ext, "-mx=1", "-mmt=on",
+                f"-w{output}",
+            ]
+            if cfg.enable_password:
+                cmd.append(f"-p{cfg.password}")
+                if cfg.ext == "7z" and cfg.encrypt_header:
+                    cmd.append("-mhe=on")
+            cmd += [str(archive_path), f"@{list_file}"]
+
+            # 输出直接丢弃：使用 PIPE 又不在主线程读取，缓冲区写满会让父子进程互相等待死锁
+            # creationflags：不弹 7z 控制台黑窗
+            proc = subprocess.Popen(
+                cmd,
+                cwd=str(source),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=NO_WINDOW
+            )
+            while proc.poll() is None:
                 if not self.is_running:
-                    return
+                    proc.kill()
+                    self._discard_broken(archive_path)
+                    return False, "任务被中止"
+                time.sleep(0.1)
+            if proc.returncode == 0:
+                return True, ""
+            # 半成品压缩包必须删除，否则下次续压会被误认为已完成
+            self._discard_broken(archive_path)
+            return False, f"7z 返回码 {proc.returncode}"
 
-            start_idx, end_idx = batches[i - 1]
-            batch_files = all_files[start_idx:end_idx]
-            batch_size_mb = sum(fsize for _, _, fsize in batch_files) / (1024 * 1024)
+        except Exception as e:
+            self._discard_broken(archive_path)
+            return False, str(e)
+        finally:
+            list_file.unlink(missing_ok=True)
 
-            archive_name = f"{prefix}_batch_{i:03d}.{ext}"
-            archive_path = output / archive_name
+    @staticmethod
+    def _discard_broken(archive_path):
+        """7z 失败或被中断时可能残留不可用的压缩包，删除以便下次重新打包"""
+        try:
+            if archive_path.exists():
+                archive_path.unlink(missing_ok=True)
+        except OSError:
+            pass
 
-            self._log(f"📦 创建: {archive_name} ({len(batch_files)} 文件, 原始大小 {batch_size_mb:.1f}MB)")
+    @staticmethod
+    def _safe_archive_stem(name):
+        """将子目录名转为合法压缩包名主体（替换非法字符，去首尾空格/圆点）"""
+        stem = re.sub(r'[\\/:*?"<>|]+', '_', name).strip(' .')
+        return stem or "archive"
 
-            list_file = CONFIG_DIR / f"tmp_filelist_{i}.txt"
+    def _cleanup_stale_tmp_files(self):
+        """启动时清理上次异常退出残留的文件清单"""
+        for p in CONFIG_DIR.glob(TMP_FILELIST_PATTERN):
             try:
-                with open(list_file, 'w', encoding='utf-8') as f:
-                    for _, rel, _ in batch_files:
-                        f.write(str(rel).replace('/', '\\') + '\n')
+                p.unlink()
+            except OSError:
+                pass
 
-                cmd = [
-                    self.seven_zip_path.get(),
-                    "a", "-t" + ext, "-mx=1", "-mmt=on",
-                    f"-w{output}",
-                ]
-                if self.enable_password.get():
-                    cmd.append(f"-p{self.password.get()}")
-                cmd += [str(archive_path), f"@{list_file}"]
-
-                proc = subprocess.Popen(
-                    cmd,
-                    cwd=str(source),
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    encoding='utf-8'
-                )
-
-                while proc.poll() is None:
-                    time.sleep(0.1)
-                if proc.returncode != 0:
-                    self._log(f"❌ 压缩失败: {archive_name}", logging.ERROR)
-                else:
-                    self._log(f"✅ 成功: {archive_name}")
-
-            finally:
-                if list_file.exists():
-                    list_file.unlink(missing_ok=True)
+    # ==================== 配置读写 ====================
 
     def _save_config(self):
         cfg = {
@@ -380,7 +619,9 @@ class BatchZipperApp:
             "archive_prefix": self.archive_prefix.get(),
             "seven_zip_path": self.seven_zip_path.get(),
             "enable_size_limit": self.enable_size_limit.get(),
-            "max_archive_size_mb": self.max_archive_size_mb.get()
+            "max_archive_size_mb": self.max_archive_size_mb.get(),
+            "one_archive_per_subdir": self.one_archive_per_subdir.get(),
+            "encrypt_header": self.encrypt_header.get()
         }
         try:
             with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
@@ -398,27 +639,15 @@ class BatchZipperApp:
                 cfg = DEFAULT_CONFIG.copy()
                 self._log("ℹ️ 使用默认配置")
             for k, v in cfg.items():
-                if hasattr(self, k):
-                    getattr(self, k).set(v)
+                attr = getattr(self, k, None)
+                if attr is not None:
+                    attr.set(v)
             self._log("✅ 配置加载完成")
         except Exception as e:
             self._log(f"⚠️ 加载配置失败: {e}", logging.WARNING)
+        self._sync_widget_states()
 
-    def _log(self, msg, level=logging.INFO):
-        logging.log(level, msg)
-        self.log_text.config(state=tk.NORMAL)
-        self.log_text.insert(tk.END, f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {msg}\n")
-        self.log_text.see(tk.END)
-        self.log_text.config(state=tk.DISABLED)
-        self.root.update_idletasks()
-
-    def _update_ui_state(self):
-        state = tk.DISABLED if self.is_running else tk.NORMAL
-        for w in [self.source_btn, self.output_btn, self.browse_7z_btn, self.save_btn, self.start_btn]:
-            w.config(state=state)
-        self.pause_btn.config(state=tk.NORMAL if self.is_running else tk.DISABLED)
-        if not self.is_running:
-            self.pause_btn.config(text="暂停")
+    # ==================== 界面构建 ====================
 
     def _create_widgets(self):
         main = ttk.Frame(self.root, padding=10)
@@ -427,14 +656,16 @@ class BatchZipperApp:
         # 源目录
         f1 = ttk.LabelFrame(main, text="源文件夹", padding=5)
         f1.pack(fill=tk.X, pady=5)
-        ttk.Entry(f1, textvariable=self.source_dir, width=80).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
+        self.source_entry = ttk.Entry(f1, textvariable=self.source_dir, width=80)
+        self.source_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
         self.source_btn = ttk.Button(f1, text="浏览...", command=self._select_source_dir)
         self.source_btn.pack(side=tk.RIGHT)
 
         # 输出目录
         f2 = ttk.LabelFrame(main, text="输出目录", padding=5)
         f2.pack(fill=tk.X, pady=5)
-        ttk.Entry(f2, textvariable=self.output_dir, width=80).pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
+        self.output_entry = ttk.Entry(f2, textvariable=self.output_dir, width=80)
+        self.output_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
         self.output_btn = ttk.Button(f2, text="浏览...", command=self._select_output_dir)
         self.output_btn.pack(side=tk.RIGHT)
 
@@ -442,47 +673,72 @@ class BatchZipperApp:
         f3 = ttk.LabelFrame(main, text="高级设置", padding=10)
         f3.pack(fill=tk.X, pady=5)
 
-        # 第一行
+        # 第一行：格式与密码
         ttk.Label(f3, text="压缩格式:").grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
-        ttk.Combobox(f3, textvariable=self.archive_format, values=["zip", "7z"], width=8, state="readonly").grid(row=0, column=1, padx=5)
-        ttk.Checkbutton(f3, text="启用密码", variable=self.enable_password).grid(row=0, column=2, padx=10)
+        self.format_combo = ttk.Combobox(f3, textvariable=self.archive_format, values=["zip", "7z"],
+                                         width=8, state="readonly")
+        self.format_combo.grid(row=0, column=1, padx=5)
+        self.format_combo.bind("<<ComboboxSelected>>", lambda e: self._sync_widget_states())
+        self.password_check = ttk.Checkbutton(f3, text="启用密码", variable=self.enable_password,
+                                              command=self._sync_widget_states)
+        self.password_check.grid(row=0, column=2, padx=10)
         ttk.Label(f3, text="密码:").grid(row=0, column=3, padx=5)
-        ttk.Entry(f3, textvariable=self.password, width=12).grid(row=0, column=4, padx=5)
+        self.password_entry = ttk.Entry(f3, textvariable=self.password, width=12)
+        self.password_entry.grid(row=0, column=4, padx=5)
 
-        # 第二行
+        # 第二行：每包文件数与前缀
         ttk.Label(f3, text="每包文件数:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
         self.files_spinbox = ttk.Spinbox(f3, from_=1, to=10000, textvariable=self.files_per_archive, width=10)
         self.files_spinbox.grid(row=1, column=1, padx=5)
         ttk.Label(f3, text="压缩包前缀:").grid(row=1, column=2, padx=10, pady=5)
-        ttk.Entry(f3, textvariable=self.archive_prefix, width=15).grid(row=1, column=3, columnspan=2, padx=5, sticky=tk.EW)
+        self.prefix_entry = ttk.Entry(f3, textvariable=self.archive_prefix, width=15)
+        self.prefix_entry.grid(row=1, column=3, columnspan=2, padx=5, sticky=tk.EW)
 
         # 第三行：大小限制
-        ttk.Checkbutton(f3, text="限制压缩包大小(MB):", variable=self.enable_size_limit,
-                        command=self._toggle_size_limit).grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
+        self.size_limit_check = ttk.Checkbutton(f3, text="限制压缩包大小(MB):", variable=self.enable_size_limit,
+                                                command=self._sync_widget_states)
+        self.size_limit_check.grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
         self.size_limit_spinbox = ttk.Spinbox(f3, from_=100, to=102400, increment=512,
-                                               textvariable=self.max_archive_size_mb, width=10)
+                                              textvariable=self.max_archive_size_mb, width=10)
         self.size_limit_spinbox.grid(row=2, column=1, padx=5)
 
-        # 第四行：7z路径
-        ttk.Label(f3, text="7z路径:").grid(row=3, column=0, sticky=tk.W, padx=5, pady=5)
-        ttk.Entry(f3, textvariable=self.seven_zip_path, width=40).grid(row=3, column=1, columnspan=3, padx=5, sticky=tk.EW)
+        # 第四行：子目录独立打包
+        self.subdir_check = ttk.Checkbutton(
+            f3, text="每个子目录打包为独立压缩包（忽略数量/大小限制，子目录名即包名）",
+            variable=self.one_archive_per_subdir, command=self._sync_widget_states)
+        self.subdir_check.grid(row=3, column=0, columnspan=4, sticky=tk.W, padx=5, pady=5)
+
+        # 第五行：文件名加密
+        self.header_check = ttk.Checkbutton(f3, text="加密文件名（仅 .7z 格式支持）",
+                                            variable=self.encrypt_header, command=self._sync_widget_states)
+        self.header_check.grid(row=4, column=0, columnspan=4, sticky=tk.W, padx=5, pady=5)
+
+        # 第六行：7z路径
+        ttk.Label(f3, text="7z路径:").grid(row=5, column=0, sticky=tk.W, padx=5, pady=5)
+        self.seven_zip_entry = ttk.Entry(f3, textvariable=self.seven_zip_path, width=40)
+        self.seven_zip_entry.grid(row=5, column=1, columnspan=3, padx=5, sticky=tk.EW)
         self.browse_7z_btn = ttk.Button(f3, text="浏览", command=self._select_7z_path, width=6)
-        self.browse_7z_btn.grid(row=3, column=4, padx=(5,0))
+        self.browse_7z_btn.grid(row=5, column=4, padx=(5, 0))
 
         f3.columnconfigure(4, weight=1)
 
-        # 初始化大小限制UI状态
-        self._toggle_size_limit()
+        # 运行期间需要统一锁定的参数控件
+        self._param_widgets = [
+            self.source_entry, self.output_entry, self.format_combo,
+            self.password_check, self.password_entry, self.prefix_entry,
+            self.files_spinbox, self.size_limit_check, self.size_limit_spinbox,
+            self.subdir_check, self.header_check, self.seven_zip_entry,
+        ]
 
         # 操作区
         btn_frame = ttk.Frame(main)
         btn_frame.pack(fill=tk.X, pady=10)
 
         self.start_btn = ttk.Button(btn_frame, text="开始打包", command=self._run_packaging)
-        self.start_btn.pack(side=tk.LEFT, padx=(0,10))
+        self.start_btn.pack(side=tk.LEFT, padx=(0, 10))
 
         self.pause_btn = ttk.Button(btn_frame, text="暂停", command=self._toggle_pause, state=tk.DISABLED)
-        self.pause_btn.pack(side=tk.LEFT, padx=(0,10))
+        self.pause_btn.pack(side=tk.LEFT, padx=(0, 10))
 
         self.save_btn = ttk.Button(btn_frame, text="保存配置", command=self._save_config)
         self.save_btn.pack(side=tk.LEFT)
@@ -496,9 +752,15 @@ class BatchZipperApp:
         self.log_text = scrolledtext.ScrolledText(log_frame, state=tk.DISABLED, wrap=tk.WORD)
         self.log_text.pack(fill=tk.BOTH, expand=True)
 
+        self._sync_widget_states()
+
+
 if __name__ == "__main__":
     if platform.system() != "Windows":
+        root = tk.Tk()
+        root.withdraw()
         messagebox.showerror("错误", "仅支持 Windows（依赖 7-Zip）")
+        root.destroy()
     else:
         root = tk.Tk()
         app = BatchZipperApp(root)
