@@ -12,6 +12,6 @@ if errorlevel 1 (
   start "" /min "C:\Users\PCL13\AppData\Local\Programs\Ollama\ollama.exe" serve
   timeout /t 6 /nobreak >nul
 )
-cd /d "D:\CODE\Python\test-data-backup\py\novel_agent"
+cd /d "%~dp0"
 "D:\dev\python\python.exe" main.py
 pause

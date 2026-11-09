@@ -134,7 +134,7 @@
                 "速记",
                 "录入"
             ],
-            "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_notes\\start.bat"
+            "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\voice_notes\\start.bat"
         },
         {
             "name": "快速启动web页面-Cosyvoice文字转音频",
@@ -144,7 +144,7 @@
                 "文字转音频",
                 "语音合成"
             ],
-            "path": "D:\\CODE\\Python\\test-data-backup\\py\\voice_tts\\start.bat"
+            "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\voice_tts\\start.bat"
         },
         {
             "name": "快速启动web页面-本地服务大厅-Hub",

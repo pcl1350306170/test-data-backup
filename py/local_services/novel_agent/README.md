@@ -7,7 +7,7 @@
 双击 `start.bat`（或在命令行执行）：
 
 ```
-cd D:\CODE\Python\test-data-backup\py\novel_agent
+cd D:\CODE\Python\test-data-backup\py\local_services\novel_agent
 python main.py
 ```
 
