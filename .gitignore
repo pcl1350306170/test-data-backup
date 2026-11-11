@@ -39,6 +39,7 @@ temp_clipboard.txt
 **/data/tasks.json
 **/json/testServer.json
 /py/local_services/voice_notes/notes.json
+/py/local_services/voice_notes/config.json
 /py/local_services/voice_notes/cert.pem
 /py/local_services/voice_notes/key.pem
 

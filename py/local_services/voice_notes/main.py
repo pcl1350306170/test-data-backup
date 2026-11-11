@@ -1,306 +1,102 @@
 # -*- coding: utf-8 -*-
 """
-语音速记本（FastAPI 本地服务）
-- 手机/电脑浏览器访问 http://<本机IP>:8010
-- 手机端用输入法语音键转文字后保存，电脑端查看/编辑/删除
-- 记录支持分类（categories.json），手机/电脑两端同步
-- 数据存本地 notes.json，无口令，局域网免密
-启动：python main.py   或双击 start.bat
+语音速记本（本地服务 · MySQL 版）
+- 访问 http://127.0.0.1:8010 （局域网内手机/电脑同网段可访问）
+- 存储：MySQL（config.json → mysql，默认库 test，表前缀 vn_）
+- 备份来源：GitHub 仓库里的 notes.json（支持静态页的 AES-GCM 密文），单向拉取
+- 合并策略：本地为准——远端永不覆盖本地正文；远端删除只在本地打标记；本地删除不复活
+- 定时：服务启动拉一次（可配），之后每天 00:00 自动拉一次，其余时间手动拉取
+启动：python main.py 或双击 start.bat
 """
+import datetime
 import json
 import os
+import socket
 import threading
-import uuid
-import datetime
+import time
+from typing import List, Optional
 
 import uvicorn
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, Response
+from pydantic import BaseModel
+
+import db
+import ghsync
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(BASE, "notes.json")
-CAT_PATH = os.path.join(BASE, "categories.json")
 PORT = 8010
 
-DEFAULT_CATS = [
-    {"id": "cat_daily", "name": "日常记录"},
-    {"id": "cat_xianjian4", "name": "仙剑四游戏同人小说大纲"},
-]
+app = FastAPI(title="语音速记本（MySQL）")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-app = FastAPI(title="语音速记本")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-LOCK = threading.Lock()
+PULL_LOCK = threading.Lock()
+PULL_STATE = {"running": False}
 
 
-def _now() -> str:
-    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-
-# ---------------------------------------------------------------- 记录
-def _load_notes() -> list:
-    if not os.path.exists(DATA_PATH):
-        return []
-    try:
-        with open(DATA_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return data if isinstance(data, list) else []
-    except Exception:
-        return []
-
-
-def _save_notes(notes: list):
-    """先写临时文件再替换，避免写一半崩溃导致数据损坏。"""
-    tmp = DATA_PATH + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(notes, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, DATA_PATH)
-
-
-def _sort_notes(notes: list) -> list:
-    """按录入时间倒序（新记录在最上）。"""
-    return sorted(notes, key=lambda n: n.get("created_at", ""), reverse=True)
-
-
+# ---------------------------------------------------------------- 请求体
 class NoteBody(BaseModel):
     content: str = ""
-    created_at: str = ""    # 可选：客户端提供的录入时间（离线同步保留原时间）
-    client_id: str = ""     # 可选：客户端唯一 ID（幂等去重，防止重复推送）
-    category_id: str = ""   # 可选：所属分类
+    category_id: Optional[str] = None
+    client_id: str = ""
+    created_at: str = ""
+    tags: Optional[List[str]] = None
 
 
-class BatchNotesBody(BaseModel):
-    notes: list = []
-
-
-class SyncUploadBody(BaseModel):
-    categories: list = []
-    notes: list = []
-
-
-# ---------------------------------------------------------------- 分类
-def _load_categories() -> list:
-    if not os.path.exists(CAT_PATH):
-        return [dict(c) for c in DEFAULT_CATS]
-    try:
-        with open(CAT_PATH, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        if isinstance(data, list) and data:
-            return data
-        return [dict(c) for c in DEFAULT_CATS]
-    except Exception:
-        return [dict(c) for c in DEFAULT_CATS]
-
-
-def _save_categories(cats: list):
-    tmp = CAT_PATH + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(cats, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, CAT_PATH)
-
-
-class CategoryBody(BaseModel):
+class NameBody(BaseModel):
     name: str = ""
 
 
-# ---------------------------------------------------------------- 跨设备同步
-@app.get("/api/sync/download")
-def sync_download():
-    """返回本地服务的全部数据（供 GitHub 离线版下载使用）。"""
-    with LOCK:
-        cats = _load_categories()
-        notes = _sort_notes(_load_notes())
-    return {"categories": cats, "notes": notes}
+class TagBindBody(BaseModel):
+    tags: Optional[List[str]] = None
+    name: str = ""
 
 
-@app.post("/api/sync/upload")
-def sync_upload(body: SyncUploadBody):
-    """从 GitHub 离线版上传数据到本地服务（分类按名称去重，记录按 client_id 去重 + 冲突检测）。"""
-    added_cats = 0
-    added_notes = 0
-    updated_notes = 0
-    with LOCK:
-        cats = _load_categories()
-        notes = _load_notes()
-
-        # 分类：按名称去重，建立 旧ID → 本地ID 映射
-        cat_name_to_local_id = {}
-        for c in cats:
-            cat_name_to_local_id[c["name"]] = c["id"]
-
-        old_cat_id_to_name = {}
-        for cat in body.categories:
-            old_cat_id_to_name[cat.get("id", "")] = cat.get("name", "")
-
-        for cat in body.categories:
-            name = (cat.get("name") or "").strip()
-            if not name:
-                continue
-            if name not in cat_name_to_local_id:
-                new_id = uuid.uuid4().hex[:12]
-                cats.append({"id": new_id, "name": name})
-                cat_name_to_local_id[name] = new_id
-                added_cats += 1
-
-        if added_cats:
-            _save_categories(cats)
-
-        # 建立 client_id → 记录索引 的映射（用于冲突检测）
-        cid_to_idx = {}
-        for i, n in enumerate(notes):
-            if n.get("client_id"):
-                cid_to_idx[n["client_id"]] = i
-
-        for item in body.notes:
-            content = (item.get("content") or "").strip()
-            if not content:
-                continue
-            cid = (item.get("client_id") or "").strip()
-
-            # 分类映射
-            old_cat_id = (item.get("category_id") or "").strip()
-            cat_name = old_cat_id_to_name.get(old_cat_id, "")
-            local_cat_id = cat_name_to_local_id.get(cat_name, "")
-
-            created_at = (item.get("created_at") or "").strip()
-            if created_at:
-                try:
-                    datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
-                except ValueError:
-                    created_at = _now()
-            else:
-                created_at = _now()
-
-            client_updated = (item.get("updated_at") or "").strip()
-
-            # 冲突检测：如果 client_id 已存在，比较 updated_at
-            if cid and cid in cid_to_idx:
-                existing = notes[cid_to_idx[cid]]
-                server_updated = existing.get("updated_at", "")
-                # 仅当客户端版本更新时才覆盖
-                if client_updated and client_updated > server_updated:
-                    existing["content"] = content
-                    existing["updated_at"] = client_updated
-                    existing["category_id"] = local_cat_id
-                    existing["copy_count"] = item.get("copy_count", existing.get("copy_count", 0))
-                    existing["last_copied_at"] = item.get("last_copied_at", existing.get("last_copied_at", ""))
-                    updated_notes += 1
-                continue
-
-            # 新记录
-            note = {
-                "id": uuid.uuid4().hex[:12],
-                "content": content,
-                "created_at": created_at,
-                "updated_at": client_updated,
-                "category_id": local_cat_id,
-                "copy_count": item.get("copy_count", 0),
-                "last_copied_at": (item.get("last_copied_at") or "").strip(),
-            }
-            if cid:
-                note["client_id"] = cid
-                cid_to_idx[cid] = len(notes)
-            notes.append(note)
-            added_notes += 1
-
-        if added_notes or updated_notes:
-            _save_notes(notes)
-
-    return {"ok": True, "added_notes": added_notes, "updated_notes": updated_notes, "added_categories": added_cats}
+class ConfigBody(BaseModel):
+    token: Optional[str] = None
+    repo: Optional[str] = None
+    path: Optional[str] = None
+    branch: Optional[str] = None
+    password: Optional[str] = None
+    pull_on_start: Optional[bool] = None
+    daily_at: Optional[str] = None
 
 
-# ---------------------------------------------------------------- 健康检测
+# ---------------------------------------------------------------- 基础
 @app.get("/api/ping")
 def ping():
-    return {"ok": True, "time": _now()}
+    ok, err = True, ""
+    try:
+        conn = db.get_conn()
+        conn.close()
+    except Exception as e:
+        ok, err = False, str(e)
+    return {"ok": ok, "time": db.now(), "db": ok, "error": err,
+            "last_pull_at": db.meta_get("last_pull_at", "")}
 
 
-# ---------------------------------------------------------------- 页面
 @app.get("/")
 def index():
     return FileResponse(os.path.join(BASE, "index.html"))
 
 
-# ---------------------------------------------------------------- 分类 API
-@app.get("/api/categories")
-def list_categories():
-    with LOCK:
-        cats = _load_categories()
-        notes = _load_notes()
-        counts = {}
-        for n in notes:
-            cid = n.get("category_id", "")
-            counts[cid] = counts.get(cid, 0) + 1
-        out = [{"id": c["id"], "name": c["name"], "count": counts.get(c["id"], 0)} for c in cats]
-        out.append({"id": "", "name": "未分类", "count": counts.get("", 0)})
-    return {"categories": out}
-
-
-@app.post("/api/categories")
-def create_category(body: CategoryBody):
-    name = (body.name or "").strip()
-    if not name:
-        raise HTTPException(status_code=400, detail="分类名不能为空")
-    if len(name) > 20:
-        raise HTTPException(status_code=400, detail="分类名最长 20 字")
-    with LOCK:
-        cats = _load_categories()
-        for c in cats:
-            if c["name"] == name:
-                raise HTTPException(status_code=400, detail="分类已存在：%s" % name)
-        cat = {"id": uuid.uuid4().hex[:12], "name": name}
-        cats.append(cat)
-        _save_categories(cats)
-    return cat
-
-
-@app.delete("/api/categories/{cat_id}")
-def delete_category(cat_id: str):
-    with LOCK:
-        cats = _load_categories()
-        kept = [c for c in cats if c["id"] != cat_id]
-        if len(kept) == len(cats):
-            raise HTTPException(status_code=404, detail="分类不存在")
-        _save_categories(kept)
-        # 该分类下的记录归入"未分类"
-        notes = _load_notes()
-        changed = False
-        for n in notes:
-            if n.get("category_id", "") == cat_id:
-                n["category_id"] = ""
-                changed = True
-        if changed:
-            _save_notes(notes)
-    return {"ok": True}
-
-
-@app.delete("/api/categories/{cat_id}/notes")
-def clear_category_notes(cat_id: str):
-    """清空指定分类下的所有记录（保留分类本身）。"""
-    with LOCK:
-        cats = _load_categories()
-        if not any(c["id"] == cat_id for c in cats):
-            raise HTTPException(status_code=404, detail="分类不存在")
-        notes = _load_notes()
-        kept = [n for n in notes if n.get("category_id", "") != cat_id]
-        removed = len(notes) - len(kept)
-        if removed:
-            _save_notes(kept)
-    return {"ok": True, "removed": removed}
-
-
-# ---------------------------------------------------------------- 记录 API
+# ---------------------------------------------------------------- 记录
 @app.get("/api/notes")
-def list_notes():
-    with LOCK:
-        notes = _sort_notes(_load_notes())
-    return {"notes": notes}
+def list_notes(kw: str = Query(""), category_id: Optional[str] = Query(None),
+               tag_ids: str = Query(""), tag_match: str = Query("any"),
+               remote: str = Query(""), start: str = Query(""), end: str = Query(""),
+               limit: int = Query(100, ge=1, le=1000), offset: int = Query(0, ge=0),
+               order: str = Query("desc")):
+    tids = [int(x) for x in tag_ids.split(",") if x.strip().isdigit()]
+    rstat = [x for x in remote.split(",") if x in ("local", "synced", "deleted")] or None
+    try:
+        return db.list_notes(kw=kw, category_id=category_id, tag_ids=tids or None,
+                             tag_match=tag_match if tag_match in ("any", "all") else "any",
+                             remote_status=rstat, start=start, end=end,
+                             limit=limit, offset=offset, order=order)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="查询失败：%s" % e)
 
 
 @app.post("/api/notes")
@@ -308,33 +104,18 @@ def create_note(body: NoteBody):
     content = (body.content or "").strip()
     if not content:
         raise HTTPException(status_code=400, detail="内容不能为空")
-    created_at = (body.created_at or "").strip()
-    if created_at:
-        try:
-            datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            created_at = ""
-    if not created_at:
-        created_at = _now()
-    note = {
-        "id": uuid.uuid4().hex[:12],
-        "content": content,
-        "created_at": created_at,
-        "updated_at": "",
-        "category_id": (body.category_id or "").strip(),
-        "copy_count": 0,
-        "last_copied_at": "",
-    }
-    if body.client_id:
-        note["client_id"] = body.client_id
-    with LOCK:
-        notes = _load_notes()
-        if body.client_id:
-            for n in notes:
-                if n.get("client_id") == body.client_id:
-                    return n  # 幂等：同一条记录重复推送时直接返回已有记录
-        notes.append(note)
-        _save_notes(notes)
+    note = db.create_note(content, category_id=(body.category_id or ""), client_id=body.client_id,
+                          created_at=body.created_at, source="local", tags=body.tags)
+    if not note:
+        raise HTTPException(status_code=500, detail="保存失败")
+    return note
+
+
+@app.get("/api/notes/{note_id}")
+def get_note(note_id: str):
+    note = db.get_note(note_id)
+    if not note:
+        raise HTTPException(status_code=404, detail="记录不存在")
     return note
 
 
@@ -343,95 +124,207 @@ def update_note(note_id: str, body: NoteBody):
     content = (body.content or "").strip()
     if not content:
         raise HTTPException(status_code=400, detail="内容不能为空")
-    with LOCK:
-        notes = _load_notes()
-        for n in notes:
-            if n.get("id") == note_id:
-                n["content"] = content
-                n["updated_at"] = _now()
-                if body.category_id is not None:
-                    n["category_id"] = (body.category_id or "").strip()
-                _save_notes(notes)
-                return n
-    raise HTTPException(status_code=404, detail="记录不存在")
+    note = db.update_note(note_id, content=content, category_id=body.category_id, tags=body.tags)
+    if not note:
+        raise HTTPException(status_code=404, detail="记录不存在")
+    return note
 
 
 @app.delete("/api/notes/{note_id}")
 def delete_note(note_id: str):
-    with LOCK:
-        notes = _load_notes()
-        kept = [n for n in notes if n.get("id") != note_id]
-        if len(kept) == len(notes):
-            raise HTTPException(status_code=404, detail="记录不存在")
-        _save_notes(kept)
-    return {"ok": True}
+    if not db.delete_note(note_id):
+        raise HTTPException(status_code=404, detail="记录不存在")
+    return {"ok": True, "tombstoned": True}
 
 
 @app.post("/api/notes/{note_id}/copy")
 def record_copy(note_id: str):
-    """记录一次复制行为，更新复制次数和最近复制时间。"""
-    with LOCK:
-        notes = _load_notes()
-        for n in notes:
-            if n.get("id") == note_id:
-                n["copy_count"] = n.get("copy_count", 0) + 1
-                n["last_copied_at"] = _now()
-                _save_notes(notes)
-                return n
-    raise HTTPException(status_code=404, detail="记录不存在")
+    if not db.record_copy(note_id):
+        raise HTTPException(status_code=404, detail="记录不存在")
+    return db.get_note(note_id)
 
 
-@app.post("/api/notes/batch")
-def batch_import(body: BatchNotesBody):
-    """批量导入记录（按 client_id 去重，已存在的跳过）。"""
-    added = 0
-    with LOCK:
-        notes = _load_notes()
-        existing_ids = set()
-        for n in notes:
-            if n.get("client_id"):
-                existing_ids.add(n["client_id"])
-            if n.get("id"):
-                existing_ids.add(n["id"])
-        for item in body.notes:
-            content = (item.get("content") or "").strip()
-            if not content:
-                continue
-            cid = (item.get("client_id") or "").strip()
-            if cid and cid in existing_ids:
-                continue
-            created_at = (item.get("created_at") or "").strip()
-            if created_at:
-                try:
-                    datetime.datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S")
-                except ValueError:
-                    created_at = _now()
-            else:
-                created_at = _now()
-            note = {
-                "id": uuid.uuid4().hex[:12],
-                "content": content,
-                "created_at": created_at,
-                "updated_at": "",
-                "category_id": (item.get("category_id") or "").strip(),
-                "copy_count": item.get("copy_count", 0),
-                "last_copied_at": item.get("last_copied_at", ""),
-            }
-            if cid:
-                note["client_id"] = cid
-                existing_ids.add(cid)
-            notes.append(note)
-            added += 1
-        if added:
-            _save_notes(notes)
-    return {"ok": True, "added": added}
+@app.put("/api/notes/{note_id}/tags")
+def bind_tags(note_id: str, body: TagBindBody):
+    if not db.get_note(note_id):
+        raise HTTPException(status_code=404, detail="记录不存在")
+    db.set_note_tags(note_id, body.tags or [])
+    return db.get_note(note_id)
+
+
+# ---------------------------------------------------------------- 分类
+@app.get("/api/categories")
+def list_categories():
+    return {"categories": db.list_categories()}
+
+
+@app.post("/api/categories")
+def create_category(body: NameBody):
+    name = (body.name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="分类名不能为空")
+    if len(name) > 20:
+        raise HTTPException(status_code=400, detail="分类名最长 20 字")
+    return db.create_category(name)
+
+
+@app.delete("/api/categories/{cat_id}")
+def delete_category(cat_id: str):
+    if not db.delete_category(cat_id):
+        raise HTTPException(status_code=404, detail="分类不存在")
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------- 标签（仅本地）
+@app.get("/api/tags")
+def list_tags():
+    return {"tags": db.list_tags()}
+
+
+@app.post("/api/tags")
+def create_tag(body: NameBody):
+    name = (body.name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="标签名不能为空")
+    ids = db.ensure_tags([name])
+    return {"id": ids[0] if ids else None, "name": name}
+
+
+@app.put("/api/tags/{tag_id}")
+def rename_tag(tag_id: int, body: NameBody):
+    name = (body.name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="标签名不能为空")
+    if not db.rename_tag(tag_id, name):
+        raise HTTPException(status_code=404, detail="标签不存在")
+    return {"ok": True}
+
+
+@app.delete("/api/tags/{tag_id}")
+def delete_tag(tag_id: int):
+    if not db.delete_tag(tag_id):
+        raise HTTPException(status_code=404, detail="标签不存在")
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------- 统计 / 导出
+@app.get("/api/stats")
+def stats():
+    out = db.stats()
+    out["sync"] = ghsync.status()
+    out["pulling"] = PULL_STATE["running"]
+    return out
+
+
+@app.get("/api/export")
+def export():
+    data = db.export_all()
+    body = json.dumps(data, ensure_ascii=False, indent=2)
+    fname = "voice_notes_mysql_%s.json" % datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    return Response(content=body, media_type="application/json; charset=utf-8",
+                    headers={"Content-Disposition": 'attachment; filename="%s"' % fname})
+
+
+# ---------------------------------------------------------------- GitHub 拉取
+def _do_pull():
+    if not PULL_LOCK.acquire(blocking=False):
+        return {"ok": False, "skipped": True, "reason": "已有拉取任务在进行中"}
+    PULL_STATE["running"] = True
+    try:
+        return ghsync.pull()
+    except ghsync.SyncError as e:
+        db.meta_set("last_pull_result", json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False))
+        return {"ok": False, "error": str(e)}
+    except Exception as e:
+        db.meta_set("last_pull_result", json.dumps({"ok": False, "error": str(e)}, ensure_ascii=False))
+        return {"ok": False, "error": "拉取异常：%s" % e}
+    finally:
+        PULL_STATE["running"] = False
+        PULL_LOCK.release()
+
+
+@app.post("/api/sync/pull")
+def sync_pull():
+    res = _do_pull()
+    if not res.get("ok") and not res.get("skipped"):
+        raise HTTPException(status_code=502, detail=res.get("error", "拉取失败"))
+    return res
+
+
+@app.get("/api/sync/status")
+def sync_status():
+    out = ghsync.status()
+    out["pulling"] = PULL_STATE["running"]
+    return out
+
+
+@app.put("/api/config")
+def update_config(body: ConfigBody):
+    cfg = db.load_config()
+    for key in ("token", "repo", "path", "branch", "password"):
+        val = getattr(body, key)
+        if val is not None:
+            cfg["github"][key] = val.strip() if isinstance(val, str) else val
+    if body.pull_on_start is not None:
+        cfg["sync"]["pull_on_start"] = bool(body.pull_on_start)
+    if body.daily_at is not None:
+        if not _valid_hhmm(body.daily_at):
+            raise HTTPException(status_code=400, detail="定时格式应为 HH:MM")
+        cfg["sync"]["daily_at"] = body.daily_at
+    db.save_config(cfg)
+    return ghsync.status()
+
+
+def _valid_hhmm(s):
+    try:
+        datetime.datetime.strptime((s or "").strip(), "%H:%M")
+        return True
+    except Exception:
+        return False
+
+
+# ---------------------------------------------------------------- 定时器（后台线程，无第三方依赖）
+def _next_run(at):
+    hh, mm = 0, 0
+    if _valid_hhmm(at):
+        hh, mm = int(at[:2]), int(at[3:5])
+    now_dt = datetime.datetime.now()
+    nxt = now_dt.replace(hour=hh, minute=mm, second=0, microsecond=0)
+    if nxt <= now_dt:
+        nxt += datetime.timedelta(days=1)
+    return nxt
+
+
+def _scheduler_loop():
+    cfg = db.load_config()["sync"]
+    if cfg.get("pull_on_start"):
+        time.sleep(2)
+        res = _do_pull()
+        print("[sync] 启动拉取：%s" % json.dumps(res, ensure_ascii=False))
+    while True:
+        nxt = _next_run(db.load_config()["sync"].get("daily_at", "00:00"))
+        wait = max(1.0, (nxt - datetime.datetime.now()).total_seconds())
+        print("[sync] 下次自动拉取：%s（%.0f 分钟后）" % (nxt.strftime("%Y-%m-%d %H:%M"), wait / 60))
+        time.sleep(wait)
+        res = _do_pull()
+        print("[sync] 定时拉取：%s" % json.dumps(res, ensure_ascii=False))
+
+
+def _bootstrap():
+    try:
+        n = db.init_db()
+        print("[db] MySQL 就绪（库：%s）%s" % (db.load_config()["mysql"]["database"],
+                                          "，导入旧记录 %d 条" % n if n else ""))
+    except Exception as e:
+        print("[db] 初始化失败：%s" % e)
+    threading.Thread(target=_scheduler_loop, daemon=True).start()
 
 
 if __name__ == "__main__":
+    _bootstrap()
     print("=" * 52)
-    print("  语音速记本已启动")
+    print("  语音速记本（MySQL 版）已启动")
     print("  本机访问:   http://127.0.0.1:%d" % PORT)
-    import socket
     try:
         host = socket.gethostbyname(socket.gethostname())
         print("  手机访问:   http://%s:%d  （需同一 WiFi）" % (host, PORT))

@@ -1,0 +1,21 @@
+{
+  "mysql": {
+    "host": "localhost",
+    "port": 3306,
+    "user": "root",
+    "password": "",
+    "database": "test",
+    "charset": "utf8mb4"
+  },
+  "github": {
+    "token": "",
+    "repo": "pcl1350306170/pcl1350306170.github.io",
+    "path": "application/voice_notes/data/notes.json",
+    "branch": "main",
+    "password": ""
+  },
+  "sync": {
+    "pull_on_start": true,
+    "daily_at": "00:00"
+  }
+}
