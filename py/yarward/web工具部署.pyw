@@ -3,6 +3,7 @@
 import os
 import json
 import logging
+import subprocess
 import threading
 import webbrowser
 import time
@@ -51,7 +52,11 @@ DEFAULT_CONFIG = {
     "jar_upload_dir": "/usr/local/apps/base-service",
     "jar_server_port": "28019",
     "jar_active_profile": "prod",
-    "also_deploy_jar": False
+    "also_deploy_jar": False,
+    # 先打包再升级相关配置
+    "build_before_deploy": False,
+    "project_root_dir": r"C:\www\gitee\my-blog-api",
+    "build_command": "mvn clean package -DskipTests"
 }
 
 # ================== 工具函数 ==================
@@ -236,6 +241,48 @@ def upload_web_files(config, progress_callback=None):
 
 # ================== JAR 部署逻辑 ==================
 
+def build_project(config, progress_callback=None):
+    """在项目管理目录执行打包命令，成功返回 True，失败返回 False"""
+    project_root = config.get("project_root_dir", "").strip()
+    build_cmd = config.get("build_command", "").strip()
+    if not project_root or not Path(project_root).exists():
+        if progress_callback:
+            progress_callback(f"❌ 项目目录不存在: {project_root}")
+        return False
+    if not build_cmd:
+        if progress_callback:
+            progress_callback("❌ 打包命令为空")
+        return False
+
+    if progress_callback:
+        progress_callback(f"正在打包: {build_cmd} ({project_root})")
+    logger.info(f"开始打包: {build_cmd} @ {project_root}")
+
+    # Windows 下 mvn 是 .cmd，需要通过 shell 执行；使用 GBK 解码控制台输出
+    proc = subprocess.Popen(build_cmd, cwd=project_root, shell=True,
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    tail_lines = []
+    for raw in iter(proc.stdout.readline, b""):
+        line = raw.decode("gbk", errors="replace").rstrip()
+        if line:
+            tail_lines.append(line)
+            if len(tail_lines) > 30:
+                tail_lines.pop(0)
+            logger.info(f"[打包] {line}")
+    proc.stdout.close()
+    returncode = proc.wait()
+
+    if returncode == 0:
+        if progress_callback:
+            progress_callback("✅ 打包成功")
+        logger.info("打包成功")
+        return True
+
+    logger.error(f"打包失败，退出码: {returncode}")
+    if progress_callback:
+        progress_callback(f"❌ 打包失败（退出码 {returncode}），最后输出: {' | '.join(tail_lines[-5:])}")
+    return False
+
 def check_port_listening(ssh, port):
     """检查指定端口是否在监听"""
     stdin, stdout, stderr = ssh.exec_command("which ss")
@@ -335,6 +382,12 @@ def deploy_jar(config, ssh=None, progress_callback=None):
     try:
         jar_path = config["jar_path"]
         jar_file = Path(jar_path)
+
+        # 勾选“先打包再升级”时，先执行构建，成功后再校验 jar 文件
+        if config.get("build_before_deploy", False):
+            if not build_project(config, progress_callback):
+                return False
+
         if not jar_file.exists():
             raise FileNotFoundError(f"JAR 文件不存在: {jar_path}")
 
@@ -577,6 +630,26 @@ class WebUploaderApp:
         self.jar_profile_var = StringVar(value=self.config.get("jar_active_profile", "prod"))
         Entry(jar_row2, textvariable=self.jar_profile_var, width=10).pack(side=LEFT, padx=5)
 
+        # 先打包再升级
+        jar_row3 = Frame(self.jar_frame)
+        jar_row3.pack(fill=X, pady=(5, 0))
+        self.build_before_deploy_var = BooleanVar(value=self.config.get("build_before_deploy", False))
+        Checkbutton(jar_row3, text="🔨 先打包再升级",
+                    variable=self.build_before_deploy_var, font=("Microsoft YaHei", 10),
+                    command=self.toggle_build_frame).pack(side=LEFT)
+
+        self.jar_row4 = Frame(self.jar_frame)
+        Label(self.jar_row4, text="项目目录:", font=("Arial", 10)).pack(side=LEFT, padx=5)
+        self.project_root_var = StringVar(value=self.config.get("project_root_dir", ""))
+        Entry(self.jar_row4, textvariable=self.project_root_var, width=45, font=("Consolas", 10)).pack(side=LEFT, padx=5)
+        Button(self.jar_row4, text="📁 选择", command=self.select_project_dir).pack(side=LEFT, padx=5)
+
+        self.jar_row5 = Frame(self.jar_frame)
+        Label(self.jar_row5, text="打包命令:", font=("Arial", 10)).pack(side=LEFT, padx=5)
+        self.build_command_var = StringVar(value=self.config.get("build_command", "mvn clean package -DskipTests"))
+        Entry(self.jar_row5, textvariable=self.build_command_var, width=55, font=("Consolas", 10)).pack(side=LEFT, padx=5)
+        self.toggle_build_frame()
+
         # 初始状态根据复选框决定
         self.toggle_jar_frame()
 
@@ -586,7 +659,7 @@ class WebUploaderApp:
 
         Button(btn_frame, text="💾 保存配置", command=self.save_config, bg="#9C27B0", fg="white", width=12).grid(row=0, column=0, padx=10)
         Button(btn_frame, text="🚀 开始升级", command=self.execute, bg="#4CAF50", fg="white", width=18, height=2).grid(row=0, column=1, padx=10)
-        Button(btn_frame, text="📦 单独部署", command=self.execute_jar_only, bg="#FF9800", fg="white", width=18, height=2).grid(row=0, column=2, padx=10)
+        Button(btn_frame, text="📦 单独部署后台", command=self.execute_jar_only, bg="#FF9800", fg="white", width=18, height=2).grid(row=0, column=2, padx=10)
 
         # ---- 进度显示 ----
         self.progress_label = Label(self.root, text="就绪", fg="green", font=("Arial", 12))
@@ -610,6 +683,23 @@ class WebUploaderApp:
             self.jar_frame.pack(fill=X, padx=20, pady=10)
         else:
             self.jar_frame.pack_forget()
+
+    def toggle_build_frame(self):
+        """根据“先打包再升级”勾选状态显示/隐藏打包配置行"""
+        if self.build_before_deploy_var.get():
+            self.jar_row4.pack(fill=X, pady=(5, 0))
+            self.jar_row5.pack(fill=X, pady=(0, 5))
+        else:
+            self.jar_row4.pack_forget()
+            self.jar_row5.pack_forget()
+
+    def select_project_dir(self):
+        dir_path = filedialog.askdirectory(
+            title="选择项目根目录",
+            initialdir=self.project_root_var.get() or "."
+        )
+        if dir_path:
+            self.project_root_var.set(dir_path)
 
     def select_local_dir(self):
         dir_path = filedialog.askdirectory(
@@ -664,7 +754,10 @@ class WebUploaderApp:
             "jar_upload_dir": self.jar_upload_dir_var.get(),
             "jar_server_port": self.jar_port_var.get(),
             "jar_active_profile": self.jar_profile_var.get(),
-            "also_deploy_jar": self.also_deploy_jar.get()
+            "also_deploy_jar": self.also_deploy_jar.get(),
+            "build_before_deploy": self.build_before_deploy_var.get(),
+            "project_root_dir": self.project_root_var.get(),
+            "build_command": self.build_command_var.get()
         })
         save_config(self.config)
         # 同步服务器信息到 testServer.json
@@ -691,10 +784,10 @@ class WebUploaderApp:
             messagebox.showerror("错误", "请选择有效的本地 Web 目录！")
             return
 
-        # 验证 JAR 配置（如果勾选了）
+        # 验证 JAR 配置（如果勾选了；勾选先打包时 jar 可能尚未生成，由构建后再校验）
         if self.also_deploy_jar.get():
             jar_path = self.jar_path_var.get().strip()
-            if not jar_path or not Path(jar_path).exists():
+            if not self.build_before_deploy_var.get() and (not jar_path or not Path(jar_path).exists()):
                 messagebox.showerror("错误", "请选择有效的 JAR 文件！")
                 return
             jar_port = self.jar_port_var.get().strip()
@@ -764,9 +857,9 @@ class WebUploaderApp:
 
     def execute_jar_only(self):
         """仅部署 JAR，不上传前端"""
-        # 验证 JAR 配置
+        # 验证 JAR 配置（勾选先打包时 jar 可能尚未生成，由构建后再校验）
         jar_path = self.jar_path_var.get().strip()
-        if not jar_path or not Path(jar_path).exists():
+        if not self.build_before_deploy_var.get() and (not jar_path or not Path(jar_path).exists()):
             messagebox.showerror("错误", "请选择有效的 JAR 文件！")
             return
         jar_port = self.jar_port_var.get().strip()

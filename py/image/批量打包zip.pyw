@@ -1,5 +1,6 @@
 # batch_zipper_enhanced.py
-# 批量打包压缩工具：单人单任务使用，支持暂停/断点续压、按数量或大小分批、每个子目录独立打包
+# 批量打包压缩工具：单人单任务使用，支持暂停/断点续压
+# 四种打包模式：按每包文件数分批 / 按压缩包大小分批 / 源目录下每个一级子目录独立包 / 手动选中的每个文件夹独立包
 
 import json
 import logging
@@ -45,9 +46,9 @@ DEFAULT_CONFIG = {
     "files_per_archive": 1000,
     "archive_prefix": "HH_Collection",
     "seven_zip_path": "7z",
-    "enable_size_limit": True,
+    "pack_mode": "size",  # files / size / subdir / selected
+    "selected_dirs": [],  # “选中文件夹独立打包”模式下的文件夹列表
     "max_archive_size_mb": 3072,  # 默认3GB
-    "one_archive_per_subdir": False,  # 每个一级子目录打包为独立压缩包
     "encrypt_header": False  # 加密文件名（仅 7z 格式支持）
 }
 
@@ -61,13 +62,21 @@ NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0) if platform.system() == "
 RESULT_DONE = "done"
 RESULT_ABORTED = "aborted"
 
+# 打包模式（互斥，界面用单选按钮组）
+MODE_BATCH_FILES = "files"      # 全部文件按每包文件数分批
+MODE_BATCH_SIZE = "size"        # 全部文件按压缩包大小上限分批
+MODE_SUBDIR = "subdir"          # 源目录下每个一级子目录一个包
+MODE_SELECTED = "selected"      # 手动添加的每个文件夹一个包
+PACK_MODES = (MODE_BATCH_FILES, MODE_BATCH_SIZE, MODE_SUBDIR, MODE_SELECTED)
+LARGE_WARN_MB = 8192  # 单个压缩包原始大小超过该值时日志提醒，不弹框打断
+
 
 class BatchZipperApp:
     def __init__(self, root):
         self.root = root
         self.root.title("批量打包压缩工具（支持暂停 & 断点续压）")
-        self.root.geometry("950x720")
-        self.root.minsize(850, 660)
+        self.root.geometry("980x800")
+        self.root.minsize(880, 700)
 
         # 控制变量（名称与配置文件 key 一一对应）
         self.source_dir = tk.StringVar()
@@ -78,10 +87,12 @@ class BatchZipperApp:
         self.files_per_archive = tk.IntVar(value=1000)
         self.archive_prefix = tk.StringVar(value="HH_Collection")
         self.seven_zip_path = tk.StringVar(value="7z")
-        self.enable_size_limit = tk.BooleanVar(value=True)
+        self.pack_mode = tk.StringVar(value=MODE_BATCH_SIZE)
         self.max_archive_size_mb = tk.IntVar(value=3072)
-        self.one_archive_per_subdir = tk.BooleanVar(value=False)
         self.encrypt_header = tk.BooleanVar(value=False)
+        self.new_dir_path = tk.StringVar()
+        # “选中文件夹独立打包”模式的目录列表：路径字符串，界面与打包任务的唯一数据源
+        self._selected_dirs = []
 
         # 运行控制：同一时刻只允许一个打包任务
         self.is_running = False
@@ -188,26 +199,24 @@ class BatchZipperApp:
             self._sync_widget_states()  # 再按当前模式恢复各控件可用性
 
     def _sync_widget_states(self):
-        """按“子目录独立打包 / 限制大小 / 按文件数”三种模式联动控件可用性"""
-        subdir_mode = self.one_archive_per_subdir.get()
+        """按当前打包模式联动控件可用性与“选中文件夹”列表的显示"""
         if self.is_running:
             return
+        mode = self.pack_mode.get()
 
-        if subdir_mode:
-            # 此模式下每包文件数、大小限制、压缩包前缀都不再生效
-            self.files_spinbox.config(state=tk.DISABLED)
-            self.size_limit_spinbox.config(state=tk.DISABLED)
-            self.size_limit_check.config(state=tk.DISABLED)
-            self.prefix_entry.config(state=tk.DISABLED)
+        # 数量/大小限制只在对应的分批模式下可编辑，前缀只用于分批模式的包名
+        self.files_spinbox.config(state=tk.NORMAL if mode == MODE_BATCH_FILES else tk.DISABLED)
+        self.size_limit_spinbox.config(state=tk.NORMAL if mode == MODE_BATCH_SIZE else tk.DISABLED)
+        self.prefix_entry.config(state=tk.NORMAL if mode in (MODE_BATCH_FILES, MODE_BATCH_SIZE) else tk.DISABLED)
+
+        # 选中文件夹模式不依赖“源目录”，其他三种模式反之
+        need_source = mode != MODE_SELECTED
+        self.source_entry.config(state=tk.NORMAL if need_source else tk.DISABLED)
+        self.source_btn.config(state=tk.NORMAL if need_source else tk.DISABLED)
+        if mode == MODE_SELECTED:
+            self._dirs_frame.pack(after=self._source_frame, fill=tk.X, pady=5)
         else:
-            self.size_limit_check.config(state=tk.NORMAL)
-            self.prefix_entry.config(state=tk.NORMAL)
-            if self.enable_size_limit.get():
-                self.files_spinbox.config(state=tk.DISABLED)
-                self.size_limit_spinbox.config(state=tk.NORMAL)
-            else:
-                self.files_spinbox.config(state=tk.NORMAL)
-                self.size_limit_spinbox.config(state=tk.DISABLED)
+            self._dirs_frame.pack_forget()
 
         # 文件名加密只有 7z 格式支持（zip 只能加密内容），且必须启用密码
         if self.archive_format.get() == "7z" and self.enable_password.get():
@@ -246,6 +255,53 @@ class BatchZipperApp:
         f = filedialog.askopenfilename(title="选择 7z.exe", filetypes=[("7z.exe", "7z.exe")])
         if f: self.seven_zip_path.set(f)
 
+    # ==================== 选中文件夹列表维护 ====================
+
+    def _add_selected_dir(self):
+        """系统对话框每次只能选一个文件夹，因此采用“多次添加累加到列表”"""
+        d = filedialog.askdirectory(title="选择一个要独立打包的文件夹")
+        if d: self._append_selected_dir(d)
+
+    def _add_selected_dir_by_path(self):
+        raw = self.new_dir_path.get().strip().strip('"')
+        if not raw:
+            return
+        if not Path(raw).is_dir():
+            messagebox.showerror("错误", f"文件夹不存在：{raw}")
+            return
+        self._append_selected_dir(raw)
+        self.new_dir_path.set("")
+
+    def _append_selected_dir(self, path):
+        resolved = self._norm_dir(path)
+        if resolved in self._selected_dirs:
+            self._log(f"ℹ️ 已在列表中，不重复添加: {resolved}")
+            return
+        self._selected_dirs.append(resolved)
+        self._refresh_dir_listbox()
+
+    def _remove_selected_dirs(self):
+        for i in reversed(self.dir_listbox.curselection()):
+            del self._selected_dirs[int(i)]
+        self._refresh_dir_listbox()
+
+    def _clear_selected_dirs(self):
+        self._selected_dirs.clear()
+        self._refresh_dir_listbox()
+
+    def _refresh_dir_listbox(self):
+        self.dir_listbox.delete(0, tk.END)
+        for d in self._selected_dirs:
+            self.dir_listbox.insert(tk.END, d)
+
+    @staticmethod
+    def _norm_dir(path):
+        """统一路径写法，便于列表去重；解析失败时保留原样"""
+        try:
+            return str(Path(path).resolve())
+        except OSError:
+            return str(path)
+
     # ==================== 任务启动校验 ====================
 
     def _resolve_7z(self):
@@ -271,25 +327,49 @@ class BatchZipperApp:
         return value
 
     def _validate_inputs(self):
-        """主线程完成全部校验并快照配置，返回 (源目录, 输出目录, 配置快照)"""
-        source = Path(self.source_dir.get())
-        if not self.source_dir.get() or not source.is_dir():
-            messagebox.showerror("错误", "源目录无效")
-            return None
+        """主线程完成全部校验并快照配置，返回 (源目录, 输出目录, 配置快照)
+
+        选中文件夹模式下 source 为 None，待打包目录列表放在 cfg.selected_dirs。
+        """
+        mode = self.pack_mode.get()
+        selected_dirs = []
+        source = None
+
+        if mode == MODE_SELECTED:
+            for raw in self._selected_dirs:
+                if Path(raw).is_dir():
+                    selected_dirs.append(Path(raw))
+                else:
+                    self._log(f"⚠️ 忽略已不存在的文件夹: {raw}", logging.WARNING)
+            if not selected_dirs:
+                messagebox.showerror("错误", "请先添加至少一个存在的文件夹")
+                return None
+        else:
+            source = Path(self.source_dir.get())
+            if not self.source_dir.get() or not source.is_dir():
+                messagebox.showerror("错误", "源目录无效")
+                return None
 
         if not self.output_dir.get():
             messagebox.showerror("错误", "请设置输出目录")
             return None
         output = Path(self.output_dir.get())
         try:
-            src_res, out_res = source.resolve(), output.resolve()
+            out_res = output.resolve()
+            src_res = source.resolve() if source is not None else None
+            sel_res = [p.resolve() for p in selected_dirs]
         except OSError as e:
             messagebox.showerror("错误", f"路径解析失败: {e}")
             return None
-        if out_res == src_res or src_res in out_res.parents:
+        if src_res is not None and (out_res == src_res or src_res in out_res.parents):
             # 输出目录在源目录内部会把压缩包再次打包进去
             messagebox.showerror("错误", "输出目录不能是源目录本身或其子目录")
             return None
+        for p in sel_res:
+            # 同理：输出目录落在待打包文件夹内会无限套娃
+            if out_res == p or p in out_res.parents:
+                messagebox.showerror("错误", f"输出目录不能是被打包文件夹本身或其子目录：{p}")
+                return None
 
         if self.enable_password.get() and not self.password.get():
             messagebox.showerror("错误", "密码不能为空")
@@ -300,30 +380,28 @@ class BatchZipperApp:
             messagebox.showerror("错误", f"未找到 7-Zip：{self.seven_zip_path.get()}\n请检查“7z路径”设置")
             return None
 
-        subdir_mode = self.one_archive_per_subdir.get()
-        size_limited = self.enable_size_limit.get()
         files_per_archive = max_mb = None
-        if not subdir_mode:
-            if not size_limited:
-                files_per_archive = self._get_positive_int(self.files_per_archive, "每包文件数")
-                if files_per_archive is None:
-                    return None
-            else:
-                max_mb = self._get_positive_int(self.max_archive_size_mb, "限制压缩包大小")
-                if max_mb is None:
-                    return None
+        if mode == MODE_BATCH_FILES:
+            files_per_archive = self._get_positive_int(self.files_per_archive, "每包文件数")
+            if files_per_archive is None:
+                return None
+        elif mode == MODE_BATCH_SIZE:
+            max_mb = self._get_positive_int(self.max_archive_size_mb, "限制压缩包大小")
+            if max_mb is None:
+                return None
 
         cfg = SimpleNamespace(
+            mode=mode,
             ext=self.archive_format.get(),
-            subdir_mode=subdir_mode,
-            size_limited=size_limited,
+            size_limited=mode == MODE_BATCH_SIZE,
             files_per_archive=files_per_archive,
             max_archive_size_mb=max_mb,
             prefix=self.archive_prefix.get().strip() or "batch",
             seven_zip=seven_zip,
             enable_password=self.enable_password.get(),
             password=self.password.get(),
-            encrypt_header=self.encrypt_header.get()
+            encrypt_header=self.encrypt_header.get(),
+            selected_dirs=selected_dirs
         )
         return source, output, cfg
 
@@ -349,8 +427,10 @@ class BatchZipperApp:
             if cfg.enable_password and cfg.ext == "zip" and cfg.encrypt_header:
                 self._log("ℹ️ zip 格式不支持加密文件名，仅加密文件内容（需加密文件名请选 7z）", logging.WARNING)
 
-            if cfg.subdir_mode:
+            if cfg.mode == MODE_SUBDIR:
                 status, success, skipped, empty, failed = self._pack_by_subdir(source, output, cfg)
+            elif cfg.mode == MODE_SELECTED:
+                status, success, skipped, empty, failed = self._pack_by_selected(cfg.selected_dirs, output, cfg)
             else:
                 all_files = self._scan_files(source)
                 if all_files is None:
@@ -420,10 +500,24 @@ class BatchZipperApp:
         def items():
             for i, batch in enumerate(batches, 1):
                 def prepare(batch=batch):
-                    return [rel for _, rel, _ in batch], sum(f for _, _, f in batch)
+                    return source, [rel for _, rel, _ in batch], sum(f for _, _, f in batch)
                 yield i, output / f"{cfg.prefix}_batch_{i:03d}.{cfg.ext}", f"第 {i}/{total} 批", prepare
 
-        return self._pack_loop(source, output, cfg, total, items())
+        return self._pack_loop(output, cfg, total, items())
+
+    def _plan_flat_archives(self, dirs, output, cfg):
+        """平铺输出计划：文件夹名即包名，同名（来自不同位置）时追加序号避免互相覆盖"""
+        used_names, plans = set(), []
+        for sd in dirs:
+            stem = self._safe_archive_stem(sd.name)
+            archive_name = f"{stem}.{cfg.ext}"
+            seq = 1
+            while archive_name.casefold() in used_names:
+                archive_name = f"{stem}_{seq}.{cfg.ext}"
+                seq += 1
+            used_names.add(archive_name.casefold())
+            plans.append((sd, output / archive_name))
+        return plans
 
     def _pack_by_subdir(self, source, output, cfg):
         """每个一级子目录打包为一个独立压缩包（忽略文件数量/压缩包大小限制）"""
@@ -441,18 +535,7 @@ class BatchZipperApp:
         if loose:
             self._log(f"⚠️ 源目录根下有 {loose} 个散文件不会被打包（此模式仅处理一级子目录）", logging.WARNING)
 
-        # 平铺输出：子目录名即包名，重名时追加序号避免互相覆盖
-        used_names, plans = set(), []
-        for sd in subdirs:
-            stem = self._safe_archive_stem(sd.name)
-            archive_name = f"{stem}.{cfg.ext}"
-            seq = 1
-            while archive_name.casefold() in used_names:
-                archive_name = f"{stem}_{seq}.{cfg.ext}"
-                seq += 1
-            used_names.add(archive_name.casefold())
-            plans.append((sd, output / archive_name))
-
+        plans = self._plan_flat_archives(subdirs, output, cfg)
         total = len(plans)
         self._log(f"📊 子目录独立打包模式：共 {total} 个一级子目录（已忽略数量/大小限制）")
 
@@ -461,10 +544,30 @@ class BatchZipperApp:
             for idx, (sd, archive_path) in enumerate(plans, 1):
                 def prepare(sd=sd, idx=idx, total=total):
                     files, size_bytes = self._collect_subdir_files(sd, idx, total)
-                    return [fp.relative_to(source) for fp in files], size_bytes
+                    return source, [fp.relative_to(source) for fp in files], size_bytes
                 yield idx, archive_path, f"第 {idx}/{total} 个子目录: {sd.name}", prepare
 
-        return self._pack_loop(source, output, cfg, total, items())
+        return self._pack_loop(output, cfg, total, items())
+
+    def _pack_by_selected(self, dirs, output, cfg):
+        """手动选中的每个文件夹打包为一个独立压缩包（忽略数量/大小限制）
+
+        各文件夹可以位于不同盘符，因此相对路径基准逐个取自己的父目录，
+        包内保留顶层文件夹名，解压得到“文件夹名/...”。
+        """
+        plans = self._plan_flat_archives(dirs, output, cfg)
+        total = len(plans)
+        self._log(f"📊 选中文件夹独立打包模式：共 {total} 个文件夹（已忽略数量/大小限制，包内保留顶层文件夹名）")
+
+        def items():
+            for idx, (sd, archive_path) in enumerate(plans, 1):
+                def prepare(sd=sd, idx=idx, total=total):
+                    files, size_bytes = self._collect_subdir_files(sd, idx, total)
+                    rel_paths = [Path(sd.name) / fp.relative_to(sd) for fp in files]
+                    return sd.parent, rel_paths, size_bytes
+                yield idx, archive_path, f"第 {idx}/{total} 个文件夹: {sd.name}", prepare
+
+        return self._pack_loop(output, cfg, total, items())
 
     def _collect_subdir_files(self, sd, idx, total):
         files, size_bytes = [], 0
@@ -482,10 +585,12 @@ class BatchZipperApp:
             self._log(f"🈳 [{idx}/{total}] 子目录内没有文件，不生成压缩包: {sd.name}", logging.WARNING)
         return files, size_bytes
 
-    def _pack_loop(self, source, output, cfg, total, items):
-        """三种模式共用的主循环：续压跳过 -> 暂停检查 -> 生成清单 -> 压缩 -> 计数汇总
+    def _pack_loop(self, output, cfg, total, items):
+        """四种模式共用的主循环：续压跳过 -> 暂停检查 -> 生成清单 -> 压缩 -> 计数汇总
 
         items 逐项产出 (序号, 压缩包路径, 进度描述, 文件清单生成函数)
+        清单生成函数返回 (相对路径基准目录, 相对路径列表, 原始字节数)，
+        基准目录逐包给定是为了支持不同盘符的文件夹共用一个输出目录。
         返回 (状态, 成功数, 已存在跳过数, 空目录数, 失败数)
         """
         success = skipped = empty = failed = 0
@@ -500,15 +605,19 @@ class BatchZipperApp:
                 self._log_summary(success, skipped, empty, failed, total)
                 return RESULT_ABORTED, success, skipped, empty, failed
 
-            rel_paths, size_bytes = prepare()
+            base_dir, rel_paths, size_bytes = prepare()
             if not rel_paths:
                 empty += 1
                 continue
 
+            if size_bytes > LARGE_WARN_MB * 1024 * 1024:
+                self._log(f"⚠️ [{idx}/{total}] 原始大小 {size_bytes / (1024 * 1024):.1f}MB 超过 "
+                          f"{LARGE_WARN_MB}MB，单包较大（需要控制包体请改用分批模式）", logging.WARNING)
+
             self._set_progress(f"正在打包 {desc}")
             self._log(f"📦 [{idx}/{total}] 创建: {archive_name} "
                       f"({len(rel_paths)} 文件, 原始大小 {size_bytes / (1024 * 1024):.1f}MB)")
-            ok, err = self._compress(source, output, archive_path, rel_paths, cfg, idx)
+            ok, err = self._compress(base_dir, output, archive_path, rel_paths, cfg, idx)
             # 压缩过程中被中止：子进程已 kill、半成品已清理，不计入成功/失败批次
             if not self.is_running:
                 self._log(f"⏹ [{idx}/{total}] 任务已中断，残包已清理: {archive_name}", logging.WARNING)
@@ -535,8 +644,12 @@ class BatchZipperApp:
             time.sleep(0.5)
         return not self.is_running
 
-    def _compress(self, source, output, archive_path, rel_paths, cfg, tag):
-        """写文件清单并调用 7-Zip 生成一个压缩包，返回 (是否成功, 错误信息)"""
+    def _compress(self, base_dir, output, archive_path, rel_paths, cfg, tag):
+        """写文件清单并调用 7-Zip 生成一个压缩包，返回 (是否成功, 错误信息)
+
+        base_dir 是 rel_paths 的相对路径基准，同时作为 7z 子进程的 cwd，
+        清单里的路径决定压缩包内部结构。
+        """
         if not rel_paths:
             return False, "没有待打包的文件"
         list_file = CONFIG_DIR / f"tmp_filelist_{os.getpid()}_{tag}.txt"
@@ -560,7 +673,7 @@ class BatchZipperApp:
             # creationflags：不弹 7z 控制台黑窗
             proc = subprocess.Popen(
                 cmd,
-                cwd=str(source),
+                cwd=str(base_dir),
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
                 creationflags=NO_WINDOW
@@ -609,6 +722,7 @@ class BatchZipperApp:
     # ==================== 配置读写 ====================
 
     def _save_config(self):
+        mode = self.pack_mode.get()
         cfg = {
             "source_dir": self.source_dir.get(),
             "output_dir": self.output_dir.get(),
@@ -618,10 +732,13 @@ class BatchZipperApp:
             "files_per_archive": self.files_per_archive.get(),
             "archive_prefix": self.archive_prefix.get(),
             "seven_zip_path": self.seven_zip_path.get(),
-            "enable_size_limit": self.enable_size_limit.get(),
+            "pack_mode": mode,
+            "selected_dirs": list(self._selected_dirs),
             "max_archive_size_mb": self.max_archive_size_mb.get(),
-            "one_archive_per_subdir": self.one_archive_per_subdir.get(),
-            "encrypt_header": self.encrypt_header.get()
+            "encrypt_header": self.encrypt_header.get(),
+            # 旧版本字段：由 pack_mode 推导写出，保证旧脚本读到同一份配置仍可用
+            "enable_size_limit": mode == MODE_BATCH_SIZE,
+            "one_archive_per_subdir": mode == MODE_SUBDIR
         }
         try:
             with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
@@ -642,6 +759,31 @@ class BatchZipperApp:
                 attr = getattr(self, k, None)
                 if attr is not None:
                     attr.set(v)
+
+            if cfg.get("pack_mode") not in PACK_MODES:
+                # 旧配置只有“限制大小 / 子目录独立”两个开关，按它们推导模式
+                if cfg.get("one_archive_per_subdir"):
+                    self.pack_mode.set(MODE_SUBDIR)
+                elif cfg.get("enable_size_limit"):
+                    self.pack_mode.set(MODE_BATCH_SIZE)
+                else:
+                    self.pack_mode.set(MODE_BATCH_FILES)
+                self._log("ℹ️ 旧配置已映射为打包模式选择")
+
+            # 选中文件夹列表不是 tk 变量，需单独回填（去重并保持添加顺序）
+            seen, dirs = set(), []
+            for raw in cfg.get("selected_dirs") or []:
+                if not isinstance(raw, str) or not raw.strip():
+                    continue
+                p = self._norm_dir(raw)
+                if p not in seen:
+                    seen.add(p)
+                    dirs.append(p)
+            self._selected_dirs = dirs
+            self._refresh_dir_listbox()
+            missing = [d for d in dirs if not Path(d).is_dir()]
+            if missing:
+                self._log(f"⚠️ 上次保存的 {len(missing)} 个文件夹当前不存在，开始打包时会被忽略", logging.WARNING)
             self._log("✅ 配置加载完成")
         except Exception as e:
             self._log(f"⚠️ 加载配置失败: {e}", logging.WARNING)
@@ -656,10 +798,36 @@ class BatchZipperApp:
         # 源目录
         f1 = ttk.LabelFrame(main, text="源文件夹", padding=5)
         f1.pack(fill=tk.X, pady=5)
+        self._source_frame = f1
         self.source_entry = ttk.Entry(f1, textvariable=self.source_dir, width=80)
         self.source_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 5))
         self.source_btn = ttk.Button(f1, text="浏览...", command=self._select_source_dir)
         self.source_btn.pack(side=tk.RIGHT)
+
+        # 选中文件夹列表：只在“选中文件夹独立打包”模式下显示（可见性由 _sync_widget_states 控制）
+        self._dirs_frame = ttk.LabelFrame(
+            main, text="选中的文件夹（每个文件夹单独成一个包，包名取文件夹名，同名自动加序号）", padding=5)
+        dir_ops = ttk.Frame(self._dirs_frame)
+        dir_ops.pack(fill=tk.X, pady=(0, 5))
+        self.dir_add_btn = ttk.Button(dir_ops, text="添加文件夹...", command=self._add_selected_dir)
+        self.dir_add_btn.pack(side=tk.LEFT)
+        self.dir_remove_btn = ttk.Button(dir_ops, text="移除选中", command=self._remove_selected_dirs)
+        self.dir_remove_btn.pack(side=tk.LEFT, padx=6)
+        self.dir_clear_btn = ttk.Button(dir_ops, text="清空", command=self._clear_selected_dirs)
+        self.dir_clear_btn.pack(side=tk.LEFT)
+        self.dir_add_path_btn = ttk.Button(dir_ops, text="添加该路径", command=self._add_selected_dir_by_path)
+        self.dir_add_path_btn.pack(side=tk.RIGHT)
+        self.dir_path_entry = ttk.Entry(dir_ops, textvariable=self.new_dir_path)
+        self.dir_path_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(14, 5))
+        self.dir_path_entry.bind("<Return>", lambda e: self._add_selected_dir_by_path())
+
+        dir_list_row = ttk.Frame(self._dirs_frame)
+        dir_list_row.pack(fill=tk.X)
+        self.dir_listbox = tk.Listbox(dir_list_row, selectmode=tk.EXTENDED, height=6, exportselection=False)
+        self.dir_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        dir_scroll = ttk.Scrollbar(dir_list_row, command=self.dir_listbox.yview)
+        dir_scroll.pack(side=tk.RIGHT, fill=tk.Y)
+        self.dir_listbox.config(yscrollcommand=dir_scroll.set)
 
         # 输出目录
         f2 = ttk.LabelFrame(main, text="输出目录", padding=5)
@@ -673,40 +841,47 @@ class BatchZipperApp:
         f3 = ttk.LabelFrame(main, text="高级设置", padding=10)
         f3.pack(fill=tk.X, pady=5)
 
-        # 第一行：格式与密码
-        ttk.Label(f3, text="压缩格式:").grid(row=0, column=0, sticky=tk.W, padx=5, pady=5)
+        # 第一行：打包模式（四选一，取代旧版“限制大小 / 子目录独立”两个勾选框）
+        mode_frame = ttk.Frame(f3)
+        mode_frame.grid(row=0, column=0, columnspan=5, sticky=tk.W, padx=5, pady=(0, 8))
+        ttk.Label(mode_frame, text="打包模式:").grid(row=0, column=0, sticky=tk.W, padx=(0, 5))
+        mode_options = [
+            (MODE_BATCH_FILES, "按每包文件数分批"),
+            (MODE_BATCH_SIZE, "按压缩包大小分批"),
+            (MODE_SUBDIR, "源目录每个一级子目录一包"),
+            (MODE_SELECTED, "选中的每个文件夹一包"),
+        ]
+        for i, (value, text) in enumerate(mode_options):
+            rb = ttk.Radiobutton(mode_frame, text=text, value=value, variable=self.pack_mode,
+                                 command=self._sync_widget_states)
+            rb.grid(row=i // 2, column=1 + (i % 2), sticky=tk.W, padx=(0, 16))
+
+        # 第二行：格式与密码
+        ttk.Label(f3, text="压缩格式:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
         self.format_combo = ttk.Combobox(f3, textvariable=self.archive_format, values=["zip", "7z"],
                                          width=8, state="readonly")
-        self.format_combo.grid(row=0, column=1, padx=5)
+        self.format_combo.grid(row=1, column=1, padx=5)
         self.format_combo.bind("<<ComboboxSelected>>", lambda e: self._sync_widget_states())
         self.password_check = ttk.Checkbutton(f3, text="启用密码", variable=self.enable_password,
                                               command=self._sync_widget_states)
-        self.password_check.grid(row=0, column=2, padx=10)
-        ttk.Label(f3, text="密码:").grid(row=0, column=3, padx=5)
+        self.password_check.grid(row=1, column=2, padx=10)
+        ttk.Label(f3, text="密码:").grid(row=1, column=3, padx=5)
         self.password_entry = ttk.Entry(f3, textvariable=self.password, width=12)
-        self.password_entry.grid(row=0, column=4, padx=5)
+        self.password_entry.grid(row=1, column=4, padx=5)
 
-        # 第二行：每包文件数与前缀
-        ttk.Label(f3, text="每包文件数:").grid(row=1, column=0, sticky=tk.W, padx=5, pady=5)
+        # 第三行：每包文件数与前缀
+        ttk.Label(f3, text="每包文件数:").grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
         self.files_spinbox = ttk.Spinbox(f3, from_=1, to=10000, textvariable=self.files_per_archive, width=10)
-        self.files_spinbox.grid(row=1, column=1, padx=5)
-        ttk.Label(f3, text="压缩包前缀:").grid(row=1, column=2, padx=10, pady=5)
+        self.files_spinbox.grid(row=2, column=1, padx=5)
+        ttk.Label(f3, text="压缩包前缀:").grid(row=2, column=2, padx=10, pady=5)
         self.prefix_entry = ttk.Entry(f3, textvariable=self.archive_prefix, width=15)
-        self.prefix_entry.grid(row=1, column=3, columnspan=2, padx=5, sticky=tk.EW)
+        self.prefix_entry.grid(row=2, column=3, columnspan=2, padx=5, sticky=tk.EW)
 
-        # 第三行：大小限制
-        self.size_limit_check = ttk.Checkbutton(f3, text="限制压缩包大小(MB):", variable=self.enable_size_limit,
-                                                command=self._sync_widget_states)
-        self.size_limit_check.grid(row=2, column=0, sticky=tk.W, padx=5, pady=5)
+        # 第四行：大小限制
+        ttk.Label(f3, text="每包上限(MB):").grid(row=3, column=0, sticky=tk.W, padx=5, pady=5)
         self.size_limit_spinbox = ttk.Spinbox(f3, from_=100, to=102400, increment=512,
                                               textvariable=self.max_archive_size_mb, width=10)
-        self.size_limit_spinbox.grid(row=2, column=1, padx=5)
-
-        # 第四行：子目录独立打包
-        self.subdir_check = ttk.Checkbutton(
-            f3, text="每个子目录打包为独立压缩包（忽略数量/大小限制，子目录名即包名）",
-            variable=self.one_archive_per_subdir, command=self._sync_widget_states)
-        self.subdir_check.grid(row=3, column=0, columnspan=4, sticky=tk.W, padx=5, pady=5)
+        self.size_limit_spinbox.grid(row=3, column=1, padx=5)
 
         # 第五行：文件名加密
         self.header_check = ttk.Checkbutton(f3, text="加密文件名（仅 .7z 格式支持）",
@@ -726,8 +901,10 @@ class BatchZipperApp:
         self._param_widgets = [
             self.source_entry, self.output_entry, self.format_combo,
             self.password_check, self.password_entry, self.prefix_entry,
-            self.files_spinbox, self.size_limit_check, self.size_limit_spinbox,
-            self.subdir_check, self.header_check, self.seven_zip_entry,
+            self.files_spinbox, self.size_limit_spinbox,
+            self.header_check, self.seven_zip_entry,
+            self.dir_add_btn, self.dir_remove_btn, self.dir_clear_btn,
+            self.dir_path_entry, self.dir_add_path_btn, self.dir_listbox,
         ]
 
         # 操作区
