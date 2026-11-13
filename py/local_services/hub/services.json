@@ -85,6 +85,41 @@
       "port": 8801,
       "health_path": "/api/ping",
       "checks": []
+    },
+    {
+      "id": "menz_packager",
+      "name": "门诊订单打包",
+      "icon": "📦",
+      "desc": "关键字搜 SVN/Git 分支 → npm 构建 → 合成基础包成品 ZIP（Node 走 PATH 注入，免管理员权限）",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\menz_packager",
+      "cmd": ["python", "server.py"],
+      "port": 8802,
+      "health_path": "/api/ping",
+      "checks": [
+        {"type": "exe", "target": "npm", "label": "npm 在 PATH"},
+        {"type": "exe", "target": "git", "label": "git 在 PATH（读分支）"},
+        {"type": "exe", "target": "svn", "label": "svn 在 PATH（提交成品）"},
+        {"type": "dir", "target": "cfg:data/config.json#svn_base_dir", "label": "门诊 SVN 基础目录（需先启动一次服务生成配置）"},
+        {"type": "dir", "target": "cfg:data/config.json#git_base_dir", "label": "门诊 Git 基础目录"}
+      ]
+    },
+    {
+      "id": "ward_packager",
+      "name": "病房订单打包",
+      "icon": "🏥",
+      "desc": "按项目类型跑 bash deploy.sh → tar.gz 产物归位 SVN 目录（旧包标记删除）",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\ward_packager",
+      "cmd": ["python", "server.py"],
+      "port": 8803,
+      "health_path": "/api/ping",
+      "checks": [
+        {"type": "file", "target": "C:\\Program Files\\Git\\bin\\bash.exe", "label": "Git Bash（跑 deploy.sh 用，PATH 里的 bash 可能是 WSL 转发器）"},
+        {"type": "exe", "target": "npm", "label": "npm 在 PATH"},
+        {"type": "exe", "target": "git", "label": "git 在 PATH（读分支）"},
+        {"type": "exe", "target": "svn", "label": "svn 在 PATH（提交成品）"},
+        {"type": "dir", "target": "cfg:data/config.json#svn_base_dir", "label": "病房 SVN 基础目录（需先启动一次服务生成配置）"},
+        {"type": "dir", "target": "cfg:data/config.json#code_base_dir", "label": "病房代码基础目录"}
+      ]
     }
   ]
 }

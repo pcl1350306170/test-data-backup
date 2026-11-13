@@ -428,10 +428,11 @@ adb logcat
 
 
 
+
 床头卡
 isStandbyTimeBedHead
 
-
+https://10.1.1.120/svn/智慧门诊/YM-801S/发版目录/7.特殊订单/2026年特殊订单/2026-1952南通通州区中医院
 
 -javaagent:C:\data\idea\FineAgent.jar
 C:\www\mywww\php\backup\20220117123520_textreplace_v1.sql
@@ -440,6 +441,7 @@ C:\www\mywww\php\backup\20220117123520_textreplace_v1.sql
 阿里云盘
 u8NRwU02kHFgyiLtbhno
 135006170
+1350306170
 jd3ISTmebrKk8nfLuwzYcMR9t76oxvUDWXqNZEsJpVPlaG0i4Ah1FByO25QHCgnQXgpbd4PVlYnWy5za
 
 在规则允许内，给人物更换最性感的服饰。

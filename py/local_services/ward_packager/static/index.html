@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>病房订单打包</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header>
+  <h1>🏥 病房订单打包</h1>
+  <div class="head-right">
+    <span class="env" id="envInfo">Node 检测中…</span>
+    <span class="pill" id="statusPill">空闲</span>
+    <button class="icon-btn" id="btnTheme" title="切换主题">🌓</button>
+  </div>
+</header>
+
+<main class="workbench">
+  <!-- 左：搜索与匹配 -->
+  <section class="col col-left">
+    <div class="panel">
+      <h2>🔍 关键字搜索</h2>
+      <div class="inline">
+        <input type="text" id="keyword" placeholder="如：阜外 / 阳泉">
+        <button id="btnSearch">搜索</button>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label>项目类型</label>
+        <div class="types" id="types"></div>
+        <span class="hint">类型决定去哪个 Git 子目录找分支，以及产物前缀</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>💾 SVN 目录 <span class="count" id="svnCount"></span></h2>
+      <ul class="list" id="svnList"><li class="empty">尚未搜索</li></ul>
+    </div>
+
+    <div class="panel">
+      <h2>📁 Git 项目 <span class="count" id="gitCount"></span></h2>
+      <ul class="list" id="gitList"><li class="empty">尚未搜索</li></ul>
+    </div>
+
+    <div class="panel">
+      <h2>🗂 基础目录</h2>
+      <div class="field">
+        <label for="svnBaseDir">病房 SVN 目录</label>
+        <div class="inline">
+          <input type="text" id="svnBaseDir">
+          <button class="mini" data-browse="svnBaseDir" data-root="svn">浏览</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="codeBaseDir">病房代码目录</label>
+        <div class="inline">
+          <input type="text" id="codeBaseDir">
+          <button class="mini" data-browse="codeBaseDir" data-root="code">浏览</button>
+        </div>
+      </div>
+      <button class="mini" id="btnSaveDirs">保存基础目录</button>
+    </div>
+  </section>
+
+  <!-- 中：本次参数 + 操作 + 成品 -->
+  <section class="col col-mid">
+    <div class="panel">
+      <h2>⚙️ 本次打包参数</h2>
+
+      <div class="field">
+        <label for="projectDir">项目目录（Git）</label>
+        <div class="inline">
+          <input type="text" id="projectDir">
+          <button class="mini" data-pick="projectDir" data-kind="dir" data-from="code">选择</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="svnDir">SVN 订单目录</label>
+        <div class="inline">
+          <input type="text" id="svnDir">
+          <button class="mini" data-pick="svnDir" data-kind="dir" data-from="svn">选择</button>
+        </div>
+        <span class="hint">产物会剪切到该目录（或其「前端」子目录）下的工作副本</span>
+      </div>
+
+      <label class="check"><input type="checkbox" id="isNewVersion"> 新版本（web 类型改用 deploy-micro.sh）</label>
+      <label class="check"><input type="checkbox" id="autoCommitSvn"> 打包完成后自动提交 SVN（默认关闭，可稍后用下方按钮单独提交）</label>
+
+      <div class="field">
+        <label for="nodeVersion">Node 版本</label>
+        <div class="inline">
+          <select id="nodeVersion"></select>
+          <button class="mini" id="btnRefreshNode">刷新</button>
+        </div>
+        <span class="hint">构建时把该版本目录注入子进程 PATH，不需要管理员权限，也不改系统当前版本</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🧾 当前推断信息</h2>
+      <div class="kv"><b>分支</b><span id="infoBranch">—</span></div>
+      <div class="kv"><b>版本</b><span id="infoVersion">—</span></div>
+      <div class="kv"><b>部署脚本</b><span id="infoScript">—</span></div>
+      <div class="kv"><b>实际落点</b><span id="infoWorkDir">—</span></div>
+      <div class="kv"><b>dist 产物</b><span id="infoPackage">—</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>🚀 操作</h2>
+      <div class="row">
+        <button class="primary" id="btnStart">开始打包</button>
+        <button id="btnStop" disabled>停止</button>
+        <button id="btnCommit" disabled>提交成品到 SVN</button>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <span class="hint">快捷键：1 秒内连按 3 次 Enter 直接开始打包</span>
+      </div>
+      <div class="errors" id="errors"></div>
+      <div class="notices" id="notices"></div>
+    </div>
+
+    <div class="panel">
+      <h2>📂 SVN 落点成品 <button class="mini" id="btnRefreshFiles">刷新列表</button></h2>
+      <div class="path" id="outputPath">（尚未生成）</div>
+      <ul class="list small" id="fileList"><li class="empty">暂无成品</li></ul>
+    </div>
+  </section>
+
+  <!-- 右：日志 + 历史 -->
+  <section class="col col-right">
+    <div class="panel">
+      <h2>📝 实时日志 <button class="mini" id="btnClearLog">清屏</button></h2>
+      <pre class="log" id="log"></pre>
+    </div>
+
+    <div class="panel">
+      <h2>📚 历史记录 <span class="count" id="histCount"></span></h2>
+      <ul class="list small" id="historyList"><li class="empty">暂无记录</li></ul>
+      <div class="row" style="margin-top:8px">
+        <button class="mini" id="btnHistApply">回填选中记录</button>
+        <button class="mini danger" id="btnHistDelete">删除选中</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="modal hidden" id="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle">选择目录</h3>
+    <div class="path" id="modalPath"></div>
+    <div class="row">
+      <button class="mini" id="modalUp">⬅ 上一级</button>
+      <button class="mini" id="modalPick">✔ 选中当前目录</button>
+      <button class="mini" id="modalClose">关闭</button>
+    </div>
+    <div class="modal-list">
+      <ul class="list" id="modalDirs"></ul>
+      <ul class="list small" id="modalFiles" style="margin-top:8px"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

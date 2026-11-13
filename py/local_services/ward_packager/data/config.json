@@ -1,0 +1,157 @@
+{
+  "port": 8803,
+  "project_type": "床旁",
+  "keyword": "",
+  "code_base_dir": "D:\\CODE\\Yarward\\病房",
+  "svn_base_dir": "D:\\CODE\\Yarward\\SVN\\病房",
+  "project_dir": "",
+  "svn_dir": "",
+  "auto_commit_svn": false,
+  "is_new_version": false,
+  "node_version": "14.19.1",
+  "history_records": [
+    {
+      "timestamp": "2026-10-09 18:11:09",
+      "project_type": "护理看板",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\看板\\看板3.1",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1689厦门妇幼保健院",
+      "package_name": "ntv-3.1.6_厦门妇幼保健院_202610091810.tar.gz",
+      "keyword": "厦门",
+      "auto_commit_svn": false,
+      "node_version": "14.19.1",
+      "is_new_version": false,
+      "branch": "3.1.6_厦门妇幼保健院"
+    },
+    {
+      "timestamp": "2026-10-09 14:15:01",
+      "project_type": "护理看板",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\看板\\看板3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-9999深圳市龙华区人民医院",
+      "package_name": "ntv-3.4.3_深圳市龙华区人民医院_202610091413.tar.gz",
+      "keyword": "深圳市龙华区人民医院",
+      "auto_commit_svn": false,
+      "node_version": "14.19.1",
+      "is_new_version": false,
+      "branch": "3.4.3_深圳市龙华区人民医院"
+    },
+    {
+      "timestamp": "2026-09-24 14:51:48",
+      "project_type": "护理看板",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\看板\\看板3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1852大同市第一人民医院",
+      "package_name": "ntv-3.4.0_大同市第一人民医院_202609241451.tar.gz",
+      "keyword": "大同市第一人民医院",
+      "auto_commit_svn": true,
+      "node_version": "14.19.1",
+      "is_new_version": false,
+      "branch": "3.4.0_大同市第一人民医院"
+    },
+    {
+      "timestamp": "2026-09-17 09:47:32",
+      "project_type": "护理看板",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\看板\\看板3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1714九江市第一人民医院（活水院区、八里河院区）-鸿蒙",
+      "package_name": "ntv-3.4.2_九江市第一人民医院（活水院区、八里湖院区）-鸿蒙_202609170946.tar.gz",
+      "keyword": "九江",
+      "auto_commit_svn": true,
+      "node_version": "14.19.1",
+      "is_new_version": false,
+      "branch": "3.4.2_九江市第一人民医院（活水院区、八里湖院区）-鸿蒙"
+    },
+    {
+      "timestamp": "2026-09-10 15:13:42",
+      "project_type": "web",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\web\\web3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1711上海蓝十字脑科医院有限公司",
+      "package_name": "web-micro-3.4.4_上海蓝十字脑科医院有限公司_202609101510.tar.gz",
+      "keyword": "上海",
+      "auto_commit_svn": true,
+      "node_version": "14.19.1",
+      "is_new_version": true,
+      "branch": "3.4.4_上海蓝十字脑科医院有限公司"
+    },
+    {
+      "timestamp": "2026-09-10 15:03:15",
+      "project_type": "web",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\web\\web3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1712四川蓝生脑科医院有限公司",
+      "package_name": "web-micro-3.4.4_四川蓝生脑科医院有限公司_202609101500.tar.gz",
+      "keyword": "四川",
+      "auto_commit_svn": true,
+      "node_version": "14.19.1",
+      "is_new_version": true,
+      "branch": "3.4.4_四川蓝生脑科医院有限公司"
+    },
+    {
+      "timestamp": "2026-09-08 17:24:56",
+      "project_type": "web",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\web\\web3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1714九江市第一人民医院（活水院区、八里河院区）-鸿蒙",
+      "package_name": "web-3.4.2_九江市第一人民医院(活水院区)_202609081722.tar.gz",
+      "keyword": "九江",
+      "auto_commit_svn": false,
+      "node_version": "14.19.1",
+      "branch": "3.4.2_九江市第一人民医院(活水院区)"
+    },
+    {
+      "timestamp": "2026-09-07 11:13:14",
+      "project_type": "护理看板",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\看板\\看板3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1712四川蓝生脑科医院有限公司",
+      "package_name": "ntv-3.4.4_四川蓝生脑科医院有限公司_202609071112.tar.gz",
+      "keyword": "四川蓝生脑科医院有限公司",
+      "auto_commit_svn": true,
+      "node_version": "14.19.1",
+      "branch": "3.4.4_四川蓝生脑科医院有限公司"
+    },
+    {
+      "timestamp": "2026-09-07 10:35:59",
+      "project_type": "护理看板",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\看板\\看板3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1711上海蓝十字脑科医院有限公司",
+      "package_name": "ntv-3.4.4_上海蓝十字脑科医院有限公司_202609071035.tar.gz",
+      "keyword": "上海蓝十字脑科医院有限公司",
+      "auto_commit_svn": false,
+      "node_version": "14.19.1",
+      "branch": "3.4.4_上海蓝十字脑科医院有限公司"
+    },
+    {
+      "timestamp": "2026-08-29 12:36:43",
+      "project_type": "床头",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\床头\\床头3.1",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1609北京朝阳医院-前端",
+      "package_name": "bedhead-3.1.3_北京朝阳医院_202608291236.tar.gz",
+      "keyword": "朝阳",
+      "auto_commit_svn": false,
+      "branch": "3.1.3_北京朝阳医院"
+    },
+    {
+      "timestamp": "2026-07-29 10:33:02",
+      "project_type": "床头",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\床头\\床头3.4",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\0A通用\\3.4.4-前端-package",
+      "package_name": "bedhead-3.4.4_202607291032.tar.gz",
+      "keyword": "3.4.4",
+      "auto_commit_svn": true,
+      "branch": "3.4.4"
+    },
+    {
+      "timestamp": "2026-07-28 16:07:07",
+      "project_type": "护理看板",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\看板\\看板3.1",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026年7月28日-济南中心医院东院区-首页空数据显示调整",
+      "package_name": "ntv-3.2.1-济南市中心医院东院区_202607281606.tar.gz",
+      "keyword": "济南",
+      "auto_commit_svn": true,
+      "branch": "3.2.1-济南市中心医院东院区"
+    },
+    {
+      "timestamp": "2026-07-20 19:35:59",
+      "project_type": "床旁",
+      "project_dir": "D:\\CODE\\Yarward\\病房\\床旁\\床旁3.2",
+      "svn_dir": "D:\\CODE\\Yarward\\SVN\\病房\\2026-1078济南中心医院东院区",
+      "package_name": "bedside-3.2.1_济南市中心医院东院区_2607201935.tar.gz",
+      "keyword": "济南"
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>门诊订单打包</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<header>
+  <h1>📦 门诊订单打包</h1>
+  <div class="head-right">
+    <span class="env" id="envInfo">Node 检测中…</span>
+    <span class="pill" id="statusPill">空闲</span>
+    <button class="icon-btn" id="btnTheme" title="切换主题">🌓</button>
+  </div>
+</header>
+
+<main class="workbench">
+  <!-- 左：搜索与匹配 -->
+  <section class="col col-left">
+    <div class="panel">
+      <h2>🔍 关键字搜索</h2>
+      <div class="inline">
+        <input type="text" id="keyword" placeholder="如：阳泉 / 上饶">
+        <button id="btnSearch">搜索</button>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <span class="hint">同时匹配 SVN 目录名与 Git 分支名；点击右侧结果自动回填参数</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>💾 SVN 目录 <span class="count" id="svnCount"></span></h2>
+      <ul class="list" id="svnList"><li class="empty">尚未搜索</li></ul>
+    </div>
+
+    <div class="panel">
+      <h2>📁 Git 项目 <span class="count" id="gitCount"></span></h2>
+      <ul class="list" id="gitList"><li class="empty">尚未搜索</li></ul>
+    </div>
+
+    <div class="panel">
+      <h2>🗂 基础目录</h2>
+      <div class="field">
+        <label for="svnBaseDir">门诊 SVN 目录</label>
+        <div class="inline">
+          <input type="text" id="svnBaseDir">
+          <button class="mini" data-browse="svnBaseDir" data-root="svn">浏览</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="gitBaseDir">门诊 Git 目录</label>
+        <div class="inline">
+          <input type="text" id="gitBaseDir">
+          <button class="mini" data-browse="gitBaseDir" data-root="git">浏览</button>
+        </div>
+      </div>
+      <button class="mini" id="btnSaveDirs">保存基础目录</button>
+    </div>
+  </section>
+
+  <!-- 中：本次参数 + 操作 + 成品 -->
+  <section class="col col-mid">
+    <div class="panel">
+      <h2>⚙️ 本次打包参数</h2>
+
+      <div class="field">
+        <label for="projectDir">项目目录（Git）</label>
+        <div class="inline">
+          <input type="text" id="projectDir">
+          <button class="mini" data-pick="projectDir" data-kind="dir" data-from="git">选择</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="outputDir">输出目录（SVN 前端目录）</label>
+        <div class="inline">
+          <input type="text" id="outputDir">
+          <button class="mini" data-pick="outputDir" data-kind="dir" data-from="svn">选择</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="orderInfo">订单信息</label>
+        <input type="text" id="orderInfo" placeholder="前 9 位为订单号，其余为医院名">
+        <span class="hint">例：2026-2082上饶市人民医院 → YM-801S-TLSS-V1.5.1.262082.01001-SRSRMYY-FE.zip</span>
+      </div>
+
+      <div class="field">
+        <label for="versionSelect">项目版本</label>
+        <div class="inline">
+          <select id="versionSelect"></select>
+          <input type="text" id="versionManual" placeholder="手动输入 x.y.z" style="display:none">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="baseZip">基础压缩包</label>
+        <div class="inline">
+          <input type="text" id="baseZip">
+          <button class="mini" data-pick="baseZip" data-kind="zip" data-from="svn">选择</button>
+        </div>
+        <div class="row" id="baseZipQuick"></div>
+      </div>
+
+      <div class="field">
+        <label for="customZip">自定义 ZIP 名称（留空自动生成）</label>
+        <input type="text" id="customZip">
+      </div>
+
+      <label class="check"><input type="checkbox" id="is155Plus"> 1.5.5 及以上版本（仅执行 npm run build，不跑 lib-render2）</label>
+      <label class="check"><input type="checkbox" id="autoCommitSvn"> 打包完成后自动提交 SVN（默认关闭，可稍后用下方按钮单独提交）</label>
+
+      <div class="field">
+        <label for="nodeVersion">Node 版本</label>
+        <div class="inline">
+          <select id="nodeVersion"></select>
+          <button class="mini" id="btnRefreshNode">刷新</button>
+        </div>
+        <span class="hint">构建时把该版本目录注入子进程 PATH，不需要管理员权限，也不改系统当前版本</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🚀 操作</h2>
+      <div class="row">
+        <button class="primary" id="btnStart">开始打包</button>
+        <button id="btnStop" disabled>停止</button>
+        <button id="btnCommit" disabled>提交成品到 SVN</button>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <span class="hint">快捷键：1 秒内连按 3 次 Enter 直接开始打包</span>
+      </div>
+      <div class="errors" id="errors"></div>
+      <div class="notices" id="notices"></div>
+    </div>
+
+    <div class="panel">
+      <h2>📂 成品目录 <button class="mini" id="btnRefreshFiles">刷新列表</button></h2>
+      <div class="path" id="outputPath">（尚未生成）</div>
+      <ul class="list small" id="fileList"><li class="empty">暂无成品</li></ul>
+    </div>
+  </section>
+
+  <!-- 右：日志 + 历史 -->
+  <section class="col col-right">
+    <div class="panel">
+      <h2>📝 实时日志 <button class="mini" id="btnClearLog">清屏</button></h2>
+      <pre class="log" id="log"></pre>
+    </div>
+
+    <div class="panel">
+      <h2>📚 历史记录 <span class="count" id="histCount"></span></h2>
+      <ul class="list small" id="historyList"><li class="empty">暂无记录</li></ul>
+      <div class="row" style="margin-top:8px">
+        <button class="mini" id="btnHistApply">回填选中记录</button>
+        <button class="mini danger" id="btnHistDelete">删除选中</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="modal hidden" id="modal">
+  <div class="modal-box">
+    <h3 id="modalTitle">选择目录</h3>
+    <div class="path" id="modalPath"></div>
+    <div class="row">
+      <button class="mini" id="modalUp">⬅ 上一级</button>
+      <button class="mini" id="modalPick">✔ 选中当前目录</button>
+      <button class="mini" id="modalClose">关闭</button>
+    </div>
+    <div class="modal-list">
+      <ul class="list" id="modalDirs"></ul>
+      <ul class="list small" id="modalFiles" style="margin-top:8px"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
