@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grok 会话导出工具</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="app-header">
+    <div class="brand">
+      <span class="logo">🛰️</span>
+      <div>
+        <h1>Grok 会话导出工具</h1>
+        <p class="sub">本地服务 · Grok 会话 JSON → Markdown / TXT</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <a href="http://127.0.0.1:8700" class="ghost-btn" target="_blank">返回服务大厅</a>
+    </div>
+  </header>
+
+  <!-- ① 文件选择区 -->
+  <section class="card" id="section-file">
+    <h2><span class="tag">①</span>JSON 文件选择</h2>
+    <div class="row">
+      <button id="btn-pick-file" class="primary">选择 JSON 文件</button>
+      <button id="btn-reload" class="ghost">重新加载</button>
+      <input id="path-input" class="path-input" placeholder="也可以直接粘贴 JSON 文件绝对路径" />
+      <button id="btn-load-path" class="ghost">加载该路径</button>
+    </div>
+    <div id="drop-zone" class="drop-zone">将 .json 文件拖拽到这里（拖入后会自动填充路径）</div>
+    <div id="file-info" class="file-info">尚未选择文件</div>
+  </section>
+
+  <!-- ② 数据概览区 -->
+  <section class="card" id="section-overview">
+    <h2><span class="tag">②</span>数据概览</h2>
+    <div id="stats" class="stats">
+      <div class="stat"><div class="num" id="stat-conv">-</div><div class="label">会话总数</div></div>
+      <div class="stat"><div class="num" id="stat-msg">-</div><div class="label">消息总数</div></div>
+      <div class="stat"><div class="num" id="stat-user">-</div><div class="label">用户消息</div></div>
+      <div class="stat"><div class="num" id="stat-grok">-</div><div class="label">Grok 回复</div></div>
+    </div>
+    <p class="hint">每个会话的标题/时间/消息数见下方「会话选择」表。</p>
+  </section>
+
+  <!-- ③ 会话选择区 -->
+  <section class="card" id="section-sessions">
+    <h2><span class="tag">③</span>会话选择</h2>
+    <div class="row toolbar">
+      <button id="btn-select-all" class="ghost">全选</button>
+      <button id="btn-select-none" class="ghost">取消全选</button>
+      <input id="search-input" placeholder="搜索会话标题…" />
+      <select id="sort-by">
+        <option value="index">按编号</option>
+        <option value="message_count">按消息数</option>
+        <option value="create_time">按创建时间</option>
+        <option value="modify_time">按修改时间</option>
+      </select>
+      <label class="ghost"><input type="checkbox" id="sort-desc"> 倒序</label>
+      <span class="spacer"></span>
+      <span id="selection-count" class="muted">已选 0 / 0</span>
+    </div>
+    <div class="table-wrap">
+      <table id="session-table">
+        <thead><tr>
+          <th class="w-check"><input type="checkbox" id="check-all"></th>
+          <th class="w-idx">#</th>
+          <th>标题</th>
+          <th class="w-num">消息</th>
+          <th class="w-num">用户</th>
+          <th class="w-num">Grok</th>
+          <th class="w-time">创建时间</th>
+          <th class="w-time">修改时间</th>
+          <th class="w-action">操作</th>
+        </tr></thead>
+        <tbody id="session-tbody"><tr><td colspan="9" class="empty">尚未加载数据</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ④ 导出配置区 -->
+  <section class="card" id="section-config">
+    <h2><span class="tag">④</span>导出配置</h2>
+    <div class="cfg-grid">
+      <div class="cfg-block">
+        <h3>导出文件格式</h3>
+        <label><input type="checkbox" class="opt-format" value="md" checked> Markdown (.md)</label>
+        <label><input type="checkbox" class="opt-format" value="txt"> TXT (.txt)</label>
+      </div>
+
+      <div class="cfg-block">
+        <h3>导出内容范围</h3>
+        <label><input type="radio" name="scope" value="all" checked> 完整对话（用户 + Grok）</label>
+        <label><input type="radio" name="scope" value="grok"> 只导出 Grok 回复</label>
+        <label><input type="radio" name="scope" value="user"> 只导出用户消息</label>
+      </div>
+
+      <div class="cfg-block">
+        <h3>导出组织方式</h3>
+        <label><input type="radio" name="org" value="individual" checked> 每个会话单独一个文件</label>
+        <label><input type="radio" name="org" value="merged"> 所有会话合并为一个文件</label>
+        <label><input type="radio" name="org" value="both"> 同时生成单独 + 合并</label>
+      </div>
+
+      <div class="cfg-block wide">
+        <h3>其他选项</h3>
+        <label><input type="checkbox" id="opt-title" checked> 文件开头添加会话标题</label>
+        <label><input type="checkbox" id="opt-time-meta" checked> 添加创建时间和修改时间</label>
+        <label><input type="checkbox" id="opt-sender-label" checked> 为每条消息添加发送者标识</label>
+        <label><input type="checkbox" id="opt-timestamp" checked> 为每条消息添加时间戳</label>
+        <label><input type="checkbox" id="opt-separator" checked> 消息之间添加分隔线</label>
+        <label><input type="checkbox" id="opt-preserve-md" checked> 保留原始 Markdown 格式 / 代码块 / 段落</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ 导出目录区 -->
+  <section class="card" id="section-output">
+    <h2><span class="tag">⑤</span>导出目录</h2>
+    <div class="row">
+      <button id="btn-pick-dir" class="primary">选择导出目录</button>
+      <input id="output-dir" class="path-input" placeholder="默认：JSON 同目录下的 Grok_Export 文件夹" />
+    </div>
+    <p class="hint">不存在的目录会自动创建；同名文件会自动追加 _01/_02 序号避免覆盖。</p>
+  </section>
+
+  <!-- ⑥ 导出操作区 -->
+  <section class="card" id="section-action">
+    <h2><span class="tag">⑥</span>导出操作</h2>
+    <div class="row">
+      <button id="btn-export" class="primary big">开始导出</button>
+      <button id="btn-cancel" class="ghost" disabled>取消导出</button>
+      <button id="btn-open-dir" class="ghost">打开导出目录</button>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div id="progress-fill" class="progress-fill" style="width:0%"></div></div>
+      <div id="progress-text" class="muted">未开始</div>
+    </div>
+    <div id="export-result" class="export-result"></div>
+    <ul id="export-log" class="export-log"></ul>
+  </section>
+
+  <footer class="app-footer">
+    <span class="muted">仅本地运行 · 不修改原始 JSON · 不上传任何数据</span>
+  </footer>
+</div>
+
+<!-- 预览浮层 -->
+<div id="preview-modal" class="modal hidden">
+  <div class="modal-mask"></div>
+  <div class="modal-body">
+    <div class="modal-head">
+      <h3 id="preview-title">预览</h3>
+      <div class="row">
+        <select id="preview-format">
+          <option value="md">Markdown</option>
+          <option value="txt">TXT</option>
+        </select>
+        <button id="btn-close-preview" class="ghost">关闭</button>
+      </div>
+    </div>
+    <pre id="preview-content" class="preview-content">加载中…</pre>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

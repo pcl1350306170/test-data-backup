@@ -74,6 +74,17 @@
       "checks": [
         {"type": "dir", "target": "cfg:data/config.json#shared_dir", "label": "共享目录可访问"}
       ]
+    },
+    {
+      "id": "grok_exporter",
+      "name": "Grok 会话导出",
+      "icon": "🛰️",
+      "desc": "Grok 导出 JSON 可视化解析，批量导出 Markdown / TXT",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\grok_exporter",
+      "cmd": ["python", "server.py"],
+      "port": 8801,
+      "health_path": "/api/ping",
+      "checks": []
     }
   ]
 }
