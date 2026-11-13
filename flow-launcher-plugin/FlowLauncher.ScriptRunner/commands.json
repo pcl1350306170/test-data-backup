@@ -1141,6 +1141,20 @@
             ],
             "script": "other\\音频文件截取.pyw",
             "description": "音频截取时间段/固定时长/前后N秒，支持波形拖拽选区与试听"
+        },
+        {
+            "name": "MP3信息编辑",
+            "keywords": [
+                "mp3bj",
+                "xxbj",
+                "mp3xxbj",
+                "id3",
+                "标签",
+                "音频",
+                "audio"
+            ],
+            "script": "other\\MP3信息编辑.pyw",
+            "description": "编辑MP3标题/作者/专辑/封面等信息（配合音频合并工具修正）"
         }
     ]
 }
