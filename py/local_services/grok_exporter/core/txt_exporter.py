@@ -64,6 +64,22 @@ def _filter_messages(messages: list, scope: str) -> list:
 
 def render_conversation_txt(session: dict, opts: dict) -> str:
     """单会话 → TXT。"""
+    scope = opts.get("scope", "all")
+    filtered = _filter_messages(session["messages"], scope)
+    preserve_md = opts.get("preserve_markdown", False)
+
+    # 仅导出 Grok 回复：纯正文，无标题/元信息/分隔符/发送者标识/时间戳
+    if scope == "grok":
+        blocks = []
+        for m in filtered:
+            content = m["content"] or "（此消息没有普通文本正文）"
+            if not preserve_md:
+                content = md_to_plain(content) or "（空）"
+            blocks.append(content)
+        if not blocks:
+            return ""
+        return "\n\n".join(blocks).rstrip() + "\n"
+
     lines = [SEP_MAJOR, session["title"], SEP_MAJOR, ""]
 
     if opts.get("time_meta", True):
@@ -72,10 +88,6 @@ def render_conversation_txt(session: dict, opts: dict) -> str:
         lines.append(f"修改时间：{session['modify_time']}")
         lines.append(f"消息数量：{len(session['messages'])}")
         lines.append("")
-
-    scope = opts.get("scope", "all")
-    filtered = _filter_messages(session["messages"], scope)
-    preserve_md = opts.get("preserve_markdown", False)
 
     for m in filtered:
         head = f"【{m['role']}】"

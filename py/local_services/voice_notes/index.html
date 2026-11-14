@@ -295,7 +295,7 @@
       word-break: break-word;
       font-size: 15px;
       line-height: 1.75;
-      cursor: pointer;
+      cursor: text;
       padding: 2px 0;
     }
 
@@ -828,7 +828,7 @@
           li.appendChild(top);
 
           var body = document.createElement('div'); body.className = 'content clamp'; body.textContent = n.content;
-          body.onclick = function () { copy(n); }; li.appendChild(body);
+          li.appendChild(body);
           var mb = document.createElement('button'); mb.className = 'more'; mb.textContent = '展开全文'; mb.style.display = 'none';
           mb.onclick = function (e) {
             e.stopPropagation();

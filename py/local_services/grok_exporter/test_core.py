@@ -132,6 +132,18 @@ for sc in ("grok", "user"):
         assert "## 1. Grok" not in text, "user-only 不应含 Grok 标题"
     print(f"  scope={sc} 文件 {p.name}，长度={len(text)}")
 
+# TXT grok-only：纯正文，无分隔符/发送者标识/元信息
+o_txt = ExportOptions({"formats": ["txt"], "scope": "grok", "organization": "individual",
+                       "output_dir": str(OUT / "t8_grok_txt")})
+r_txt = exporter.run_export([sessions[0]], o_txt)
+txt = Path(r_txt.files[0]).read_text(encoding="utf-8")
+assert "=" * 40 not in txt, "TXT grok-only 不应含 === 分隔符"
+assert "-" * 40 not in txt, "TXT grok-only 不应含 --- 分隔符"
+assert "【Grok】" not in txt, "TXT grok-only 不应含发送者标识"
+assert "【用户】" not in txt, "TXT grok-only 不应含用户标识"
+assert "会话 ID：" not in txt, "TXT grok-only 不应含元信息"
+print(f"  TXT grok-only 纯正文验证通过，长度={len(txt)}")
+
 banner("T9  重名文件追加 _01 序号")
 o = ExportOptions({"formats": ["md"], "scope": "all", "organization": "individual",
                    "output_dir": str(OUT / "t9")})

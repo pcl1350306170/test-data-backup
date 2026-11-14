@@ -66,6 +66,12 @@ input[type="text"]:focus, select:focus { outline: none; border-color: var(--acce
 .inline { display: flex; gap: 6px; align-items: center; }
 .inline input[type="text"] { flex: 1; min-width: 0; }
 .check { display: flex; align-items: center; gap: 6px; font-size: 13px; margin-bottom: 8px; }
+.types { display: flex; gap: 6px; flex-wrap: wrap; }
+.types button {
+  padding: 5px 12px; font-size: 12px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--bg);
+}
+.types button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 button {
   padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px;
   background: var(--panel); color: var(--text); cursor: pointer; font-size: 13px;

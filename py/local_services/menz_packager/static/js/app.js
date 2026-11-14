@@ -1,9 +1,10 @@
 /* 门诊订单打包 — 三栏工作台交互
    对应桌面版 门诊打包.pyw：关键字搜索 → 点选回填 → 打包 → 成品列表 → 历史。
-   区别：不弹本机目录对话框（走 /api/browse 受限浏览），日志走 SSE，Node 版本走 PATH 注入。 */
+   区别：不弹本机目录对话框（走 /api/browse 受限浏览），日志走 SSE，Node 版本走 PATH 注入。
+   一个服务打三种成品（模板 / 播报机 / web运维端），类型只影响 Git 目录范围、基础包前缀与构建脚本。 */
 var App = (function () {
   var cfg = {};
-  var meta = {version_options: [], roots: []};
+  var meta = {version_options: [], roots: [], project_kinds: []};
   var nodeInfo = {};
   var stream = null;
   var searchData = {svn_dirs: [], projects: []};
@@ -12,6 +13,7 @@ var App = (function () {
   var histSel = -1;
   var lastPackage = '';
   var busy = false;
+  var kind = '模板';
   var picker = {target: '', kind: 'dir', path: '', from: 'svn'};
   var enterHits = [];
 
@@ -37,6 +39,76 @@ var App = (function () {
   // meta.roots 约定为 [svn_base_dir, git_base_dir]
   function rootOf(which) {
     return (meta.roots || [])[which === 'git' ? 1 : 0] || '';
+  }
+
+  // ── 打包项目类型 ────────────────────────────────
+  function kindList() {
+    return meta.project_kinds || [];
+  }
+
+  function hasKind(name) {
+    var list = kindList();
+    for (var i = 0; i < list.length; i++) if (list[i].name === name) return true;
+    return false;
+  }
+
+  // 后端是唯一规则源（meta.project_kinds），页面只做展示与联动
+  function kindRule(name) {
+    var list = kindList();
+    for (var i = 0; i < list.length; i++) if (list[i].name === (name || kind)) return list[i];
+    return list[0] || {name: '模板', zip_prefix: 'YM-801S-TLSS-', build_script: 'build',
+                       node_version: '', render_lib: true, dirs: ['template']};
+  }
+
+  function renderKinds() {
+    $('kinds').innerHTML = kindList().map(function (r) {
+      return '<button type="button" data-kind="' + esc(r.name) + '" class="' +
+        (r.name === kind ? 'on' : '') + '" title="目录 ' + esc((r.dirs || []).join('/')) +
+        '* ・ npm run ' + esc(r.build_script) + '">' + esc(r.name) + '</button>';
+    }).join('');
+  }
+
+  function applyKindUI() {
+    var r = kindRule();
+    // lib-render2 只适用于模板，其他类型藏起来并强制不勾选
+    $('row155').style.display = r.render_lib ? '' : 'none';
+    if (!r.render_lib) $('is155Plus').checked = false;
+    $('baseZipLabel').textContent = '基础压缩包（' + r.zip_prefix + '****-FE.zip）';
+    $('orderHint').textContent = '例：2026-2082上饶市人民医院 → ' + r.zip_prefix +
+      'V1.5.1.262082.01001-SRSRMYY-FE.zip';
+    var hint = '「' + kind + '」：Git 目录 ' + (r.dirs || []).join('/') + '*，基础包 ' +
+      r.zip_prefix + '*，跑 npm run ' + r.build_script;
+    if (r.node_version) hint += '，建议用 Node ' + r.node_version;
+    if (r.render_lib) hint += '；1.5.5 及以上不跑 lib-render2';
+    $('kindHint').textContent = hint;
+  }
+
+  // 切类型时带出该类型建议的 Node；建议为空的类型回到配置/默认版本（仍可手动改）
+  function syncNodeWithKind() {
+    var want = kindRule().node_version || cfg.node_version || nodeInfo.default || '';
+    var sel = $('nodeVersion');
+    if (!want) return;
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === want) {
+        sel.value = want;
+        return;
+      }
+    }
+    toast('「' + kind + '」建议 Node ' + want + '，本机未检测到，保持当前版本', 5000);
+  }
+
+  function setKind(name, opt) {
+    opt = opt || {};
+    if (!name || !hasKind(name)) return;
+    if (name === kind && !opt.force) return;
+    kind = name;
+    renderKinds();
+    applyKindUI();
+    if (opt.node !== false) syncNodeWithKind();
+    if (opt.persist !== false) req('POST', '/api/config', {project_kind: kind});
+    var r = kindRule();
+    setNotice('已切换为「' + kind + '」：基础包 ' + r.zip_prefix + '****-FE.zip，构建 npm run ' +
+      r.build_script + '；建议重新搜索一次，列出的 Git 项目会跟着变');
   }
 
   // ── 请求封装 ──────────────────────────────────────
@@ -74,6 +146,7 @@ var App = (function () {
       if (!res.ok) { toast('读取配置失败：' + res.status); return; }
       cfg = res.data.config || {};
       meta = res.data.meta || meta;
+      if (hasKind(cfg.project_kind)) kind = cfg.project_kind;
       $('svnBaseDir').value = cfg.svn_base_dir || '';
       $('gitBaseDir').value = cfg.git_base_dir || '';
       setVal('projectDir', cfg.project_dir);
@@ -84,6 +157,8 @@ var App = (function () {
       $('is155Plus').checked = !!cfg.is_version_155_plus;
       $('autoCommitSvn').checked = !!cfg.auto_commit_svn;
       buildVersionOptions(cfg.project_version);
+      renderKinds();
+      applyKindUI();
       if (res.data.legacy_migrated) toast('已从旧桌面版配置迁移：' + res.data.legacy_migrated, 5000);
     });
   }
@@ -143,7 +218,7 @@ var App = (function () {
     setErrors([]);
     setNotice('');
     $('btnSearch').disabled = true;
-    req('POST', '/api/search', {keyword: keyword}).then(function (res) {
+    req('POST', '/api/search', {keyword: keyword, project_kind: kind}).then(function (res) {
       $('btnSearch').disabled = false;
       if (!res.ok) {
         var d = detailOf(res);
@@ -193,7 +268,12 @@ var App = (function () {
       if (sug.project_dir) $('projectDir').value = sug.project_dir;
       if (sug.project_version) setVersion(sug.project_version);
     }
-    if (!svn.length && !git.length) setNotice(data.notice || '未找到匹配目录');
+    if (!svn.length && !git.length) {
+      setNotice(data.notice || '未找到匹配目录');
+    } else if (!git.length) {
+      setNotice('SVN 有 ' + svn.length + ' 个目录，但「' + kind + '」下没匹配到 Git 分支' +
+        '（只看目录名 ' + (kindRule().dirs || []).join('/') + '* 的仓库），类型不对就切一下重试');
+    }
   }
 
   function setVersion(ver) {
@@ -225,7 +305,7 @@ var App = (function () {
       var item = searchData.svn_dirs[+li.getAttribute('data-svn')];
       if (!item) return;
       selectLi('svnList', li);
-      prefill({svn_dir: item.path}, function (d) {
+      prefill({svn_dir: item.path, project_kind: kind}, function (d) {
         if (d.output_dir) $('outputDir').value = d.output_dir;
         if (d.order_info) $('orderInfo').value = d.order_info;
         if (d.base_zip_path) $('baseZip').value = d.base_zip_path;
@@ -252,11 +332,46 @@ var App = (function () {
       selectLi('gitList', li);
       $('projectDir').value = item.path;
       if (item.version) setVersion(item.version);
-      prefill({project_dir: item.path}, function (d) {
+      prefill({project_dir: item.path, project_kind: kind}, function (d) {
         if (d.project_version) setVersion(d.project_version);
         setNotice(d.version_notice || (d.git_branch ? '分支：' + d.git_branch : ''));
+        if (d.has_build_script === false) {
+          toast('⚠️ 该项目没有 npm run ' + (d.build_script || kindRule().build_script) +
+                '，现有：' + ((d.available_scripts || []).join('、') || '无'), 6000);
+        }
       });
     });
+  }
+
+  // 手工选了项目目录：除回填分支/版本外，还要核对目录属于哪个类型（后端会反推）
+  function syncProjectDir(path) {
+    prefill({project_dir: path, project_kind: kind}, function (d) {
+      if (d.project_version) setVersion(d.project_version);
+      if (d.dir_kind && d.dir_kind !== kind) {
+        setKind(d.dir_kind, {persist: true, force: true});
+        toast(d.kind_notice || ('目录属于「' + d.dir_kind + '」，已自动切换类型'), 6000);
+        return;
+      }
+      if (d.has_build_script === false) {
+        toast('⚠️ 该项目没有 npm run ' + (d.build_script || kindRule().build_script) +
+              '，现有：' + ((d.available_scripts || []).join('、') || '无'), 6000);
+        return;
+      }
+      setNotice(d.git_branch ? '分支 ' + d.git_branch + '，构建 npm run ' + kindRule().build_script
+                             : '没读到 git 分支，请确认选的是仓库目录');
+    });
+  }
+
+  // 手工选了基础压缩包：前缀与类型不配时先提醒，别等到校验才看到
+  function checkBaseZip(name) {
+    var rule = kindRule();
+    if (!name || name.indexOf(rule.zip_prefix) === 0) return;
+    var owner = '其他';
+    kindList().forEach(function (k) {
+      if (name.indexOf(k.zip_prefix) === 0) owner = k.name;
+    });
+    toast('⚠️ 这是「' + owner + '」的基础包，与当前类型「' + kind + '」不配（应以 ' +
+          rule.zip_prefix + ' 开头）', 6000);
   }
 
   function prefill(params, done) {
@@ -349,7 +464,7 @@ var App = (function () {
       if (!li) return;
       $(picker.target).value = li.getAttribute('data-file');
       closeModal();
-      if (picker.target === 'baseZip') setNotice('');
+      if (picker.target === 'baseZip') checkBaseZip(li.getAttribute('data-file'));
     });
     $('modalUp').addEventListener('click', function () {
       var p = picker.path.replace(/[\\/]+$/, '');
@@ -360,6 +475,7 @@ var App = (function () {
       $(picker.target).value = picker.path;
       closeModal();
       if (picker.target === 'outputDir') refreshFiles();
+      if (picker.target === 'projectDir') syncProjectDir(picker.path);
     });
     $('modalClose').addEventListener('click', closeModal);
     $('modal').addEventListener('click', function (e) { if (e.target === $('modal')) closeModal(); });
@@ -382,13 +498,15 @@ var App = (function () {
   // ── 打包参数 ──────────────────────────────────────
   function collectParams() {
     return {
+      project_kind: kind,
       project_dir: val('projectDir'),
       output_dir: val('outputDir'),
       order_info: val('orderInfo'),
       project_version: currentVersion(),
       base_zip_path: val('baseZip'),
       custom_zip_name: val('customZip'),
-      is_version_155_plus: $('is155Plus').checked,
+      // 非模板类型没有 lib-render2，勾了也不带上，避免后端白跑一步
+      is_version_155_plus: kindRule().render_lib ? $('is155Plus').checked : false,
       auto_commit_svn: $('autoCommitSvn').checked,
       node_version: $('nodeVersion').value
     };
@@ -568,7 +686,8 @@ var App = (function () {
       histRecords = res.data.records || [];
       $('histCount').textContent = histRecords.length + ' / ' + (res.data.limit || 100);
       $('historyList').innerHTML = histRecords.length ? histRecords.map(function (r, i) {
-        return '<li data-h="' + i + '"><div class="name">' + esc(r.order_info || pkgName(r) || '(未填订单)') + '</div>' +
+        return '<li data-h="' + i + '"><div class="name">[' + esc(r.project_kind || '模板') + '] ' +
+          esc(r.order_info || pkgName(r) || '(未填订单)') + '</div>' +
           '<div class="sub">' + esc(r.timestamp || '') + (r.project_version ? ' · v' + esc(r.project_version) : '') + '</div>' +
           '<div class="sub">' + esc(pkgName(r) || '无成品名') + '</div></li>';
       }).join('') : '<li class="empty">暂无记录</li>';
@@ -585,6 +704,8 @@ var App = (function () {
   function applyHistory() {
     if (histSel < 0 || !histRecords[histSel]) { toast('先点击选中一条历史记录'); return; }
     var r = histRecords[histSel];
+    // 类型先恢复，否则 155 勾选框在别的类型下还藏着，写了值也看不到
+    if (r.project_kind) setKind(r.project_kind, {node: false, force: true});
     setVal('projectDir', r.project_dir);
     setVal('outputDir', r.output_dir);
     setVal('orderInfo', r.order_info);
@@ -599,7 +720,7 @@ var App = (function () {
     refreshFiles(r.output_dir);
     if (r.base_zip_path) {
       var dir = r.base_zip_path.replace(/[\\/][^\\/]+$/, '');
-      req('POST', '/api/prefill', {svn_dir: dir}).then(function (res) {
+      req('POST', '/api/prefill', {svn_dir: dir, project_kind: kind}).then(function (res) {
         if (res.ok) { baseZips = res.data.base_zips || []; renderBaseZipQuick(); }
       });
     }
@@ -692,6 +813,10 @@ var App = (function () {
   function bind() {
     $('btnSearch').addEventListener('click', doSearch);
     $('keyword').addEventListener('keydown', function (e) { if (e.key === 'Enter') doSearch(); });
+    $('kinds').addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('button[data-kind]') : null;
+      if (btn) setKind(btn.getAttribute('data-kind'));
+    });
     $('btnSaveDirs').addEventListener('click', saveDirs);
     $('btnStart').addEventListener('click', startPack);
     $('btnStop').addEventListener('click', stopPack);

@@ -15,7 +15,8 @@ from .util import dir_mtime, mtime_str, run_capture
 
 _SKIP_DIRS = {".svn", "node_modules", "dist", ".git"}
 
-_VERSION_RE = re.compile(r"dev_(\d+\.\d+\.\d+)_")
+# dev_1.5.1_某某 / dev_1.5.5重庆儿童医院：版本号后面可能有下划线，也可能直接接中文医院名
+_DEV_VERSION_RE = re.compile(r"dev[_/\-]*(\d+\.\d+\.\d+)")
 _ANY_VERSION_RE = re.compile(r"(\d+\.\d+\.\d+)")
 
 
@@ -39,18 +40,21 @@ def svn_tool_available():
 
 
 def version_from_branch(branch):
-    """分支 dev_1.5.1_某某医院 → 1.5.1；病房分支 3.1.6_某某 → 3.1.6。"""
-    m = _VERSION_RE.search(branch or "")
+    """分支 dev_1.5.1_某某医院 → 1.5.1；dev_1.5.5重庆儿童医院 → 1.5.5；病房 3.1.6_某某 → 3.1.6。"""
+    branch = branch or ""
+    m = _DEV_VERSION_RE.search(branch)
     if m:
         return m.group(1)
-    m = _ANY_VERSION_RE.match(branch or "")
+    m = _ANY_VERSION_RE.match(branch)
     return m.group(1) if m else ""
 
 
-def dirs_by_branch(base_dir, keyword, sub_dir=""):
+def dirs_by_branch(base_dir, keyword, sub_dir="", name_match=None):
     """base_dir[/sub_dir] 下所有 git 分支名含 keyword 的目录。
 
     返回 [{path,name,branch,version,mtime,mtime_str}]，按 mtime 倒序。
+    name_match 为目录名过滤器（dir_name → bool）：先按名字筛再看分支，
+    避免为无关目录白跑一次 git。
     """
     search = Path(base_dir) / sub_dir if sub_dir else Path(base_dir)
     out = []
@@ -59,6 +63,8 @@ def dirs_by_branch(base_dir, keyword, sub_dir=""):
     kw = (keyword or "").lower()
     for item in search.iterdir():
         if not item.is_dir():
+            continue
+        if name_match and not name_match(item.name):
             continue
         branch = git_branch(item)
         if not branch or (kw and kw not in branch.lower()):

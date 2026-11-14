@@ -28,6 +28,11 @@
       <div class="field" style="margin-top:8px">
         <span class="hint">同时匹配 SVN 目录名与 Git 分支名；点击右侧结果自动回填参数</span>
       </div>
+      <div class="field" style="margin-top:10px">
+        <label>打包项目</label>
+        <div class="types" id="kinds"></div>
+        <span class="hint" id="kindHint">类型决定去哪些 Git 目录找分支、用哪个基础压缩包、跑哪条 npm 脚本</span>
+      </div>
     </div>
 
     <div class="panel">
@@ -84,7 +89,7 @@
       <div class="field">
         <label for="orderInfo">订单信息</label>
         <input type="text" id="orderInfo" placeholder="前 9 位为订单号，其余为医院名">
-        <span class="hint">例：2026-2082上饶市人民医院 → YM-801S-TLSS-V1.5.1.262082.01001-SRSRMYY-FE.zip</span>
+        <span class="hint" id="orderHint">例：2026-2082上饶市人民医院 → YM-801S-TLSS-V1.5.1.262082.01001-SRSRMYY-FE.zip</span>
       </div>
 
       <div class="field">
@@ -96,7 +101,7 @@
       </div>
 
       <div class="field">
-        <label for="baseZip">基础压缩包</label>
+        <label for="baseZip" id="baseZipLabel">基础压缩包</label>
         <div class="inline">
           <input type="text" id="baseZip">
           <button class="mini" data-pick="baseZip" data-kind="zip" data-from="svn">选择</button>
@@ -109,7 +114,7 @@
         <input type="text" id="customZip">
       </div>
 
-      <label class="check"><input type="checkbox" id="is155Plus"> 1.5.5 及以上版本（仅执行 npm run build，不跑 lib-render2）</label>
+      <label class="check" id="row155"><input type="checkbox" id="is155Plus"> 1.5.5 及以上版本（仅执行 npm run build，不跑 lib-render2）</label>
       <label class="check"><input type="checkbox" id="autoCommitSvn"> 打包完成后自动提交 SVN（默认关闭，可稍后用下方按钮单独提交）</label>
 
       <div class="field">

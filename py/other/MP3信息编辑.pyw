@@ -11,6 +11,8 @@ MP3 信息编辑（GUI）
      源目录下的 _backup_标签编辑\\ 子目录（同名覆盖，只留最近一份）
   4. 可选开关：标题修改后同步重命名文件（默认关闭）
   5. 批量时单文件失败不中断整批，失败明细写『标签编辑失败清单.txt』
+  6. 随机头像：选图对话框默认从「头像目录」预选一张随机图；批量可勾选
+     随机封面/随机背景，每个文件独立随机一张（完全随机）
 
 运行方式：
   双击运行（.pyw 不弹控制台），进度和结果显示在“日志”页
@@ -22,6 +24,7 @@ MP3 信息编辑（GUI）
 import json
 import os
 import queue
+import random
 import shutil
 import sys
 import threading
@@ -81,6 +84,9 @@ DEFAULT_CONFIG = {
     "batch_comment": "",                # 批量备注，留空 = 不修改
     "batch_cover_path": "",             # 批量封面图路径，留空 = 不修改
     "batch_bg_image_path": "",          # 批量播放背景图路径，留空 = 不修改
+    "avatar_dir": r"D:\CODE\Miscellaneous\GPT-IMG\头像",  # 随机头像目录（选图预选/批量随机共用）
+    "batch_random_cover": False,        # 批量随机封面：每个文件独立随机一张（勾选后忽略固定封面路径）
+    "batch_random_bg": False,           # 批量随机背景图：每个文件独立随机一张（勾选后忽略固定背景路径）
     "sync_rename": False,               # 标题修改后同步重命名文件（默认关闭）
 }
 
@@ -93,6 +99,9 @@ PT_OTHER = 0            # APIC type 0x00 Other          <- ffmpeg comment=Other�
 PT_FRONT_COVER = 3      # APIC type 0x03 FrontCover     <- ffmpeg comment=Cover (front)（封面）
 COVER_DESC = "Album cover"
 BG_DESC = "Background"
+
+# 头像目录扫描的图片扩展名（与选图框过滤一致）
+IMAGE_EXTS = {".jpg", ".jpeg", ".png"}
 
 # 「说明」页正文
 TUTORIAL = """
@@ -120,13 +129,16 @@ TUTORIAL = """
   3. 批量处理：在“参数”页填好要统一套用的信息（留空 = 不修改该项），
      底部点“开始批量应用”。标题 = 前缀 + 序号（起始序号 055 表示三位补零，
      与音频合并工具规则一致），音轨自动写 序号/总数。
-  4. 保存前自动把原文件备份到 源目录\\_backup_标签编辑\\（同名覆盖，只留最近一份），
+  4. 随机头像：所有选图对话框默认从「头像目录」预选一张随机图（双击即选中，
+     也可换选别的文件）；批量页勾选“随机封面/随机背景”后，每个文件从该目录
+     独立随机一张（完全随机，可能重复），勾选时忽略左侧固定图片路径。
+  5. 保存前自动把原文件备份到 源目录\\_backup_标签编辑\\（同名覆盖，只留最近一份），
      改错了可从备份恢复。确认无误后，可用“文件”页目录栏的“清理备份”一键删除该备份文件夹。
-  5. “标题修改后同步重命名文件”默认关闭；勾选后文件名随标题变化
+  6. “标题修改后同步重命名文件”默认关闭；勾选后文件名随标题变化
      （非法字符自动过滤，目标重名则跳过重命名只改标签）。
-  6. 只修改 ID3 标签，不重新编码音频，音质零损失；批量中单个文件失败只记警告
+  7. 只修改 ID3 标签，不重新编码音频，音质零损失；批量中单个文件失败只记警告
      不中断，结尾汇总并写『标签编辑失败清单.txt』，本轮无失败会自动删除旧清单。
-  7. 所有设置都会记住（json/config_mp3_tag_editor.json），下次打开自动回填。
+  8. 所有设置都会记住（json/config_mp3_tag_editor.json），下次打开自动回填。
 
 【四、参数微调（“参数”页，键名对应配置）】
 
@@ -137,6 +149,9 @@ TUTORIAL = """
     batch_comment           备注；留空 = 不修改
     batch_cover_path        封面图（jpg/png），写入 APIC type=Front Cover；留空 = 不动封面
     batch_bg_image_path     播放背景图，写入 APIC type=Other；留空 = 不动背景图
+    avatar_dir              随机头像目录；选图框随机预选与批量随机都取自此目录
+    batch_random_cover      批量随机封面（true/false）：勾选后每个文件独立随机一张
+    batch_random_bg         批量随机背景图（true/false）：同上
     sync_rename             标题修改后同步重命名文件（默认关闭）
 
 【五、提醒】
@@ -349,6 +364,35 @@ def batch_title_for(prefix, start, width, idx):
     return "%s%0*d" % (prefix, width, start + idx - 1)
 
 
+def list_avatar_images(avatar_dir):
+    """头像目录顶层的候选图片（按名排序；目录无效/无图返回空列表）"""
+    try:
+        d = Path(avatar_dir)
+        if not d.is_dir():
+            return []
+        return sorted(p for p in d.iterdir()
+                      if p.is_file() and p.suffix.lower() in IMAGE_EXTS)
+    except Exception:
+        return []
+
+
+def pick_random_image(avatar_dir):
+    """随机取一张头像图路径（选图对话框预选用）；无候选返回 None"""
+    pool = list_avatar_images(avatar_dir)
+    return random.choice(pool) if pool else None
+
+
+def random_image_op(pool, fallback=None):
+    """批量随机图片操作：从池随机读一张 -> ("data", bytes, mime)；池空或读取失败回退 fallback"""
+    if not pool:
+        return fallback
+    try:
+        data = random.choice(pool).read_bytes()
+        return ("data", data, sniff_image_mime(data))
+    except Exception:
+        return fallback
+
+
 def cleanup_backups(input_dir):
     """删除 MP3 目录下的 _backup_标签编辑 备份子目录（仅限该固定名称，不做越界删除）
     :return: (删除文件数, 备份目录路径字符串)
@@ -399,6 +443,9 @@ class App:
         self.batch_comment_var = tk.StringVar(value=DEFAULT_CONFIG["batch_comment"])
         self.batch_cover_path_var = tk.StringVar(value=DEFAULT_CONFIG["batch_cover_path"])
         self.batch_bg_image_path_var = tk.StringVar(value=DEFAULT_CONFIG["batch_bg_image_path"])
+        self.avatar_dir_var = tk.StringVar(value=DEFAULT_CONFIG["avatar_dir"])
+        self.batch_random_cover_var = tk.BooleanVar(value=DEFAULT_CONFIG["batch_random_cover"])
+        self.batch_random_bg_var = tk.BooleanVar(value=DEFAULT_CONFIG["batch_random_bg"])
         self.sync_rename_var = tk.BooleanVar(value=DEFAULT_CONFIG["sync_rename"])
         # 单文件编辑区变量
         self.s_title_var = tk.StringVar()
@@ -535,10 +582,11 @@ class App:
                   text="说明：批量处理会始终重写音轨号为 序号/总数；标题前缀非空时按序号规则重新生成标题"
                   ).pack(anchor="w", padx=8, pady=(0, 4))
 
-        frm_img = ttk.LabelFrame(outer, text="批量图片（留空 = 不修改该项）")
+        frm_img = ttk.LabelFrame(outer, text="批量图片（留空 = 不修改该项；勾选随机 = 每个文件不同图）")
         frm_img.pack(fill="x", pady=4)
-        for label, var, browse in (("封面图:", self.batch_cover_path_var, self._pick_batch_cover),
-                                   ("背景图:", self.batch_bg_image_path_var, self._pick_batch_bg)):
+        for label, var, browse, rnd in (
+                ("封面图:", self.batch_cover_path_var, self._pick_batch_cover, self.batch_random_cover_var),
+                ("背景图:", self.batch_bg_image_path_var, self._pick_batch_bg, self.batch_random_bg_var)):
             row = ttk.Frame(frm_img)
             row.pack(fill="x", padx=6, pady=3)
             ttk.Label(row, text=label).pack(side="left")
@@ -546,6 +594,16 @@ class App:
             ttk.Button(row, text="浏览…", command=browse).pack(side="left", padx=2)
             ttk.Button(row, text="清除", width=5,
                        command=lambda v=var: v.set("")).pack(side="left", padx=2)
+            ttk.Checkbutton(row, text="随机", variable=rnd).pack(side="left", padx=4)
+        row = ttk.Frame(frm_img)
+        row.pack(fill="x", padx=6, pady=3)
+        ttk.Label(row, text="头像目录:").pack(side="left")
+        ttk.Entry(row, textvariable=self.avatar_dir_var).pack(side="left", fill="x", expand=True, padx=4)
+        ttk.Button(row, text="浏览…", command=self._pick_avatar_dir).pack(side="left", padx=2)
+        ttk.Label(frm_img, foreground="#888",
+                  text="说明：勾选随机后每个文件从头像目录独立随机一张（完全随机可能重复，忽略左侧固定路径）；"
+                       "未勾选时选图对话框也会默认预选该目录的一张随机图"
+                  ).pack(anchor="w", padx=8, pady=(0, 4))
 
         frm_opt = ttk.LabelFrame(outer, text="保存选项")
         frm_opt.pack(fill="x", pady=4)
