@@ -710,17 +710,29 @@ class App:
             self._log("[清理备份失败] %s" % _short_err(e))
             self._show_toast("清理失败", _short_err(e), "error", 6000)
 
+    def _pick_avatar_dir(self):
+        p = filedialog.askdirectory(title="选择随机头像目录")
+        if p:
+            self.avatar_dir_var.set(p)
+
+    def _ask_image(self, title, fallback_dir):
+        """统一图片选择框：头像目录可用时随机预选其中一张（可换选），否则按 fallback 目录打开"""
+        filetypes = [("图片文件", "*.jpg;*.jpeg;*.png"), ("所有文件", "*.*")]
+        avatar_dir = self.avatar_dir_var.get().strip()
+        pick = pick_random_image(avatar_dir) if avatar_dir else None
+        if pick is not None:
+            return filedialog.askopenfilename(title=title, initialdir=str(pick.parent),
+                                              initialfile=pick.name, filetypes=filetypes)
+        return filedialog.askopenfilename(title=title, initialdir=fallback_dir or None,
+                                          filetypes=filetypes)
+
     def _pick_batch_cover(self):
-        p = filedialog.askopenfilename(
-            title="选择封面图", initialdir=self.input_dir_var.get() or None,
-            filetypes=[("图片文件", "*.jpg;*.jpeg;*.png"), ("所有文件", "*.*")])
+        p = self._ask_image("选择封面图", self.input_dir_var.get())
         if p:
             self.batch_cover_path_var.set(p)
 
     def _pick_batch_bg(self):
-        p = filedialog.askopenfilename(
-            title="选择播放背景图", initialdir=self.input_dir_var.get() or None,
-            filetypes=[("图片文件", "*.jpg;*.jpeg;*.png"), ("所有文件", "*.*")])
+        p = self._ask_image("选择播放背景图", self.input_dir_var.get())
         if p:
             self.batch_bg_image_path_var.set(p)
 
@@ -736,6 +748,9 @@ class App:
         self.batch_comment_var.set(cfg.get("batch_comment", "") or "")
         self.batch_cover_path_var.set(cfg.get("batch_cover_path", "") or "")
         self.batch_bg_image_path_var.set(cfg.get("batch_bg_image_path", "") or "")
+        self.avatar_dir_var.set(cfg.get("avatar_dir", DEFAULT_CONFIG["avatar_dir"]))
+        self.batch_random_cover_var.set(bool(cfg.get("batch_random_cover", False)))
+        self.batch_random_bg_var.set(bool(cfg.get("batch_random_bg", False)))
         self.sync_rename_var.set(bool(cfg.get("sync_rename", False)))
 
     def _collect_config_from_ui(self):
@@ -749,6 +764,9 @@ class App:
             "batch_comment": self.batch_comment_var.get().strip(),
             "batch_cover_path": self.batch_cover_path_var.get().strip(),
             "batch_bg_image_path": self.batch_bg_image_path_var.get().strip(),
+            "avatar_dir": self.avatar_dir_var.get().strip(),
+            "batch_random_cover": bool(self.batch_random_cover_var.get()),
+            "batch_random_bg": bool(self.batch_random_bg_var.get()),
             "sync_rename": bool(self.sync_rename_var.get()),
         }
 
@@ -855,9 +873,7 @@ class App:
             self._show_toast("提示", "请先在列表中选择一个 MP3 文件", "warning")
             return
         title = "选择封面图" if which == "cover" else "选择播放背景图"
-        p = filedialog.askopenfilename(
-            title=title, initialdir=str(self._loaded_path.parent),
-            filetypes=[("图片文件", "*.jpg;*.jpeg;*.png"), ("所有文件", "*.*")])
+        p = self._ask_image(title, str(self._loaded_path.parent))
         if not p:
             return
         try:
@@ -1043,15 +1059,22 @@ class App:
         if not cfg["input_dir"] or not d.is_dir():
             self._show_toast("提示", "MP3 目录不存在，请先在“文件”页选择。", "warning")
             return
-        # 批量图片路径校验
-        for key in ("batch_cover_path", "batch_bg_image_path"):
+        # 批量图片路径校验（勾选随机时忽略固定路径）
+        for key, rnd_key in (("batch_cover_path", "batch_random_cover"),
+                             ("batch_bg_image_path", "batch_random_bg")):
             p = cfg[key]
-            if p and not os.path.isfile(p):
+            if p and not cfg[rnd_key] and not os.path.isfile(p):
                 self._show_toast("提示", "图片文件不存在：%s" % p, "warning")
+                return
+        if cfg["batch_random_cover"] or cfg["batch_random_bg"]:
+            if not list_avatar_images(cfg["avatar_dir"]):
+                self._show_toast("头像目录不可用",
+                                 "目录不存在或没有图片：\n%s" % cfg["avatar_dir"], "error")
                 return
         has_any = any([cfg["batch_title_prefix"], cfg["batch_artist"], cfg["batch_album"],
                        cfg["batch_date"], cfg["batch_comment"],
-                       cfg["batch_cover_path"], cfg["batch_bg_image_path"]])
+                       cfg["batch_cover_path"], cfg["batch_bg_image_path"],
+                       cfg["batch_random_cover"], cfg["batch_random_bg"]])
         if not has_any:
             if not messagebox.askyesno(
                     "没有填写任何批量项",
@@ -1120,10 +1143,13 @@ class App:
                     base_meta[key] = cfg[ck]
 
             cover_op = bg_op = None
-            if cfg["batch_cover_path"]:
+            # 随机池只在批量开始时扫描一次；勾选随机时忽略固定图片路径
+            cover_pool = list_avatar_images(cfg["avatar_dir"]) if cfg["batch_random_cover"] else []
+            bg_pool = list_avatar_images(cfg["avatar_dir"]) if cfg["batch_random_bg"] else []
+            if cfg["batch_cover_path"] and not cfg["batch_random_cover"]:
                 data = Path(cfg["batch_cover_path"]).read_bytes()
                 cover_op = ("data", data, sniff_image_mime(data))
-            if cfg["batch_bg_image_path"]:
+            if cfg["batch_bg_image_path"] and not cfg["batch_random_bg"]:
                 data = Path(cfg["batch_bg_image_path"]).read_bytes()
                 bg_op = ("data", data, sniff_image_mime(data))
 
@@ -1134,8 +1160,8 @@ class App:
                 cfg["batch_album"] or "（不改）", cfg["batch_date"] or "（不改）",
                 cfg["batch_comment"] or "（不改）"))
             self._thread_log("封面: %s | 背景图: %s | 同步重命名: %s" % (
-                cfg["batch_cover_path"] or "（不改）",
-                cfg["batch_bg_image_path"] or "（不改）",
+                ("随机（头像 %d 张）" % len(cover_pool)) if cover_pool else (cfg["batch_cover_path"] or "（不改）"),
+                ("随机（头像 %d 张）" % len(bg_pool)) if bg_pool else (cfg["batch_bg_image_path"] or "（不改）"),
                 "开" if cfg["sync_rename"] else "关"))
             self._thread_log("=" * 60)
 
@@ -1154,7 +1180,9 @@ class App:
                 meta["track"] = "%d/%d" % (idx, total)
                 try:
                     final, notes = apply_edits(
-                        path, meta, cover_op, bg_op,
+                        path, meta,
+                        random_image_op(cover_pool, cover_op),
+                        random_image_op(bg_pool, bg_op),
                         rename_title=new_title if cfg["sync_rename"] else None)
                     done += 1
                     self._thread_log("[%d/%d] 完成: %s%s" % (

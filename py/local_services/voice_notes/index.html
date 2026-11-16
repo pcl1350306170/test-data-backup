@@ -5,8 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>语音速记本 · 本地库</title>
-  <link rel="icon" type="image/jpeg"
-    href="https://raw.githubusercontent.com/pcl1350306170/test-data-backup/refs/heads/main/img/T/%E6%A8%AA%E5%B1%8F-%E8%92%82%E6%B3%95%E9%AB%98%E6%B8%85-yw9z7s.jpg">
+  <link rel="icon" type="image/jpeg" href="https://cdn.jsdelivr.net/gh/pcl1350306170/Miscellaneous@refs/heads/main/GPT-IMG/头像/032.jpg">
   <style>
     :root {
       --bg: #f5f6f8;
@@ -291,12 +290,120 @@
     }
 
     .card .content {
-      white-space: pre-wrap;
       word-break: break-word;
+      overflow-wrap: anywhere;
       font-size: 15px;
       line-height: 1.75;
       cursor: text;
       padding: 2px 0;
+    }
+
+    /* markdown 渲染后的块级元素样式（两端留白交给块自己控制，避开 pre-wrap 带来的多余空行） */
+    .card .content > *:first-child {
+      margin-top: 0;
+    }
+
+    .card .content > *:last-child {
+      margin-bottom: 0;
+    }
+
+    .card .content .p {
+      margin: 0 0 8px;
+    }
+
+    .card .content h1,
+    .card .content h2,
+    .card .content h3 {
+      margin: 12px 0 8px;
+      line-height: 1.5;
+    }
+
+    .card .content h1 {
+      font-size: 19px;
+    }
+
+    .card .content h2 {
+      font-size: 17px;
+    }
+
+    .card .content h3 {
+      font-size: 15.5px;
+    }
+
+    .card .content ul,
+    .card .content ol {
+      margin: 0 0 8px;
+      padding-left: 22px;
+    }
+
+    .card .content li {
+      margin: 2px 0;
+    }
+
+    .card .content code {
+      background: var(--input);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: Consolas, Menlo, monospace;
+      font-size: 13px;
+    }
+
+    .card .content pre {
+      background: var(--input);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 0 0 8px;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.6;
+    }
+
+    .card .content pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 13px;
+    }
+
+    .card .content blockquote {
+      margin: 0 0 8px;
+      padding: 4px 12px;
+      border-left: 3px solid var(--border);
+      color: var(--muted);
+    }
+
+    .card .content a {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    .card .content hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 10px 0;
+    }
+
+    .card .content table {
+      border-collapse: collapse;
+      margin: 0 0 8px;
+      font-size: 14px;
+      display: block;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    .card .content th,
+    .card .content td {
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      text-align: left;
+    }
+
+    .card .content th {
+      background: var(--input);
     }
 
     .card .content.clamp {
@@ -827,7 +934,7 @@
           if (n.copy_count) { var cp = document.createElement('span'); cp.textContent = '复制 ' + n.copy_count + ' 次'; top.appendChild(cp); }
           li.appendChild(top);
 
-          var body = document.createElement('div'); body.className = 'content clamp'; body.textContent = n.content;
+          var body = document.createElement('div'); body.className = 'content clamp'; body.innerHTML = mdRender(n.content);
           li.appendChild(body);
           var mb = document.createElement('button'); mb.className = 'more'; mb.textContent = '展开全文'; mb.style.display = 'none';
           mb.onclick = function (e) {
@@ -866,6 +973,76 @@
         document.body.appendChild(ta); ta.select(); var ok = false;
         try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
         document.body.removeChild(ta); return ok;
+      }
+
+      // ---------- markdown 渲染（仅用于展示，内部先全量转义，不会执行原文里的脚本） ----------
+      // 支持：# 标题 / **加粗** / *斜体* / `行内代码` / ``` 代码块 / - * + 无序列表 / 1. 有序列表
+      //       > 引用 / --- 分隔线 / [文字](url) 链接 / a|b|c 表格；其余行按段落处理，单换行保留为折行
+      function mdEsc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+      function mdInline(s) {
+        var code = [];
+        var RE_LINK = new RegExp('\\[([^\\]]+)\\]\\(([^\\s)]+)\\)', 'g');
+        var RE_PROTO = new RegExp('^(https?:|mailto:|/)', 'i');
+        s = s.replace(/`([^`]+)`/g, function (m, t) { code.push(t); return '\x00' + (code.length - 1) + '\x00'; });
+        s = s.replace(RE_LINK, function (m, txt, url) {
+          var safe = RE_PROTO.test(url) ? url : '#';
+          return '<a href="' + safe + '" target="_blank" rel="noopener">' + txt + '</a>';
+        });
+        s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?![*\w])/g, '$1<em>$2</em>');
+        s = s.replace(/\x00(\d+)\x00/g, function (m, i) { return '<code>' + code[+i] + '</code>'; });
+        return s;
+      }
+      function mdRender(src) {
+        var NL = String.fromCharCode(10), CR = String.fromCharCode(13);
+        var lines = mdEsc(src).split(CR + NL).join(NL).split(CR).join(NL).split(NL);
+        var out = [], i = 0, arr;
+        function closeP(buf) { if (buf.length) { out.push('<div class="p">' + buf.join('<br>') + '</div>'); buf.length = 0; } }
+        for (var pbuf = []; i < lines.length; i++) {
+          var ln = lines[i], m;
+          if (!/^\s*\S/.test(ln)) { closeP(pbuf); continue; }
+          if ((m = ln.match(/^(\s*)(```|~~~)(.*)$/))) {
+            closeP(pbuf); var lang = mdInline(m[3]), codeb = [];
+            i++;
+            while (i < lines.length && !/^(\s*)(```|~~~)\s*$/.test(lines[i])) { codeb.push(lines[i]); i++; }
+            out.push('<pre><code' + (lang ? ' data-lang="' + lang + '"' : '') + '>' + codeb.join(NL) + '</code></pre>');
+            continue;
+          }
+          if ((m = ln.match(/^(#{1,6})\s+(.*)$/))) { closeP(pbuf); var lv = m[1].length; out.push('<h' + lv + '>' + mdInline(m[2]) + '</h' + lv + '>'); continue; }
+          if (/^\s*([-*_])\s*(\1\s*){2,}$/.test(ln)) { closeP(pbuf); out.push('<hr>'); continue; }
+          if ((m = ln.match(/^\s*&gt;\s?(.*)$/))) {
+            closeP(pbuf); arr = [mdInline(m[1])];
+            while (i + 1 < lines.length && /^\s*&gt;\s?/.test(lines[i + 1])) { arr.push(mdInline(lines[++i].replace(/^\s*&gt;\s?/, ''))); }
+            out.push('<blockquote>' + arr.join('<br>') + '</blockquote>'); continue;
+          }
+          if ((m = ln.match(/^(\s*)([-*+])\s+(.*)$/))) {
+            closeP(pbuf); arr = ['<li>' + mdInline(m[3]) + '</li>'];
+            while (i + 1 < lines.length && (m = lines[i + 1].match(/^(\s*)([-*+])\s+(.*)$/))) { arr.push('<li>' + mdInline(m[3]) + '</li>'); i++; }
+            out.push('<ul>' + arr.join('') + '</ul>'); continue;
+          }
+          if ((m = ln.match(/^(\s*)(\d+)[.)]\s+(.*)$/))) {
+            closeP(pbuf); arr = ['<li>' + mdInline(m[3]) + '</li>'];
+            while (i + 1 < lines.length && (m = lines[i + 1].match(/^(\s*)(\d+)[.)]\s+(.*)$/))) { arr.push('<li>' + mdInline(m[3]) + '</li>'); i++; }
+            out.push('<ol>' + arr.join('') + '</ol>'); continue;
+          }
+          if (ln.indexOf('|') >= 0 && i + 1 < lines.length && /^\s*\|?[:|\s-]+\|[:|\s-]*$/.test(lines[i + 1]) && lines[i + 1].indexOf('-') >= 0) {
+            closeP(pbuf);
+            var cells = function (s) { return s.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(function (x) { return mdInline(x.trim()); }); };
+            var head = cells(ln); i += 2;
+            var rowsB = [];
+            while (i < lines.length && lines[i].indexOf('|') >= 0 && /^\s*\S/.test(lines[i])) { rowsB.push('<tr><td>' + cells(lines[i]).join('</td><td>') + '</td></tr>'); i++; }
+            i--;
+            out.push('<table><thead><tr><th>' + head.join('</th><th>') + '</th></tr></thead><tbody>' + rowsB.join('') + '</tbody></table>');
+            continue;
+          }
+          pbuf.push(mdInline(ln));
+        }
+        closeP(pbuf);
+        return out.join('');
       }
 
       // ---------- 元信息（分类/标签/统计） ----------

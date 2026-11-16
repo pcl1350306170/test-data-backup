@@ -139,6 +139,7 @@ pause
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>服务名称</title>
+    <link rel="icon" type="image/jpeg" href="__PICK_ICON__">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -150,6 +151,8 @@ pause
 </body>
 </html>
 ```
+
+> `__PICK_ICON__` 是占位符，**必须**执行下面 4.1 步由脚本替换成真实图标地址，不得手工填写或留空。
 
 **static/js/app.js**:
 ```javascript
@@ -186,6 +189,30 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 ```
+
+### 4.1 自动分配 favicon（必做）
+
+图标统一来自 `img/icons.json`（纯 URL 字符串数组），由挑选器自动分配，**不要手写图片地址**：
+
+```bash
+python img/pick_icon.py --html py/local_services/new_service/static/index.html
+```
+
+脚本行为：
+- 扫描 `py/local_services` 下所有 HTML 的 `rel="icon"`，按**文件名**判定占用（同一张图的 raw / jsDelivr 双地址算同一个）
+- 从池中随机挑一个**未被占用**的图标，保证各服务页面图标互不相同、浏览器标签页可区分
+- 已有 icon 则原位替换（保留缩进与 CRLF/LF 行尾），没有则插到 `<title>` 之后
+- 按扩展名自动写 `type`（jpg→image/jpeg、png→image/png 等）
+
+其他用法：
+
+```bash
+python img/pick_icon.py                  # 只打印一个可用 URL 与可粘贴的 <link> 行
+python img/pick_icon.py --used           # 查看当前图标占用情况
+python img/pick_icon.py --html 页面.html --scan d:/CODE/FontEnd/pcl1350306170.github.io   # 跨仓库避免撞图
+```
+
+新增图标时往 `img/icons.json` 数组追加一条 URL 字符串即可，保持纯数组结构，不要加对象或元数据字段。
 
 ### 5. 注册到 Hub
 
@@ -339,9 +366,11 @@ def emit_event(task_id, event):
 - [ ] Hub 停止服务时能正确杀进程
 - [ ] 日志输出到 hub/logs/{service_id}.log
 - [ ] 配置持久化正常工作（如有）
+- [ ] favicon 已由 `python img/pick_icon.py --html ...` 分配，页面无 `__PICK_ICON__` 残留
+- [ ] `python img/pick_icon.py --used` 中该页面图标不与其他页面重复
 
 ## 参考项目
 
-- **简单架构**: [voice_notes](file:///d:/CODE/Python/test-data-backup/py/voice_notes) - 单文件后端
-- **分层架构**: [voice_tts](file:///d:/CODE/Python/test-data-backup/py/voice_tts) - core/ + static/ + data/
+- **简单架构**: [voice_notes](file:///d:/CODE/Python/test-data-backup/py/local_services/voice_notes) - 单文件后端
+- **分层架构**: [voice_tts](file:///d:/CODE/Python/test-data-backup/py/local_services/voice_tts) - core/ + static/ + data/
 - **SSE 推送**: [podcast_web](file:///d:/CODE/Python/test-data-backup/AI%20Work%20Space/Skills/pdf-to-local-podcast/web) - 任务进度实时推送

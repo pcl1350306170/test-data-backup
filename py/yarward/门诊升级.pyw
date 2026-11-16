@@ -369,7 +369,7 @@ class YarwardUpgradeGUI:
 
         Label(frame_server, text="密码:").grid(row=1, column=0, sticky=W, pady=3)
         self.pwd_var = StringVar()
-        Entry(frame_server, textvariable=self.pwd_var, width=25, show="*").grid(row=1, column=1, padx=5, pady=3)
+        Entry(frame_server, textvariable=self.pwd_var, width=25).grid(row=1, column=1, padx=5, pady=3)
         Button(frame_server, text="💾 保存配置", command=self.save_server_config).grid(row=0, column=4, rowspan=2, padx=10)
 
         # 加载初始服务器信息
@@ -683,25 +683,31 @@ class YarwardUpgradeGUI:
                 self.username_var.set(username)
                 return host, username, password
 
-        # 尝试默认密码
+        # 尝试默认用户名+默认密码
+        DEFAULT_USERNAMES = [username]
+        if "yahua" not in DEFAULT_USERNAMES:
+            DEFAULT_USERNAMES.append("yahua")
         DEFAULT_PASSWORDS = ["Yahua3585668", "yh123456", "Huawei@123"]
-        for pwd in DEFAULT_PASSWORDS:
-            try:
-                self._log(f"尝试默认密码: {pwd}")
-                self.root.update_idletasks()
-                test_client = get_ssh_client(host, username=username, password=pwd, timeout=5)
-                test_client.close()
-                password = pwd
-                self.pwd_var.set(pwd)
-                # 保存到 testServer.json
-                if host not in self.test_servers:
-                    self.test_servers[host] = {"link": host}
-                self.test_servers[host]["name"] = username
-                self.test_servers[host]["password"] = pwd
-                save_test_servers(self.test_servers)
-                return host, username, password
-            except Exception:
-                continue
+        for try_username in DEFAULT_USERNAMES:
+            for pwd in DEFAULT_PASSWORDS:
+                try:
+                    self._log(f"尝试 {try_username} / {pwd}")
+                    self.root.update_idletasks()
+                    test_client = get_ssh_client(host, username=try_username, password=pwd, timeout=5)
+                    test_client.close()
+                    username = try_username
+                    password = pwd
+                    self.pwd_var.set(pwd)
+                    self.username_var.set(username)
+                    # 保存到 testServer.json
+                    if host not in self.test_servers:
+                        self.test_servers[host] = {"link": host}
+                    self.test_servers[host]["name"] = username
+                    self.test_servers[host]["password"] = pwd
+                    save_test_servers(self.test_servers)
+                    return host, username, password
+                except Exception:
+                    continue
 
         # 所有默认密码都失败，弹出手动输入
         pwd_input = simpledialog.askstring(
