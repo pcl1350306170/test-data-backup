@@ -123,12 +123,42 @@ button.mini { padding: 3px 8px; font-size: 12px; }
 }
 .modal-box h3 { font-size: 14px; }
 .modal-list { overflow: auto; flex: 1; }
+/* 右下角通知栈：toast 与打包完成卡片共用一个容器，自然堆叠不互相压住 */
+.notify-stack {
+  position: fixed; right: 18px; bottom: 18px; z-index: 60;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+  width: min(400px, calc(100vw - 36px)); pointer-events: none;
+}
+.notify-stack > * { pointer-events: auto; }
 .toast {
-  position: fixed; right: 18px; bottom: 18px; z-index: 60; display: none;
-  max-width: 380px; padding: 10px 14px; border-radius: 10px; font-size: 13px;
+  display: none; max-width: 100%; padding: 10px 14px; border-radius: 10px; font-size: 13px;
   background: var(--accent); color: #fff; box-shadow: 0 6px 20px var(--shadow);
   white-space: pre-wrap; word-break: break-all;
 }
+.notify-card {
+  display: flex; gap: 10px; align-items: flex-start; width: 100%;
+  padding: 12px; border-radius: 12px; background: var(--panel);
+  border: 1px solid var(--border); box-shadow: 0 8px 24px var(--shadow);
+  animation: notify-in .22s ease-out;
+}
+.notify-card.out { animation: notify-out .2s ease-in forwards; }
+.notify-avatar {
+  width: 40px; height: 40px; flex: none; border-radius: 50%; object-fit: cover;
+  border: 1px solid var(--border); background: var(--bg);
+}
+.notify-avatar-fallback {
+  display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.notify-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.notify-title { font-size: 13px; font-weight: 600; color: var(--green); }
+.notify-name { font-size: 12px; line-height: 1.5; word-break: break-all; }
+.notify-actions { display: flex; gap: 6px; align-items: center; }
+.notify-close { margin-left: auto; padding: 3px 8px; color: var(--muted); }
+@keyframes notify-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes notify-out { to { opacity: 0; transform: translateY(6px); } }
 
 @media (max-width: 1280px) {
   .workbench { grid-template-columns: 1fr 1fr; }

@@ -433,6 +433,110 @@ var App = (function () {
     pill.className = 'pill ' + (status || 'idle');
   }
 
+  // ── 打包完成通知（右下角卡片）──────────────────
+  var NOTIFY_MS = 10000;   // 自动消失时间，鼠标悬停暂停计时
+  var NOTIFY_MAX = 3;      // 最多同时保留几条
+
+  function notifyDone(result) {
+    var pkg = result.package_path || lastPackage;
+    if (!pkg) return;
+    var name = result.package_name || pkg.replace(/[\\/]+$/, '').split(/[\\/]/).pop();
+    req('GET', '/api/notify/avatar').then(function (res) {
+      addNotifyCard(name, pkg, res.ok ? (res.data.url || '') : '');
+    }).catch(function () { addNotifyCard(name, pkg, ''); });
+  }
+
+  function addNotifyCard(name, pkg, avatarUrl) {
+    var card = document.createElement('div');
+    card.className = 'notify-card';
+
+    var avatar = document.createElement('img');
+    avatar.className = 'notify-avatar';
+    avatar.alt = '';
+    // 头像来自远程 URL，断网/图挂了就地换成默认图标，不留碎图
+    avatar.onerror = function () {
+      var fb = document.createElement('div');
+      fb.className = 'notify-avatar notify-avatar-fallback';
+      fb.textContent = '📦';
+      if (avatar.parentNode === card) card.replaceChild(fb, avatar);
+    };
+    card.appendChild(avatar);
+
+    var body = document.createElement('div');
+    body.className = 'notify-body';
+    var title = document.createElement('div');
+    title.className = 'notify-title';
+    title.textContent = '✅ 打包完成';
+    var nameEl = document.createElement('div');
+    nameEl.className = 'notify-name';
+    nameEl.textContent = name;
+    nameEl.title = pkg;
+    var actions = document.createElement('div');
+    actions.className = 'notify-actions';
+    var openBtn = document.createElement('button');
+    openBtn.className = 'mini';
+    openBtn.textContent = '打开包目录';
+    openBtn.addEventListener('click', function () { openPackageDir(pkg, openBtn); });
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'mini notify-close';
+    closeBtn.textContent = '✕';
+    closeBtn.title = '关闭通知';
+    closeBtn.addEventListener('click', function () { dismissNotify(card); });
+    actions.appendChild(openBtn);
+    actions.appendChild(closeBtn);
+    body.appendChild(title);
+    body.appendChild(nameEl);
+    body.appendChild(actions);
+    card.appendChild(body);
+
+    $('notifyStack').appendChild(card);
+    if (avatarUrl) avatar.src = avatarUrl; else avatar.onerror();
+    trimNotify();
+    armNotifyTimer(card);
+  }
+
+  // 悬停暂停：记住剩余时间，移开后接着倒计时（至少再给 1.2s，不会一移开就没了）
+  function armNotifyTimer(card) {
+    card._left = NOTIFY_MS;
+    card._tick = function () {
+      card._since = Date.now();
+      card._timer = setTimeout(function () { dismissNotify(card); }, card._left);
+    };
+    card.addEventListener('mouseenter', function () {
+      clearTimeout(card._timer);
+      card._left = Math.max(1200, card._left - (Date.now() - card._since));
+    });
+    card.addEventListener('mouseleave', card._tick);
+    card._tick();
+  }
+
+  function dismissNotify(card) {
+    if (!card || card._closing) return;
+    card._closing = true;
+    clearTimeout(card._timer);
+    card.className = 'notify-card out';
+    setTimeout(function () {
+      if (card.parentNode) card.parentNode.removeChild(card);
+    }, 200);
+  }
+
+  function trimNotify() {
+    var cards = $('notifyStack').querySelectorAll('.notify-card');
+    for (var i = 0; i < cards.length - NOTIFY_MAX; i++) dismissNotify(cards[i]);
+  }
+
+  function openPackageDir(pkg, btn) {
+    btn.disabled = true;
+    req('POST', '/api/open/dir', {path: pkg}).then(function (res) {
+      btn.disabled = false;
+      if (!res.ok) { toast(detailOf(res).message || '打开目录失败'); return; }
+      toast('已在资源管理器中选中该包：' + (res.data.dir || ''));
+    }).catch(function (e) {
+      btn.disabled = false;
+      toast('打开目录请求异常：' + e);
+    });
+  }
+
   // ── SSE ───────────────────────────────────────────
   function openStream() {
     closeStream();
@@ -481,6 +585,7 @@ var App = (function () {
         onResult(ev.result || {});
         setNotice('打包完成，用时 ' + (ev.elapsed || 0) + 's');
         setBusy(false, 'done');
+        notifyDone(ev.result || {});
         loadHistory();
         break;
       case 'error':

@@ -16,7 +16,7 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import browse, node_env
+from . import browse, node_env, notify
 from .engine import PackEngine
 from .store import HISTORY_LIMIT, Store
 
@@ -129,6 +129,29 @@ def create_app(profile, service_dir):
             raise HTTPException(400, str(e))
         return {"path": listing["path"], "files": listing["files"],
                 "total": len(listing["files"])}
+
+    # ── 完成通知 ──────────────────────────────
+
+    @app.get("/api/notify/avatar")
+    def notify_avatar():
+        """从 img/icons.json 随机取一个头像 URL（远程图，前端加载失败会回落默认头像）。"""
+        return notify.random_avatar()
+
+    @app.post("/api/open/dir")
+    def open_dir(data: dict):
+        """资源管理器打开成品所在目录并选中该包；仍只允许根目录白名单内的路径。"""
+        path = (data or {}).get("path") or ""
+        if not path:
+            raise HTTPException(400, "缺少成品路径")
+        cfg = store.load()
+        try:
+            browse.check_root(str(Path(path).parent), profile.roots(cfg))
+        except browse.PathDenied as e:
+            raise HTTPException(400, str(e))
+        ok, message = notify.reveal(path)
+        if not ok:
+            raise HTTPException(404 if not Path(path).is_file() else 400, message)
+        return {"ok": True, "path": path, "dir": message}
 
     # ── 打包任务 ──────────────────────────────────────
 
