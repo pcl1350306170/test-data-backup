@@ -375,6 +375,7 @@ var App = (function () {
 
   function startPack() {
     if (busy) { toast('已有任务在跑'); return; }
+    askSysNotifyOnStart();
     setErrors([]);
     setNotice('');
     lastPackage = '';
@@ -442,8 +443,13 @@ var App = (function () {
     if (!pkg) return;
     var name = result.package_name || pkg.replace(/[\\/]+$/, '').split(/[\\/]/).pop();
     req('GET', '/api/notify/avatar').then(function (res) {
-      addNotifyCard(name, pkg, res.ok ? (res.data.url || '') : '');
-    }).catch(function () { addNotifyCard(name, pkg, ''); });
+      var url = res.ok ? (res.data.url || '') : '';
+      addNotifyCard(name, pkg, url);
+      sendSysNotify(name, pkg, url);
+    }).catch(function () {
+      addNotifyCard(name, pkg, '');
+      sendSysNotify(name, pkg, '');
+    });
   }
 
   function addNotifyCard(name, pkg, avatarUrl) {
@@ -535,6 +541,82 @@ var App = (function () {
       btn.disabled = false;
       toast('打开目录请求异常：' + e);
     });
+  }
+
+  // ── Windows 系统通知（Notification API，页内卡片之外的系统级弹窗）──
+  var SYS_NOTIFY_KEY = 'packager-sys-notify';   // '0' = 用户手动关闭
+
+  function sysNotifySupported() { return 'Notification' in window; }
+
+  function sysNotifyOn() {
+    return sysNotifySupported() && Notification.permission === 'granted'
+      && localStorage.getItem(SYS_NOTIFY_KEY) !== '0';
+  }
+
+  function renderSysNotifyBtn() {
+    var btn = $('btnSysNotify');
+    if (!sysNotifySupported()) {
+      btn.disabled = true;
+      btn.textContent = '🔕 不支持通知';
+      btn.title = '当前浏览器不支持系统通知';
+      return;
+    }
+    if (Notification.permission === 'denied') {
+      btn.textContent = '🔕 通知被禁';
+      btn.title = '通知权限被禁用：点地址栏锁图标 → 站点设置 → 允许通知，再刷新页面';
+      return;
+    }
+    var on = sysNotifyOn();
+    btn.textContent = on ? '🔔 系统通知：开' : '🔔 系统通知：关';
+    btn.title = on ? '点击关闭 Windows 系统通知（页内卡片不受影响）'
+                   : '点击开启 Windows 系统通知（首次需要授权）';
+  }
+
+  function initSysNotify() {
+    renderSysNotifyBtn();
+    $('btnSysNotify').addEventListener('click', function () {
+      if (!sysNotifySupported()) return;
+      if (Notification.permission === 'denied') {
+        toast('通知权限被禁用：点地址栏锁图标 → 站点设置 → 允许通知，再刷新页面');
+        return;
+      }
+      if (Notification.permission !== 'granted') {
+        Notification.requestPermission().then(function (p) {
+          renderSysNotifyBtn();
+          toast(p === 'granted' ? '已开启系统通知，打包完成会弹 Windows 通知'
+                                : '未授权通知权限，将只使用页内通知');
+        });
+        return;
+      }
+      var off = localStorage.getItem(SYS_NOTIFY_KEY) === '0';
+      localStorage.setItem(SYS_NOTIFY_KEY, off ? '1' : '0');
+      renderSysNotifyBtn();
+      toast(off ? '已开启系统通知' : '已关闭系统通知（页内卡片不受影响）');
+    });
+  }
+
+  // 点「开始打包」时顺带申请权限（浏览器要求用户手势内发起）
+  function askSysNotifyOnStart() {
+    if (sysNotifySupported() && Notification.permission === 'default'
+        && localStorage.getItem(SYS_NOTIFY_KEY) !== '0') {
+      Notification.requestPermission().then(renderSysNotifyBtn);
+    }
+  }
+
+  function sendSysNotify(name, pkg, avatarUrl) {
+    if (!sysNotifyOn()) return;
+    try {
+      var n = new Notification('✅ 打包完成', {
+        body: name,
+        icon: avatarUrl || undefined,
+        tag: 'packager-done-' + name   // 同一包名替换旧通知，不无限堆叠
+      });
+      n.onclick = function () {
+        window.focus();
+        openPackageDir(pkg, {});   // 复用页内按钮逻辑：资源管理器选中该包
+        n.close();
+      };
+    } catch (e) { /* 系统通知失败就静默回落，页内卡片仍在 */ }
   }
 
   // ── SSE ───────────────────────────────────────────
@@ -826,6 +908,7 @@ var App = (function () {
 
   function init() {
     initTheme();
+    initSysNotify();
     bind();
     loadConfig().then(loadNodeVersions).then(function () {
       loadHistory();

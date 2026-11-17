@@ -36,6 +36,8 @@ header h1 { font-size: 18px; white-space: nowrap; }
   background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
   padding: 4px 10px; cursor: pointer; color: var(--text); font-size: 14px;
 }
+.sys-notify-btn { font-size: 12px; white-space: nowrap; }
+.sys-notify-btn:disabled { opacity: .6; cursor: not-allowed; }
 
 .workbench {
   display: grid; grid-template-columns: 320px minmax(360px, 1fr) 400px;

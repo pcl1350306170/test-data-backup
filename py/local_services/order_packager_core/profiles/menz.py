@@ -182,6 +182,7 @@ class MenzProfile(Profile):
         "custom_zip_name": "",
         "auto_commit_svn": False,
         "is_version_155_plus": False,
+        "native_notify": True,
         "node_version": node_env.DEFAULT_NODE_VERSION,
         "history_records": [],
     }

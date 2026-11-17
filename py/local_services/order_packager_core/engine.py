@@ -16,6 +16,7 @@ import time
 import traceback
 import uuid
 
+from . import notify
 from .util import NO_WINDOW, kill_tree
 
 MAX_LOG_LINES = 2000
@@ -266,6 +267,8 @@ class PackEngine:
                 ctx.set_result(history_count=count)
             self._emit({"type": "complete", "result": dict(self.last_result),
                         "elapsed": round(time.time() - start_ts, 1)})
+            # Windows 原生通知：不依赖浏览器开着；内部后台线程 + 全异常兜底
+            notify.native_done(self.profile.TITLE, dict(self.last_result), self.store.load())
         except Aborted as e:
             self.status = "stopped"
             self.error = str(e)

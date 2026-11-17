@@ -12,10 +12,11 @@
   "custom_zip_name": "",
   "auto_commit_svn": false,
   "is_version_155_plus": false,
+  "native_notify": true,
   "node_version": "14.19.1",
   "history_records": [
     {
-      "timestamp": "2026-11-16 16:19:19",
+      "timestamp": "2026-11-16 19:27:03",
       "project_kind": "播报机",
       "project_dir": "D:\\CODE\\Yarward\\门诊\\clinic-kiosks-web",
       "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-1985重庆儿童医院宜宾院区\\前端",

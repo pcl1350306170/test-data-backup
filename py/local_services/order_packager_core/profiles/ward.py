@@ -131,6 +131,7 @@ class WardProfile(Profile):
         "svn_dir": "",
         "auto_commit_svn": False,
         "is_new_version": False,
+        "native_notify": True,
         "node_version": node_env.DEFAULT_NODE_VERSION,
         "history_records": [],
     }
