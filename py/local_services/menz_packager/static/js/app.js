@@ -583,14 +583,10 @@ var App = (function () {
     var pkg = result.package_path || lastPackage;
     if (!pkg) return;
     var name = result.package_name || pkg.replace(/[\\/]+$/, '').split(/[\\/]/).pop();
-    req('GET', '/api/notify/avatar').then(function (res) {
-      var url = res.ok ? (res.data.url || '') : '';
-      addNotifyCard(name, pkg, url);
-      sendSysNotify(name, pkg, url);
-    }).catch(function () {
-      addNotifyCard(name, pkg, '');
-      sendSysNotify(name, pkg, '');
-    });
+    // 通知统一用后端默认图（本地文件，不走外网随机头像）
+    var url = '/api/notify/icon';
+    addNotifyCard(name, pkg, url);
+    sendSysNotify(name, pkg, url);
   }
 
   function addNotifyCard(name, pkg, avatarUrl) {

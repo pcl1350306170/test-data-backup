@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""打包完成通知的后端支撑：随机头像 + 在资源管理器里定位成品 + Windows 原生 toast。
+"""打包完成通知的后端支撑：默认通知图 + 在资源管理器里定位成品 + Windows 原生 toast。
 
-头像池直接用仓库里的 img/icons.json（一串远程图片 URL），进程内只读一次；
-池子读不到就返回空 URL，由前端回落到默认头像，不让通知因为断网/缺文件而弹不出来。
+通知统一用 assets/notify_default.jpeg（已随代码入库，不依赖外部路径）；
+头像池 img/icons.json 的随机接口仍保留，但通知不再使用。
 打开目录是本机动作，路径白名单校验在路由层（browse.check_root）做。
 
 原生 toast 走 windows-toasts（WinRT）：不依赖浏览器开着，打包完成由引擎直接发；
@@ -13,15 +13,13 @@ import random
 import subprocess
 import sys
 import threading
-import urllib.request
 from pathlib import Path
-from urllib.parse import quote
 
 from . import util
 
 ICONS_PATH = util.py_dir().parent / "img" / "icons.json"
 LOGO_PATH = util.py_dir().parent / "img" / "logo.png"
-AVATAR_CACHE_DIR = Path(__file__).resolve().parent.parent / ".avatar_cache"
+DEFAULT_ICON_PATH = Path(__file__).resolve().parent / "assets" / "notify_default.jpeg"
 
 _lock = threading.Lock()
 _pool = None
@@ -74,10 +72,11 @@ def _register_aumid(aumid, display_name):
     """HKCU 注册自定义 AUMID，通知中心才会显示独立应用名而不是 cmd.exe。"""
     import winreg
     key_path = r"Software\Classes\AppUserModelId\%s" % aumid
+    icon = DEFAULT_ICON_PATH if DEFAULT_ICON_PATH.is_file() else LOGO_PATH
     with winreg.CreateKey(winreg.HKEY_CURRENT_USER, key_path) as key:
         winreg.SetValueEx(key, "DisplayName", 0, winreg.REG_SZ, display_name)
-        if LOGO_PATH.is_file():
-            winreg.SetValueEx(key, "IconUri", 0, winreg.REG_SZ, str(LOGO_PATH))
+        if icon.is_file():
+            winreg.SetValueEx(key, "IconUri", 0, winreg.REG_SZ, str(icon))
 
 
 def _get_toaster(title):
@@ -92,23 +91,10 @@ def _get_toaster(title):
         return toaster
 
 
-def _local_avatar():
-    """toast 图标只认本地文件：随机头像下载到缓存目录，失败回落仓库 logo。"""
-    url = random_avatar().get("url") or ""
-    if url:
-        try:
-            AVATAR_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-            suffix = Path(url.split("?")[0]).suffix or ".jpg"
-            cache = AVATAR_CACHE_DIR / (hashlib.md5(url.encode("utf-8")).hexdigest() + suffix)
-            if not cache.is_file():
-                # URL 里有中文路径（头像/），urllib 只认 ASCII，先百分号编码
-                safe_url = quote(url, safe=":/?&=%#@")
-                with urllib.request.urlopen(safe_url, timeout=4) as resp:
-                    cache.write_bytes(resp.read())
-            if cache.is_file() and cache.stat().st_size > 0:
-                return cache
-        except Exception:
-            pass
+def _notify_icon():
+    """toast 图标只认本地文件：默认通知图缺失时回落仓库 logo。"""
+    if DEFAULT_ICON_PATH.is_file():
+        return DEFAULT_ICON_PATH
     return LOGO_PATH if LOGO_PATH.is_file() else None
 
 
@@ -130,7 +116,7 @@ def native_done(title, result, cfg):
             toast.duration = ToastDuration.Long
             toast.tag = name
             toast.group = name   # 同一包名在通知中心里替换旧条目
-            icon = _local_avatar()
+            icon = _notify_icon()
             if icon:
                 toast.AddImage(ToastDisplayImage.fromPath(str(icon)))
             toast.AddAction(ToastButton("打开包目录", "open_dir"))

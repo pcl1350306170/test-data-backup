@@ -134,8 +134,15 @@ def create_app(profile, service_dir):
 
     @app.get("/api/notify/avatar")
     def notify_avatar():
-        """从 img/icons.json 随机取一个头像 URL（远程图，前端加载失败会回落默认头像）。"""
+        """从 img/icons.json 随机取一个头像 URL（保留接口；完成通知已改用默认图）。"""
         return notify.random_avatar()
+
+    @app.get("/api/notify/icon")
+    def notify_icon():
+        """完成通知的默认图（随代码入库的本地文件，不依赖外网）。"""
+        if not notify.DEFAULT_ICON_PATH.is_file():
+            raise HTTPException(404, "默认通知图缺失")
+        return FileResponse(notify.DEFAULT_ICON_PATH, media_type="image/jpeg")
 
     @app.post("/api/open/dir")
     def open_dir(data: dict):
