@@ -42,6 +42,7 @@ temp_clipboard.txt
 /py/local_services/voice_notes/config.json
 /py/local_services/voice_notes/cert.pem
 /py/local_services/voice_notes/key.pem
+/py/local_services/.avatar_cache/
 
 # 任务进度目录（不提交）
 /py/other/json/progress/

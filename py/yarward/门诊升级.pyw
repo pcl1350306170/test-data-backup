@@ -660,6 +660,39 @@ class YarwardUpgradeGUI:
         self.server_combo['values'] = list(self.test_servers.keys())
         messagebox.showinfo("成功", "服务器配置已保存！")
 
+    def _verify_credentials(self, host, username, password):
+        """验证凭据能否连接服务器，认证失败返回 False，其他异常向上抛出"""
+        try:
+            client = get_ssh_client(host, username=username, password=password, timeout=10)
+            client.close()
+            return True
+        except paramiko.AuthenticationException:
+            return False
+
+    def _resolve_credentials(self):
+        """获取并验证服务器连接信息；密码失效时清空旧密码，重新走默认密码尝试/手动输入流程"""
+        creds = self._get_server_credentials()
+        if not creds:
+            return None
+        host, username, password = creds
+
+        self._log(f"正在验证服务器 {host} 连接凭据...")
+        try:
+            ok = self._verify_credentials(host, username, password)
+        except Exception as e:
+            messagebox.showerror("错误", f"无法连接服务器 {host}：{e}")
+            return None
+        if ok:
+            return host, username, password
+
+        # 服务器密码已变更：清空旧密码及已保存的旧凭据，重新获取
+        self._log("⚠️ 当前用户名/密码认证失败（服务器密码可能已更改），尝试重新获取凭据...")
+        self.pwd_var.set("")
+        if host in self.test_servers:
+            self.test_servers[host]["password"] = ""
+            save_test_servers(self.test_servers)
+        return self._get_server_credentials()
+
     def _get_server_credentials(self):
         """获取服务器连接信息，返回 (host, username, password) 或 None"""
         host = self.server_var.get().strip()
@@ -829,7 +862,7 @@ class YarwardUpgradeGUI:
             self.front_zip_path_var.set(names)
 
     def start_frontend_upgrade(self):
-        creds = self._get_server_credentials()
+        creds = self._resolve_credentials()
         if not creds:
             return
         host, username, password = creds
@@ -987,7 +1020,7 @@ class YarwardUpgradeGUI:
         self._log(f"已选择 WAR 包: {selected_war.name}")
 
     def start_server_upgrade(self):
-        creds = self._get_server_credentials()
+        creds = self._resolve_credentials()
         if not creds:
             return
         host, username, password = creds

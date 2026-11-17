@@ -20,11 +20,13 @@ DEFAULT_GEEKER_DIR = r"D:\CODE\Java\Geeker-Admin-Java"
 DEFAULT_BLOG_DIR = r"D:\CODE\Java\my-blog-api"
 
 # 前端项目默认配置：本地目录 => 远程目录
+# build_dir 存在时表示该是需先执行 npm 打包的项目（在项目根目录跑 npm run build）
 DEFAULT_FRONTEND_PROJECTS = {
     "geeker_admin": {
         "name": "Geeker Admin",
         "local_dir": r"D:\CODE\FontEnd\Geeker-Admin\dist",
         "remote_dir": "/home/projects/frontend/GeekerAdmin",
+        "build_dir": r"D:\CODE\FontEnd\Geeker-Admin",
     },
     "blog_site": {
         "name": "pcl1350306170.github.io",
@@ -69,7 +71,11 @@ DEFAULT_CONFIG = {
     "build_geeker": True,
     "build_blog": True,
     "frontend_projects": {
-        key: {"local_dir": p["local_dir"], "remote_dir": p["remote_dir"]}
+        key: {
+            "local_dir": p["local_dir"],
+            "remote_dir": p["remote_dir"],
+            **({"build": True} if p.get("build_dir") else {}),
+        }
         for key, p in DEFAULT_FRONTEND_PROJECTS.items()
     }
 }
@@ -166,6 +172,8 @@ class JavaDeployer:
         front_config = self.config.get("frontend_projects", {})
         self.front_local_vars = {}
         self.front_remote_vars = {}
+        # 仅对有 build_dir 的项目提供 npm 打包选项
+        self.front_build_vars = {}
 
         for key, project in DEFAULT_FRONTEND_PROJECTS.items():
             saved = front_config.get(key, {})
@@ -176,6 +184,11 @@ class JavaDeployer:
             self.front_remote_vars[key] = tk.StringVar(
                 value=saved.get("remote_dir", project["remote_dir"])
             )
+
+            if project.get("build_dir"):
+                self.front_build_vars[key] = tk.BooleanVar(
+                    value=saved.get("build", True)
+                )
 
         self.front_upgrade_buttons = {}
         self.service_upgrade_buttons = {}
@@ -450,12 +463,19 @@ class JavaDeployer:
                 command=lambda v=self.front_local_vars[key]: self.choose_dir(v)
             ).grid(row=row, column=2)
 
+            if key in self.front_build_vars:
+                ttk.Checkbutton(
+                    project_frame,
+                    text="npm打包",
+                    variable=self.front_build_vars[key]
+                ).grid(row=row, column=3, padx=6)
+
             button = ttk.Button(
                 project_frame,
                 text="🚀 升级前端",
                 command=lambda k=key: self.start_frontend_deploy(k)
             )
-            button.grid(row=row, column=3, padx=10)
+            button.grid(row=row, column=4, padx=10)
 
             self.front_upgrade_buttons[key] = button
 
@@ -558,6 +578,9 @@ class JavaDeployer:
                 "local_dir": self.front_local_vars[key].get(),
                 "remote_dir": self.front_remote_vars[key].get()
             }
+
+            if key in self.front_build_vars:
+                frontend_projects[key]["build"] = self.front_build_vars[key].get()
 
         return {
             "geeker_dir": self.geeker_dir.get(),
@@ -1007,9 +1030,22 @@ class JavaDeployer:
         local_dir = self.front_local_vars[project_key].get().strip()
         remote_dir = self.front_remote_vars[project_key].get().strip()
 
-        if not os.path.isdir(local_dir):
+        build_dir = DEFAULT_FRONTEND_PROJECTS[project_key].get("build_dir", "")
+        should_build = (
+            build_dir
+            and project_key in self.front_build_vars
+            and self.front_build_vars[project_key].get()
+        )
+
+        # 勾选打包时 dist 可能尚未生成，不提前校验本地目录
+        if not should_build and not os.path.isdir(local_dir):
 
             self.show_toast("错误", f"本地目录不存在：{local_dir}", "error")
+            return
+
+        if should_build and not os.path.isdir(build_dir):
+
+            self.show_toast("错误", f"打包目录不存在：{build_dir}", "error")
             return
 
         if not remote_dir:
@@ -1022,11 +1058,11 @@ class JavaDeployer:
 
         threading.Thread(
             target=self.frontend_deploy_worker,
-            args=(project_key, local_dir, remote_dir),
+            args=(project_key, local_dir, remote_dir, build_dir if should_build else ""),
             daemon=True
         ).start()
 
-    def frontend_deploy_worker(self, project_key, local_dir, remote_dir):
+    def frontend_deploy_worker(self, project_key, local_dir, remote_dir, build_dir=""):
 
         project_name = DEFAULT_FRONTEND_PROJECTS[project_key]["name"]
 
@@ -1048,6 +1084,16 @@ class JavaDeployer:
             self.log(f"开始前端升级：{project_name}")
             self.log(f"本地：{local_dir}  =>  远程：{remote_dir}")
             self.log("=" * 60)
+
+            # 升级前先执行 npm 打包（仅当传入 build_dir）
+            if build_dir:
+                self.log(f"{project_name}：开始 npm 打包（{build_dir}）")
+                self.run_npm_build(build_dir)
+                self.log("✓ npm 打包成功")
+                # 重新上报本地目录，因为刚打包可能刚生成 dist
+                local_dir = self.front_local_vars[project_key].get().strip()
+                if not os.path.isdir(local_dir):
+                    raise RuntimeError(f"打包后仍未找到输出目录：{local_dir}")
 
             client = self.create_ssh()
 
@@ -1090,6 +1136,41 @@ class JavaDeployer:
             self.root.after(
                 0,
                 lambda: button and button.configure(state=tk.NORMAL)
+            )
+
+    def run_npm_build(self, build_dir):
+        """在项目根目录执行 npm run build，优先使用本地 npm.cmd"""
+
+        build_dir = Path(build_dir)
+
+        if os.name == "nt":
+            command = ["npm.cmd", "run", "build"]
+        else:
+            command = ["npm", "run", "build"]
+
+        self.log(f"执行命令：{' '.join(command)}")
+
+        process = subprocess.Popen(
+            command,
+            cwd=str(build_dir),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            bufsize=1
+        )
+
+        for line in process.stdout:
+            line = line.rstrip()
+            if line:
+                self.log(line)
+
+        return_code = process.wait()
+
+        if return_code != 0:
+            raise RuntimeError(
+                f"npm 打包失败，退出码：{return_code}"
             )
 
     def upload_frontend_dir(self, client, local_dir, remote_dir):
