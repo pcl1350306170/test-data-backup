@@ -185,6 +185,10 @@ class MenzProfile(Profile):
         "native_notify": True,
         "node_version": node_env.DEFAULT_NODE_VERSION,
         "history_records": [],
+        # 前端升级（upgrade.py）专用：上次服务器 / 发布脚本超时 / 独立历史
+        "upgrade_last_server": "",
+        "upgrade_timeout": 300,
+        "upgrade_history_records": [],
     }
     LEGACY_CONFIG_PATHS = (util.py_dir() / "yarward" / "json" / "config_menz_order_packager.json",)
 

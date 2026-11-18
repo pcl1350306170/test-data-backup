@@ -18,6 +18,12 @@
   </div>
 </header>
 
+<nav class="tabs">
+  <button type="button" id="tabPack" class="on">📦 打包</button>
+  <button type="button" id="tabUpgrade">🚀 前端升级</button>
+</nav>
+
+<div id="panePack" class="tab-pane">
 <main class="workbench">
   <!-- 左：搜索与匹配 -->
   <section class="col col-left">
@@ -144,7 +150,7 @@
     </div>
 
     <div class="panel">
-      <h2>📂 成品目录 <button class="mini" id="btnRefreshFiles">刷新列表</button></h2>
+      <h2>📂 成品目录 <span class="row"><button class="mini" id="btnUpgradePkg" disabled title="切到升级页签并把最新成品加入待升级列表">🚀 升级此包</button> <button class="mini" id="btnRefreshFiles">刷新列表</button></span></h2>
       <div class="path" id="outputPath">（尚未生成）</div>
       <ul class="list small" id="fileList"><li class="empty">暂无成品</li></ul>
     </div>
@@ -167,6 +173,102 @@
     </div>
   </section>
 </main>
+</div>
+
+<div id="paneUpgrade" class="tab-pane" hidden>
+<main class="workbench">
+  <!-- 左：服务器 + 搜索 -->
+  <section class="col col-left">
+    <div class="panel">
+      <h2>🖥️ 服务器</h2>
+      <div class="field">
+        <label for="upServerSelect">已保存服务器（testServer.json，与桌面版共用）</label>
+        <select id="upServerSelect"></select>
+      </div>
+      <div class="field" id="upHostManualRow" style="display:none">
+        <label for="upHostManual">服务器地址</label>
+        <input type="text" id="upHostManual" placeholder="如 192.168.31.97">
+      </div>
+      <div class="field">
+        <label for="upUsername">用户名</label>
+        <input type="text" id="upUsername" value="root">
+      </div>
+      <div class="field">
+        <label for="upPassword">密码（明文，与桌面版一致）</label>
+        <div class="inline">
+          <input type="text" id="upPassword">
+          <button class="mini" id="btnUpSaveServer">💾 保存</button>
+        </div>
+        <span class="hint" id="upAuthHint">开始升级前会自动验证；旧密码失效时自动轮试默认凭据</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🔍 关键字搜索</h2>
+      <div class="inline">
+        <input type="text" id="upKeyword" placeholder="如：阳泉 / 上饶">
+        <button id="btnUpSearch">搜索</button>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <span class="hint">在门诊 SVN 基础目录下匹配目录，自动选中最新一个并列出 YM-801S-*.zip</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>💾 SVN 目录 <span class="count" id="upDirCount"></span></h2>
+      <ul class="list" id="upDirList"><li class="empty">尚未搜索</li></ul>
+    </div>
+  </section>
+
+  <!-- 中：ZIP 选择 + 操作 -->
+  <section class="col col-mid">
+    <div class="panel">
+      <h2>📦 待升级 ZIP 包 <span class="count" id="upZipCount"></span></h2>
+      <div class="field">
+        <label for="upZipManual">直接指定 ZIP（打包成品 / 任意本地文件）</label>
+        <div class="inline">
+          <input type="text" id="upZipManual" placeholder="粘贴路径或点选择">
+          <button class="mini" data-pick="upZipManual" data-kind="zip" data-from="svn">选择</button>
+          <button class="mini" id="btnUpAddZip">添加</button>
+        </div>
+      </div>
+      <ul class="list" id="upZipList"><li class="empty">搜索目录后点选 ZIP，或直接指定文件</li></ul>
+      <span class="hint">勾选要上传的包，可多选；服务器端逐个执行 publish_front.sh</span>
+    </div>
+
+    <div class="panel">
+      <h2>🚀 操作</h2>
+      <div class="row">
+        <button class="primary" id="btnUpStart">开始前端升级</button>
+        <button id="btnUpStop" disabled>停止</button>
+      </div>
+      <div class="up-progress" id="upProgressWrap" hidden>
+        <div class="up-progress-bar" id="upProgressBar"></div>
+      </div>
+      <div class="path" id="upProgressText"></div>
+      <div class="errors" id="upErrors"></div>
+      <div class="notices" id="upNotices"></div>
+    </div>
+  </section>
+
+  <!-- 右：日志 + 历史 -->
+  <section class="col col-right">
+    <div class="panel">
+      <h2>📝 升级日志 <button class="mini" id="btnUpClearLog">清屏</button></h2>
+      <pre class="log" id="upLog"></pre>
+    </div>
+
+    <div class="panel">
+      <h2>📚 升级历史 <span class="count" id="upHistCount"></span></h2>
+      <ul class="list small" id="upHistoryList"><li class="empty">暂无记录</li></ul>
+      <div class="row" style="margin-top:8px">
+        <button class="mini" id="btnUpHistApply">回填选中记录</button>
+        <button class="mini danger" id="btnUpHistDelete">删除选中</button>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
 
 <div class="modal hidden" id="modal">
   <div class="modal-box">
@@ -188,5 +290,6 @@
   <div class="toast" id="toast"></div>
 </div>
 <script src="/static/js/app.js"></script>
+<script src="/static/js/upgrade.js"></script>
 </body>
 </html>

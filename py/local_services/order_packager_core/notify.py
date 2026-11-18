@@ -98,8 +98,11 @@ def _notify_icon():
     return LOGO_PATH if LOGO_PATH.is_file() else None
 
 
-def native_done(title, result, cfg):
-    """打包成功后发 Windows 原生通知；后台线程里跑，任何异常都不影响打包。"""
+def native_done(title, result, cfg, title_text="✅ 打包完成"):
+    """任务成功后发 Windows 原生通知；后台线程里跑，任何异常都不影响主任务。
+
+    title_text 区分打包/升级等场景；定位的文件取 result.package_path。
+    """
     if sys.platform != "win32" or not (cfg or {}).get("native_notify", True):
         return
     pkg = (result or {}).get("package_path") or ""
@@ -112,10 +115,13 @@ def native_done(title, result, cfg):
             name = (result or {}).get("package_name") or Path(pkg).name
             toaster = _get_toaster(title)
             toast = Toast()
-            toast.text_fields = ["✅ 打包完成", name]
+            toast.text_fields = [title_text, name]
             toast.duration = ToastDuration.Long
-            toast.tag = name
-            toast.group = name   # 同一包名在通知中心里替换旧条目
+            # WinRT 要求 tag/group 为字母数字且 ≤16 字符，直接用包名会报
+            # WinError -2143420138 整条丢弃；取 md5 前 16 位，同名包仍替换通知中心旧条目
+            toast_key = hashlib.md5(name.encode("utf-8")).hexdigest()[:16]
+            toast.tag = toast_key
+            toast.group = toast_key
             icon = _notify_icon()
             if icon:
                 toast.AddImage(ToastDisplayImage.fromPath(str(icon)))

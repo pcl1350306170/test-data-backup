@@ -16,6 +16,8 @@ var App = (function () {
   var kind = '模板';
   var picker = {target: '', kind: 'dir', path: '', from: 'svn'};
   var enterHits = [];
+  var activeTab = 'pack';
+  var statusMap = {pack: 'idle', upgrade: 'idle'};
 
   // ── 小工具 ────────────────────────────────────────
   function $(id) { return document.getElementById(id); }
@@ -465,6 +467,8 @@ var App = (function () {
       $(picker.target).value = li.getAttribute('data-file');
       closeModal();
       if (picker.target === 'baseZip') checkBaseZip(li.getAttribute('data-file'));
+      // 升级页的 ZIP 选择：选完直接进待升级列表
+      if (picker.target === 'upZipManual' && window.Up) Up.addZip(li.getAttribute('data-file'));
     });
     $('modalUp').addEventListener('click', function () {
       var p = picker.path.replace(/[\\/]+$/, '');
@@ -562,6 +566,7 @@ var App = (function () {
 
   function updateCommitBtn() {
     $('btnCommit').disabled = busy || !lastPackage;
+    $('btnUpgradePkg').disabled = busy || !lastPackage;
   }
 
   var STATUS = {
@@ -570,26 +575,48 @@ var App = (function () {
   };
 
   function setStatus(status) {
+    statusMap.pack = status || 'idle';
+    renderStatusPill();
+  }
+
+  // 页签切换：打包 / 前端升级（升级面板逻辑在 upgrade.js）
+  function switchTab(name) {
+    activeTab = name === 'upgrade' ? 'upgrade' : 'pack';
+    $('panePack').hidden = activeTab !== 'pack';
+    $('paneUpgrade').hidden = activeTab !== 'upgrade';
+    $('tabPack').className = activeTab === 'pack' ? 'on' : '';
+    $('tabUpgrade').className = activeTab === 'upgrade' ? 'on' : '';
+    renderStatusPill();
+  }
+
+  function renderStatusPill() {
+    var status = statusMap[activeTab] || 'idle';
     var pill = $('statusPill');
     pill.textContent = STATUS[status] || status;
-    pill.className = 'pill ' + (status || 'idle');
+    pill.className = 'pill ' + status;
+  }
+
+  function bindTabs() {
+    $('tabPack').addEventListener('click', function () { switchTab('pack'); });
+    $('tabUpgrade').addEventListener('click', function () { switchTab('upgrade'); });
   }
 
   // ── 打包完成通知（右下角卡片）──────────────────
   var NOTIFY_MS = 10000;   // 自动消失时间，鼠标悬停暂停计时
   var NOTIFY_MAX = 3;      // 最多同时保留几条
 
-  function notifyDone(result) {
+  function notifyDone(result, opt) {
     var pkg = result.package_path || lastPackage;
     if (!pkg) return;
     var name = result.package_name || pkg.replace(/[\\/]+$/, '').split(/[\\/]/).pop();
-    // 通知统一用后端默认图（本地文件，不走外网随机头像）
+    // 通知统一用后端默认图（本地文件，不走外网随机头像）；opt.title 区分打包/升级
     var url = '/api/notify/icon';
-    addNotifyCard(name, pkg, url);
-    sendSysNotify(name, pkg, url);
+    addNotifyCard(name, pkg, url, opt);
+    sendSysNotify(name, pkg, url, opt);
   }
 
-  function addNotifyCard(name, pkg, avatarUrl) {
+  function addNotifyCard(name, pkg, avatarUrl, opt) {
+    opt = opt || {};
     var card = document.createElement('div');
     card.className = 'notify-card';
 
@@ -609,7 +636,7 @@ var App = (function () {
     body.className = 'notify-body';
     var title = document.createElement('div');
     title.className = 'notify-title';
-    title.textContent = '✅ 打包完成';
+    title.textContent = opt.title || '✅ 打包完成';
     var nameEl = document.createElement('div');
     nameEl.className = 'notify-name';
     nameEl.textContent = name;
@@ -740,10 +767,10 @@ var App = (function () {
     }
   }
 
-  function sendSysNotify(name, pkg, avatarUrl) {
+  function sendSysNotify(name, pkg, avatarUrl, opt) {
     if (!sysNotifyOn()) return;
     try {
-      var n = new Notification('✅ 打包完成', {
+      var n = new Notification((opt && opt.title) || '✅ 打包完成', {
         body: name,
         icon: avatarUrl || undefined,
         tag: 'packager-done-' + name   // 同一包名替换旧通知，不无限堆叠
@@ -830,7 +857,7 @@ var App = (function () {
   function onResult(result) {
     if (result.package_path) {
       lastPackage = result.package_path;
-      $('btnCommit').disabled = busy;
+      updateCommitBtn();
     }
     if (result.output_dir) showOutput(result.output_dir);
     if (result.svn_committed != null) {
@@ -966,7 +993,8 @@ var App = (function () {
       enterHits = enterHits.filter(function (t) { return now - t < 1000; });
       if (enterHits.length >= 3) {
         enterHits = [];
-        startPack();
+        if (activeTab === 'upgrade') { if (window.Up) Up.start(); }
+        else startPack();
       }
     });
   }
@@ -1028,6 +1056,10 @@ var App = (function () {
     bindModal();
     bindHistory();
     bindEnterShortcut();
+    bindTabs();
+    $('btnUpgradePkg').addEventListener('click', function () {
+      if (lastPackage && window.Up) Up.addPackage(lastPackage);
+    });
 
     // 选择/浏览按钮
     Array.prototype.forEach.call(document.querySelectorAll('[data-pick]'), function (btn) {
@@ -1061,7 +1093,20 @@ var App = (function () {
     });
   }
 
-  return {init: init, toast: toast};
+  // 给 upgrade.js 的共享能力（同一页面的两个页签，不重复造工具）
+  function upgradeApi() {
+    return {
+      req: req, detailOf: detailOf, esc: esc, toast: toast,
+      val: val, setVal: setVal, selectLi: selectLi, closestLI: closestLI,
+      logClass: logClass, notifyDone: notifyDone,
+      askSysNotifyOnStart: askSysNotifyOnStart,
+      setStatus: function (s) { statusMap.upgrade = s || 'idle'; renderStatusPill(); },
+      switchTab: switchTab,
+      isUpgradeTab: function () { return activeTab === 'upgrade'; }
+    };
+  }
+
+  return {init: init, toast: toast, upgradeApi: upgradeApi};
 })();
 
 document.addEventListener('DOMContentLoaded', App.init);

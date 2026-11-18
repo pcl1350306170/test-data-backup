@@ -39,6 +39,19 @@ header h1 { font-size: 18px; white-space: nowrap; }
 .sys-notify-btn { font-size: 12px; white-space: nowrap; }
 .sys-notify-btn:disabled { opacity: .6; cursor: not-allowed; }
 
+/* 页签：打包 / 前端升级；hidden 兼容 display:grid 等非默认显示模式 */
+[hidden] { display: none !important; }
+.tabs {
+  display: flex; gap: 6px; padding: 10px 20px 0;
+  background: var(--panel); border-bottom: 1px solid var(--border);
+}
+.tabs button {
+  border: none; border-bottom: 2px solid transparent; border-radius: 0;
+  background: none; padding: 8px 14px; font-size: 14px; color: var(--muted);
+}
+.tabs button:hover:not(:disabled) { filter: none; color: var(--text); }
+.tabs button.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
 .workbench {
   display: grid; grid-template-columns: 320px minmax(360px, 1fr) 400px;
   gap: 14px; padding: 14px 20px 28px; align-items: start;
@@ -96,6 +109,20 @@ button.mini { padding: 3px 8px; font-size: 12px; }
 .list .sub { color: var(--muted); word-break: break-all; }
 .list.small li { padding: 5px 8px; }
 .empty { color: var(--muted); font-size: 12px; padding: 6px 2px; }
+
+/* 升级页：待升级 ZIP 多选行 + 上传进度条 */
+.list li.zip-item { display: flex; align-items: center; gap: 8px; cursor: default; }
+.zip-item input[type="checkbox"] { flex: none; width: 15px; height: 15px; cursor: pointer; }
+.zip-item .zip-info { flex: 1; min-width: 0; }
+.zip-item button { flex: none; color: var(--muted); }
+.up-progress {
+  height: 8px; border-radius: 999px; background: var(--bg);
+  border: 1px solid var(--border); overflow: hidden; margin-top: 10px;
+}
+.up-progress-bar {
+  height: 100%; width: 0; background: var(--accent);
+  border-radius: 999px; transition: width .3s;
+}
 
 .path { font-size: 11px; color: var(--muted); word-break: break-all; margin-bottom: 6px; }
 .errors { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }

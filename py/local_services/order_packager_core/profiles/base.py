@@ -52,7 +52,8 @@ class Profile:
 
     # ── 通用校验 ──────────────────────────────────────
 
-    NON_PARAM_KEYS = ("history_records", "port", "native_notify")
+    NON_PARAM_KEYS = ("history_records", "port", "native_notify",
+                      "upgrade_last_server", "upgrade_timeout", "upgrade_history_records")
 
     def validate(self, params, cfg):
         """通用字段清洗，业务必填项由子类 _extra_validate 补充。"""

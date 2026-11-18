@@ -1,4 +1,0 @@
-默认图存在: True (406457 bytes)
-_notify_icon 解析: D:\CODE\Python\test-data-backup\py\local_services\order_packager_core\assets\notify_default.jpeg
-AUMID IconUri: D:\CODE\Python\test-data-backup\py\local_services\order_packager_core\assets\notify_default.jpeg
-live_toasts: 1（应弹出 1 条使用默认图的通知）

@@ -89,26 +89,29 @@ class Store:
 
     # ── 历史记录 ──────────────────────────────────────
 
-    def history(self):
-        records = self.load().get("history_records") or []
+    def history(self, key="history_records"):
+        records = self.load().get(key) or []
         return records if isinstance(records, list) else []
 
-    def add_history(self, record, dedup_key=""):
-        """按 dedup_key（如订单信息/项目类型+目录）去重后插到最前。"""
+    def add_history(self, record, dedup_key="", key="history_records"):
+        """按 dedup_key（如订单信息/项目类型+目录）去重后插到最前。
+
+        key 可指向另一份历史（如升级服务的 upgrade_history_records），互不混存。
+        """
         with self._lock:
             cfg = self.load()
-            records = list(cfg.get("history_records") or [])
+            records = list(cfg.get(key) or [])
             if dedup_key:
                 records = [r for r in records if r.get(dedup_key) != record.get(dedup_key)]
             records.insert(0, record)
-            cfg["history_records"] = records[:HISTORY_LIMIT]
+            cfg[key] = records[:HISTORY_LIMIT]
         self.save(cfg)
-        return len(cfg["history_records"])
+        return len(cfg[key])
 
-    def delete_history(self, index):
+    def delete_history(self, index, key="history_records"):
         with self._lock:
             cfg = self.load()
-            records = list(cfg.get("history_records") or [])
+            records = list(cfg.get(key) or [])
             try:
                 index = int(index)
             except (TypeError, ValueError):
@@ -116,7 +119,7 @@ class Store:
             if not (0 <= index < len(records)):
                 return {"ok": False, "error": "序号超出范围"}
             removed = records.pop(index)
-            cfg["history_records"] = records
+            cfg[key] = records
         self.save(cfg)
         return {"ok": True, "removed": removed}
 
