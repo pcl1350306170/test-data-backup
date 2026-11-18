@@ -17,7 +17,7 @@ var App = (function () {
   var picker = {target: '', kind: 'dir', path: '', from: 'svn'};
   var enterHits = [];
   var activeTab = 'pack';
-  var statusMap = {pack: 'idle', upgrade: 'idle'};
+  var statusMap = {pack: 'idle', upgrade: 'idle', server: 'idle'};
 
   // ── 小工具 ────────────────────────────────────────
   function $(id) { return document.getElementById(id); }
@@ -408,15 +408,15 @@ var App = (function () {
     picker = {target: targetId, kind: kind, path: startPath || '', from: from || 'svn'};
     if (!picker.path) picker.path = rootOf(from) || (meta.roots || []).filter(function (r) { return r; })[0] || '';
     if (!picker.path) { toast('还没配置可浏览的基础目录'); return; }
-    $('modalTitle').textContent = title || (kind === 'zip' ? '选择压缩包' : '选择目录');
-    $('modalPick').style.display = kind === 'zip' ? 'none' : '';
+    $('modalTitle').textContent = title || (kind === 'war' ? '选择 WAR 包' : (kind === 'zip' ? '选择压缩包' : '选择目录'));
+    $('modalPick').style.display = (kind === 'zip' || kind === 'war') ? 'none' : '';
     $('modal').classList.remove('hidden');
     loadPicker(picker.path);
   }
 
   // 打开某个目录失败时退回根目录，避免填了根目录之外的路径就卡死
   function loadPicker(path, allowFallback) {
-    var exts = picker.kind === 'zip' ? '.zip' : '';
+    var exts = picker.kind === 'zip' ? '.zip' : (picker.kind === 'war' ? '.war' : '');
     req('GET', '/api/browse?path=' + encodeURIComponent(path) + '&exts=' + exts)
       .then(function (res) {
         if (!res.ok) {
@@ -438,11 +438,11 @@ var App = (function () {
             '</div><div class="sub">' + esc(tag) + (tag ? ' · ' : '') + '更新 ' + esc(x.mtime_str) +
             '</div></li>';
         }).join('') : '<li class="empty">没有子目录</li>';
-        $('modalFiles').innerHTML = (picker.kind === 'zip')
+        $('modalFiles').innerHTML = (picker.kind === 'zip' || picker.kind === 'war')
           ? ((d.files || []).length ? d.files.map(function (f) {
             return '<li data-file="' + esc(f.path) + '"><div class="name">' + esc(f.name) +
               '</div><div class="sub">' + esc(f.size_str) + ' · ' + esc(f.mtime_str) + '</div></li>';
-          }).join('') : '<li class="empty">没有 .zip 文件</li>')
+          }).join('') : '<li class="empty">没有 ' + (picker.kind === 'war' ? '.war' : '.zip') + ' 文件</li>')
           : '';
       });
   }
@@ -467,8 +467,9 @@ var App = (function () {
       $(picker.target).value = li.getAttribute('data-file');
       closeModal();
       if (picker.target === 'baseZip') checkBaseZip(li.getAttribute('data-file'));
-      // 升级页的 ZIP 选择：选完直接进待升级列表
+      // 升级页的包选择：选完直接进待升级列表（前端 ZIP / 服务端 WAR）
       if (picker.target === 'upZipManual' && window.Up) Up.addZip(li.getAttribute('data-file'));
+      if (picker.target === 'svWarManual' && window.Sv) Sv.addZip(li.getAttribute('data-file'));
     });
     $('modalUp').addEventListener('click', function () {
       var p = picker.path.replace(/[\\/]+$/, '');
@@ -579,13 +580,15 @@ var App = (function () {
     renderStatusPill();
   }
 
-  // 页签切换：打包 / 前端升级（升级面板逻辑在 upgrade.js）
+  // 页签切换：打包 / 前端升级 / 服务端升级（升级面板逻辑在 upgrade.js）
   function switchTab(name) {
-    activeTab = name === 'upgrade' ? 'upgrade' : 'pack';
+    activeTab = (name === 'upgrade' || name === 'server') ? name : 'pack';
     $('panePack').hidden = activeTab !== 'pack';
     $('paneUpgrade').hidden = activeTab !== 'upgrade';
+    $('paneServer').hidden = activeTab !== 'server';
     $('tabPack').className = activeTab === 'pack' ? 'on' : '';
     $('tabUpgrade').className = activeTab === 'upgrade' ? 'on' : '';
+    $('tabServer').className = activeTab === 'server' ? 'on' : '';
     renderStatusPill();
   }
 
@@ -599,6 +602,7 @@ var App = (function () {
   function bindTabs() {
     $('tabPack').addEventListener('click', function () { switchTab('pack'); });
     $('tabUpgrade').addEventListener('click', function () { switchTab('upgrade'); });
+    $('tabServer').addEventListener('click', function () { switchTab('server'); });
   }
 
   // ── 打包完成通知（右下角卡片）──────────────────
@@ -994,6 +998,7 @@ var App = (function () {
       if (enterHits.length >= 3) {
         enterHits = [];
         if (activeTab === 'upgrade') { if (window.Up) Up.start(); }
+        else if (activeTab === 'server') { if (window.Sv) Sv.start(); }
         else startPack();
       }
     });
@@ -1068,9 +1073,9 @@ var App = (function () {
         var from = btn.getAttribute('data-from');
         var target = btn.getAttribute('data-pick');
         var start = val(target);
-        if (!start && kind === 'zip') start = val('outputDir') || val('baseZip').replace(/[\\/][^\\/]+$/, '');
+        if (!start && (kind === 'zip' || kind === 'war')) start = val('outputDir') || val('baseZip').replace(/[\\/][^\\/]+$/, '');
         if (!start) start = rootOf(from);
-        openPicker(target, kind, start, kind === 'zip' ? '选择基础压缩包（.zip）' : '选择目录', from);
+        openPicker(target, kind, start, kind === 'war' ? '选择 WAR 包（.war）' : (kind === 'zip' ? '选择基础压缩包（.zip）' : '选择目录'), from);
       });
     });
     Array.prototype.forEach.call(document.querySelectorAll('[data-browse]'), function (btn) {
@@ -1100,7 +1105,7 @@ var App = (function () {
       val: val, setVal: setVal, selectLi: selectLi, closestLI: closestLI,
       logClass: logClass, notifyDone: notifyDone,
       askSysNotifyOnStart: askSysNotifyOnStart,
-      setStatus: function (s) { statusMap.upgrade = s || 'idle'; renderStatusPill(); },
+      setStatus: function (key, s) { statusMap[key] = s || 'idle'; renderStatusPill(); },
       switchTab: switchTab,
       isUpgradeTab: function () { return activeTab === 'upgrade'; }
     };

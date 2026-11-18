@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""门诊前端升级：SFTP 上传 zip → 执行 publish_front.sh，逻辑迁自 门诊升级.pyw。
+"""门诊前端 / 服务端升级：SFTP 上传包 → 执行 publish 脚本，逻辑迁自 门诊升级.pyw。
+
+前端升级传 zip 跑 publish_front.sh，服务端升级传 war 跑 publish_server.sh，
+两者共用同一套骨架，差异全部收敛为 UpgradeEngine 的类属性，ServerUpgradeEngine 只改属性：
 
 与打包服务共用同一套骨架：
 - UpgradeEngine 继承 PackEngine，线程 / SSE / 日志环形缓冲 / 停止 / 状态快照全部复用，
@@ -31,8 +34,11 @@ except ImportError:
 # 与桌面版 门诊升级.pyw 保持一致的远程路径 / 发布脚本 / 默认凭据
 FRONT_REMOTE_DIR = "/home/ym_clinic/ym801s_setup/application/webapps/front"
 PUBLISH_FRONT_SCRIPT = "publish_front.sh"
+SERVER_REMOTE_DIR = "/home/ym_clinic/ym801s_setup/application/webapps/server"
+PUBLISH_SERVER_SCRIPT = "publish_server.sh"
 DEFAULT_PASSWORDS = ("Yahua3585668", "yh123456", "Huawei@123")
 ZIP_PREFIX = "YM-801S-"
+WAR_PREFIX = "YM-801S-OSCS-"
 TEST_SERVER_PATH = util.py_dir() / "yarward" / "json" / "testServer.json"
 LEGACY_UPGRADE_CONFIG = util.py_dir() / "yarward" / "json" / "config_yarward_upgrade.json"
 
@@ -128,8 +134,23 @@ def resolve_auth(host, username="", password="", log=None):
 class UpgradeEngine(PackEngine):
     """前端升级任务：复用父类线程 / SSE / 日志 / 停止，业务在 _run 里。"""
 
+    # 差异点全部做成类属性，服务端升级子类只覆写这些（前端默认值保持原行为）
     TITLE = "门诊前端升级"
+    REMOTE_DIR = FRONT_REMOTE_DIR
+    PUBLISH_SCRIPT = PUBLISH_FRONT_SCRIPT
+    FILE_SUFFIX = ".zip"
+    FILE_WORD = "ZIP 包"
+    SEARCH_PREFIX = ZIP_PREFIX
+    SEARCH_RESULT_KEY = "zips"
+    FILES_KEY = "zip_paths"
+    NAMES_KEY = "zip_names"
     HISTORY_KEY = "upgrade_history_records"
+    LAST_SERVER_KEY = "upgrade_last_server"
+    TIMEOUT_KEY = "upgrade_timeout"
+    DONE_TITLE = "✅ 升级完成"
+    LEGACY_HISTORY_FIELD = "history_frontend"
+    ROUTE_PREFIX = "/api/upgrade"
+    STATE_ATTR = "upgrade_engine"
     DEDUP_FIELD = "_dedup_key"
 
     def __init__(self, profile, store):
@@ -140,17 +161,17 @@ class UpgradeEngine(PackEngine):
     def _migrate_legacy(self):
         """一次性只读迁移桌面版升级历史与上次服务器；旧文件保持不动。"""
         cfg = self.store.load()
-        if cfg.get("upgrade_history_records") or cfg.get("upgrade_last_server"):
+        if cfg.get(self.HISTORY_KEY) or cfg.get(self.LAST_SERVER_KEY):
             return
         legacy = util.read_json(LEGACY_UPGRADE_CONFIG, default={})
         if not isinstance(legacy, dict) or not legacy:
             return
         patch = {}
-        history = legacy.get("history_frontend")
+        history = legacy.get(self.LEGACY_HISTORY_FIELD)
         if isinstance(history, list) and history:
-            patch["upgrade_history_records"] = history
+            patch[self.HISTORY_KEY] = history
         if legacy.get("last_server"):
-            patch["upgrade_last_server"] = legacy["last_server"]
+            patch[self.LAST_SERVER_KEY] = legacy["last_server"]
         if patch:
             self.store.update(patch)
             self.log("📦 已迁移桌面版升级配置：%s" % LEGACY_UPGRADE_CONFIG)
@@ -165,23 +186,23 @@ class UpgradeEngine(PackEngine):
         host = str((params or {}).get("host") or "").strip()
         username = str((params or {}).get("username") or "").strip() or "root"
         password = str((params or {}).get("password") or "")
-        zips = (params or {}).get("zip_paths") or []
+        files = (params or {}).get(self.FILES_KEY) or []
         errors = []
         if not host:
             errors.append("请填写服务器地址")
-        if not isinstance(zips, list) or not zips:
-            errors.append("请先选择要升级的 ZIP 包")
+        if not isinstance(files, list) or not files:
+            errors.append("请先选择要升级的%s" % self.FILE_WORD)
         else:
-            for z in zips:
+            for z in files:
                 if not Path(str(z)).is_file():
                     errors.append("文件不存在：%s" % z)
-                elif not str(z).lower().endswith(".zip"):
-                    errors.append("不是 zip 文件：%s" % z)
+                elif not str(z).lower().endswith(self.FILE_SUFFIX):
+                    errors.append("不是 %s 文件：%s" % (self.FILE_SUFFIX, z))
         if errors:
             return False, "参数校验未通过", errors
 
         normalized = {"host": host, "username": username, "password": password,
-                      "zip_paths": [str(z) for z in zips]}
+                      self.FILES_KEY: [str(z) for z in files]}
         self.status = "running"
         self.task_id = uuid.uuid4().hex[:8]
         self.started_at = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -194,7 +215,7 @@ class UpgradeEngine(PackEngine):
         self._stop_event.clear()
         with self._log_lock:
             self.logs = []
-        self.store.update({"upgrade_last_server": host})
+        self.store.update({self.LAST_SERVER_KEY: host})
         self._thread = threading.Thread(target=self._run, args=(normalized,), daemon=True)
         self._thread.start()
         self._emit({"type": "start", "task_id": self.task_id,
@@ -248,8 +269,8 @@ class UpgradeEngine(PackEngine):
         sftp.put(str(local), remote, callback=_cb)
         self.log("✅ 已上传: %s" % local.name)
 
-    def _publish(self, ssh, zip_name, timeout):
-        cmd = "cd %s && sh %s %s" % (FRONT_REMOTE_DIR, PUBLISH_FRONT_SCRIPT, zip_name)
+    def _publish(self, ssh, file_name, timeout):
+        cmd = "cd %s && sh %s %s" % (self.REMOTE_DIR, self.PUBLISH_SCRIPT, file_name)
         self.log("▶ %s" % cmd)
         stdin, stdout, stderr = ssh.exec_command(cmd)
         stdout.channel.settimeout(timeout)
@@ -265,40 +286,40 @@ class UpgradeEngine(PackEngine):
             if self._stop_event.is_set():
                 raise Aborted("用户已停止任务")
             raise RuntimeError("执行 %s 超时或读取输出失败（%ss）：%s"
-                               % (PUBLISH_FRONT_SCRIPT, timeout, e))
+                               % (self.PUBLISH_SCRIPT, timeout, e))
         code = stdout.channel.recv_exit_status()
         err = (stderr.read() or b"").decode("utf-8", "replace").strip()
         if err:
             self.log("[STDERR] %s" % err)
         if code != 0:
             raise RuntimeError("%s %s 执行失败，返回码: %s"
-                               % (PUBLISH_FRONT_SCRIPT, zip_name, code))
-        self.log("✅ %s 前端升级完成！" % zip_name)
+                               % (self.PUBLISH_SCRIPT, file_name, code))
+        self.log("✅ %s 升级完成！" % file_name)
 
     def _run(self, params):
         start_ts = time.time()
         host, username, password = params["host"], params["username"], params["password"]
-        zips = [Path(z) for z in params["zip_paths"]]
-        timeout = int(self.store.load().get("upgrade_timeout") or 300)
+        files = [Path(z) for z in params[self.FILES_KEY]]
+        timeout = int(self.store.load().get(self.TIMEOUT_KEY) or 300)
         self.log("=" * 52)
         self.log("🚀 %s 任务 %s 开始" % (self.TITLE, self.task_id))
         try:
-            self._set_stage("连接服务器", 1, 1 + len(zips) * 2)
+            self._set_stage("连接服务器", 1, 1 + len(files) * 2)
             self.log("正在连接服务器 %s（%s）…" % (host, username))
             ssh = _connect(host, username, password, timeout=10)
             self._ssh = ssh
             try:
                 self._check_stop()
                 sftp = ssh.open_sftp()
-                self._ensure_remote_dir(sftp, FRONT_REMOTE_DIR)
+                self._ensure_remote_dir(sftp, self.REMOTE_DIR)
                 step = 2
-                for i, local in enumerate(zips, 1):
+                for i, local in enumerate(files, 1):
                     self._check_stop()
-                    self._set_stage("上传 %s" % local.name, step, 1 + len(zips) * 2)
+                    self._set_stage("上传 %s" % local.name, step, 1 + len(files) * 2)
                     step += 1
-                    self._upload(sftp, local, "%s/%s" % (FRONT_REMOTE_DIR, local.name),
-                                 i, len(zips))
-                    self._set_stage("发布 %s" % local.name, step, 1 + len(zips) * 2)
+                    self._upload(sftp, local, "%s/%s" % (self.REMOTE_DIR, local.name),
+                                 i, len(files))
+                    self._set_stage("发布 %s" % local.name, step, 1 + len(files) * 2)
                     step += 1
                     self._publish(ssh, local.name, timeout)
                 sftp.close()
@@ -312,19 +333,19 @@ class UpgradeEngine(PackEngine):
                 raise Aborted("任务已停止")
 
             self.status = "done"
-            names = ", ".join(z.name for z in zips)
+            names = ", ".join(z.name for z in files)
             self.last_result.update({
                 "host": host, "username": username,
-                "zip_paths": [str(z) for z in zips], "zip_names": names,
-                "package_path": str(zips[0]),
+                self.FILES_KEY: [str(z) for z in files], self.NAMES_KEY: names,
+                "package_path": str(files[0]),
                 "package_name": "%s ← %s" % (host, names),
             })
-            self.log("🎉 服务器 %s 前端升级完成，用时 %.1fs" % (host, time.time() - start_ts))
+            self.log("🎉 服务器 %s %s完成，用时 %.1fs" % (host, self.TITLE, time.time() - start_ts))
             record = {
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "server": host, "username": username,
-                "zip_paths": [str(z) for z in zips], "zip_names": names,
-                "svn_dir": zips[0].parent.name,
+                self.FILES_KEY: [str(z) for z in files], self.NAMES_KEY: names,
+                "svn_dir": files[0].parent.name,
                 "_dedup_key": "%s_%s" % (host, names),
             }
             count = self.store.add_history(record, self.DEDUP_FIELD, key=self.HISTORY_KEY)
@@ -332,7 +353,7 @@ class UpgradeEngine(PackEngine):
             self._emit({"type": "complete", "result": dict(self.last_result),
                         "elapsed": round(time.time() - start_ts, 1)})
             notify.native_done(self.profile.TITLE, dict(self.last_result),
-                               self.store.load(), title_text="✅ 升级完成")
+                               self.store.load(), title_text=self.DONE_TITLE)
         except Aborted as e:
             self.status = "stopped"
             self.error = str(e)
@@ -359,13 +380,36 @@ class UpgradeEngine(PackEngine):
             self._emit({"type": "finish", "status": self.status, "elapsed": self.elapsed})
 
 
-# ── 路由（只由门诊服务挂载）───────────────────────────────────────
+class ServerUpgradeEngine(UpgradeEngine):
+    """服务端升级：传 war 到 webapps/server 跑 publish_server.sh，只改差异属性。"""
+
+    TITLE = "门诊服务端升级"
+    REMOTE_DIR = SERVER_REMOTE_DIR
+    PUBLISH_SCRIPT = PUBLISH_SERVER_SCRIPT
+    FILE_SUFFIX = ".war"
+    FILE_WORD = "WAR 包"
+    SEARCH_PREFIX = WAR_PREFIX
+    SEARCH_RESULT_KEY = "wars"
+    FILES_KEY = "war_paths"
+    NAMES_KEY = "war_names"
+    HISTORY_KEY = "server_upgrade_history_records"
+    LAST_SERVER_KEY = "server_upgrade_last_server"
+    TIMEOUT_KEY = "server_upgrade_timeout"
+    DONE_TITLE = "✅ 服务端升级完成"
+    LEGACY_HISTORY_FIELD = "history_server"
+    ROUTE_PREFIX = "/api/server-upgrade"
+    STATE_ATTR = "server_upgrade_engine"
+
+
+# ── 路由（只由门诊服务挂载，前端 / 服务端各挂一套）─────────────────
 
 def attach_upgrade_routes(app, profile, store, engine, sse_timeout=30):
     import asyncio
     import json
 
-    @app.get("/api/upgrade/servers")
+    prefix = engine.ROUTE_PREFIX
+
+    @app.get(prefix + "/servers")
     def upgrade_servers():
         """testServer.json 全量列表（含密码，与桌面版一致的单机明文约定）。"""
         data = load_servers()
@@ -374,9 +418,9 @@ def attach_upgrade_routes(app, profile, store, engine, sse_timeout=30):
                    for h, v in data.items()]
         servers.sort(key=lambda s: s["host"])
         return {"servers": servers, "path": str(TEST_SERVER_PATH),
-                "last_server": store.load().get("upgrade_last_server", "")}
+                "last_server": store.load().get(engine.LAST_SERVER_KEY, "")}
 
-    @app.post("/api/upgrade/server/save")
+    @app.post(prefix + "/server/save")
     def upgrade_server_save(data: dict):
         host = str((data or {}).get("host") or "").strip()
         password = str((data or {}).get("password") or "").strip()
@@ -384,42 +428,43 @@ def attach_upgrade_routes(app, profile, store, engine, sse_timeout=30):
         if not host or not password:
             raise HTTPException(400, "请填写服务器地址和密码")
         save_server(host, username, password)
-        store.update({"upgrade_last_server": host})
+        store.update({engine.LAST_SERVER_KEY: host})
         return {"ok": True, "host": host}
 
-    @app.post("/api/upgrade/auth")
+    @app.post(prefix + "/auth")
     def upgrade_auth(data: dict):
         """验证凭据 + 默认密码轮试；阻塞型（最多 6 次 SSH），同步 def 走线程池。"""
         data = data or {}
         return resolve_auth(data.get("host"), data.get("username"),
                             data.get("password"), log=engine.log)
 
-    @app.post("/api/upgrade/search")
+    @app.post(prefix + "/search")
     def upgrade_search(data: dict):
-        """关键字搜 SVN 目录（自动选最新并列出 zip），或列指定目录下的 zip。"""
+        """关键字搜 SVN 目录（自动选最新并列出包），或列指定目录下的包。"""
         cfg = store.load()
         base = cfg.get("svn_base_dir", "")
+        rk = engine.SEARCH_RESULT_KEY
         directory = str((data or {}).get("dir") or "").strip()
         if directory:
             try:
                 target = browse.check_root(directory, [base])
             except browse.PathDenied as e:
                 raise HTTPException(400, str(e))
-            zips = vcs.find_files(Path(target), ZIP_PREFIX, ".zip")
-            return {"dir": target, "zips": zips, "total": len(zips)}
+            files = vcs.find_files(Path(target), engine.SEARCH_PREFIX, engine.FILE_SUFFIX)
+            return {"dir": target, rk: files, "total": len(files)}
         keyword = str((data or {}).get("keyword") or "").strip()
         if not keyword:
             raise HTTPException(400, "请输入关键字")
         dirs = vcs.dirs_by_name(base, keyword)
-        selected, zips = "", []
+        selected, files = "", []
         if dirs:
             selected = dirs[0]["path"]   # dirs_by_name 已按 mtime 倒序，首个即最新
-            zips = vcs.find_files(Path(selected), ZIP_PREFIX, ".zip")
+            files = vcs.find_files(Path(selected), engine.SEARCH_PREFIX, engine.FILE_SUFFIX)
         return {"keyword": keyword, "dirs": dirs, "selected": selected,
-                "zips": zips, "base": base,
+                rk: files, "base": base,
                 "notice": "" if dirs else "未找到包含「%s」的目录（基础目录：%s）" % (keyword, base)}
 
-    @app.post("/api/upgrade/start")
+    @app.post(prefix + "/start")
     def upgrade_start(data: dict):
         ok, message, errors = engine.start(data or {})
         if not ok:
@@ -427,17 +472,17 @@ def attach_upgrade_routes(app, profile, store, engine, sse_timeout=30):
                                 {"message": message, "errors": errors})
         return {"ok": True, "task_id": engine.task_id, "status": engine.status}
 
-    @app.get("/api/upgrade/status")
+    @app.get(prefix + "/status")
     def upgrade_status():
         return engine.get_status()
 
-    @app.post("/api/upgrade/stop")
+    @app.post(prefix + "/stop")
     def upgrade_stop():
         if not engine.stop():
             raise HTTPException(409, "当前没有在进行的升级任务")
         return {"ok": True, "status": engine.status}
 
-    @app.get("/api/upgrade/progress")
+    @app.get(prefix + "/progress")
     async def upgrade_progress():
         """SSE：与打包进度同款——先补发日志快照，再实时推送，30s 心跳。"""
         queue = engine.subscribe()
@@ -464,16 +509,16 @@ def attach_upgrade_routes(app, profile, store, engine, sse_timeout=30):
                                  headers={"Cache-Control": "no-cache",
                                           "X-Accel-Buffering": "no"})
 
-    @app.get("/api/upgrade/history")
+    @app.get(prefix + "/history")
     def upgrade_history():
         records = store.history(engine.HISTORY_KEY)
         return {"records": records, "total": len(records)}
 
-    @app.delete("/api/upgrade/history")
+    @app.delete(prefix + "/history")
     def upgrade_history_delete(index: int = Query(...)):
         result = store.delete_history(index, key=engine.HISTORY_KEY)
         if not result.get("ok"):
             raise HTTPException(400, result.get("error", "删除失败"))
         return result
 
-    app.state.upgrade_engine = engine
+    setattr(app.state, engine.STATE_ATTR, engine)

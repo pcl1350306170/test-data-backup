@@ -189,6 +189,10 @@ class MenzProfile(Profile):
         "upgrade_last_server": "",
         "upgrade_timeout": 300,
         "upgrade_history_records": [],
+        # 服务端升级（ServerUpgradeEngine）专用：与前端升级各自独立
+        "server_upgrade_last_server": "",
+        "server_upgrade_timeout": 300,
+        "server_upgrade_history_records": [],
     }
     LEGACY_CONFIG_PATHS = (util.py_dir() / "yarward" / "json" / "config_menz_order_packager.json",)
 

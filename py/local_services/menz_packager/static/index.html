@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>门诊订单打包</title>
+<title>门诊服务</title>
 <link rel="icon" type="image/jpeg" href="https://cdn.jsdelivr.net/gh/pcl1350306170/Miscellaneous@refs/heads/main/GPT-IMG/头像/398.jpg">
 <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
 <header>
-  <h1>📦 门诊订单打包</h1>
+  <h1>📦 门诊服务</h1>
   <div class="head-right">
     <span class="env" id="envInfo">Node 检测中…</span>
     <span class="pill" id="statusPill">空闲</span>
@@ -21,6 +21,7 @@
 <nav class="tabs">
   <button type="button" id="tabPack" class="on">📦 打包</button>
   <button type="button" id="tabUpgrade">🚀 前端升级</button>
+  <button type="button" id="tabServer">🖥️ 服务端升级</button>
 </nav>
 
 <div id="panePack" class="tab-pane">
@@ -264,6 +265,101 @@
       <div class="row" style="margin-top:8px">
         <button class="mini" id="btnUpHistApply">回填选中记录</button>
         <button class="mini danger" id="btnUpHistDelete">删除选中</button>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+
+<div id="paneServer" class="tab-pane" hidden>
+<main class="workbench">
+  <!-- 左：服务器 + 搜索 -->
+  <section class="col col-left">
+    <div class="panel">
+      <h2>🖥️ 服务器</h2>
+      <div class="field">
+        <label for="svServerSelect">已保存服务器（testServer.json，与桌面版共用）</label>
+        <select id="svServerSelect"></select>
+      </div>
+      <div class="field" id="svHostManualRow" style="display:none">
+        <label for="svHostManual">服务器地址</label>
+        <input type="text" id="svHostManual" placeholder="如 192.168.31.97">
+      </div>
+      <div class="field">
+        <label for="svUsername">用户名</label>
+        <input type="text" id="svUsername" value="root">
+      </div>
+      <div class="field">
+        <label for="svPassword">密码（明文，与桌面版一致）</label>
+        <div class="inline">
+          <input type="text" id="svPassword">
+          <button class="mini" id="btnSvSaveServer">💾 保存</button>
+        </div>
+        <span class="hint" id="svAuthHint">开始升级前会自动验证；旧密码失效时自动轮试默认凭据</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🔍 关键字搜索</h2>
+      <div class="inline">
+        <input type="text" id="svKeyword" placeholder="如：阳泉 / 上饶">
+        <button id="btnSvSearch">搜索</button>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <span class="hint">在门诊 SVN 基础目录下匹配目录，自动选中最新一个并列出 YM-801S-OSCS-*.war</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>💾 SVN 目录 <span class="count" id="svDirCount"></span></h2>
+      <ul class="list" id="svDirList"><li class="empty">尚未搜索</li></ul>
+    </div>
+  </section>
+
+  <!-- 中：WAR 选择 + 操作 -->
+  <section class="col col-mid">
+    <div class="panel">
+      <h2>📦 待升级 WAR 包 <span class="count" id="svWarCount"></span></h2>
+      <div class="field">
+        <label for="svWarManual">直接指定 WAR（服务端成品 / 任意本地文件）</label>
+        <div class="inline">
+          <input type="text" id="svWarManual" placeholder="粘贴路径或点选择">
+          <button class="mini" data-pick="svWarManual" data-kind="war" data-from="svn">选择</button>
+          <button class="mini" id="btnSvAddWar">添加</button>
+        </div>
+      </div>
+      <ul class="list" id="svWarList"><li class="empty">搜索目录后点选 WAR，或直接指定文件</li></ul>
+      <span class="hint">勾选要上传的包，可多选；服务器端逐个执行 publish_server.sh</span>
+    </div>
+
+    <div class="panel">
+      <h2>🚀 操作</h2>
+      <div class="row">
+        <button class="primary" id="btnSvStart">开始服务端升级</button>
+        <button id="btnSvStop" disabled>停止</button>
+      </div>
+      <div class="up-progress" id="svProgressWrap" hidden>
+        <div class="up-progress-bar" id="svProgressBar"></div>
+      </div>
+      <div class="path" id="svProgressText"></div>
+      <div class="errors" id="svErrors"></div>
+      <div class="notices" id="svNotices"></div>
+    </div>
+  </section>
+
+  <!-- 右：日志 + 历史 -->
+  <section class="col col-right">
+    <div class="panel">
+      <h2>📝 升级日志 <button class="mini" id="btnSvClearLog">清屏</button></h2>
+      <pre class="log" id="svLog"></pre>
+    </div>
+
+    <div class="panel">
+      <h2>📚 升级历史 <span class="count" id="svHistCount"></span></h2>
+      <ul class="list small" id="svHistoryList"><li class="empty">暂无记录</li></ul>
+      <div class="row" style="margin-top:8px">
+        <button class="mini" id="btnSvHistApply">回填选中记录</button>
+        <button class="mini danger" id="btnSvHistDelete">删除选中</button>
       </div>
     </div>
   </section>
