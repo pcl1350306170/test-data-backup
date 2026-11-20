@@ -13,7 +13,10 @@
 # 备份与日志输出位置：/root/mysql-backup/
 # ============================================================
 
-MYSQL_USER="dev_user"
+# 自 2026-11-19 起数据库统一到 Windows 本地 MySQL（127.0.0.1:3306）
+MYSQL_HOST="127.0.0.1"
+MYSQL_PORT="3306"
+MYSQL_USER="root"
 MYSQL_PASSWORD="123456"
 BACKUP_DIR="/root/mysql-backup"
 KEEP_COUNT=5
@@ -46,7 +49,7 @@ BACKUP_FILE="$BACKUP_DIR/mysql-${STAMP}.sql.gz"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 开始备份 MySQL 全部数据库 ..." >> "$LOG_FILE"
 
 # --all-databases 全库；--single-transaction InnoDB 一致性快照；--routines/--triggers 保留存储过程与触发器
-if mysqldump -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --all-databases --single-transaction --routines --triggers --hex-blob 2>>"$LOG_FILE" | gzip > "$BACKUP_FILE"; then
+if mysqldump -h"$MYSQL_HOST" -P"$MYSQL_PORT" -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" --all-databases --single-transaction --routines --triggers --hex-blob 2>>"$LOG_FILE" | gzip > "$BACKUP_FILE"; then
     SIZE=$(du -h "$BACKUP_FILE" | cut -f1)
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] 备份成功: $BACKUP_FILE (${SIZE})" >> "$LOG_FILE"
 else

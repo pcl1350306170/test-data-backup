@@ -16,6 +16,21 @@
   "node_version": "14.19.1",
   "history_records": [
     {
+      "timestamp": "2026-11-20 11:01:16",
+      "project_kind": "模板",
+      "project_dir": "D:\\CODE\\Yarward\\门诊\\template1.5.6",
+      "output_dir": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-2093 -南通市中医院\\前端",
+      "order_info": "2026-2093 -南通市中医院",
+      "project_version": "1.5.6",
+      "base_zip_path": "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-2093 -南通市中医院\\前端\\YM-801S-TLSS-V1.5.6.262093.01001-NTSZYY-FE.zip",
+      "custom_zip_name": "",
+      "auto_commit_svn": true,
+      "is_version_155_plus": true,
+      "node_version": "14.19.1",
+      "package_name": "YM-801S-TLSS-V1.5.6.262093.01001-NTSZYY-FE.zip",
+      "_dedup_key": "模板_2026-2093 -南通市中医院"
+    },
+    {
       "timestamp": "2026-11-18 14:57:55",
       "project_kind": "模板",
       "project_dir": "D:\\CODE\\Yarward\\门诊\\template1.5.4",
@@ -554,7 +569,7 @@
   "upgrade_timeout": 300,
   "upgrade_history_records": [
     {
-      "timestamp": "2026-11-18 15:13:59",
+      "timestamp": "2026-11-19 16:37:11",
       "server": "192.168.31.42",
       "username": "root",
       "zip_paths": [
@@ -563,6 +578,17 @@
       "zip_names": "YM-801S-TLSS-V1.5.6.262152.01001-ZBSZXYYDYQ-FE.zip",
       "svn_dir": "前端",
       "_dedup_key": "192.168.31.42_YM-801S-TLSS-V1.5.6.262152.01001-ZBSZXYYDYQ-FE.zip"
+    },
+    {
+      "timestamp": "2026-11-19 15:38:58",
+      "server": "192.168.31.198",
+      "username": "root",
+      "zip_paths": [
+        "D:\\CODE\\Yarward\\SVN\\0门诊\\2026-2093 -南通市中医院\\前端\\YM-801S-TLSS-V1.5.6.262093.01001-NTSZYY-FE.zip"
+      ],
+      "zip_names": "YM-801S-TLSS-V1.5.6.262093.01001-NTSZYY-FE.zip",
+      "svn_dir": "前端",
+      "_dedup_key": "192.168.31.198_YM-801S-TLSS-V1.5.6.262093.01001-NTSZYY-FE.zip"
     },
     {
       "timestamp": "2026-11-18 14:58:11",

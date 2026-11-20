@@ -1107,8 +1107,14 @@
         var payload = { content: content, category_id: $('eCat').value, tags: state.editTags };
         var req = state.editing ? api('/api/notes/' + state.editing, { json: payload, method: 'PUT' })
           : api('/api/notes', { json: payload });
-        req.then(function () { $('mEdit').classList.add('hidden'); toast('已保存'); refreshMeta(); reload(); })
-          .catch(function (e) { toast('保存失败：' + e.message); });
+        req.then(function () {
+          toast('已保存'); refreshMeta(); reload();
+          if (state.editing) {
+            $('mEdit').classList.add('hidden');
+          } else {
+            $('eContent').value = ''; $('eContent').focus();
+          }
+        }).catch(function (e) { toast('保存失败：' + e.message); });
       };
 
       // ---------- 管理弹层 ----------
