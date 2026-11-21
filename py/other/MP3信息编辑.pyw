@@ -13,6 +13,8 @@ MP3 信息编辑（GUI）
   5. 批量时单文件失败不中断整批，失败明细写『标签编辑失败清单.txt』
   6. 随机头像：选图对话框默认从「头像目录」预选一张随机图；批量可勾选
      随机封面/随机背景，每个文件独立随机一张（完全随机）
+  7. 多文件精修：文件名清洗成标题（去标点/英文/开头序号、繁转简），
+     逐行编辑后一键保存，默认按标题重命名文件
 
 运行方式：
   双击运行（.pyw 不弹控制台），进度和结果显示在“日志”页
@@ -25,6 +27,7 @@ import json
 import os
 import queue
 import random
+import re
 import shutil
 import sys
 import threading
@@ -73,6 +76,14 @@ except Exception:
     Image = None
     HAVE_PIL = False
 
+# ---------- 可选依赖：zhconv（繁转简，多文件精修标题清洗用） ----------
+try:
+    import zhconv
+    HAVE_ZHCONV = True
+except Exception:
+    zhconv = None
+    HAVE_ZHCONV = False
+
 # ---------- 默认配置（每个键一行注释） ----------
 DEFAULT_CONFIG = {
     "input_dir": r"D:\AUDIO\mp3",       # MP3 所在目录（批量处理对象）
@@ -87,6 +98,15 @@ DEFAULT_CONFIG = {
     "avatar_dir": r"D:\CODE\Miscellaneous\GPT-IMG\头像",  # 随机头像目录（选图预选/批量随机共用）
     "batch_random_cover": False,        # 批量随机封面：每个文件独立随机一张（勾选后忽略固定封面路径）
     "batch_random_bg": False,           # 批量随机背景图：每个文件独立随机一张（勾选后忽略固定背景路径）
+    "fine_t2s": True,                   # 多文件精修：标题清洗时繁转简（需 zhconv）
+    "fine_rename": True,                # 多文件精修：保存后默认按标题重命名文件
+    "clean_filter_words": "",           # 标题清洗过滤词（逗号分隔，如网站名水印），空 = 不启用
+    "fine_artist": "",                  # 多文件精修：通用作者，留空 = 不修改
+    "fine_album": "",                   # 多文件精修：通用专辑，留空 = 不修改
+    "fine_date": "",                    # 多文件精修：通用日期（年份），留空 = 不修改
+    "fine_comment": "",                 # 多文件精修：通用备注，留空 = 不修改
+    "fine_random_cover": False,         # 多文件精修：随机封面（头像目录，每首不同）
+    "fine_random_bg": False,            # 多文件精修：随机背景图（头像目录，每首不同）
     "sync_rename": False,               # 标题修改后同步重命名文件（默认关闭）
 }
 
@@ -107,12 +127,13 @@ IMAGE_EXTS = {".jpg", ".jpeg", ".png"}
 TUTORIAL = """
 【一、pip 安装命令】
 
-  pip install mutagen
+  pip install mutagen zhconv
 
   国内网络较慢时可用镜像：
-  pip install mutagen -i https://pypi.tuna.tsinghua.edu.cn/simple
+  pip install mutagen zhconv -i https://pypi.tuna.tsinghua.edu.cn/simple
 
   注意：包名是 mutagen（变形虫），不要装成 mutate / mutation 等同名近似库。
+  zhconv 仅用于多文件精修的繁转简，未安装时该功能降级为保留繁体。
   验证安装：python -c "import mutagen; print(mutagen.version_string)"
 
 【二、外部依赖（Windows）】
@@ -126,19 +147,24 @@ TUTORIAL = """
      便于核对音频合并工具写错的信息。
   2. 单文件精修：在列表中点选一个 MP3，下方编辑区自动载入现有标签与图片；
      改完点“保存当前文件”。封面/背景图可 更换、删除、导出。
-  3. 批量处理：在“参数”页填好要统一套用的信息（留空 = 不修改该项），
+  3. 多文件精修：在“多文件精修”页点“加载列表”，每行显示 原文件名 -> 清洗后标题，
+     标题可逐行手改（红色=清洗为空已回退原文件名，橙色=标题重复）；清洗规则：
+     去开头序号、只留中文+数字、繁转简（可关）、可配过滤词。页内可设通用作者/专辑/
+     日期/备注（留空=不改），可选随机封面/背景图（头像目录，每首不同）；
+     音轨自动 n/N；保存后默认按标题重命名文件。
+  4. 批量处理：在“参数”页填好要统一套用的信息（留空 = 不修改该项），
      底部点“开始批量应用”。标题 = 前缀 + 序号（起始序号 055 表示三位补零，
      与音频合并工具规则一致），音轨自动写 序号/总数。
-  4. 随机头像：所有选图对话框默认从「头像目录」预选一张随机图（双击即选中，
+  5. 随机头像：所有选图对话框默认从「头像目录」预选一张随机图（双击即选中，
      也可换选别的文件）；批量页勾选“随机封面/随机背景”后，每个文件从该目录
      独立随机一张（完全随机，可能重复），勾选时忽略左侧固定图片路径。
-  5. 保存前自动把原文件备份到 源目录\\_backup_标签编辑\\（同名覆盖，只留最近一份），
+  6. 保存前自动把原文件备份到 源目录\\_backup_标签编辑\\（同名覆盖，只留最近一份），
      改错了可从备份恢复。确认无误后，可用“文件”页目录栏的“清理备份”一键删除该备份文件夹。
-  6. “标题修改后同步重命名文件”默认关闭；勾选后文件名随标题变化
+  7. “标题修改后同步重命名文件”默认关闭（仅批量模式）；勾选后文件名随标题变化
      （非法字符自动过滤，目标重名则跳过重命名只改标签）。
-  7. 只修改 ID3 标签，不重新编码音频，音质零损失；批量中单个文件失败只记警告
+  8. 只修改 ID3 标签，不重新编码音频，音质零损失；批量中单个文件失败只记警告
      不中断，结尾汇总并写『标签编辑失败清单.txt』，本轮无失败会自动删除旧清单。
-  8. 所有设置都会记住（json/config_mp3_tag_editor.json），下次打开自动回填。
+  9. 所有设置都会记住（json/config_mp3_tag_editor.json），下次打开自动回填。
 
 【四、参数微调（“参数”页，键名对应配置）】
 
@@ -152,7 +178,13 @@ TUTORIAL = """
     avatar_dir              随机头像目录；选图框随机预选与批量随机都取自此目录
     batch_random_cover      批量随机封面（true/false）：勾选后每个文件独立随机一张
     batch_random_bg         批量随机背景图（true/false）：同上
-    sync_rename             标题修改后同步重命名文件（默认关闭）
+    fine_t2s                多文件精修：标题清洗繁转简（默认开，需 zhconv）
+    fine_rename             多文件精修：保存后按标题重命名文件（默认开）
+    clean_filter_words      标题清洗过滤词，逗号分隔（如网站名水印），空 = 不启用
+    fine_artist/album       精修通用作者/专辑；留空 = 不修改
+    fine_date/comment       精修通用日期/备注；留空 = 不修改
+    fine_random_cover/bg    精修随机封面/背景图（true/false）：每首独立随机一张
+    sync_rename             标题修改后同步重命名文件（默认关闭，仅批量模式）
 
 【五、提醒】
 
@@ -364,6 +396,38 @@ def batch_title_for(prefix, start, width, idx):
     return "%s%0*d" % (prefix, width, start + idx - 1)
 
 
+# 开头序号模式：055_ / 01. / 第01集 等（音轨号由 n/N 单独写）
+_LEADING_NUM_RE = re.compile(r"^(?:第\s*)?\d+\s*[集章回节期]?\s*[\s._\-、．:：]*")
+
+
+def clean_title_from_filename(stem, t2s=True, filter_words=""):
+    """文件名 -> 候选标题：繁转简 -> 过滤词 -> 去开头序号 -> 只保留中文+数字
+    返回空串表示清洗后无内容，由调用方决定兜底策略"""
+    s = stem
+    if t2s and HAVE_ZHCONV:
+        s = zhconv.convert(s, "zh-cn")
+    for w in filter_words.replace("，", ",").split(","):
+        w = w.strip()
+        if w:
+            s = s.replace(w, "")
+    while True:
+        s2 = _LEADING_NUM_RE.sub("", s, count=1)
+        if s2 == s:
+            break
+        s = s2
+    return "".join(ch for ch in s if "\u4e00" <= ch <= "\u9fff" or ch in "0123456789")
+
+
+def build_common_meta(cfg, prefix="batch"):
+    """通用文本字段（留空 = 不修改）；prefix 区分批量(batch)/精修(fine)"""
+    meta = {}
+    for key in ("artist", "album", "date", "comment"):
+        val = cfg.get(prefix + "_" + key, "")
+        if val:
+            meta[key] = val
+    return meta
+
+
 def list_avatar_images(avatar_dir):
     """头像目录顶层的候选图片（按名排序；目录无效/无图返回空列表）"""
     try:
@@ -432,6 +496,9 @@ class App:
         self._cover_photo = None
         self._bg_photo = None
         self._files = []                     # 当前目录的 mp3 路径列表
+        self._fine_rows = []                 # 多文件精修行状态列表
+        self._fine_dir = None                # 精修列表加载时的目录（防目录变更后误保存）
+        self._last_mode = "batch"            # 最近一次任务模式：batch / fine
 
         # 界面变量（与 DEFAULT_CONFIG 键一一对应）
         self.input_dir_var = tk.StringVar(value=DEFAULT_CONFIG["input_dir"])
@@ -446,6 +513,15 @@ class App:
         self.avatar_dir_var = tk.StringVar(value=DEFAULT_CONFIG["avatar_dir"])
         self.batch_random_cover_var = tk.BooleanVar(value=DEFAULT_CONFIG["batch_random_cover"])
         self.batch_random_bg_var = tk.BooleanVar(value=DEFAULT_CONFIG["batch_random_bg"])
+        self.fine_t2s_var = tk.BooleanVar(value=DEFAULT_CONFIG["fine_t2s"])
+        self.fine_rename_var = tk.BooleanVar(value=DEFAULT_CONFIG["fine_rename"])
+        self.clean_filter_words_var = tk.StringVar(value=DEFAULT_CONFIG["clean_filter_words"])
+        self.fine_artist_var = tk.StringVar(value=DEFAULT_CONFIG["fine_artist"])
+        self.fine_album_var = tk.StringVar(value=DEFAULT_CONFIG["fine_album"])
+        self.fine_date_var = tk.StringVar(value=DEFAULT_CONFIG["fine_date"])
+        self.fine_comment_var = tk.StringVar(value=DEFAULT_CONFIG["fine_comment"])
+        self.fine_random_cover_var = tk.BooleanVar(value=DEFAULT_CONFIG["fine_random_cover"])
+        self.fine_random_bg_var = tk.BooleanVar(value=DEFAULT_CONFIG["fine_random_bg"])
         self.sync_rename_var = tk.BooleanVar(value=DEFAULT_CONFIG["sync_rename"])
         # 单文件编辑区变量
         self.s_title_var = tk.StringVar()
@@ -456,6 +532,7 @@ class App:
         self.s_track_var = tk.StringVar()
         # 状态栏
         self.list_count_var = tk.StringVar(value="尚未刷新")
+        self.fine_count_var = tk.StringVar(value="尚未加载")
         self.loaded_var = tk.StringVar(value="未载入文件")
         self.status_var = tk.StringVar(value="就绪")
         self.progress_var = tk.DoubleVar(value=0)
@@ -552,6 +629,71 @@ class App:
         ttk.Checkbutton(btn_row, text="标题修改后同步重命名文件",
                         variable=self.sync_rename_var).pack(side="right")
 
+        # ===== 多文件精修页 =====
+        fine_tab = ttk.Frame(self.notebook)
+        self.notebook.add(fine_tab, text=" 多文件精修 ")
+
+        top = ttk.Frame(fine_tab)
+        top.pack(fill="x", padx=10, pady=4)
+        ttk.Label(top, text="目录:", foreground="#555").pack(side="left")
+        ttk.Label(top, textvariable=self.input_dir_var, foreground="#1565c0").pack(side="left", padx=4)
+        self.fine_load_btn = ttk.Button(top, text="加载列表", command=self._load_fine_list)
+        self.fine_load_btn.pack(side="left", padx=6)
+        self.fine_reclean_btn = ttk.Button(top, text="重新清洗", command=self._reclean_fine)
+        self.fine_reclean_btn.pack(side="left")
+        ttk.Label(top, textvariable=self.fine_count_var, foreground="#555").pack(side="left", padx=8)
+
+        opt = ttk.Frame(fine_tab)
+        opt.pack(fill="x", padx=10, pady=2)
+        ttk.Checkbutton(opt, text="繁转简", variable=self.fine_t2s_var).pack(side="left")
+        ttk.Checkbutton(opt, text="保存后按标题重命名文件", variable=self.fine_rename_var).pack(side="left", padx=10)
+        ttk.Label(opt, text="过滤词:").pack(side="left", padx=(10, 2))
+        ttk.Entry(opt, textvariable=self.clean_filter_words_var, width=22).pack(side="left")
+        ttk.Label(opt, text="逗号分隔", foreground="#888").pack(side="left", padx=2)
+
+        frm_common = ttk.LabelFrame(fine_tab, text="通用信息（留空 = 不修改该项）")
+        frm_common.pack(fill="x", padx=10, pady=2)
+        crow = ttk.Frame(frm_common)
+        crow.pack(fill="x", padx=6, pady=3)
+        for label, var in (("作者:", self.fine_artist_var), ("专辑:", self.fine_album_var),
+                           ("日期:", self.fine_date_var), ("备注:", self.fine_comment_var)):
+            ttk.Label(crow, text=label).pack(side="left")
+            ttk.Entry(crow, textvariable=var, width=14).pack(side="left", padx=(2, 8))
+        irow = ttk.Frame(frm_common)
+        irow.pack(fill="x", padx=6, pady=(0, 4))
+        ttk.Checkbutton(irow, text="随机封面图", variable=self.fine_random_cover_var).pack(side="left")
+        ttk.Checkbutton(irow, text="随机背景图", variable=self.fine_random_bg_var).pack(side="left", padx=10)
+        ttk.Label(irow, foreground="#888",
+                  text="每个文件独立随机一张，取自“参数”页头像目录").pack(side="left", padx=6)
+
+        ttk.Label(fine_tab, foreground="#888",
+                  text="音轨自动 n/N；红色=清洗为空已回退原文件名，橙色=标题重复；"
+                       "手改过的行不会被重新清洗覆盖"
+                  ).pack(anchor="w", padx=12)
+
+        wrap = ttk.Frame(fine_tab)
+        wrap.pack(fill="both", expand=True, padx=10, pady=4)
+        self.fine_canvas = tk.Canvas(wrap, highlightthickness=0)
+        fine_sb = ttk.Scrollbar(wrap, orient="vertical", command=self.fine_canvas.yview)
+        self.fine_inner = ttk.Frame(self.fine_canvas)
+        self.fine_inner.bind("<Configure>", lambda e: self.fine_canvas.configure(
+            scrollregion=self.fine_canvas.bbox("all")))
+        self._fine_win = self.fine_canvas.create_window((0, 0), window=self.fine_inner, anchor="nw")
+        self.fine_canvas.bind("<Configure>", lambda e: self.fine_canvas.itemconfig(
+            self._fine_win, width=e.width))
+        self.fine_canvas.configure(yscrollcommand=fine_sb.set)
+        self.fine_canvas.pack(side="left", fill="both", expand=True)
+        fine_sb.pack(side="right", fill="y")
+        self.fine_canvas.bind("<Enter>", lambda e: self.fine_canvas.bind_all("<MouseWheel>", self._on_fine_wheel))
+        self.fine_canvas.bind("<Leave>", lambda e: self.fine_canvas.unbind_all("<MouseWheel>"))
+
+        fbtn = ttk.Frame(fine_tab)
+        fbtn.pack(fill="x", padx=10, pady=6)
+        self.fine_save_btn = ttk.Button(fbtn, text="保存精修结果", command=self._save_fine)
+        self.fine_save_btn.pack(side="left")
+        ttk.Label(fbtn, foreground="#888",
+                  text="只处理勾选行；保存前自动备份到 %s\\" % BACKUP_SUBDIR).pack(side="left", padx=10)
+
         # ===== 参数页 =====
         param_tab = ttk.Frame(self.notebook)
         self.notebook.add(param_tab, text=" 参数 ")
@@ -615,9 +757,9 @@ class App:
                   text="备份始终自动开启：源目录\\%s" % BACKUP_SUBDIR).pack(side="left", padx=12)
 
         # ===== 日志页 =====
-        log_tab = ttk.Frame(self.notebook)
-        self.notebook.add(log_tab, text=" 日志 ")
-        frm_log = ttk.Frame(log_tab)
+        self.log_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.log_tab, text=" 日志 ")
+        frm_log = ttk.Frame(self.log_tab)
         frm_log.pack(fill="both", expand=True, padx=6, pady=6)
         self.log_text = tk.Text(frm_log, wrap="word", state="disabled",
                                 font=("Consolas", 9))
@@ -736,6 +878,128 @@ class App:
         if p:
             self.batch_bg_image_path_var.set(p)
 
+    # ---------- 多文件精修 ----------
+    def _load_fine_list(self):
+        d = self.input_dir_var.get().strip()
+        if not d or not Path(d).is_dir():
+            self._show_toast("提示", "请先在“文件”页选择 MP3 目录。", "warning")
+            return
+        files = sorted(p for p in Path(d).iterdir()
+                       if p.is_file() and p.suffix.lower() == ".mp3")
+        for child in self.fine_inner.winfo_children():
+            child.destroy()
+        self._fine_rows = []
+        self._fine_dir = Path(d)
+        ttk.Label(self.fine_inner, text="纳入", foreground="#555").grid(row=0, column=0, padx=4, pady=2)
+        ttk.Label(self.fine_inner, text="原文件名", foreground="#555").grid(row=0, column=1, sticky="w", padx=4)
+        ttk.Label(self.fine_inner, text="标题（可编辑）", foreground="#555").grid(row=0, column=2, sticky="w", padx=4)
+        self.fine_inner.columnconfigure(2, weight=1)
+        t2s = self.fine_t2s_var.get()
+        fw = self.clean_filter_words_var.get()
+        if t2s and not HAVE_ZHCONV:
+            self._show_toast("缺少依赖", "繁转简需要 zhconv：\npip install zhconv\n本次加载将保留繁体。",
+                             "warning", 6000)
+        for i, p in enumerate(files, start=1):
+            cleaned = clean_title_from_filename(p.stem, t2s, fw)
+            row = {"path": p, "check": tk.BooleanVar(value=True),
+                   "title": tk.StringVar(value=cleaned or p.stem),
+                   "dirty": False, "fallback": not cleaned}
+            ttk.Checkbutton(self.fine_inner, variable=row["check"]).grid(row=i, column=0, padx=4, pady=1)
+            ttk.Label(self.fine_inner, text=p.name, foreground="#666", anchor="w").grid(
+                row=i, column=1, sticky="w", padx=4)
+            ent = tk.Entry(self.fine_inner, textvariable=row["title"])
+            ent.grid(row=i, column=2, sticky="ew", padx=4, pady=1)
+            row["entry"] = ent
+            row["title"].trace_add("write", lambda *a, r=row: self._on_fine_title_edit(r))
+            self._fine_rows.append(row)
+        self._refresh_fine_marks()
+        self.fine_count_var.set("%d 个文件" % len(files))
+        self._log("[多文件精修] 已加载 %d 个 MP3: %s" % (len(files), d))
+
+    def _on_fine_title_edit(self, row):
+        row["dirty"] = True
+        row["fallback"] = False
+        self._refresh_fine_marks()
+
+    def _refresh_fine_marks(self):
+        counts = {}
+        for r in self._fine_rows:
+            t = r["title"].get().strip()
+            if t:
+                counts[t] = counts.get(t, 0) + 1
+        for r in self._fine_rows:
+            t = r["title"].get().strip()
+            if r["fallback"] and not r["dirty"]:
+                bg = "#ffd6d6"      # 红：清洗为空已回退原文件名
+            elif t and counts.get(t, 0) > 1:
+                bg = "#ffe8cc"      # 橙：标题重复
+            else:
+                bg = "white"
+            try:
+                r["entry"].configure(background=bg)
+            except Exception:
+                pass
+
+    def _reclean_fine(self):
+        if not self._fine_rows:
+            self._show_toast("提示", "请先点“加载列表”。", "warning")
+            return
+        t2s = self.fine_t2s_var.get()
+        fw = self.clean_filter_words_var.get()
+        n = 0
+        for r in self._fine_rows:
+            if r["dirty"]:
+                continue
+            cleaned = clean_title_from_filename(r["path"].stem, t2s, fw)
+            r["title"].set(cleaned or r["path"].stem)
+            r["dirty"] = False      # 程序 set 会触发 trace，这里重置
+            r["fallback"] = not cleaned
+            n += 1
+        self._refresh_fine_marks()
+        self._show_toast("已重新清洗", "重算 %d 行（手改过的行已保留）" % n, "success")
+
+    def _save_fine(self):
+        if self.worker_thread and self.worker_thread.is_alive():
+            return
+        if not HAVE_MUTAGEN:
+            self._show_toast("缺少依赖", "请先安装 mutagen：\npip install mutagen", "error")
+            return
+        if not self._fine_rows:
+            self._show_toast("提示", "请先点“加载列表”。", "warning")
+            return
+        cfg = self._collect_config_from_ui()
+        if self._fine_dir is None or Path(cfg["input_dir"]) != self._fine_dir:
+            self._show_toast("提示", "目录已变化，请重新加载列表后再保存。", "warning")
+            return
+        items, skipped = [], []
+        for r in self._fine_rows:
+            if not r["check"].get():
+                continue
+            t = r["title"].get().strip()
+            if not t:
+                skipped.append(r["path"].name)
+                continue
+            items.append((r["path"], t))
+        if skipped:
+            self._log("[多文件精修] 跳过 %d 个空标题文件: %s" % (
+                len(skipped), ", ".join(skipped)))
+        if not items:
+            self._show_toast("提示", "没有可处理的行：请勾选并填写标题。", "warning")
+            return
+        verr = self._validate_images(cfg, "fine")
+        if verr:
+            self._show_toast(*verr)
+            return
+        self._save_config_file(cfg)
+        self._last_mode = "fine"
+        self._stop_event.clear()
+        self.progress_var.set(0)
+        self.status_var.set("准备中...")
+        self._set_running(True)
+        self.notebook.select(self.log_tab)
+        self.worker_thread = threading.Thread(target=self._work_fine, args=(cfg, items), daemon=True)
+        self.worker_thread.start()
+
     # ---------- 配置读写 ----------
     def _load_config_to_ui(self):
         cfg = self._read_config_file()
@@ -751,6 +1015,15 @@ class App:
         self.avatar_dir_var.set(cfg.get("avatar_dir", DEFAULT_CONFIG["avatar_dir"]))
         self.batch_random_cover_var.set(bool(cfg.get("batch_random_cover", False)))
         self.batch_random_bg_var.set(bool(cfg.get("batch_random_bg", False)))
+        self.fine_t2s_var.set(bool(cfg.get("fine_t2s", True)))
+        self.fine_rename_var.set(bool(cfg.get("fine_rename", True)))
+        self.clean_filter_words_var.set(cfg.get("clean_filter_words", "") or "")
+        self.fine_artist_var.set(cfg.get("fine_artist", "") or "")
+        self.fine_album_var.set(cfg.get("fine_album", "") or "")
+        self.fine_date_var.set(cfg.get("fine_date", "") or "")
+        self.fine_comment_var.set(cfg.get("fine_comment", "") or "")
+        self.fine_random_cover_var.set(bool(cfg.get("fine_random_cover", False)))
+        self.fine_random_bg_var.set(bool(cfg.get("fine_random_bg", False)))
         self.sync_rename_var.set(bool(cfg.get("sync_rename", False)))
 
     def _collect_config_from_ui(self):
@@ -767,6 +1040,15 @@ class App:
             "avatar_dir": self.avatar_dir_var.get().strip(),
             "batch_random_cover": bool(self.batch_random_cover_var.get()),
             "batch_random_bg": bool(self.batch_random_bg_var.get()),
+            "fine_t2s": bool(self.fine_t2s_var.get()),
+            "fine_rename": bool(self.fine_rename_var.get()),
+            "clean_filter_words": self.clean_filter_words_var.get().strip(),
+            "fine_artist": self.fine_artist_var.get().strip(),
+            "fine_album": self.fine_album_var.get().strip(),
+            "fine_date": self.fine_date_var.get().strip(),
+            "fine_comment": self.fine_comment_var.get().strip(),
+            "fine_random_cover": bool(self.fine_random_cover_var.get()),
+            "fine_random_bg": bool(self.fine_random_bg_var.get()),
             "sync_rename": bool(self.sync_rename_var.get()),
         }
 
@@ -1059,18 +1341,11 @@ class App:
         if not cfg["input_dir"] or not d.is_dir():
             self._show_toast("提示", "MP3 目录不存在，请先在“文件”页选择。", "warning")
             return
-        # 批量图片路径校验（勾选随机时忽略固定路径）
-        for key, rnd_key in (("batch_cover_path", "batch_random_cover"),
-                             ("batch_bg_image_path", "batch_random_bg")):
-            p = cfg[key]
-            if p and not cfg[rnd_key] and not os.path.isfile(p):
-                self._show_toast("提示", "图片文件不存在：%s" % p, "warning")
-                return
-        if cfg["batch_random_cover"] or cfg["batch_random_bg"]:
-            if not list_avatar_images(cfg["avatar_dir"]):
-                self._show_toast("头像目录不可用",
-                                 "目录不存在或没有图片：\n%s" % cfg["avatar_dir"], "error")
-                return
+        # 批量图片配置校验（与多文件精修共用）
+        verr = self._validate_images(cfg)
+        if verr:
+            self._show_toast(*verr)
+            return
         has_any = any([cfg["batch_title_prefix"], cfg["batch_artist"], cfg["batch_album"],
                        cfg["batch_date"], cfg["batch_comment"],
                        cfg["batch_cover_path"], cfg["batch_bg_image_path"],
@@ -1082,11 +1357,12 @@ class App:
                     "但会重写音轨号 n/N 并备份原文件。\n\n确定继续吗？", parent=self.root):
                 return
         self._save_config_file(cfg)
+        self._last_mode = "batch"
         self._stop_event.clear()
         self.progress_var.set(0)
         self.status_var.set("准备中...")
         self._set_running(True)
-        self.notebook.select(2)
+        self.notebook.select(self.log_tab)
         self.worker_thread = threading.Thread(target=self._work, args=(cfg,), daemon=True)
         self.worker_thread.start()
 
@@ -1099,6 +1375,11 @@ class App:
         state = "disabled" if running else "normal"
         self.start_btn.config(state=state)
         self.stop_btn.config(state="normal" if running else "disabled")
+        for btn in (self.fine_save_btn, self.fine_load_btn, self.fine_reclean_btn):
+            btn.config(state=state)
+
+    def _on_fine_wheel(self, event):
+        self.fine_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
     def _on_close(self):
         if self.worker_thread and self.worker_thread.is_alive():
@@ -1111,6 +1392,58 @@ class App:
         self.root.destroy()
 
     # ---------- 工作线程 ----------
+    def _validate_images(self, cfg, mode="batch"):
+        """图片配置校验；返回 (标题, 消息, 级别) 或 None。精修只校验随机头像目录"""
+        if mode == "fine":
+            if cfg["fine_random_cover"] or cfg["fine_random_bg"]:
+                if not list_avatar_images(cfg["avatar_dir"]):
+                    return ("头像目录不可用",
+                            "目录不存在或没有图片：\n%s" % cfg["avatar_dir"], "error")
+            return None
+        for key, rnd_key in (("batch_cover_path", "batch_random_cover"),
+                             ("batch_bg_image_path", "batch_random_bg")):
+            p = cfg[key]
+            if p and not cfg[rnd_key] and not os.path.isfile(p):
+                return ("提示", "图片文件不存在：%s" % p, "warning")
+        if cfg["batch_random_cover"] or cfg["batch_random_bg"]:
+            if not list_avatar_images(cfg["avatar_dir"]):
+                return ("头像目录不可用",
+                        "目录不存在或没有图片：\n%s" % cfg["avatar_dir"], "error")
+        return None
+
+    def _prepare_image_ops(self, cfg, mode="batch"):
+        """图片操作：随机池只扫描一次；批量另有固定图片路径，精修仅随机"""
+        if mode == "fine":
+            cover_pool = list_avatar_images(cfg["avatar_dir"]) if cfg["fine_random_cover"] else []
+            bg_pool = list_avatar_images(cfg["avatar_dir"]) if cfg["fine_random_bg"] else []
+            return cover_pool, bg_pool, None, None
+        cover_pool = list_avatar_images(cfg["avatar_dir"]) if cfg["batch_random_cover"] else []
+        bg_pool = list_avatar_images(cfg["avatar_dir"]) if cfg["batch_random_bg"] else []
+        cover_op = bg_op = None
+        if cfg["batch_cover_path"] and not cfg["batch_random_cover"]:
+            data = Path(cfg["batch_cover_path"]).read_bytes()
+            cover_op = ("data", data, sniff_image_mime(data))
+        if cfg["batch_bg_image_path"] and not cfg["batch_random_bg"]:
+            data = Path(cfg["batch_bg_image_path"]).read_bytes()
+            bg_op = ("data", data, sniff_image_mime(data))
+        return cover_pool, bg_pool, cover_op, bg_op
+
+    def _finish_fail_list(self, d, failed_list):
+        """写出失败明细；本轮无失败则删除旧清单"""
+        fail_log = d / FAIL_LIST_NAME
+        if failed_list:
+            with open(fail_log, "w", encoding="utf-8") as f:
+                f.write("失败文件清单（%d 个）\n%s\n" % (len(failed_list), "=" * 40))
+                for name, err in failed_list:
+                    f.write("%s\n    原因: %s\n" % (name, err))
+            self._thread_log("失败明细已写入: %s" % fail_log)
+        elif fail_log.exists():
+            try:
+                fail_log.unlink()
+                self._thread_log("已删除上一轮遗留的失败清单: %s" % fail_log.name)
+            except Exception as e:
+                logger.error("删除旧失败清单失败: %s", e)
+
     def _work(self, cfg):
         """批量主流程：扫描 -> 逐项写标签（备份+原子替换） -> 汇总失败清单"""
         try:
@@ -1136,22 +1469,8 @@ class App:
 
             prefix = cfg["batch_title_prefix"]
             # 批量 meta：只包含非空字段（留空 = 不修改）
-            base_meta = {}
-            for key, ck in (("artist", "batch_artist"), ("album", "batch_album"),
-                            ("date", "batch_date"), ("comment", "batch_comment")):
-                if cfg[ck]:
-                    base_meta[key] = cfg[ck]
-
-            cover_op = bg_op = None
-            # 随机池只在批量开始时扫描一次；勾选随机时忽略固定图片路径
-            cover_pool = list_avatar_images(cfg["avatar_dir"]) if cfg["batch_random_cover"] else []
-            bg_pool = list_avatar_images(cfg["avatar_dir"]) if cfg["batch_random_bg"] else []
-            if cfg["batch_cover_path"] and not cfg["batch_random_cover"]:
-                data = Path(cfg["batch_cover_path"]).read_bytes()
-                cover_op = ("data", data, sniff_image_mime(data))
-            if cfg["batch_bg_image_path"] and not cfg["batch_random_bg"]:
-                data = Path(cfg["batch_bg_image_path"]).read_bytes()
-                bg_op = ("data", data, sniff_image_mime(data))
+            base_meta = build_common_meta(cfg)
+            cover_pool, bg_pool, cover_op, bg_op = self._prepare_image_ops(cfg)
 
             self._thread_log("=" * 60)
             self._thread_log("批量目录: %s（%d 个 MP3）" % (d, total))
@@ -1198,24 +1517,67 @@ class App:
                     logger.error("批量编辑失败 %s: %s", path.name, brief)
 
             elapsed = time.time() - start_ts
-            fail_log = d / FAIL_LIST_NAME
-            if failed_list:
-                with open(fail_log, "w", encoding="utf-8") as f:
-                    f.write("失败文件清单（%d 个）\n%s\n" % (len(failed_list), "=" * 40))
-                    for name, err in failed_list:
-                        f.write("%s\n    原因: %s\n" % (name, err))
-                self._thread_log("失败明细已写入: %s" % fail_log)
-            elif fail_log.exists():
-                try:
-                    fail_log.unlink()
-                    self._thread_log("已删除上一轮遗留的失败清单: %s" % fail_log.name)
-                except Exception as e:
-                    logger.error("删除旧失败清单失败: %s", e)
-
+            self._finish_fail_list(d, failed_list)
             self.msg_queue.put(("done", done, failed, elapsed, str(d)))
         except Exception as e:
             self.msg_queue.put(("error", "任务异常：%s" % e))
             logger.exception("批量标签编辑异常")
+
+    def _work_fine(self, cfg, items):
+        """多文件精修主流程：逐行标题 + 通用字段 -> 写标签（备份+原子替换）"""
+        try:
+            d = Path(cfg["input_dir"])
+            total = len(items)
+            base_meta = build_common_meta(cfg, "fine")
+            cover_pool, bg_pool, cover_op, bg_op = self._prepare_image_ops(cfg, "fine")
+
+            self._thread_log("=" * 60)
+            self._thread_log("多文件精修: %s（%d 个文件）" % (d, total))
+            self._thread_log("作者: %s | 专辑: %s | 日期: %s | 备注: %s" % (
+                cfg["fine_artist"] or "（不改）", cfg["fine_album"] or "（不改）",
+                cfg["fine_date"] or "（不改）", cfg["fine_comment"] or "（不改）"))
+            self._thread_log("封面: %s | 背景图: %s | 按标题重命名: %s" % (
+                ("随机（头像 %d 张）" % len(cover_pool)) if cover_pool else "（不改）",
+                ("随机（头像 %d 张）" % len(bg_pool)) if bg_pool else "（不改）",
+                "开" if cfg["fine_rename"] else "关"))
+            self._thread_log("=" * 60)
+
+            done = failed = 0
+            failed_list = []
+            start_ts = time.time()
+            for idx, (path, title) in enumerate(items, start=1):
+                if self._stop_event.is_set():
+                    self.msg_queue.put(("stopped", "已在第 %d/%d 个文件后停止" % (idx - 1, total)))
+                    return
+                self.msg_queue.put(("progress", idx, total))
+                meta = dict(base_meta)
+                meta["title"] = title
+                meta["track"] = "%d/%d" % (idx, total)
+                try:
+                    final, notes = apply_edits(
+                        path, meta,
+                        random_image_op(cover_pool, cover_op),
+                        random_image_op(bg_pool, bg_op),
+                        rename_title=title if cfg["fine_rename"] else None)
+                    done += 1
+                    self._thread_log("[%d/%d] 完成: %s%s" % (
+                        idx, total, final.name,
+                        ("  (%s)" % "；".join(notes)) if notes else ""))
+                    logger.info("精修编辑完成: %s", final)
+                except Exception as e:
+                    failed += 1
+                    brief = _short_err(e)
+                    failed_list.append((path.name, brief))
+                    self._thread_log("      [警告] 失败已跳过: %s\n             原因: %s" % (
+                        path.name, brief))
+                    logger.error("精修编辑失败 %s: %s", path.name, brief)
+
+            elapsed = time.time() - start_ts
+            self._finish_fail_list(d, failed_list)
+            self.msg_queue.put(("done", done, failed, elapsed, str(d)))
+        except Exception as e:
+            self.msg_queue.put(("error", "任务异常：%s" % e))
+            logger.exception("多文件精修异常")
 
     # ---------- 消息轮询 ----------
     def _after_poll(self):
@@ -1244,12 +1606,14 @@ class App:
                     self._log("任务结束：成功 %d，失败 %d，用时 %.1f 秒" % (done, failed, elapsed))
                     self._log("=" * 60)
                     self._refresh_file_list()
+                    if self._last_mode == "fine":
+                        self._load_fine_list()      # 重命名后刷新精修列表
                     if failed:
                         self._show_toast("完成（有失败）",
                                          "成功 %d，失败 %d\n明细见目录的『%s』" % (
                                              done, failed, FAIL_LIST_NAME), "warning", 7000)
                     else:
-                        self._show_toast("批量完成",
+                        self._show_toast("精修完成" if self._last_mode == "fine" else "批量完成",
                                          "成功 %d 个，用时 %.1f 秒\n%s" % (done, elapsed, out_dir),
                                          "success", 5000)
                 elif kind == "stopped":
@@ -1257,6 +1621,8 @@ class App:
                     self._set_running(False)
                     self._log("\n[停止] %s\n已处理的文件均已保存并备份。" % msg[1])
                     self._refresh_file_list()
+                    if self._last_mode == "fine":
+                        self._load_fine_list()
                 elif kind == "error":
                     self.status_var.set("出错")
                     self._set_running(False)

@@ -35,6 +35,8 @@ vue.config.js
 temp_clipboard.txt
 
 # Script config files
+# 后续脚本的 config.json 一律不再由 git 监听
+**/config.json
 **/json/config_*.json
 **/data/tasks.json
 **/json/testServer.json

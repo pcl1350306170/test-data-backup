@@ -2,6 +2,7 @@ import os
 import sys
 import glob
 import json
+import shutil
 import subprocess
 import threading
 import time
@@ -110,7 +111,7 @@ def save_config(config):
     try:
         CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
         with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
-            json.dump(config, f, ensure_ascii=False, indent=4)
+            json.dump(config, f, ensure_ascii=False, indent=2)
         logger.info("配置已保存")
     except Exception as e:
         logger.error(f"保存配置失败: {e}")
@@ -690,6 +691,40 @@ class JavaDeployer:
         ).start()
 
     # --------------------------------------------------------
+    # 子进程输出流式读取
+    # --------------------------------------------------------
+
+    @staticmethod
+    def _decode_output(raw):
+        """Maven 在 Windows 上输出 GBK，npm 输出 UTF-8，逐个尝试避免乱码"""
+        for enc in ("utf-8", "gbk"):
+            try:
+                return raw.decode(enc)
+            except UnicodeDecodeError:
+                continue
+        return raw.decode("utf-8", errors="replace")
+
+    def _stream_process(self, command, cwd):
+        """执行命令并逐行回显输出，返回退出码"""
+
+        self.log(f"执行命令：{' '.join(command)}")
+
+        process = subprocess.Popen(
+            command,
+            cwd=str(cwd),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT
+        )
+
+        for raw in process.stdout:
+            line = self._decode_output(raw).rstrip()
+
+            if line:
+                self.log(line)
+
+        return process.wait()
+
+    # --------------------------------------------------------
     # Maven
     # --------------------------------------------------------
 
@@ -701,42 +736,26 @@ class JavaDeployer:
         mvnw = project_dir / "mvnw.cmd"
 
         if mvnw.exists():
-            command = [
-                str(mvnw),
-                "clean",
-                "package",
-                "-DskipTests"
-            ]
+            mvn_exe = str(mvnw)
         else:
-            command = [
-                "mvn",
-                "clean",
-                "package",
-                "-DskipTests"
-            ]
+            # Windows 上 mvn 通常是 mvn.cmd，Popen 列表形式无法按 PATH 解析 .cmd，
+            # 需用 shutil.which 拿到完整路径（与 npm.cmd 的处理同理）
+            mvn_exe = shutil.which("mvn")
 
-        self.log(
-            f"执行 Maven：{' '.join(command)}"
-        )
+            if not mvn_exe:
+                raise RuntimeError(
+                    "未找到 Maven：项目缺少 mvnw.cmd，且 PATH 中没有 mvn，"
+                    "请安装 Maven 并配置 PATH"
+                )
 
-        process = subprocess.Popen(
-            command,
-            cwd=str(project_dir),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            bufsize=1
-        )
+        command = [
+            mvn_exe,
+            "clean",
+            "package",
+            "-DskipTests"
+        ]
 
-        for line in process.stdout:
-            line = line.rstrip()
-
-            if line:
-                self.log(line)
-
-        return_code = process.wait()
+        return_code = self._stream_process(command, project_dir)
 
         if return_code != 0:
             raise RuntimeError(
@@ -1141,32 +1160,12 @@ class JavaDeployer:
     def run_npm_build(self, build_dir):
         """在项目根目录执行 npm run build，优先使用本地 npm.cmd"""
 
-        build_dir = Path(build_dir)
-
         if os.name == "nt":
             command = ["npm.cmd", "run", "build"]
         else:
             command = ["npm", "run", "build"]
 
-        self.log(f"执行命令：{' '.join(command)}")
-
-        process = subprocess.Popen(
-            command,
-            cwd=str(build_dir),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            bufsize=1
-        )
-
-        for line in process.stdout:
-            line = line.rstrip()
-            if line:
-                self.log(line)
-
-        return_code = process.wait()
+        return_code = self._stream_process(command, build_dir)
 
         if return_code != 0:
             raise RuntimeError(
