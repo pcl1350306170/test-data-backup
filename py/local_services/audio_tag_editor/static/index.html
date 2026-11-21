@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音频标签编辑</title>
+    <link rel="icon" type="image/jpeg" href="https://cdn.jsdelivr.net/gh/pcl1350306170/Miscellaneous@refs/heads/main/GPT-IMG/头像/391.jpg">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<div class="app">
+    <header class="topbar">
+        <h1>🎵 音频标签编辑</h1>
+        <div class="deps" id="deps"></div>
+    </header>
+
+    <nav class="tabs" id="tabs">
+        <button class="tab active" data-tab="file">文件</button>
+        <button class="tab" data-tab="fine">多文件精修</button>
+        <button class="tab" data-tab="param">参数</button>
+        <button class="tab" data-tab="log">日志</button>
+        <button class="tab" data-tab="help">说明</button>
+    </nav>
+
+    <main class="panels">
+        <!-- ===== 文件页 ===== -->
+        <section class="panel active" id="panel-file">
+            <div class="card">
+                <div class="card-title">1. 音频目录</div>
+                <div class="row">
+                    <input type="text" class="grow" data-cfg="input_dir" placeholder="填写本机音频目录路径，如 D:\AUDIO\mp3">
+                    <button id="btn-refresh">刷新列表</button>
+                    <button id="btn-cleanup" class="warn">清理备份</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">2. 文件列表 <span class="muted" id="file-count">尚未刷新</span></div>
+                <div class="filelist" id="file-list"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">3. 单文件精修 <span class="muted">当前：<b id="loaded-name">未载入文件</b></span>
+                    <button id="btn-reload" class="mini right">重新载入</button>
+                </div>
+                <div class="form-grid">
+                    <label>标题<input type="text" id="s-title"></label>
+                    <label>作者<input type="text" id="s-artist"></label>
+                    <label>专辑<input type="text" id="s-album"></label>
+                    <label>日期<input type="text" id="s-date"></label>
+                    <label>音轨(n/N)<input type="text" id="s-track"></label>
+                    <label>备注<input type="text" id="s-comment"></label>
+                </div>
+                <div class="img-row">
+                    <div class="img-box" data-kind="cover">
+                        <div class="img-title">封面图（Cover front）</div>
+                        <div class="img-preview"><img alt="" hidden><span class="img-ph">未载入</span></div>
+                        <div class="row">
+                            <input type="text" class="img-path grow" placeholder="更换：填图片路径">
+                            <button class="mini act-set">更换</button>
+                            <button class="mini act-del">删除</button>
+                            <button class="mini act-export">导出</button>
+                        </div>
+                        <div class="img-state muted"></div>
+                    </div>
+                    <div class="img-box" data-kind="bg">
+                        <div class="img-title">播放背景图（Other）</div>
+                        <div class="img-preview"><img alt="" hidden><span class="img-ph">未载入</span></div>
+                        <div class="row">
+                            <input type="text" class="img-path grow" placeholder="更换：填图片路径">
+                            <button class="mini act-set">更换</button>
+                            <button class="mini act-del">删除</button>
+                            <button class="mini act-export">导出</button>
+                        </div>
+                        <div class="img-state muted"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <button id="btn-save-current" class="primary">保存当前文件</button>
+                    <label class="chk right"><input type="checkbox" data-cfg="sync_rename">标题修改后同步重命名文件</label>
+                </div>
+                <div class="muted small">保存前自动备份到 _backup_标签编辑\（同名覆盖）。</div>
+            </div>
+        </section>
+
+        <!-- ===== 多文件精修页 ===== -->
+        <section class="panel" id="panel-fine">
+            <div class="card">
+                <div class="row">
+                    <span class="muted">目录：</span><b id="fine-dir" class="path-label"></b>
+                    <button id="btn-fine-load">加载列表</button>
+                    <button id="btn-fine-reclean">重新清洗</button>
+                    <span class="muted" id="fine-count">尚未加载</span>
+                </div>
+                <div class="row">
+                    <label class="chk"><input type="checkbox" data-cfg="fine_t2s">繁转简</label>
+                    <label class="chk"><input type="checkbox" data-cfg="fine_rename">保存后按标题重命名文件</label>
+                    <span class="muted">过滤词:</span>
+                    <input type="text" data-cfg="clean_filter_words" placeholder="逗号分隔" style="width:200px">
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">通用信息（留空 = 不修改该项）</div>
+                <div class="row">
+                    <label class="inline">作者<input type="text" data-cfg="fine_artist"></label>
+                    <label class="inline">专辑<input type="text" data-cfg="fine_album"></label>
+                    <label class="inline">日期<input type="text" data-cfg="fine_date"></label>
+                    <label class="inline">备注<input type="text" data-cfg="fine_comment"></label>
+                </div>
+                <div class="row">
+                    <label class="chk"><input type="checkbox" data-cfg="fine_random_cover">随机封面图</label>
+                    <label class="chk"><input type="checkbox" data-cfg="fine_random_bg">随机背景图</label>
+                    <span class="muted small">每个文件独立随机一张，取自“参数”页头像目录</span>
+                </div>
+            </div>
+
+            <div class="muted small pad">音轨自动 n/N；红色=清洗为空已回退原文件名，橙色=标题重复；手改过的行不会被重新清洗覆盖。</div>
+            <div class="fine-wrap card">
+                <table class="fine-table">
+                    <thead><tr><th style="width:48px">纳入</th><th style="width:38%">原文件名</th><th>标题（可编辑）</th></tr></thead>
+                    <tbody id="fine-body"></tbody>
+                </table>
+            </div>
+            <div class="row pad">
+                <button id="btn-fine-save" class="primary">保存精修结果</button>
+                <span class="muted small">只处理勾选行；保存前自动备份到 _backup_标签编辑\</span>
+            </div>
+        </section>
+
+        <!-- ===== 参数页 ===== -->
+        <section class="panel" id="panel-param">
+            <div class="card">
+                <div class="card-title">批量文本信息（留空 = 不修改该项）</div>
+                <div class="form-grid">
+                    <label>标题前缀<input type="text" data-cfg="batch_title_prefix" placeholder="留空=不动标题"></label>
+                    <label>起始序号<input type="text" data-cfg="batch_start_num" placeholder="前导零定宽度，如 055"></label>
+                    <label>作者<input type="text" data-cfg="batch_artist"></label>
+                    <label>专辑<input type="text" data-cfg="batch_album"></label>
+                    <label>日期(年)<input type="text" data-cfg="batch_date" placeholder="如 2026"></label>
+                    <label>备注<input type="text" data-cfg="batch_comment"></label>
+                </div>
+                <div class="muted small">批量会始终重写音轨号为 序号/总数；标题前缀非空时按序号规则重新生成标题。</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">批量图片（留空 = 不修改；勾选随机 = 每个文件不同图）</div>
+                <div class="row">
+                    <span class="lbl">封面图:</span>
+                    <input type="text" class="grow" data-cfg="batch_cover_path" placeholder="图片路径">
+                    <label class="chk"><input type="checkbox" data-cfg="batch_random_cover">随机</label>
+                    <button class="mini" id="btn-preview-cover">预览</button>
+                </div>
+                <div class="row">
+                    <span class="lbl">背景图:</span>
+                    <input type="text" class="grow" data-cfg="batch_bg_image_path" placeholder="图片路径">
+                    <label class="chk"><input type="checkbox" data-cfg="batch_random_bg">随机</label>
+                    <button class="mini" id="btn-preview-bg">预览</button>
+                </div>
+                <div class="row">
+                    <span class="lbl">头像目录:</span>
+                    <input type="text" class="grow" data-cfg="avatar_dir">
+                    <button class="mini" id="btn-avatar-random">随机推荐一张</button>
+                </div>
+                <div class="avatar-suggest" id="avatar-suggest" hidden>
+                    <img alt="" id="avatar-img">
+                    <div class="col">
+                        <span class="muted small" id="avatar-name"></span>
+                        <div class="row">
+                            <button class="mini" id="btn-avatar-cover">填入封面</button>
+                            <button class="mini" id="btn-avatar-bg">填入背景</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="batch-preview" id="batch-preview"></div>
+                <div class="muted small">勾选随机后每个文件从头像目录独立随机一张（完全随机可能重复，忽略固定路径）。</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">保存选项</div>
+                <label class="chk"><input type="checkbox" data-cfg="sync_rename">标题修改后同步重命名文件</label>
+                <span class="muted small">备份始终自动开启：源目录\_backup_标签编辑</span>
+            </div>
+        </section>
+
+        <!-- ===== 日志页 ===== -->
+        <section class="panel" id="panel-log">
+            <pre class="log" id="log"></pre>
+        </section>
+
+        <!-- ===== 说明页 ===== -->
+        <section class="panel" id="panel-help">
+            <pre class="help" id="help"></pre>
+        </section>
+    </main>
+
+    <footer class="bottombar">
+        <button id="btn-batch" class="primary">开始批量应用</button>
+        <button id="btn-stop" class="warn" disabled>停止</button>
+        <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+        <span id="status" class="status">就绪</span>
+    </footer>
+</div>
+<div class="toast-wrap" id="toast-wrap"></div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

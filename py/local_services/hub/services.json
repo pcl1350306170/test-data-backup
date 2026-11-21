@@ -120,6 +120,17 @@
         {"type": "dir", "target": "cfg:data/config.json#svn_base_dir", "label": "病房 SVN 基础目录（需先启动一次服务生成配置）"},
         {"type": "dir", "target": "cfg:data/config.json#code_base_dir", "label": "病房代码基础目录"}
       ]
+    },
+    {
+      "id": "audio_tag_editor",
+      "name": "音频标签编辑",
+      "icon": "🎵",
+      "desc": "MP3/M4A 标签精修/批量套用/文件名清洗标题/随机封面（原地编辑磁盘文件，M4A 仅封面）",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\audio_tag_editor",
+      "cmd": ["python", "server.py"],
+      "port": 8804,
+      "health_path": "/api/ping",
+      "checks": []
     }
   ]
 }

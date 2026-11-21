@@ -1,0 +1,5 @@
+mutagen
+zhconv
+fastapi
+uvicorn
+pillow
