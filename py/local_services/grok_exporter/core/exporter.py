@@ -40,6 +40,16 @@ def _write_text(path: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def _sort_sessions_by_create_time(sessions: list) -> list:
+    """合并导出专用：按会话创建时间升序。
+
+    create_time 为 "YYYY-MM-DD HH:MM:SS" 字符串，字典序即时间序；
+    "未知时间"（字段缺失/解析失败）排到最后，与 _sort_by_create_time 回退风格一致。
+    """
+    return sorted(sessions, key=lambda s: (s.get("create_time") == "未知时间",
+                                           s.get("create_time") or ""))
+
+
 class ExportOptions:
     def __init__(self, raw: dict):
         self.formats = [f.lower() for f in (raw.get("formats") or ["md"])]
@@ -88,6 +98,9 @@ def run_export(sessions: list, opts: ExportOptions,
     total = len(sessions)
     individual = opts.organization in ("individual", "both")
     merge = opts.organization in ("merged", "both")
+    # 仅合并模式：按会话创建时间正序渲染合并文件；单独导出的文件顺序不受影响
+    if merge and not individual:
+        sessions = _sort_sessions_by_create_time(sessions)
     merged_md_blocks = []
     merged_txt_blocks = []
 

@@ -10,14 +10,21 @@
   --red: #f85149; --log-bg: #010409; --log-fg: #c9d1d9; --shadow: rgba(0,0,0,.4);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
+/* 大屏时 body 不整体滚动：header/页签固定，工作区占满剩余高度 */
+html, body { height: 100%; }
 body {
   font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
   background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px;
+  display: flex; flex-direction: column; overflow: hidden;
+}
+@media (max-width: 860px) {
+  /* 窄屏回退整页滚动，各列自然伸展 */
+  body { overflow: auto; }
 }
 
 header {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; flex-wrap: wrap;
+  gap: 12px; flex-wrap: wrap; flex: none;
   padding: 12px 20px; background: var(--panel); border-bottom: 1px solid var(--border);
   position: sticky; top: 0; z-index: 20;
 }
@@ -42,7 +49,7 @@ header h1 { font-size: 18px; white-space: nowrap; }
 /* 页签：打包 / 前端升级；hidden 兼容 display:grid 等非默认显示模式 */
 [hidden] { display: none !important; }
 .tabs {
-  display: flex; gap: 6px; padding: 10px 20px 0;
+  display: flex; gap: 6px; padding: 10px 20px 0; flex: none;
   background: var(--panel); border-bottom: 1px solid var(--border);
 }
 .tabs button {
@@ -52,11 +59,16 @@ header h1 { font-size: 18px; white-space: nowrap; }
 .tabs button:hover:not(:disabled) { filter: none; color: var(--text); }
 .tabs button.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
 
+/* 页签面板占满 header/tabs 之外的剩余高度；滚动单位是整个工作区 */
+.tab-pane { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.tab-pane[hidden] { display: none; }
 .workbench {
   display: grid; grid-template-columns: 320px minmax(360px, 1fr) 400px;
   gap: 14px; padding: 14px 20px 28px; align-items: start;
+  flex: 1 1 auto; min-height: 0;
 }
-.col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+/* 左/中/右整列各自独立滚动；日志/列表仍保持内部滚动 */
+.col { display: flex; flex-direction: column; gap: 14px; min-width: 0; max-height: 100%; overflow-y: auto; }
 
 .panel {
   background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
@@ -196,4 +208,8 @@ button.mini { padding: 3px 8px; font-size: 12px; }
 @media (max-width: 860px) {
   .workbench { grid-template-columns: 1fr; }
   .col-left, .col-mid, .col-right { grid-column: auto; }
+  /* 回退整页滚动：列不再各自出滚动条 */
+  .tab-pane { flex: none; }
+  .workbench { flex: none; }
+  .col { max-height: none; overflow: visible; }
 }
