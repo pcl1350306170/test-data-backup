@@ -131,6 +131,19 @@
       "port": 8804,
       "health_path": "/api/ping",
       "checks": []
+    },
+    {
+      "id": "video_merger",
+      "name": "视频合并",
+      "icon": "🎬",
+      "desc": "目录下 mp4 按文件名自然顺序拼接为一个（参数一致无损直拷，否则自动重编码）",
+      "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\video_merger",
+      "cmd": ["python", "server.py"],
+      "port": 8805,
+      "health_path": "/api/ping",
+      "checks": [
+        {"type": "exe", "target": "ffmpeg", "label": "ffmpeg 在 PATH"}
+      ]
     }
   ]
 }

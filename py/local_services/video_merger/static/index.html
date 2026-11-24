@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频合并</title>
+    <link rel="icon" type="image/jpeg" href="https://cdn.jsdelivr.net/gh/pcl1350306170/Miscellaneous@refs/heads/main/GPT-IMG/头像/134.jpg">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>🎬 视频合并</h1>
+                <p class="subtitle">选择目录，按文件名自然顺序把 mp4 拼接为一个视频</p>
+            </div>
+            <button id="themeToggle" class="theme-toggle" title="切换夜间模式">🌙</button>
+        </div>
+
+        <!-- 目录选择 -->
+        <section class="card">
+            <div class="card-title">1. 视频目录</div>
+            <div class="dir-row">
+                <input type="text" id="dirInput" placeholder="例如 D:\Videos\聚会录像" spellcheck="false">
+                <button id="scanBtn" class="btn btn-primary">扫描</button>
+            </div>
+            <div id="recentDirs" class="recent-dirs"></div>
+        </section>
+
+        <!-- 文件列表 -->
+        <section class="card" id="fileCard" style="display:none">
+            <div class="card-title">
+                2. 拼接顺序（可勾选 / 上移下移调整）
+                <span id="compatBadge" class="badge"></span>
+            </div>
+            <div id="compatDetail" class="compat-detail" style="display:none"></div>
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th style="width:36px">#</th>
+                        <th style="width:44px">参与</th>
+                        <th>文件名</th>
+                        <th style="width:80px">时长</th>
+                        <th style="width:100px">分辨率</th>
+                        <th style="width:64px">帧率</th>
+                        <th style="width:110px">编码</th>
+                        <th style="width:132px">排序</th>
+                    </tr>
+                </thead>
+                <tbody id="fileTbody"></tbody>
+            </table>
+            <div class="table-summary" id="tableSummary"></div>
+        </section>
+
+        <!-- 输出与执行 -->
+        <section class="card" id="mergeCard" style="display:none">
+            <div class="card-title">3. 输出设置</div>
+            <div class="merge-row">
+                <label>输出文件名
+                    <input type="text" id="outputName" placeholder="留空自动命名：合并输出_日期_时间.mp4">
+                </label>
+                <label>合并模式
+                    <select id="mergeMode">
+                        <option value="auto">自动（参数一致无损直拷，否则重编码）</option>
+                        <option value="copy">强制无损直拷（快，参数须一致）</option>
+                        <option value="reencode">强制重编码（慢，兼容任意参数）</option>
+                    </select>
+                </label>
+                <button id="mergeBtn" class="btn btn-primary btn-lg">开始合并</button>
+            </div>
+        </section>
+
+        <!-- 进度 -->
+        <section class="card" id="progressCard" style="display:none">
+            <div class="card-title">执行进度</div>
+            <div class="progress-wrap">
+                <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+                <span id="progressText">0%</span>
+            </div>
+            <div id="progressMsg" class="progress-msg"></div>
+            <pre id="taskLog" class="task-log"></pre>
+            <div id="resultRow" class="result-row" style="display:none">
+                <span id="resultText"></span>
+                <button id="revealBtn" class="btn">打开所在目录</button>
+            </div>
+        </section>
+    </div>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

@@ -16,6 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR.parent))          # py/local_services，用于 import 公共 core
 
 from order_packager_core.base_server import create_app, run_server  # noqa: E402
+from order_packager_core.docgen import attach_docgen_routes         # noqa: E402
 from order_packager_core.profiles import menz as menz_profile       # noqa: E402
 from order_packager_core.upgrade import (UpgradeEngine, ServerUpgradeEngine,  # noqa: E402
                                          attach_upgrade_routes)
@@ -31,6 +32,9 @@ attach_upgrade_routes(app, menz_profile.profile, app.state.store, upgrade_engine
 # 服务端升级：传 war 跑 publish_server.sh，路由 /api/server-upgrade/*
 server_upgrade_engine = ServerUpgradeEngine(menz_profile.profile, app.state.store)
 attach_upgrade_routes(app, menz_profile.profile, app.state.store, server_upgrade_engine)
+
+# 升级说明 docx 生成（仅前端升级页签用）：/api/upgrade/doc/plan|generate
+attach_docgen_routes(app, menz_profile.profile, app.state.store)
 
 
 @app.on_event("startup")

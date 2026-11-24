@@ -25,6 +25,20 @@
 </nav>
 
 <div id="panePack" class="tab-pane">
+<div class="panel op-top">
+      <h2>🚀 操作</h2>
+      <div class="row">
+        <button class="primary" id="btnStart">开始打包</button>
+        <button id="btnStop" disabled>停止</button>
+        <button id="btnCommit" disabled>提交成品到 SVN</button>
+        <button id="btnGenDoc" title="按最新成品或输出目录里的压缩包生成升级说明（写到 zip 同级目录并按订单改写）">📄 生成升级说明</button>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <span class="hint">快捷键：1 秒内连按 3 次 Enter 直接开始打包</span>
+      </div>
+      <div class="errors" id="errors"></div>
+      <div class="notices" id="notices"></div>
+    </div>
 <main class="workbench">
   <!-- 左：搜索与匹配 -->
   <section class="col col-left">
@@ -134,20 +148,6 @@
         </div>
         <span class="hint">构建时把该版本目录注入子进程 PATH，不需要管理员权限，也不改系统当前版本</span>
       </div>
-    </div>
-
-    <div class="panel">
-      <h2>🚀 操作</h2>
-      <div class="row">
-        <button class="primary" id="btnStart">开始打包</button>
-        <button id="btnStop" disabled>停止</button>
-        <button id="btnCommit" disabled>提交成品到 SVN</button>
-      </div>
-      <div class="field" style="margin-top:8px">
-        <span class="hint">快捷键：1 秒内连按 3 次 Enter 直接开始打包</span>
-      </div>
-      <div class="errors" id="errors"></div>
-      <div class="notices" id="notices"></div>
     </div>
 
     <div class="panel">
@@ -378,6 +378,38 @@
     <div class="modal-list">
       <ul class="list" id="modalDirs"></ul>
       <ul class="list small" id="modalFiles" style="margin-top:8px"></ul>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="docModal">
+  <div class="modal-box doc-box">
+    <h3>📄 生成升级说明（核对/编辑各项后写出）</h3>
+    <div class="path" id="docTargetHint"></div>
+    <div class="errors" id="docErrors"></div>
+    <div class="doc-fields" id="docFields"></div>
+    <div class="field">
+      <label for="docTemplate">模板路径</label>
+      <input type="text" id="docTemplate">
+    </div>
+    <div class="row">
+      <div class="field" style="flex:1 1 auto">
+        <label for="docTargetDir">目标目录（与 zip 同级）</label>
+        <input type="text" id="docTargetDir">
+      </div>
+      <div class="field" style="flex:0 0 300px">
+        <label for="docTargetName">文件名</label>
+        <input type="text" id="docTargetName">
+      </div>
+    </div>
+    <div class="row">
+      <label class="check"><input type="checkbox" id="docDropDb"> 删除「数据库升级说明」行</label>
+      <label class="check"><input type="checkbox" id="docAppendNote"> 文末加模板说明</label>
+      <label class="check"><input type="checkbox" id="docOverwrite"> 覆盖同名文件</label>
+    </div>
+    <div class="row">
+      <button class="primary" id="docGenBtn">写出 docx</button>
+      <button id="docClose">关闭</button>
     </div>
   </div>
 </div>

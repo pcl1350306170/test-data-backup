@@ -69,6 +69,8 @@ header h1 { font-size: 18px; white-space: nowrap; }
 }
 /* 左/中/右整列各自独立滚动；日志/列表仍保持内部滚动 */
 .col { display: flex; flex-direction: column; gap: 14px; min-width: 0; max-height: 100%; overflow-y: auto; }
+/* 打包页操作区：从中间列移到三栏顶部的全宽横条（不参与列内滚动） */
+.tab-pane > .op-top { flex: none; margin: 14px 20px 0; }
 
 .panel {
   background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
@@ -164,6 +166,13 @@ button.mini { padding: 3px 8px; font-size: 12px; }
 }
 .modal-box h3 { font-size: 14px; }
 .modal-list { overflow: auto; flex: 1; }
+/* 升级说明生成弹窗：字段列表可滚动，多行项用 textarea */
+.doc-box { width: min(920px, 100%); }
+.doc-fields { flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
+.doc-row { display: flex; gap: 8px; align-items: flex-start; }
+.doc-row > label { width: 140px; flex: none; font-size: 12px; color: var(--muted); padding-top: 7px; text-align: right; }
+.doc-row textarea { flex: 1; width: 100%; min-width: 0; min-height: 56px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 12px; font-family: inherit; resize: vertical; }
+.doc-row .hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
 /* 右下角通知栈：toast 与打包完成卡片共用一个容器，自然堆叠不互相压住 */
 .notify-stack {
   position: fixed; right: 18px; bottom: 18px; z-index: 60;

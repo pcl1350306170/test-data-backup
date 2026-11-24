@@ -568,6 +568,7 @@ var App = (function () {
   function updateCommitBtn() {
     $('btnCommit').disabled = busy || !lastPackage;
     $('btnUpgradePkg').disabled = busy || !lastPackage;
+    // btnGenDoc 不随成品禁用：没刚打包时也可用输出目录里现成的压缩包
   }
 
   var STATUS = {
@@ -1104,6 +1105,8 @@ var App = (function () {
       req: req, detailOf: detailOf, esc: esc, toast: toast,
       val: val, setVal: setVal, selectLi: selectLi, closestLI: closestLI,
       logClass: logClass, notifyDone: notifyDone,
+      getLastPackage: function () { return lastPackage; },
+      getOutputDir: function () { return val('outputDir'); },
       askSysNotifyOnStart: askSysNotifyOnStart,
       setStatus: function (key, s) { statusMap[key] = s || 'idle'; renderStatusPill(); },
       switchTab: switchTab,

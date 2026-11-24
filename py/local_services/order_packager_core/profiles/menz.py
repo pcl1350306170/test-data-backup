@@ -193,6 +193,8 @@ class MenzProfile(Profile):
         "server_upgrade_last_server": "",
         "server_upgrade_timeout": 300,
         "server_upgrade_history_records": [],
+        # 升级说明生成（docgen.py）：模板 docx 路径，弹窗里可临时改
+        "upgrade_doc_template": r"D:\CODE\Python\test-data\门诊\801S-订单\前端\前端升级说明-1.5.1.docx",
     }
     LEGACY_CONFIG_PATHS = (util.py_dir() / "yarward" / "json" / "config_menz_order_packager.json",)
 

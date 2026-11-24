@@ -450,7 +450,116 @@ function createUpgradeController(opts) {
     openStream();
   }
 
-  return {init: init, start: start, addZip: addFile, addPackage: addPackage};
+  return {init: init, start: start, addZip: addFile, addPackage: addPackage,
+          getFiles: checkedFiles};
+}
+
+/* 升级说明生成（按钮在打包页签）：一般打完包就顺手写说明，所以优先用
+   本次打包的最新成品 zip；若还没打包但升级页签勾了包，则拿勾选的第一个。
+   弹窗展示各替换项（可编辑）→ 确认后后端复制模板到 zip 同级目录写出 docx。
+   句式与自动替换规则见 order_packager_core/docgen.py 顶部注释。 */
+function createUpgradeDocController(opts) {
+  var api = null;
+  var current = null;    // 最近一次 plan 数据（文末说明文本等随它透传）
+
+  function $(id) { return document.getElementById(id); }
+
+  function open() {
+    // 1) 本次刚打出的成品优先
+    var zip = api.getLastPackage();
+    if (zip) { plan(zip); return; }
+    // 2) 没刚打包：拿当前输出目录里现成的压缩包（取最新的）
+    var dir = api.getOutputDir();
+    if (dir) {
+      api.req('GET', '/api/output/files?path=' + encodeURIComponent(dir)).then(function (res) {
+        if (!res.ok) { api.toast(api.detailOf(res).message || '无法读取成品目录'); return; }
+        var zips = (res.data.files || []).filter(function (f) { return /\.zip$/i.test(f.name); });
+        if (!zips.length) { api.toast('输出目录里没有压缩包：' + (res.data.path || dir)); return; }
+        plan(zips[0].path);
+      });
+      return;
+    }
+    // 3) 输出目录也空：退到升级页签勾选的第一个
+    var paths = opts.up.getFiles();
+    if (paths.length) { plan(paths[0]); return; }
+    api.toast('先填写输出目录（里面有压缩包）或完成一次打包');
+  }
+
+  function plan(zip) {
+    api.req('POST', '/api/upgrade/doc/plan', {zip_path: zip}).then(function (res) {
+      if (!res.ok) {
+        api.toast(api.detailOf(res).message || '解析升级说明模板失败');
+        return;
+      }
+      renderPlan(res.data);
+    });
+  }
+
+  function renderPlan(d) {
+    current = d;
+    $('docTemplate').value = d.template || '';
+    $('docTargetDir').value = d.target_dir || '';
+    $('docTargetName').value = d.target_name || '';
+    $('docDropDb').checked = !!d.drop_db_row;
+    $('docAppendNote').checked = !!d.append_note;
+    $('docOverwrite').checked = false;
+    $('docTargetHint').textContent = d.target_dir
+      ? '将写到：' + d.target_dir + '\\' + d.target_name
+      : '';
+    var warns = d.warnings || [];
+    $('docErrors').innerHTML = warns.map(function (e) {
+      return '<div>⚠️ ' + api.esc(e) + '</div>';
+    }).join('');
+    $('docFields').innerHTML = (d.fields || []).map(function (f) {
+      var v = f.value || '';
+      var input = v.indexOf('\n') >= 0
+        ? '<textarea data-k="' + f.key + '" rows="' + Math.min(10, v.split('\n').length + 1) + '">'
+          + api.esc(v) + '</textarea>'
+        : '<input type="text" data-k="' + f.key + '" value="' + api.esc(v) + '">';
+      return '<div class="doc-row"><label>' + api.esc(f.label) + '</label><div style="flex:1;min-width:0">'
+        + input + (f.hint ? '<div class="hint">' + api.esc(f.hint) + '</div>' : '') + '</div></div>';
+    }).join('');
+    $('docModal').classList.remove('hidden');
+  }
+
+  function generate() {
+    var fields = [];
+    Array.prototype.forEach.call($('docFields').querySelectorAll('[data-k]'), function (el) {
+      fields.push({key: el.getAttribute('data-k'), value: el.value});
+    });
+    var body = {
+      template: $('docTemplate').value.trim(),
+      target_dir: $('docTargetDir').value.trim(),
+      target_name: $('docTargetName').value.trim(),
+      drop_db_row: $('docDropDb').checked,
+      append_note: $('docAppendNote').checked,
+      overwrite: $('docOverwrite').checked,
+      end_note: (current && current.end_note) || '',
+      fields: fields
+    };
+    api.req('POST', '/api/upgrade/doc/generate', body).then(function (res) {
+      if (!res.ok) {
+        var d = api.detailOf(res);
+        $('docErrors').innerHTML = '<div>• ' + api.esc(d.message || '生成失败') + '</div>';
+        // 同名文件已存在：自动勾上覆盖，再点一次即可
+        if (res.status === 409) $('docOverwrite').checked = true;
+        return;
+      }
+      $('docModal').classList.add('hidden');
+      api.toast('✅ 已生成升级说明：' + res.data.path);
+    });
+  }
+
+  function init() {
+    api = App.upgradeApi();
+    $('btnGenDoc').addEventListener('click', open);
+    $('docGenBtn').addEventListener('click', generate);
+    $('docClose').addEventListener('click', function () {
+      $('docModal').classList.add('hidden');
+    });
+  }
+
+  return {init: init};
 }
 
 // 前端升级：沿用原 up* id 与 /api/upgrade/*，行为与重构前一致
@@ -489,4 +598,7 @@ var Sv = createUpgradeController({
   }
 });
 
-document.addEventListener('DOMContentLoaded', function () { Up.init(); Sv.init(); });
+// 升级说明生成：按钮在打包页签，默认吃最新打包成品（Up 勾选列表作兜底）
+var UpDoc = createUpgradeDocController({up: Up});
+
+document.addEventListener('DOMContentLoaded', function () { Up.init(); Sv.init(); UpDoc.init(); });
