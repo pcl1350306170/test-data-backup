@@ -103,6 +103,23 @@ async def list_prompt_audios():
     return {"audios": tts_engine.scan_prompt_audios(cfg.get("tts_dir", ""))}
 
 
+@app.get("/api/prompt_audio/play")
+async def play_prompt_audio(path: str = Query(...)):
+    """按绝对路径返回参考音频文件，供前端试听（仅限 tts_dir 下的音频文件）。"""
+    cfg = _get_cfg()
+    fp = os.path.abspath(path or "")
+    ext = os.path.splitext(fp)[1].lower()
+    tts_dir = os.path.abspath(cfg.get("tts_dir", "") or "")
+    if (not tts_dir or ext not in tts_engine.AUDIO_EXTS
+            or os.path.normcase(os.path.dirname(fp)) != os.path.normcase(tts_dir)
+            or not os.path.isfile(fp)):
+        raise HTTPException(404, "参考音频不存在")
+    media_map = {".wav": "audio/wav", ".mp3": "audio/mpeg",
+                 ".flac": "audio/flac", ".ogg": "audio/ogg", ".m4a": "audio/mp4"}
+    return FileResponse(fp, media_type=media_map.get(ext, "audio/wav"),
+                        headers={"Accept-Ranges": "bytes"})
+
+
 # ── 当前活动任务 API ──────────────────────────────────
 
 @app.post("/api/task/start")

@@ -129,12 +129,14 @@ var App = (function () {
         sel.value = config.prompt_audio;
         $('promptTextInput').value = config.prompt_text || '';
       }
+      updatePromptPreviewBtn();
     }).catch(function () { });
   }
 
   // ── 参考音频联动 ──────────────────────────────────
   function initPromptAudio() {
     $('promptAudioSelect').addEventListener('change', function () {
+      stopPromptPreview();
       if (this.value) {
         $('spkSelect').disabled = true;
         if (!$('promptTextInput').value && config.default_prompt_text) {
@@ -144,6 +146,48 @@ var App = (function () {
         $('spkSelect').disabled = false;
         $('promptTextInput').value = '';
       }
+      updatePromptPreviewBtn();
+    });
+  }
+
+  // ── 参考音色试听 ──────────────────────────────
+  function updatePromptPreviewBtn() {
+    var btn = $('btnPromptPreview');
+    if (!btn) return;
+    var selected = $('promptAudioSelect').value;
+    btn.disabled = !selected;
+    if (!selected) btn.textContent = '▶ 试听';
+  }
+
+  function stopPromptPreview() {
+    var audio = $('promptPreviewAudio');
+    var btn = $('btnPromptPreview');
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    if (btn && !btn.disabled) btn.textContent = '▶ 试听';
+  }
+
+  function previewPromptAudio() {
+    var path = $('promptAudioSelect').value;
+    if (!path) { toast('请先选择参考音色'); return; }
+    var audio = $('promptPreviewAudio');
+    var btn = $('btnPromptPreview');
+    var playUrl = '/api/prompt_audio/play?path=' + encodeURIComponent(path);
+    // 正在播放同一音色 → 停止
+    if (!audio.paused && audio.getAttribute('src') === playUrl) {
+      stopPromptPreview();
+      return;
+    }
+    audio.pause();
+    audio.setAttribute('src', playUrl);
+    audio.onended = function () { btn.textContent = '▶ 试听'; };
+    audio.onerror = function () { btn.textContent = '▶ 试听'; toast('试听失败：无法加载音频'); };
+    audio.play().then(function () {
+      btn.textContent = '⏹ 停止';
+    }).catch(function (e) {
+      btn.textContent = '▶ 试听';
+      toast('试听失败: ' + e.message);
     });
   }
 
@@ -467,6 +511,7 @@ var App = (function () {
     playAudio: playAudio,
     deleteAudio: deleteAudio,
     getParams: getParams,
+    previewPromptAudio: previewPromptAudio,
     getConfig: function () { return config; },
     loadTaskList: loadTaskList,
     resumeTask: resumeTask,

@@ -46,6 +46,7 @@ temp_clipboard.txt
 /py/local_services/voice_notes/key.pem
 /py/local_services/.avatar_cache/
 /py/local_services/menz_packager/data/config.json
+/py/book/json/novelMapping.json
 
 # 任务进度目录（不提交）
 /py/other/json/progress/

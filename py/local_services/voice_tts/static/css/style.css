@@ -256,6 +256,8 @@ input[type="range"] { width:100%; accent-color:var(--accent); }
 
 /* ── Image Picker ── */
 .img-pick-row { display:flex; gap:6px; align-items:center; }
+.prompt-preview-row { margin-top:6px; }
+.prompt-preview-row .btn { white-space:nowrap; }
 .img-pick-row input[type="text"] { flex:1; font-size:12px; }
 .img-pick-row .btn { white-space:nowrap; padding:5px 10px; font-size:12px; }
 .img-preview-wrap {

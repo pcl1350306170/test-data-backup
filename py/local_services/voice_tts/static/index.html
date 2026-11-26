@@ -100,6 +100,9 @@
           <div class="form-group flex-2">
             <label>选择参考音色</label>
             <select id="promptAudioSelect"><option value="">(不使用)</option></select>
+            <div class="prompt-preview-row">
+              <button id="btnPromptPreview" class="btn btn-sm" type="button" disabled onclick="App.previewPromptAudio()">▶ 试听</button>
+            </div>
           </div>
           <div class="form-group flex-3">
             <label>音频对应文本</label>
@@ -107,6 +110,7 @@
           </div>
         </div>
         <p class="hint">选择参考音频后将使用 Zero-Shot 模式复刻该音色，上方"音色"选项将被忽略。</p>
+        <audio id="promptPreviewAudio" style="display:none"></audio>
       </div>
 
       <!-- 操作按钮 -->
