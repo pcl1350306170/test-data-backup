@@ -331,10 +331,87 @@ async function startBatch() {
     } catch (e) { toast("无法启动", e.message, "error", 6000); }
 }
 
+// ---------- JSON 歌曲清单 ----------
+async function previewManifest() {
+    const text = $("#manifest-text").value.trim();
+    if (!text) { toast("提示", "请先粘贴 JSON 清单或选择 JSON 文件", "warning"); return; }
+    let d;
+    try { d = await api("POST", "/api/manifest/preview", { text, dir: state.config.input_dir || "" }); }
+    catch (e) { toast("预览失败", e.message, "error", 7000); return; }
+    const box = $("#manifest-preview");
+    box.innerHTML = "";
+    const sum = document.createElement("div");
+    sum.textContent = "目录 " + d.total_files + " 个音频 / 清单 " + d.total_entries
+        + " 项 → 匹配 " + d.matched + "（其中清洗回退 " + d.weak + "）"
+        + "，未匹配文件 " + d.unmatched_files.length + "，未命中条目 " + d.unmatched_entries.length;
+    box.appendChild(sum);
+    const ul = document.createElement("div");
+    if (d.unmatched_files.length)
+        ul.textContent = "未匹配文件：" + d.unmatched_files.slice(0, 30).join("、")
+            + (d.unmatched_files.length > 30 ? " …" : "");
+    box.appendChild(ul);
+    const ul2 = document.createElement("div");
+    if (d.unmatched_entries.length)
+        ul2.textContent = "未命中条目：" + d.unmatched_entries.slice(0, 30).join("、")
+            + (d.unmatched_entries.length > 30 ? " …" : "");
+    box.appendChild(ul2);
+    if (d.matched) {
+        const tbl = document.createElement("table");
+        tbl.className = "fine-table manifest-table";
+        tbl.innerHTML = '<thead><tr><th>文件</th><th>歌名</th><th>歌手</th><th>专辑</th></tr></thead>';
+        const tb = document.createElement("tbody");
+        d.rows.slice(0, 15).forEach(r => {
+            const tr = document.createElement("tr");
+            [r.file + (r.weak ? " ↺" : ""), r.title, r.artist, r.album || "（空）"].forEach(t => {
+                const td = document.createElement("td");
+                td.textContent = t;
+                tr.appendChild(td);
+            });
+            tb.appendChild(tr);
+        });
+        tbl.appendChild(tb);
+        box.appendChild(tbl);
+        if (d.rows.length > 15) {
+            const m = document.createElement("div");
+            m.textContent = "…仅展示前 15 行（↺=清洗回退匹配）";
+            box.appendChild(m);
+        }
+    }
+}
+
+async function startManifest() {
+    if (state.running) return;
+    const text = $("#manifest-text").value.trim();
+    if (!text) { toast("提示", "请先粘贴 JSON 清单或选择 JSON 文件", "warning"); return; }
+    try {
+        const d = await api("POST", "/api/manifest/start", {
+            text, config: state.config, rename: !!state.config.manifest_rename,
+        });
+        if (d.unmatched_files && d.unmatched_files.length)
+            toast("部分未匹配", "有 " + d.unmatched_files.length + " 个文件不在清单中，已跳过", "info", 5000);
+        startPolling();
+    } catch (e) { toast("无法启动", e.message, "error", 7000); }
+}
+
+function bindManifest() {
+    $("#btn-manifest-file").addEventListener("click", () => $("#manifest-file").click());
+    $("#manifest-file").addEventListener("change", () => {
+        const f = $("#manifest-file").files[0];
+        if (!f) return;
+        const rd = new FileReader();
+        rd.onload = () => { $("#manifest-text").value = rd.result; toast("已载入", f.name, "success"); };
+        rd.readAsText(f, "utf-8");
+        $("#manifest-file").value = "";
+    });
+    $("#btn-manifest-preview").addEventListener("click", previewManifest);
+    $("#btn-manifest-start").addEventListener("click", startManifest);
+}
+
 // ---------- 任务轮询 ----------
 function setRunning(b) {
     state.running = b;
-    ["#btn-batch", "#btn-fine-save", "#btn-fine-load", "#btn-fine-reclean"]
+    ["#btn-batch", "#btn-fine-save", "#btn-fine-load", "#btn-fine-reclean",
+     "#btn-manifest-start", "#btn-manifest-preview"]
         .forEach(s => { $(s).disabled = b; });
     $("#btn-stop").disabled = !b;
 }
@@ -379,7 +456,8 @@ async function pollTask() {
         if (st.failed)
             toast("完成（有失败）", "成功 " + st.done + "，失败 " + st.failed + "\n明细见目录的『标签编辑失败清单.txt』", "warning", 7000);
         else
-            toast(mode === "fine" ? "精修完成" : "批量完成", "成功 " + st.done + " 个，用时 " + st.elapsed.toFixed(1) + " 秒", "success", 5000);
+            toast({ fine: "精修完成", manifest: "清单套用完成" }[mode] || "批量完成",
+                "成功 " + st.done + " 个，用时 " + st.elapsed.toFixed(1) + " 秒", "success", 5000);
         refreshFiles();
         if (mode === "fine") loadFine();
     } else if (st.state === "stopped") {
@@ -462,6 +540,7 @@ async function init() {
     $$(".tab").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.tab)));
     bindConfig();
     bindImageBoxes();
+    bindManifest();
 
     $("#btn-refresh").addEventListener("click", refreshFiles);
     $("#btn-cleanup").addEventListener("click", cleanupBackups);

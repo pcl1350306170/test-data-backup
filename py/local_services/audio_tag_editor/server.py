@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """音频标签编辑 Web 服务（FastAPI）
 
-迁移自 MP3信息编辑.pyw：单文件精修 / 多文件精修 / 批量处理 / 随机头像 / 清理备份。
-引擎按格式适配器分层（MP3 / M4A）。本机原地编辑磁盘文件，
+迁移自 MP3信息编辑.pyw：单文件精修 / 多文件精修 / 批量处理 / JSON 清单套用 / 随机头像 / 清理备份。
+引擎按格式适配器分层（MP3 / M4A / APE / FLAC / WMA）。本机原地编辑磁盘文件，
 路径手动填写；进度通过 GET /api/task 轮询。
 """
 import sys
@@ -22,7 +22,8 @@ if str(BASE_DIR) not in sys.path:
 from core import engine, formats                     # noqa: E402
 from core.config import (load_config, save_config, DEFAULT_CONFIG,  # noqa: E402
                          TUTORIAL, logger, CONFIG_PATH)
-from core.tasks import TaskManager, run_batch, run_fine  # noqa: E402
+from core.tasks import (TaskManager, run_batch, run_fine,  # noqa: E402
+                        run_manifest)
 
 try:
     import mutagen
@@ -271,6 +272,75 @@ async def fine_start(body: dict):
     except RuntimeError as e:
         raise HTTPException(409, str(e))
     return {"ok": True, "skipped": skipped}
+
+
+# ================== JSON 歌曲清单 ==================
+
+def _manifest_entries_or_400(body):
+    text = (body.get("text") or "").strip()
+    if not text:
+        raise HTTPException(400, "清单内容为空：请粘贴 JSON 或选择 JSON 文件。")
+    try:
+        return engine.parse_manifest_text(text)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+def _um_entry_names(entries, um_indices):
+    """未匹配条目 -> 展示名（file 优先，其次标题/歌名，兼无则序号）"""
+    names = []
+    for i in um_indices:
+        e = entries[i]
+        names.append(str(e.get("file") or e.get("name")
+                       or engine._entry_field(e, "title", "标题", "歌名")
+                       or "第%d项" % (i + 1)))
+    return names
+
+
+@app.post("/api/manifest/preview")
+async def manifest_preview(body: dict):
+    entries = _manifest_entries_or_400(body)
+    dir_path = (body.get("dir") or "").strip() or load_config()["input_dir"]
+    d = Path(dir_path)
+    if not dir_path or not d.is_dir():
+        raise HTTPException(400, "音频目录不存在：%s" % (dir_path or "（未填写）"))
+    files = engine.list_audio_files(d)
+    cfg = load_config()
+    pairs, um_files, um_entries = engine.match_manifest(
+        files, entries, cfg.get("fine_t2s", True), cfg.get("clean_filter_words", ""))
+    rows = [{"file": p.name, "path": str(p),
+             "title": engine._entry_field(e, "title", "标题", "歌名"),
+             "artist": engine._entry_field(e, "artist", "作者", "歌手"),
+             "album": engine._entry_field(e, "album", "专辑"),
+             "weak": weak} for p, e, weak in pairs]
+    return {"ok": True, "dir": str(d), "total_files": len(files),
+            "total_entries": len(entries), "matched": len(pairs),
+            "weak": sum(1 for r in rows if r["weak"]),
+            "unmatched_files": um_files,
+            "unmatched_entries": _um_entry_names(entries, um_entries),
+            "rows": rows[:200]}
+
+
+@app.post("/api/manifest/start")
+async def manifest_start(body: dict):
+    entries = _manifest_entries_or_400(body)
+    cfg = _merged_cfg(body.get("config", {}))
+    d = Path(cfg["input_dir"])
+    if not cfg["input_dir"] or not d.is_dir():
+        raise HTTPException(400, "音频目录不存在，请先在“文件”页填写。")
+    files = engine.list_audio_files(d)
+    pairs, um_files, um_entries = engine.match_manifest(
+        files, entries, cfg.get("fine_t2s", True), cfg.get("clean_filter_words", ""))
+    if not pairs:
+        raise HTTPException(400, "没有匹配到任何文件（清单 %d 项 / 目录 %d 个音频），\n"
+                                 "请先用“预览匹配”检查文件名。" % (len(entries), len(files)))
+    save_config(cfg)
+    try:
+        tm.start(run_manifest, "manifest", cfg, pairs, bool(body.get("rename", True)))
+    except RuntimeError as e:
+        raise HTTPException(409, str(e))
+    return {"ok": True, "matched": len(pairs),
+            "unmatched_files": um_files, "unmatched_entries": len(um_entries)}
 
 
 @app.get("/api/task")

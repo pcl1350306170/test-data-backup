@@ -3,6 +3,7 @@
 
 标签读写按扩展名分派到 formats 适配器；本层只负责通用逻辑与文件安全。
 """
+import json
 import os
 import random
 import re
@@ -245,3 +246,125 @@ def write_fail_list(directory, failed_list):
         except Exception:
             pass
     return notes
+
+
+# ---------- JSON 歌曲清单：解析 / 归一化 / 匹配 ----------
+
+MANIFEST_FIELDS = ("title", "artist", "album", "date", "comment")
+
+# 归一化时视为分隔符的字符（连字符/下划线/斜杠/逗号/与号等）
+_MANIFEST_SEPS = "-–—_/、,，&＆+"
+
+
+def manifest_normalize(text):
+    """文件名/匹配键 -> 归一化小写串：去扩展名、全角冒号转半角、分隔符转空格、
+    去开头曲目序号（如 023. / 01- ）、压缩空白。用于 JSON 清单与音频文件名的容错匹配"""
+    s = str(text or "").strip()
+    s = re.sub(r"\.[A-Za-z0-9]{1,5}$", "", s)          # 去扩展名
+    s = s.replace("：", ":")
+    for ch in _MANIFEST_SEPS:
+        s = s.replace(ch, " ")
+    s = re.sub(r"^\d+[\s._\-、]*", "", s)              # 去开头曲目序号 023. / 01-
+    s = s.strip(". ")                                   # 去首尾残留点缀
+    s = re.sub(r"\s+", " ", s).strip().lower()
+    return s
+
+
+def parse_manifest_text(text):
+    """JSON 文本 -> 条目列表（每项为 dict）。支持顶层数组或 {"songs":[...]}；
+    条目内 file/name/文件名/标题 均可作匹配键。非法输入抛 ValueError"""
+    try:
+        data = json.loads(text)
+    except Exception as e:
+        raise ValueError("JSON 解析失败：%s" % e)
+    if isinstance(data, dict):
+        for key in ("songs", "list", "items", "data", "tracks"):
+            if isinstance(data.get(key), list):
+                data = data[key]
+                break
+        else:
+            raise ValueError('顶层需为数组或 {"songs": [...]}')
+    if not isinstance(data, list) or not data:
+        raise ValueError("清单为空或不是数组")
+    entries = []
+    for i, it in enumerate(data, start=1):
+        if not isinstance(it, dict):
+            raise ValueError("第 %d 项不是对象" % i)
+        entries.append(it)
+    return entries
+
+
+def _entry_field(entry, *names):
+    for nm in names:
+        if entry.get(nm) is not None and str(entry.get(nm)).strip():
+            return str(entry.get(nm)).strip()
+    return ""
+
+
+def match_manifest(files, entries, t2s=True, filter_words=""):
+    """音频文件与 JSON 条目匹配：
+      1) 文件名(去扩展名)归一化 == 条目 file/title/artist 组合键
+      2) 条目仅 title+artist 时兼容 “歌名 - 歌手” 与 “歌手 - 歌名” 两种文件名
+      3) 回退：文件名清洗后标题唯一命中条目 title
+    :return: (pairs[(path, entry)], 未匹配文件 list, 未匹配条目 entry 下标 list)"""
+    def keys_for(entry):
+        f = _entry_field(entry, "file", "name", "文件名", "filename")
+        t = _entry_field(entry, "title", "标题", "歌名")
+        a = _entry_field(entry, "artist", "作者", "歌手")
+        keys = []
+        if f:
+            keys.append(manifest_normalize(f))
+        if t and a:
+            k = "%s %s" % (t, a)
+            keys.append(manifest_normalize(k))
+            keys.append(manifest_normalize("%s %s" % (a, t)))
+        elif t:
+            keys.append(manifest_normalize(t))
+        return [k for k in dict.fromkeys(keys) if k]
+
+    by_key = {}
+    for i, e in enumerate(entries):
+        for k in keys_for(e):
+            by_key.setdefault(k, i)
+
+    used = set()        # 已被直接命中占用的条目（防一个条目被多个文件名抢）
+    consumed = set()    # 任何进入 pairs 的条目（含弱匹配，用于未命中统计）
+    pairs = []
+    um_files = []
+    for p in files:
+        nk = manifest_normalize(p.name)
+        i = by_key.get(nk)
+        weak = False
+        if i is None:
+            # 回退：文件名清洗后标题唯一命中条目 title（低置信，不占用条目）
+            ct = clean_title_from_filename(p.stem, t2s, filter_words)
+            if ct:
+                ck = manifest_normalize(ct)
+                cand = [j for j, e in enumerate(entries)
+                        if ck and ck == manifest_normalize(_entry_field(e, "title", "标题", "歌名"))]
+                if len(cand) == 1:
+                    i, weak = cand[0], True
+        if i is None or (not weak and i in used):
+            um_files.append(p.name)
+            continue
+        if not weak:
+            used.add(i)
+        consumed.add(i)
+        pairs.append((p, entries[i], weak))
+    um_entries = [i for i in range(len(entries)) if i not in consumed]
+    return pairs, um_files, um_entries
+
+
+def manifest_meta(entry):
+    """条目 -> 引擎 meta：非空字段写入；album 显式给出（含空串）则清空"""
+    meta = {}
+    for key in MANIFEST_FIELDS:
+        val = _entry_field(entry, key, {"title": "标题", "artist": "作者",
+                                        "album": "专辑", "date": "日期",
+                                        "comment": "备注"}.get(key, key))
+        if val:
+            meta[key] = val
+    raw_album = entry.get("album", entry.get("专辑"))
+    if raw_album is not None and not str(raw_album).strip():
+        meta["album"] = ""        # 清单明确给了空专辑 -> 清空标签
+    return meta

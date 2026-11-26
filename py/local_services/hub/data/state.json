@@ -20,5 +20,9 @@
     "started_at": "2026-11-26 19:18:49",
     "claimed": true,
     "cmdline": "\"D:\\CODE\\Python\\test-data-backup\\.venv\\Scripts\\python.exe\" d:\\CODE\\Python\\test-data-backup\\py\\local_services\\voice_tts\\server.py"
+  },
+  "audio_tag_editor": {
+    "pid": 90660,
+    "started_at": "2026-11-26 20:16:28"
   }
 }

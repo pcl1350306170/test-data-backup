@@ -198,3 +198,51 @@ def run_fine(tm, cfg, items):
     except Exception as e:
         tm.finish("error", message="任务异常：%s" % e)
         logger.exception("多文件精修异常")
+
+
+def run_manifest(tm, cfg, pairs, rename):
+    """JSON 清单套用：逐条按匹配到的条目写标题/作者/专辑等，封面图不动"""
+    try:
+        d = Path(cfg["input_dir"])
+        total = len(pairs)
+        tm.log("=" * 60)
+        tm.log("JSON 清单套用: %s（%d 个匹配文件）" % (d, total))
+        tm.log("按标题重命名: %s | 封面/背景图: 保持原样" % ("开" if rename else "关"))
+        tm.log("=" * 60)
+
+        done = failed = 0
+        failed_list = []
+        start_ts = time.time()
+        for idx, (path, entry, weak) in enumerate(pairs, start=1):
+            if tm.stopped():
+                tm.finish("stopped", message="已在第 %d/%d 个文件后停止" % (idx - 1, total),
+                          done=done, failed=failed, dir=str(d))
+                return
+            tm.progress(idx, total)
+            meta = engine.manifest_meta(entry)
+            meta["track"] = "%d/%d" % (idx, total)
+            title = meta.get("title", "")
+            try:
+                final, notes = engine.apply_edits(
+                    Path(path), meta, None, None,
+                    rename_title=title if rename else None)
+                done += 1
+                tag = "（清洗回退匹配）" if weak else ""
+                tm.log("[%d/%d] 完成: %s%s%s" % (
+                    idx, total, final.name, tag,
+                    ("  (%s)" % "；".join(notes)) if notes else ""))
+                logger.info("清单套用完成: %s", final)
+            except Exception as e:
+                failed += 1
+                brief = engine._short_err(e)
+                failed_list.append((Path(path).name, brief))
+                tm.log("      [警告] 失败已跳过: %s\n             原因: %s" % (Path(path).name, brief))
+                logger.error("清单套用失败 %s: %s", Path(path).name, brief)
+
+        elapsed = time.time() - start_ts
+        for note in engine.write_fail_list(d, failed_list):
+            tm.log(note)
+        tm.finish("done", done=done, failed=failed, elapsed=elapsed, dir=str(d))
+    except Exception as e:
+        tm.finish("error", message="任务异常：%s" % e)
+        logger.exception("JSON 清单套用异常")

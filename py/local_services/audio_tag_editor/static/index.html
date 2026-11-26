@@ -181,6 +181,23 @@
                 <label class="chk"><input type="checkbox" data-cfg="sync_rename">标题修改后同步重命名文件</label>
                 <span class="muted small">备份始终自动开启：源目录\_backup_标签编辑</span>
             </div>
+
+            <div class="card">
+                <div class="card-title">JSON 清单套用 <span class="muted">按歌匹配：已查好的歌曲信息逐条写入，封面图不动</span></div>
+                <textarea id="manifest-text" class="manifest-text" spellcheck="false"
+                    placeholder='[{"file": "原文件名.mp3", "title": "歌名", "artist": "歌手", "album": "专辑或空串"}]&#10;file 可省略，用 title+artist 也能匹配；album 缺省=不改，空串=清空'></textarea>
+                <div class="row">
+                    <input type="file" id="manifest-file" accept=".json" hidden>
+                    <button class="mini" id="btn-manifest-file">选择 JSON 文件</button>
+                    <button class="mini" id="btn-manifest-preview">预览匹配</button>
+                    <label class="chk"><input type="checkbox" data-cfg="manifest_rename">按标题重命名文件（文件名=歌名）</label>
+                </div>
+                <div id="manifest-preview" class="manifest-preview muted small"></div>
+                <div class="row">
+                    <button id="btn-manifest-start" class="primary">按清单批量套用</button>
+                    <span class="muted small">匹配规则：文件名（去序号/分隔符容错）→ 歌名+歌手 → 清洗标题唯一回退；未匹配项不修改</span>
+                </div>
+            </div>
         </section>
 
         <!-- ===== 日志页 ===== -->

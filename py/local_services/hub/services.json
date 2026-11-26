@@ -125,7 +125,7 @@
       "id": "audio_tag_editor",
       "name": "音频标签编辑",
       "icon": "🎵",
-      "desc": "MP3/M4A 标签精修/批量套用/文件名清洗标题/随机封面（原地编辑磁盘文件，M4A 仅封面）",
+      "desc": "MP3/M4A/APE/FLAC/WMA 标签精修/批量套用/JSON歌曲清单按歌匹配/文件名清洗标题/随机封面（原地编辑磁盘文件，非 MP3 仅封面）",
       "path": "D:\\CODE\\Python\\test-data-backup\\py\\local_services\\audio_tag_editor",
       "cmd": ["python", "server.py"],
       "port": 8804,
