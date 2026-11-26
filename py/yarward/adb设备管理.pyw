@@ -40,6 +40,11 @@ def auto_find_qtscrcpy():
 # 配置路径
 CONFIG_DIR = SCRIPT_DIR / "json"
 CONFIG_PATH = CONFIG_DIR / "config_adb_device_manager.json"
+HISTORY_PATH = CONFIG_DIR / "config_adb_device_history.json"
+LEGACY_CONFIG_PATHS = [
+    CONFIG_DIR / "config_adb_device_manager.json",
+    CONFIG_DIR / "config_adb_device_manager_scrcpy.json",
+]
 CONFIG_DIR.mkdir(exist_ok=True)
 
 # ──────────── 公共日志模块（可选依赖）────────────
@@ -76,6 +81,75 @@ DEFAULT_CONFIG = {
     "device_ip": "192.168.1.100",
     "history_devices": []
 }
+
+# ================== 共享 IP 历史 ==================
+def normalize_history(history_devices, max_history=30):
+    """清理历史记录：去空白、去重并限制数量"""
+    if not isinstance(history_devices, (list, tuple)):
+        return []
+    normalized = []
+    for device in history_devices:
+        if not isinstance(device, str):
+            continue
+        device = device.strip()
+        if device and device not in normalized:
+            normalized.append(device)
+    return normalized[:max_history]
+
+
+def load_shared_history(legacy_history=None, max_history=30):
+    """读取共享历史；首次创建时合并两个版本的旧配置"""
+    shared_history = []
+    shared_exists = HISTORY_PATH.exists()
+    if shared_exists:
+        try:
+            with open(HISTORY_PATH, 'r', encoding='utf-8') as f:
+                shared_history = json.load(f)
+        except Exception as e:
+            logger.warning(f"共享 IP 历史读取失败，将迁移旧配置: {e}")
+            shared_history = []
+            shared_exists = False
+
+    histories = [shared_history]
+    if not shared_exists:
+        if isinstance(legacy_history, list):
+            histories.append(legacy_history)
+        for legacy_path in LEGACY_CONFIG_PATHS:
+            if legacy_path == CONFIG_PATH or not legacy_path.exists():
+                continue
+            try:
+                with open(legacy_path, 'r', encoding='utf-8') as f:
+                    legacy_config = json.load(f)
+                if isinstance(legacy_config, dict):
+                    histories.append(legacy_config.get("history_devices", []))
+            except Exception as e:
+                logger.warning(f"旧 IP 历史配置读取失败: {legacy_path.name}, {e}")
+
+    merged = []
+    for history in histories:
+        for device in normalize_history(history, max_history):
+            if device not in merged:
+                merged.append(device)
+    merged = merged[:max_history]
+
+    if merged != shared_history:
+        save_shared_history(merged, max_history)
+    return merged
+
+
+def save_shared_history(history_devices, max_history=30):
+    """原子保存共享 IP 历史，避免写入中断留下半截文件"""
+    history = normalize_history(history_devices, max_history)
+    tmp_path = HISTORY_PATH.with_name(HISTORY_PATH.name + ".tmp")
+    try:
+        HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(tmp_path, 'w', encoding='utf-8') as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+        tmp_path.replace(HISTORY_PATH)
+        return True
+    except Exception as e:
+        logger.error(f"共享 IP 历史保存失败: {e}")
+        return False
 
 # ================== 工具函数 ==================
 def load_or_create_config(root=None):
@@ -170,8 +244,11 @@ class ADBDeviceManager:
 
         self.adb_executable = Path(self.config["adb_dir"]) / "adb.exe" if self.config["adb_dir"] else None
 
-        # 历史设备列表
-        self.history_devices = self.config.get("history_devices", [])
+        # 历史设备列表：启动时合并旧配置，之后以共享文件为准
+        self.history_devices = load_shared_history(
+            self.config.get("history_devices", []), self.MAX_HISTORY
+        )
+        self.config["history_devices"] = self.history_devices
 
         self.setup_ui()
         self.update_display()
@@ -219,6 +296,7 @@ class ADBDeviceManager:
         self.history_combo = ttk.Combobox(frame_ip, textvariable=StringVar(), width=22, state="readonly", font=("Consolas", 10))
         self.history_combo.pack(side=LEFT, padx=5)
         self.history_combo.bind("<<ComboboxSelected>>", self.on_history_selected)
+        self.history_combo.bind("<FocusIn>", self.refresh_history_dropdown, add="+")
 
         # 操作按钮区
         btn_frame = Frame(self.root)
@@ -341,7 +419,7 @@ class ADBDeviceManager:
             self.show_toast("输入错误", "设备IP不能为空！", "warning")
             return
         self.config["device_ip"] = ip
-        save_config(self.config, self.root)
+        self.add_to_history(ip)
         self.set_status(f"IP 已保存: {ip}", "blue")
         logger.info(f"设备IP更新为: {ip}")
 
@@ -400,20 +478,31 @@ class ADBDeviceManager:
     # ------------------------------
     # 历史设备管理
     # ------------------------------
-    def refresh_history_dropdown(self):
-        """刷新历史设备下拉列表"""
+    def refresh_history_dropdown(self, event=None):
+        """刷新共享历史设备下拉列表"""
+        current = self.history_combo.get()
+        self.history_devices = load_shared_history(max_history=self.MAX_HISTORY)
+        self.config["history_devices"] = self.history_devices
         self.history_combo["values"] = self.history_devices
-        if self.history_devices:
+        if current in self.history_devices:
+            self.history_combo.set(current)
+        elif self.history_devices:
             self.history_combo.current(0)
+        else:
+            self.history_combo.set("")
 
     def add_to_history(self, ip: str):
-        """将设备 IP 加入历史（去重，保持最新在前）"""
+        """将设备 IP 加入共享历史（去重，保持最新在前）"""
+        ip = ip.strip()
+        if not ip:
+            return
+        self.history_devices = load_shared_history(max_history=self.MAX_HISTORY)
         if ip in self.history_devices:
             self.history_devices.remove(ip)
         self.history_devices.insert(0, ip)
-        # 限制最大数量
-        if len(self.history_devices) > self.MAX_HISTORY:
-            self.history_devices = self.history_devices[:self.MAX_HISTORY]
+        self.history_devices = self.history_devices[:self.MAX_HISTORY]
+        if not save_shared_history(self.history_devices, self.MAX_HISTORY):
+            return
         self.config["history_devices"] = self.history_devices
         save_config(self.config, self.root)
         self.refresh_history_dropdown()

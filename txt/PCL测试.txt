@@ -761,7 +761,7 @@ u8NRwU02kHFgyiLtbhno
 135006170
 jd3ISTmebrKk8nfLuwzYcMR9t76oxvUDWXqNZEsJpVPlaG0i4Ah1FByO25QHCgnQXgpbd4PVlYnWy5za
 1991
-
+http://192.168.18.228:28019
 npm install -g pnpm
 pnpm install
 pnpm run build
