@@ -16,10 +16,8 @@
     "started_at": "2026-11-25 17:21:13"
   },
   "voice_tts": {
-    "pid": 72740,
-    "started_at": "2026-11-26 19:18:49",
-    "claimed": true,
-    "cmdline": "\"D:\\CODE\\Python\\test-data-backup\\.venv\\Scripts\\python.exe\" d:\\CODE\\Python\\test-data-backup\\py\\local_services\\voice_tts\\server.py"
+    "pid": 65140,
+    "started_at": "2026-11-27 08:32:54"
   },
   "audio_tag_editor": {
     "pid": 90660,

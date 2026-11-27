@@ -1,0 +1,13 @@
+{
+    "ID": "FF9D4D8BB3004FED8DA61A283A5C8572",
+    "ActionKeyword": "svn",
+    "Name": "SVN Quick Checkout",
+    "Description": "快速检索在线 SVN 目录（病房/门诊），复制 URL 或打开已检出目录",
+    "Author": "PCL",
+    "Version": "1.0.0",
+    "Language": "python",
+    "Website": "https://github.com/Flow-Launcher/Flow.Launcher",
+    "IcoPath": "Images\\icon.png",
+    "ExecuteFileName": "main.py",
+    "MinimumAppVersion": "1.8.0"
+}

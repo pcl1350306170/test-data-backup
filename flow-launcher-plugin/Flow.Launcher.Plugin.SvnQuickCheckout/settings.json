@@ -1,0 +1,20 @@
+{
+  "svn_types": [
+    {
+      "name": "病房",
+      "svn_base_url": "https://10.1.1.120/svn/智慧病房特殊订单",
+      "username": "pangchunlei",
+      "password": "888888",
+      "local_checkout_dir": "D:\\CODE\\Yarward\\SVN\\病房"
+    },
+    {
+      "name": "门诊",
+      "svn_base_url": "https://10.1.1.120/svn/智慧门诊/YM-801S/发版目录/7.特殊订单/2026年特殊订单",
+      "username": "pangchunlei",
+      "password": "888888",
+      "local_checkout_dir": "D:/CODE/Yarward/SVN/0门诊"
+    }
+  ],
+  "max_results": 40,
+  "cache_seconds": 300
+}
